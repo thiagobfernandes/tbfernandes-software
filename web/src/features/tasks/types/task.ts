@@ -8,6 +8,12 @@ export const taskStatuses = [
 
 export type TaskStatus = (typeof taskStatuses)[number] | "canceled";
 
+export type ChecklistItem = {
+  id: string;
+  title: string;
+  done: boolean;
+};
+
 export type TaskPriority = "low" | "normal" | "high" | "urgent";
 
 export type Task = {
@@ -21,7 +27,14 @@ export type Task = {
   tag?: string;
   startDate?: string;
   dueDate?: string;
+  /** How to know the task is finished. */
+  doneCriteria?: string;
+  /** Aggregate progress for tasks without itemized checklists. */
   checklist?: { done: number; total: number };
+  checklistItems?: ChecklistItem[];
+  goalId?: string;
+  /** Set when the task moves to "done" (business rule 6.6.5). */
+  completedAt?: string;
 };
 
 export const taskStatusLabels: Record<TaskStatus, string> = {
@@ -32,3 +45,14 @@ export const taskStatusLabels: Record<TaskStatus, string> = {
   done: "Done",
   canceled: "Canceled",
 };
+
+/** Checklist progress from itemized items when present, else the aggregate. */
+export function checklistProgress(task: Task) {
+  if (task.checklistItems?.length) {
+    return {
+      done: task.checklistItems.filter((item) => item.done).length,
+      total: task.checklistItems.length,
+    };
+  }
+  return task.checklist;
+}

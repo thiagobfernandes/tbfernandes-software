@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Building2 } from "lucide-react";
 
 import type { Company, Project } from "@/features/projects/types/project";
@@ -29,14 +30,19 @@ export function ProjectCard({
   const color = projectColorClasses[project.color];
 
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm">
+    <Link
+      href={`/projects/${project.id}`}
+      className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition-colors outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1">
           <h3 className="flex items-center gap-2 font-medium">
             <span className={cn("text-base", color.text)} aria-hidden>
               #
             </span>
-            <span className="truncate">{project.name}</span>
+            <span className="truncate group-hover:text-primary">
+              {project.name}
+            </span>
           </h3>
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Building2 className="size-3.5" aria-hidden />
@@ -78,6 +84,6 @@ export function ProjectCard({
           </span>
         )}
       </div>
-    </article>
+    </Link>
   );
 }

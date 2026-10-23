@@ -1,4 +1,10 @@
+"use client";
+
+import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/features/tasks/components/task-card";
+import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
 import {
   taskStatuses,
   taskStatusLabels,
@@ -21,9 +27,20 @@ type TasksBoardProps = {
   tasks: Task[];
   projectsById: Map<string, Project>;
   today: string;
+  onSelectTask?: (taskId: string) => void;
+  /** Shows a "+" per column that creates a task in that status. */
+  allowCreate?: boolean;
+  defaultProjectId?: string;
 };
 
-export function TasksBoard({ tasks, projectsById, today }: TasksBoardProps) {
+export function TasksBoard({
+  tasks,
+  projectsById,
+  today,
+  onSelectTask,
+  allowCreate = false,
+  defaultProjectId,
+}: TasksBoardProps) {
   return (
     <div className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6">
       <div className="grid auto-cols-[17rem] grid-flow-col gap-4">
@@ -46,6 +63,22 @@ export function TasksBoard({ tasks, projectsById, today }: TasksBoardProps) {
                 <span className="ml-auto rounded-full bg-background px-2 py-px text-xs text-muted-foreground tabular-nums">
                   {column.length}
                 </span>
+                {allowCreate && (
+                  <TaskFormDialog
+                    defaultStatus={status}
+                    defaultProjectId={defaultProjectId}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-7"
+                        aria-label={`Add task to ${taskStatusLabels[status]}`}
+                      >
+                        <Plus />
+                      </Button>
+                    }
+                  />
+                )}
               </header>
               {column.length === 0 ? (
                 <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
@@ -62,6 +95,7 @@ export function TasksBoard({ tasks, projectsById, today }: TasksBoardProps) {
                         : undefined
                     }
                     today={today}
+                    onSelect={onSelectTask}
                   />
                 ))
               )}

@@ -84,6 +84,8 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
+  --color-chart-income: var(--chart-income);
+  --color-chart-expense: var(--chart-expense);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -208,4 +210,61 @@
     transparent 1px
   );
   background-size: 18px 18px;
+}
+
+/*
+ * Syntax highlighting (highlight.js classes, see components/shared/code-block.tsx).
+ * Colors follow the theme instead of a bundled highlight.js theme.
+ */
+@layer components {
+  .hljs {
+    --code-keyword: #0f766e;
+    --code-string: #7c3aed;
+    --code-number: #b45309;
+    --code-title: #0369a1;
+    --code-comment: var(--muted-foreground);
+    color: var(--foreground);
+  }
+  .dark .hljs {
+    --code-keyword: #2dd4bf;
+    --code-string: #c4b5fd;
+    --code-number: #fbbf24;
+    --code-title: #7dd3fc;
+  }
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-built_in,
+  .hljs-literal,
+  .hljs-meta {
+    color: var(--code-keyword);
+  }
+  .hljs-string,
+  .hljs-regexp,
+  .hljs-attr,
+  .hljs-symbol {
+    color: var(--code-string);
+  }
+  .hljs-number,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-type {
+    color: var(--code-number);
+  }
+  .hljs-title,
+  .hljs-function,
+  .hljs-section,
+  .hljs-name {
+    color: var(--code-title);
+  }
+  .hljs-comment,
+  .hljs-quote {
+    color: var(--code-comment);
+    font-style: italic;
+  }
+}
+
+/* Chart series colors, validated for CVD separation on both surfaces. */
+:root {
+  --chart-income: #0d9488;
+  --chart-expense: #c026d3;
 }

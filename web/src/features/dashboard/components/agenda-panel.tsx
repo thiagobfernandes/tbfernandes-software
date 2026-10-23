@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Task } from "@/features/tasks/types/task";
 import { addDays, daysBetween, parseDay, toDay } from "@/lib/dates";
+import { workActions } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
 
 const weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -24,7 +26,6 @@ export function AgendaPanel({
   today: string;
 }) {
   const [monthOffset, setMonthOffset] = useState(0);
-  const [checked, setChecked] = useState<Set<string>>(new Set());
 
   const todayDate = parseDay(today);
   const month = new Date(
@@ -64,12 +65,13 @@ export function AgendaPanel({
     later: open.filter((task) => daysBetween(today, task.dueDate!) > 7),
   };
 
-  function toggle(id: string) {
-    setChecked((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+  function complete(task: Task) {
+    workActions.updateTask(task.id, { status: "done" });
+    toast.success("Task completed", {
+      action: {
+        label: "Undo",
+        onClick: () => workActions.updateTask(task.id, { status: task.status }),
+      },
     });
   }
 
@@ -152,28 +154,19 @@ export function AgendaPanel({
                 </p>
               ) : (
                 <ul className="flex flex-col gap-1">
-                  {groups[key].map((task) => {
-                    const done = checked.has(task.id);
-                    return (
-                      <li key={task.id}>
-                        <label className="flex cursor-pointer items-start gap-2.5 rounded-md px-1 py-1.5 text-sm hover:bg-accent/50">
-                          <Checkbox
-                            checked={done}
-                            onCheckedChange={() => toggle(task.id)}
-                            className="mt-0.5"
-                          />
-                          <span
-                            className={cn(
-                              "leading-snug",
-                              done && "text-muted-foreground line-through",
-                            )}
-                          >
-                            {task.title}
-                          </span>
-                        </label>
-                      </li>
-                    );
-                  })}
+                  {groups[key].map((task) => (
+                    <li key={task.id}>
+                      <label className="flex cursor-pointer items-start gap-2.5 rounded-md px-1 py-1.5 text-sm hover:bg-accent/50">
+                        <Checkbox
+                          checked={false}
+                          aria-label={`Mark "${task.title}" as done`}
+                          onCheckedChange={() => complete(task)}
+                          className="mt-0.5"
+                        />
+                        <span className="leading-snug">{task.title}</span>
+                      </label>
+                    </li>
+                  ))}
                 </ul>
               )}
             </TabsContent>

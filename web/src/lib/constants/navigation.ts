@@ -40,11 +40,11 @@ export function isNavGroup(entry: NavEntry): entry is NavGroup {
   return "items" in entry;
 }
 
-// One group per product area from the vision doc. Planned modules stay
-// visible as "soon" so the map of the product is clear from day one.
+// One group per product area from the vision doc. Mark a planned module
+// with `soon` to show it in the map before it is built.
 export const mainNavigation: NavEntry[] = [
   { title: "Overview", href: "/", icon: LayoutDashboard },
-  { title: "Assistant", href: "/assistant", icon: Sparkles, soon: true },
+  { title: "Assistant", href: "/assistant", icon: Sparkles },
   {
     title: "Work",
     icon: Briefcase,
@@ -68,13 +68,12 @@ export const mainNavigation: NavEntry[] = [
     title: "Growth",
     icon: Target,
     items: [
-      { title: "Goals", href: "/goals", icon: Target, soon: true },
-      { title: "Learning", href: "/learning", icon: GraduationCap, soon: true },
+      { title: "Goals", href: "/goals", icon: Target },
+      { title: "Learning", href: "/learning", icon: GraduationCap },
       {
         title: "Certifications",
         href: "/certifications",
         icon: Medal,
-        soon: true,
       },
     ],
   },
@@ -82,19 +81,18 @@ export const mainNavigation: NavEntry[] = [
     title: "Finance",
     icon: Wallet,
     items: [
-      { title: "Cash flow", href: "/finance", icon: Wallet, soon: true },
+      { title: "Cash flow", href: "/finance", icon: Wallet },
       {
         title: "Planned purchases",
         href: "/finance/purchases",
         icon: ShoppingCart,
-        soon: true,
       },
     ],
   },
   {
     title: "Network",
     icon: Users,
-    items: [{ title: "Contacts", href: "/contacts", icon: Users, soon: true }],
+    items: [{ title: "Contacts", href: "/contacts", icon: Users }],
   },
 ];
 

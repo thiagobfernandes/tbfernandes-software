@@ -9,8 +9,33 @@ import type { Task } from "@/features/tasks/types/task";
 export const SAMPLE_TODAY = "2026-10-23";
 
 export const sampleCompanies: Company[] = [
-  { id: "c1", name: "Software house" },
-  { id: "c2", name: "TBFernandes PJ" },
+  {
+    id: "c1",
+    name: "Software house",
+    relationship: "contractor",
+    status: "active",
+    description:
+      "Software house I provide development services to as a PJ contractor.",
+    startDate: "2025-03-10",
+    mainContact: "Engineering manager",
+  },
+  {
+    id: "c2",
+    name: "TBFernandes PJ",
+    tradeName: "TBFernandes Software",
+    relationship: "own",
+    status: "active",
+    description: "My own company: contracts, invoicing, and personal products.",
+    startDate: "2024-08-01",
+  },
+  {
+    id: "c3",
+    name: "Previous agency",
+    relationship: "client",
+    status: "closed",
+    description: "Former client for landing pages and integrations.",
+    startDate: "2023-02-01",
+  },
 ];
 
 export const sampleProjects: Project[] = [
@@ -39,6 +64,7 @@ export const sampleProjects: Project[] = [
     startDate: "2026-10-20",
     dueDate: "2026-11-15",
     nextDelivery: "MVP: companies & tasks · Nov 15",
+    goalId: "g1",
   },
   {
     id: "p3",
@@ -50,6 +76,7 @@ export const sampleProjects: Project[] = [
     startDate: "2026-10-05",
     dueDate: "2026-11-30",
     nextDelivery: "Raft experiment · Nov 30",
+    goalId: "g2",
   },
   {
     id: "p4",
@@ -58,6 +85,7 @@ export const sampleProjects: Project[] = [
     status: "planned",
     color: "sky",
     startDate: "2026-11-16",
+    goalId: "g2",
   },
 ];
 
@@ -182,4 +210,16 @@ export function findProject(id?: string) {
 
 export function findCompany(id?: string) {
   return sampleCompanies.find((company) => company.id === id);
+}
+
+export function projectsOfCompany(companyId: string) {
+  return sampleProjects.filter((project) => project.companyId === companyId);
+}
+
+export function tasksOfProject(projectId: string) {
+  return sampleTasks.filter((task) => task.projectId === projectId);
+}
+
+export function isOpenTask(task: Task) {
+  return task.status !== "done" && task.status !== "canceled";
 }

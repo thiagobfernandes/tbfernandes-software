@@ -3,9 +3,18 @@ export type ProjectCategory =
   "professional" | "personal" | "study" | "research";
 export type ProjectColor = "teal" | "violet" | "amber" | "rose" | "sky";
 
+export type CompanyRelationship = "contractor" | "client" | "partner" | "own";
+export type CompanyStatus = "active" | "inactive" | "closed";
+
 export type Company = {
   id: string;
   name: string;
+  tradeName?: string;
+  relationship: CompanyRelationship;
+  status: CompanyStatus;
+  description?: string;
+  startDate: string;
+  mainContact?: string;
 };
 
 export type Project = {
@@ -19,4 +28,5 @@ export type Project = {
   startDate: string;
   dueDate?: string;
   nextDelivery?: string;
+  goalId?: string;
 };

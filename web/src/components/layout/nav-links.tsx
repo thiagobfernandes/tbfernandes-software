@@ -24,21 +24,8 @@ import {
   type NavItem,
 } from "@/lib/constants/navigation";
 import { projectColorClasses } from "@/lib/project-colors";
-import { sampleProjects, sampleTasks } from "@/lib/sample-data/work";
+import { useWorkData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
-
-// Sample counts until the API exists (see lib/sample-data/work.ts).
-const navCounts: Record<string, number> = {
-  "/projects": sampleProjects.filter((project) => project.status === "active")
-    .length,
-  "/tasks": sampleTasks.filter(
-    (task) => task.status !== "done" && task.status !== "canceled",
-  ).length,
-};
-
-const pinnedProjects = sampleProjects.filter(
-  (project) => project.status === "active",
-);
 
 type NavLinksProps = {
   collapsed?: boolean;
@@ -51,6 +38,17 @@ const itemClass =
 export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
   const pathname = usePathname();
   const activeHref = findActiveNav(pathname)?.item.href;
+  const data = useWorkData();
+  const pinnedProjects = data.projects.filter(
+    (project) => project.status === "active",
+  );
+  // Counts from the simulated data until the API exists.
+  const navCounts: Record<string, number> = {
+    "/projects": pinnedProjects.length,
+    "/tasks": data.tasks.filter(
+      (task) => task.status !== "done" && task.status !== "canceled",
+    ).length,
+  };
 
   if (collapsed) {
     return (
@@ -98,6 +96,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
             key={entry.title}
             group={entry}
             activeHref={activeHref}
+            counts={navCounts}
             onNavigate={onNavigate}
           />
         ) : (
@@ -116,7 +115,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
         {pinnedProjects.map((project) => (
           <Link
             key={project.id}
-            href="/projects"
+            href={`/projects/${project.id}`}
             onClick={onNavigate}
             className={cn(itemClass, "h-8 font-normal")}
           >
@@ -195,10 +194,12 @@ function TopLink({
 function NavGroupSection({
   group,
   activeHref,
+  counts,
   onNavigate,
 }: {
   group: NavGroup;
   activeHref?: string;
+  counts: Record<string, number>;
   onNavigate?: () => void;
 }) {
   const Icon = group.icon;
@@ -265,9 +266,9 @@ function NavGroupSection({
                     )}
                   >
                     <span className="truncate">{item.title}</span>
-                    {navCounts[item.href] !== undefined && (
+                    {counts[item.href] !== undefined && (
                       <span className="ml-auto rounded-full bg-sidebar-accent px-1.5 text-[11px] font-medium text-muted-foreground tabular-nums">
-                        {navCounts[item.href]}
+                        {counts[item.href]}
                       </span>
                     )}
                   </Link>

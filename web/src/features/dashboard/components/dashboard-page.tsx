@@ -1,11 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
   BookOpen,
   Building2,
+  Check,
   FolderKanban,
   ListChecks,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -21,60 +26,58 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MetricCard } from "@/features/dashboard/components/metric-card";
+import { MetricCard } from "@/components/shared/metric-card";
 import {
   DotRow,
   ProgressRing,
   Sparkline,
   TickBars,
-} from "@/features/dashboard/components/metric-visuals";
+} from "@/components/shared/metric-visuals";
 import { AgendaPanel } from "@/features/dashboard/components/agenda-panel";
-import {
-  sampleContextTree,
-  sampleTrends,
-} from "@/features/dashboard/data/sample-dashboard";
+import { sampleTrends } from "@/features/dashboard/data/sample-dashboard";
+import { NoteFormDialog } from "@/features/knowledge/components/knowledge-form-dialogs";
+import { buildContextTree } from "@/features/knowledge/lib/graph";
+import { CompanyFormDialog } from "@/features/companies/components/company-form-dialog";
+import { ProjectFormDialog } from "@/features/projects/components/project-form-dialog";
 import { DueChip } from "@/features/tasks/components/due-chip";
+import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
+import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
 import { projectColorClasses } from "@/lib/project-colors";
-import {
-  SAMPLE_TODAY,
-  findCompany,
-  findProject,
-  sampleProjects,
-  sampleTasks,
-} from "@/lib/sample-data/work";
+import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
+import { SAMPLE_TODAY } from "@/lib/sample-data/work";
 import { daysBetween } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
-// Open tasks due within two days, most urgent first.
-const focusTasks = sampleTasks
-  .filter(
-    (task) =>
-      task.status !== "done" &&
-      task.dueDate &&
-      daysBetween(SAMPLE_TODAY, task.dueDate) <= 2,
-  )
-  .sort((a, b) => a.dueDate!.localeCompare(b.dueDate!));
-
-const activeProjectRows = sampleProjects
-  .filter((project) => project.status === "active")
-  .map((project) => {
-    const tasks = sampleTasks.filter((task) => task.projectId === project.id);
-    const done = tasks.filter((task) => task.status === "done").length;
-    return {
-      ...project,
-      company: findCompany(project.companyId),
-      progress: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
-    };
-  });
-
-const quickActions = [
-  { label: "Company", href: "/companies", icon: Building2 },
-  { label: "Project", href: "/projects", icon: FolderKanban },
-  { label: "Task", href: "/tasks", icon: ListChecks },
-  { label: "Note", href: "/knowledge", icon: BookOpen },
-];
-
 export function DashboardPage() {
+  const data = useWorkData();
+  const { findCompany, findProject, tasksOfProject } = selectors(data);
+  const [selectedTaskId, setSelectedTaskId] = useState<string>();
+  const sampleTasks = data.tasks;
+  const contextTree = buildContextTree(data);
+
+  // Open tasks due within two days, most urgent first.
+  const focusTasks = sampleTasks
+    .filter(
+      (task) =>
+        task.status !== "done" &&
+        task.status !== "canceled" &&
+        task.dueDate &&
+        daysBetween(SAMPLE_TODAY, task.dueDate) <= 2,
+    )
+    .sort((a, b) => a.dueDate!.localeCompare(b.dueDate!));
+
+  const activeProjectRows = data.projects
+    .filter((project) => project.status === "active")
+    .map((project) => {
+      const tasks = tasksOfProject(project.id);
+      const done = tasks.filter((task) => task.status === "done").length;
+      return {
+        ...project,
+        company: findCompany(project.companyId),
+        progress: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
+      };
+    });
+
   const openTasks = sampleTasks.filter(
     (task) => task.status !== "done" && task.status !== "canceled",
   );
@@ -102,13 +105,34 @@ export function DashboardPage() {
           actions={
             <>
               <SampleDataBadge />
-              {quickActions.map(({ label, href, icon: Icon }) => (
-                <Button key={label} variant="outline" size="sm" asChild>
-                  <Link href={href}>
-                    <Icon /> {label}
-                  </Link>
-                </Button>
-              ))}
+              <CompanyFormDialog
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <Building2 /> Company
+                  </Button>
+                }
+              />
+              <ProjectFormDialog
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <FolderKanban /> Project
+                  </Button>
+                }
+              />
+              <TaskFormDialog
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <ListChecks /> Task
+                  </Button>
+                }
+              />
+              <NoteFormDialog
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <BookOpen /> Note
+                  </Button>
+                }
+              />
             </>
           }
         />
@@ -134,11 +158,11 @@ export function DashboardPage() {
               <MetricCard
                 label="Active projects"
                 value={activeProjectRows.length}
-                unit={`/ ${sampleProjects.length}`}
+                unit={`/ ${data.projects.length}`}
                 visual={
                   <ProgressRing
                     value={activeProjectRows.length}
-                    total={sampleProjects.length}
+                    total={data.projects.length}
                   />
                 }
               />
@@ -172,14 +196,33 @@ export function DashboardPage() {
                         key={task.id}
                         className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-accent/60"
                       >
-                        <span
-                          aria-hidden
-                          className="size-4 shrink-0 rounded-full border border-input"
-                        />
+                        <button
+                          type="button"
+                          aria-label={`Mark "${task.title}" as done`}
+                          onClick={() => {
+                            workActions.updateTask(task.id, { status: "done" });
+                            toast.success("Task completed", {
+                              action: {
+                                label: "Undo",
+                                onClick: () =>
+                                  workActions.updateTask(task.id, {
+                                    status: task.status,
+                                  }),
+                              },
+                            });
+                          }}
+                          className="group/check flex size-4 shrink-0 items-center justify-center rounded-full border border-input outline-none hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                        >
+                          <Check className="size-3 text-primary opacity-0 group-hover/check:opacity-100" />
+                        </button>
                         <div className="flex min-w-0 flex-1 flex-col">
-                          <span className="truncate text-sm font-medium">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedTaskId(task.id)}
+                            className="truncate text-left text-sm font-medium outline-none hover:text-primary focus-visible:text-primary"
+                          >
                             {task.title}
-                          </span>
+                          </button>
                           <span className="truncate text-xs text-muted-foreground">
                             {findProject(task.projectId)?.name ?? "No project"}
                           </span>
@@ -209,9 +252,12 @@ export function DashboardPage() {
                     {activeProjectRows.map((project) => (
                       <li key={project.id} className="flex flex-col gap-2">
                         <div className="flex items-baseline justify-between gap-3">
-                          <span className="truncate text-sm font-medium">
+                          <Link
+                            href={`/projects/${project.id}`}
+                            className="truncate text-sm font-medium hover:text-primary"
+                          >
                             {project.name}
-                          </span>
+                          </Link>
                           <span className="text-xs text-muted-foreground tabular-nums">
                             {project.progress}%
                           </span>
@@ -261,7 +307,13 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="rounded-xl border bg-dot-grid px-4 py-8">
-                  <RelationTree root={sampleContextTree} />
+                  {contextTree ? (
+                    <RelationTree root={contextTree} />
+                  ) : (
+                    <p className="text-center text-sm text-muted-foreground">
+                      Link a project to a goal to see how your work connects.
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -270,6 +322,10 @@ export function DashboardPage() {
             <AgendaPanel tasks={sampleTasks} today={SAMPLE_TODAY} />
           </div>
         </div>
+        <TaskDetailSheet
+          taskId={selectedTaskId}
+          onOpenChange={(open) => !open && setSelectedTaskId(undefined)}
+        />
       </PageContainer>
     </div>
   );

@@ -9,9 +9,15 @@ type TasksListProps = {
   tasks: Task[];
   projectsById: Map<string, Project>;
   today: string;
+  onSelectTask?: (taskId: string) => void;
 };
 
-export function TasksList({ tasks, projectsById, today }: TasksListProps) {
+export function TasksList({
+  tasks,
+  projectsById,
+  today,
+  onSelectTask,
+}: TasksListProps) {
   if (tasks.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
@@ -45,14 +51,27 @@ export function TasksList({ tasks, projectsById, today }: TasksListProps) {
               >
                 <td className="max-w-80 px-4 py-3">
                   <div className="flex flex-col">
-                    <span
-                      className={cn(
-                        "truncate font-medium",
-                        done && "text-muted-foreground line-through",
-                      )}
-                    >
-                      {task.title}
-                    </span>
+                    {onSelectTask ? (
+                      <button
+                        type="button"
+                        onClick={() => onSelectTask(task.id)}
+                        className={cn(
+                          "truncate text-left font-medium outline-none hover:text-primary focus-visible:text-primary focus-visible:underline",
+                          done && "text-muted-foreground line-through",
+                        )}
+                      >
+                        {task.title}
+                      </button>
+                    ) : (
+                      <span
+                        className={cn(
+                          "truncate font-medium",
+                          done && "text-muted-foreground line-through",
+                        )}
+                      >
+                        {task.title}
+                      </span>
+                    )}
                     {task.tag && (
                       <span className="text-xs text-muted-foreground">
                         {task.tag}

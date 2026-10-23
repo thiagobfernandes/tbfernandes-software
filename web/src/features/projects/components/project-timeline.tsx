@@ -21,6 +21,7 @@ type ProjectTimelineProps = {
   start: string;
   days: number;
   today: string;
+  onSelectTask?: (taskId: string) => void;
 };
 
 /**
@@ -34,6 +35,7 @@ export function ProjectTimeline({
   start,
   days,
   today,
+  onSelectTask,
 }: ProjectTimelineProps) {
   const end = addDays(start, days - 1);
   const dayList = Array.from({ length: days }, (_, index) =>
@@ -144,7 +146,10 @@ export function ProjectTimeline({
                       height: ROW_HEIGHT - 12,
                     }}
                   >
-                    <span className="text-sm font-medium">{task.title}</span>
+                    <TaskTitle
+                      title={task.title}
+                      onSelect={onSelectTask && (() => onSelectTask(task.id))}
+                    />
                     <span className="text-xs text-muted-foreground">
                       {dates}
                       {progress !== undefined && ` · ${progress}%`}
@@ -169,9 +174,11 @@ export function ProjectTimeline({
                 }}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="truncate text-sm font-medium">
-                    {task.title}
-                  </span>
+                  <TaskTitle
+                    title={task.title}
+                    className="truncate after:absolute after:inset-0"
+                    onSelect={onSelectTask && (() => onSelectTask(task.id))}
+                  />
                   {progress !== undefined && (
                     <span className="flex shrink-0 items-center gap-2">
                       <span className="hidden h-1 w-12 overflow-hidden rounded-full bg-muted sm:block">
@@ -196,5 +203,33 @@ export function ProjectTimeline({
         </div>
       </div>
     </div>
+  );
+}
+
+function TaskTitle({
+  title,
+  className,
+  onSelect,
+}: {
+  title: string;
+  className?: string;
+  onSelect?: () => void;
+}) {
+  if (!onSelect) {
+    return (
+      <span className={cn("text-sm font-medium", className)}>{title}</span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "text-left text-sm font-medium outline-none hover:text-primary focus-visible:text-primary focus-visible:underline",
+        className,
+      )}
+    >
+      {title}
+    </button>
   );
 }

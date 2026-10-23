@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { GanttChart, LayoutGrid, Plus } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
@@ -6,23 +9,21 @@ import { SampleDataBadge } from "@/components/shared/sample-data-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectCard } from "@/features/projects/components/project-card";
+import { ProjectFormDialog } from "@/features/projects/components/project-form-dialog";
 import { ProjectTimeline } from "@/features/projects/components/project-timeline";
+import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { addDays, formatShort } from "@/lib/dates";
-import {
-  SAMPLE_TODAY,
-  findCompany,
-  sampleProjects,
-  sampleTasks,
-} from "@/lib/sample-data/work";
+import { selectors, useWorkData } from "@/lib/sample-data/store";
+import { SAMPLE_TODAY } from "@/lib/sample-data/work";
 
 const TIMELINE_START = addDays(SAMPLE_TODAY, -4);
 const TIMELINE_DAYS = 14;
 
-const projectsById = new Map(
-  sampleProjects.map((project) => [project.id, project]),
-);
-
 export function ProjectsPage() {
+  const data = useWorkData();
+  const { findCompany, tasksOfProject, projectsById } = selectors(data);
+  const [selectedTaskId, setSelectedTaskId] = useState<string>();
+
   return (
     <PageContainer className="max-w-none">
       <PageHeading
@@ -31,35 +32,35 @@ export function ProjectsPage() {
         actions={
           <>
             <SampleDataBadge />
-            <Button disabled>
-              <Plus /> New project
-            </Button>
+            <ProjectFormDialog
+              trigger={
+                <Button>
+                  <Plus /> New project
+                </Button>
+              }
+            />
           </>
         }
       />
 
       <Tabs defaultValue="overview">
-        <div className="flex flex-wrap items-center gap-3">
-          <TabsList>
-            <TabsTrigger value="overview">
-              <LayoutGrid /> Overview
-            </TabsTrigger>
-            <TabsTrigger value="timeline">
-              <GanttChart /> Timeline
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        <TabsList>
+          <TabsTrigger value="overview">
+            <LayoutGrid /> Overview
+          </TabsTrigger>
+          <TabsTrigger value="timeline">
+            <GanttChart /> Timeline
+          </TabsTrigger>
+        </TabsList>
 
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
-            {sampleProjects.map((project) => (
+            {data.projects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 company={findCompany(project.companyId)}
-                tasks={sampleTasks.filter(
-                  (task) => task.projectId === project.id,
-                )}
+                tasks={tasksOfProject(project.id)}
               />
             ))}
           </div>
@@ -71,14 +72,19 @@ export function ProjectsPage() {
             {formatShort(addDays(TIMELINE_START, TIMELINE_DAYS - 1))}
           </p>
           <ProjectTimeline
-            tasks={sampleTasks}
+            tasks={data.tasks}
             projectsById={projectsById}
             start={TIMELINE_START}
             days={TIMELINE_DAYS}
             today={SAMPLE_TODAY}
+            onSelectTask={setSelectedTaskId}
           />
         </TabsContent>
       </Tabs>
+      <TaskDetailSheet
+        taskId={selectedTaskId}
+        onOpenChange={(open) => !open && setSelectedTaskId(undefined)}
+      />
     </PageContainer>
   );
 }

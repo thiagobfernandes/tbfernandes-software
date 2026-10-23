@@ -1,6 +1,6 @@
 import { PriorityBadge } from "@/components/shared/priority-badge";
 import { DueChip } from "@/features/tasks/components/due-chip";
-import type { Task } from "@/features/tasks/types/task";
+import { checklistProgress, type Task } from "@/features/tasks/types/task";
 import type { Project } from "@/features/projects/types/project";
 import { projectColorClasses } from "@/lib/project-colors";
 import { cn } from "@/lib/utils";
@@ -9,14 +9,21 @@ type TaskCardProps = {
   task: Task;
   project?: Project;
   today: string;
+  onSelect?: (taskId: string) => void;
 };
 
-export function TaskCard({ task, project, today }: TaskCardProps) {
+export function TaskCard({ task, project, today, onSelect }: TaskCardProps) {
   const done = task.status === "done";
-  const checklist = task.checklist;
+  const checklist = checklistProgress(task);
 
   return (
-    <article className="flex flex-col gap-3 rounded-xl border bg-card p-3.5 shadow-sm transition-colors hover:border-input">
+    <article
+      className={cn(
+        "relative flex flex-col gap-3 rounded-xl border bg-card p-3.5 shadow-sm transition-colors hover:border-input",
+        onSelect &&
+          "has-[button:focus-visible]:ring-[3px] has-[button:focus-visible]:ring-ring/50",
+      )}
+    >
       <div className="flex flex-wrap items-center gap-1.5">
         {task.tag && (
           <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
@@ -35,7 +42,17 @@ export function TaskCard({ task, project, today }: TaskCardProps) {
             done && "text-muted-foreground line-through",
           )}
         >
-          {task.title}
+          {onSelect ? (
+            <button
+              type="button"
+              onClick={() => onSelect(task.id)}
+              className="text-left outline-none after:absolute after:inset-0 after:rounded-xl"
+            >
+              {task.title}
+            </button>
+          ) : (
+            task.title
+          )}
         </h3>
         {task.description && (
           <p className="line-clamp-2 text-xs text-muted-foreground">

@@ -10,32 +10,30 @@ import { SampleDataBadge } from "@/components/shared/sample-data-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
+import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
 import { TasksBoard } from "@/features/tasks/components/tasks-board";
 import { TasksList } from "@/features/tasks/components/tasks-list";
 import type { TaskPriority } from "@/features/tasks/types/task";
 import { projectColorClasses } from "@/lib/project-colors";
-import {
-  SAMPLE_TODAY,
-  sampleProjects,
-  sampleTasks,
-} from "@/lib/sample-data/work";
+import { selectors, useWorkData } from "@/lib/sample-data/store";
+import { SAMPLE_TODAY } from "@/lib/sample-data/work";
 import { cn } from "@/lib/utils";
 
 const priorities: TaskPriority[] = ["urgent", "high", "normal", "low"];
-
-const projectsById = new Map(
-  sampleProjects.map((project) => [project.id, project]),
-);
 
 export function TasksPage() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [projectId, setProjectId] = useState<string>();
   const [priority, setPriority] = useState<TaskPriority>();
+  const [selectedTaskId, setSelectedTaskId] = useState<string>();
+  const data = useWorkData();
+  const { projectsById } = selectors(data);
 
   const tasks = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return sampleTasks.filter(
+    return data.tasks.filter(
       (task) =>
         (!needle ||
           task.title.toLowerCase().includes(needle) ||
@@ -44,7 +42,7 @@ export function TasksPage() {
         (!projectId || task.projectId === projectId) &&
         (!priority || task.priority === priority),
     );
-  }, [query, projectId, priority]);
+  }, [data.tasks, query, projectId, priority]);
 
   return (
     <PageContainer className="max-w-none">
@@ -54,9 +52,14 @@ export function TasksPage() {
         actions={
           <>
             <SampleDataBadge />
-            <Button disabled>
-              <Plus /> Add task
-            </Button>
+            <TaskFormDialog
+              defaultProjectId={projectId}
+              trigger={
+                <Button>
+                  <Plus /> Add task
+                </Button>
+              }
+            />
           </>
         }
       />
@@ -94,7 +97,7 @@ export function TasksPage() {
             >
               All projects
             </FilterChip>
-            {sampleProjects
+            {data.projects
               .filter((project) => project.status === "active")
               .map((project) => (
                 <FilterChip
@@ -136,6 +139,7 @@ export function TasksPage() {
             tasks={tasks}
             projectsById={projectsById}
             today={SAMPLE_TODAY}
+            onSelectTask={setSelectedTaskId}
           />
         </TabsContent>
         <TabsContent value="board">
@@ -143,9 +147,16 @@ export function TasksPage() {
             tasks={tasks}
             projectsById={projectsById}
             today={SAMPLE_TODAY}
+            onSelectTask={setSelectedTaskId}
+            allowCreate
+            defaultProjectId={projectId}
           />
         </TabsContent>
       </Tabs>
+      <TaskDetailSheet
+        taskId={selectedTaskId}
+        onOpenChange={(open) => !open && setSelectedTaskId(undefined)}
+      />
     </PageContainer>
   );
 }
