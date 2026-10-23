@@ -24,13 +24,13 @@ export function EmptyState({
         className,
       )}
     >
-      <span className="bg-muted text-primary flex size-10 items-center justify-center rounded-full">
+      <span className="flex size-10 items-center justify-center rounded-full bg-muted text-primary">
         <Icon className="size-5" aria-hidden />
       </span>
       <div className="flex max-w-sm flex-col gap-1">
         <p className="text-sm font-medium">{title}</p>
         {description && (
-          <p className="text-muted-foreground text-sm">{description}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
         )}
       </div>
       {action}

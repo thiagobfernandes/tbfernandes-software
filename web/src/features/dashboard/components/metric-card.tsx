@@ -19,21 +19,21 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "bg-card text-card-foreground relative flex min-h-36 flex-col justify-between overflow-hidden rounded-2xl border p-5 shadow-sm",
+        "relative flex min-h-36 flex-col justify-between overflow-hidden rounded-2xl border bg-card p-5 text-card-foreground shadow-sm",
         className,
       )}
     >
-      <span className="text-muted-foreground text-sm">{label}</span>
+      <span className="text-sm text-muted-foreground">{label}</span>
       <div className="flex items-end justify-between gap-4">
         <p className="flex items-baseline gap-1.5">
           <span className="text-4xl font-light tracking-tight tabular-nums">
             {value}
           </span>
           {unit && (
-            <span className="text-muted-foreground text-sm">{unit}</span>
+            <span className="text-sm text-muted-foreground">{unit}</span>
           )}
         </p>
-        {visual && <div className="text-foreground shrink-0">{visual}</div>}
+        {visual && <div className="shrink-0 text-foreground">{visual}</div>}
       </div>
     </div>
   );

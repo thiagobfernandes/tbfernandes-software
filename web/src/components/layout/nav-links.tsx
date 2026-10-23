@@ -23,7 +23,22 @@ import {
   type NavGroup,
   type NavItem,
 } from "@/lib/constants/navigation";
+import { projectColorClasses } from "@/lib/project-colors";
+import { sampleProjects, sampleTasks } from "@/lib/sample-data/work";
 import { cn } from "@/lib/utils";
+
+// Sample counts until the API exists (see lib/sample-data/work.ts).
+const navCounts: Record<string, number> = {
+  "/projects": sampleProjects.filter((project) => project.status === "active")
+    .length,
+  "/tasks": sampleTasks.filter(
+    (task) => task.status !== "done" && task.status !== "canceled",
+  ).length,
+};
+
+const pinnedProjects = sampleProjects.filter(
+  (project) => project.status === "active",
+);
 
 type NavLinksProps = {
   collapsed?: boolean;
@@ -48,7 +63,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
           return (
             <div key={entry.title} className="flex flex-col gap-1">
               {isNavGroup(entry) && index > 0 && (
-                <Separator className="bg-sidebar-border my-1" />
+                <Separator className="my-1 bg-sidebar-border" />
               )}
               {items.map((item) => (
                 <RailLink
@@ -94,6 +109,27 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
           />
         ),
       )}
+      <div className="mt-5 flex flex-col gap-0.5">
+        <span className="px-3 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+          Active projects
+        </span>
+        {pinnedProjects.map((project) => (
+          <Link
+            key={project.id}
+            href="/projects"
+            onClick={onNavigate}
+            className={cn(itemClass, "h-8 font-normal")}
+          >
+            <span
+              aria-hidden
+              className={projectColorClasses[project.color].text}
+            >
+              #
+            </span>
+            <span className="truncate">{project.name}</span>
+          </Link>
+        ))}
+      </div>
       <div className="mt-auto flex flex-col gap-1 pt-4">
         {secondaryNavigation.map((item) => (
           <TopLink
@@ -110,7 +146,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
 
 function SoonBadge() {
   return (
-    <span className="border-sidebar-border text-muted-foreground ml-auto rounded-full border px-1.5 py-px text-[10px] font-medium tracking-wide uppercase">
+    <span className="ml-auto rounded-full border border-sidebar-border px-1.5 py-px text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
       Soon
     </span>
   );
@@ -186,15 +222,15 @@ function NavGroupSection({
         {isPlanned && <SoonBadge />}
         <ChevronRight
           className={cn(
-            "text-muted-foreground size-4 shrink-0 transition-transform group-data-[state=open]/nav:rotate-90",
+            "size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]/nav:rotate-90",
             !isPlanned && "ml-auto",
           )}
           aria-hidden
         />
       </CollapsibleTrigger>
-      <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down overflow-hidden">
+      <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         {/* Tree guide: a vertical rail with a node dot per item, echoing the relationship graph. */}
-        <ul className="border-sidebar-border relative mt-1 ml-5 flex flex-col gap-0.5 border-l pl-3">
+        <ul className="relative mt-1 ml-5 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
           {group.items.map((item) => {
             const active = item.href === activeHref;
             return (
@@ -202,7 +238,7 @@ function NavGroupSection({
                 <span
                   aria-hidden
                   className={cn(
-                    "bg-sidebar-border absolute top-1/2 -left-[15.5px] size-1.5 -translate-y-1/2 rounded-full",
+                    "absolute top-1/2 -left-[15.5px] size-1.5 -translate-y-1/2 rounded-full bg-sidebar-border",
                     active &&
                       "bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)]",
                   )}
@@ -225,10 +261,15 @@ function NavGroupSection({
                       itemClass,
                       "h-8 px-2 font-normal",
                       active &&
-                        "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
+                        "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
                     )}
                   >
                     <span className="truncate">{item.title}</span>
+                    {navCounts[item.href] !== undefined && (
+                      <span className="ml-auto rounded-full bg-sidebar-accent px-1.5 text-[11px] font-medium text-muted-foreground tabular-nums">
+                        {navCounts[item.href]}
+                      </span>
+                    )}
                   </Link>
                 )}
               </li>

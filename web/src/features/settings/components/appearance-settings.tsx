@@ -39,7 +39,7 @@ export function AppearanceSettings() {
             aria-checked={selected}
             onClick={() => setTheme(value)}
             className={cn(
-              "hover:bg-accent focus-visible:ring-ring/50 flex items-center gap-3 rounded-lg border p-4 text-left text-sm font-medium transition-colors outline-none focus-visible:ring-[3px]",
+              "flex items-center gap-3 rounded-lg border p-4 text-left text-sm font-medium transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50",
               selected && "border-primary bg-accent",
             )}
           >

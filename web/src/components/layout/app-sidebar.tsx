@@ -21,13 +21,13 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "border-sidebar-border bg-sidebar sticky top-0 hidden h-svh shrink-0 flex-col border-r transition-[width] duration-200 md:flex",
+        "sticky top-0 hidden h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 md:flex",
         collapsed ? "w-16" : "w-64",
       )}
     >
       <div
         className={cn(
-          "border-sidebar-border flex h-14 items-center border-b",
+          "flex h-14 items-center border-b border-sidebar-border",
           collapsed ? "justify-center" : "px-4",
         )}
       >
@@ -40,7 +40,7 @@ export function AppSidebar() {
       </div>
       <div
         className={cn(
-          "border-sidebar-border flex border-t p-3",
+          "flex border-t border-sidebar-border p-3",
           collapsed ? "justify-center" : "justify-end",
         )}
       >

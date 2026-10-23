@@ -12,7 +12,7 @@ export function KnowledgeGraphPage() {
         description="Explore how goals, companies, projects, tasks, and notes relate. Lists and search stay the primary way to navigate."
         actions={<SampleDataBadge />}
       />
-      <div className="bg-dot-grid flex min-h-[28rem] items-center rounded-2xl border px-4 py-10">
+      <div className="flex min-h-[28rem] items-center rounded-2xl border bg-dot-grid px-4 py-10">
         <RelationTree root={sampleContextTree} className="w-full" />
       </div>
     </PageContainer>

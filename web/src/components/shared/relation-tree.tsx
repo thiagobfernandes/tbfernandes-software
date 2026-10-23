@@ -77,7 +77,7 @@ function TreeNode({
     <>
       {!isRoot && <Dot className="-top-[3px]" />}
       {node.kind && (
-        <span className="text-muted-foreground text-[10px] font-medium tracking-wide uppercase">
+        <span className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
           {node.kind}
         </span>
       )}
@@ -101,7 +101,7 @@ function Dot({ className }: { className: string }) {
     <span
       aria-hidden
       className={cn(
-        "bg-foreground absolute left-1/2 size-1.5 -translate-x-1/2 rounded-full",
+        "absolute left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-foreground",
         className,
       )}
     />

@@ -9,11 +9,11 @@ export function BrandMark({
 }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <span className="bg-sidebar-primary text-sidebar-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sm font-bold text-sidebar-primary-foreground">
         TB
       </span>
       {!collapsed && (
-        <span className="text-sidebar-accent-foreground truncate text-sm font-semibold">
+        <span className="truncate text-sm font-semibold text-sidebar-accent-foreground">
           TBFernandes
         </span>
       )}

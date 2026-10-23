@@ -30,8 +30,8 @@ export function MobileNav() {
           <Menu />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="bg-sidebar w-72 gap-0 p-0">
-        <SheetHeader className="border-sidebar-border h-14 justify-center border-b px-4 py-0">
+      <SheetContent side="left" className="w-72 gap-0 bg-sidebar p-0">
+        <SheetHeader className="h-14 justify-center border-b border-sidebar-border px-4 py-0">
           <SheetTitle asChild>
             <div>
               <BrandMark />
