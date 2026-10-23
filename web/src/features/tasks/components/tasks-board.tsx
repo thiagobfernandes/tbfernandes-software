@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/features/tasks/components/task-card";
@@ -12,6 +14,7 @@ import {
   type TaskStatus,
 } from "@/features/tasks/types/task";
 import type { Project } from "@/features/projects/types/project";
+import { workActions } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
 
 const statusDot: Record<TaskStatus, string> = {
@@ -41,6 +44,26 @@ export function TasksBoard({
   allowCreate = false,
   defaultProjectId,
 }: TasksBoardProps) {
+  const [draggingId, setDraggingId] = useState<string>();
+  const [overStatus, setOverStatus] = useState<TaskStatus>();
+
+  // Dropping a card on a column moves the task to that status.
+  function drop(status: TaskStatus) {
+    const task = tasks.find((item) => item.id === draggingId);
+    setDraggingId(undefined);
+    setOverStatus(undefined);
+    if (!task || task.status === status) return;
+    const previous = task.status;
+    workActions.updateTask(task.id, { status });
+    toast.success(`Moved to ${taskStatusLabels[status]}`, {
+      description: task.title,
+      action: {
+        label: "Undo",
+        onClick: () => workActions.updateTask(task.id, { status: previous }),
+      },
+    });
+  }
+
   return (
     <div className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6">
       <div className="grid auto-cols-[17rem] grid-flow-col gap-4">
@@ -50,7 +73,26 @@ export function TasksBoard({
             <section
               key={status}
               aria-label={taskStatusLabels[status]}
-              className="flex flex-col gap-3 rounded-2xl bg-muted/40 p-2.5"
+              onDragOver={(event) => {
+                if (!draggingId) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                if (overStatus !== status) setOverStatus(status);
+              }}
+              onDragLeave={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node))
+                  setOverStatus(undefined);
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                drop(status);
+              }}
+              className={cn(
+                "flex flex-col gap-3 rounded-2xl bg-muted/40 p-2.5 ring-2 ring-transparent transition-colors",
+                overStatus === status &&
+                  draggingId &&
+                  "bg-primary/10 ring-primary/50",
+              )}
             >
               <header className="flex items-center gap-2 px-1.5 pt-1">
                 <span
@@ -82,21 +124,38 @@ export function TasksBoard({
               </header>
               {column.length === 0 ? (
                 <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
-                  No tasks
+                  {draggingId ? "Drop here" : "No tasks"}
                 </p>
               ) : (
                 column.map((task) => (
-                  <TaskCard
+                  <div
                     key={task.id}
-                    task={task}
-                    project={
-                      task.projectId
-                        ? projectsById.get(task.projectId)
-                        : undefined
-                    }
-                    today={today}
-                    onSelect={onSelectTask}
-                  />
+                    draggable
+                    onDragStart={(event) => {
+                      event.dataTransfer.effectAllowed = "move";
+                      event.dataTransfer.setData("text/plain", task.id);
+                      setDraggingId(task.id);
+                    }}
+                    onDragEnd={() => {
+                      setDraggingId(undefined);
+                      setOverStatus(undefined);
+                    }}
+                    className={cn(
+                      "cursor-grab active:cursor-grabbing",
+                      draggingId === task.id && "opacity-40",
+                    )}
+                  >
+                    <TaskCard
+                      task={task}
+                      project={
+                        task.projectId
+                          ? projectsById.get(task.projectId)
+                          : undefined
+                      }
+                      today={today}
+                      onSelect={onSelectTask}
+                    />
+                  </div>
                 ))
               )}
             </section>
