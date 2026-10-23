@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Brand palette (from the product vision):
+ *   ink    #0C1821   navy   #1B2A41   slate  #324A5F
+ *   teal   #2DD4BF   lilac  #CCC9DC   white  #FFFFFF
+ * Intermediate tones below are derived from these to keep contrast
+ * accessible. Change colors here only; components consume the tokens.
+ */
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #ffffff;
+  --foreground: #0c1821;
+  --card: #ffffff;
+  --card-foreground: #0c1821;
+  --popover: #ffffff;
+  --popover-foreground: #0c1821;
+  /* #2DD4BF fails contrast on white, so light mode uses a deeper teal. */
+  --primary: #0f766e;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f0f6;
+  --secondary-foreground: #1b2a41;
+  --muted: #f1f0f6;
+  --muted-foreground: #4b5d70;
+  --accent: #e9f8f6;
+  --accent-foreground: #0c1821;
+  --destructive: #dc2626;
+  --border: #e2e0ea;
+  --input: #d6d3e1;
+  --ring: #0f766e;
+
+  --sidebar: #f7f7fa;
+  --sidebar-foreground: #1b2a41;
+  --sidebar-primary: #0f766e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9f8f6;
+  --sidebar-accent-foreground: #0c1821;
+  --sidebar-border: #e2e0ea;
+  --sidebar-ring: #0f766e;
+
+  --success: #15803d;
+  --warning: #b45309;
+}
+
+.dark {
+  --background: #0c1821;
+  --foreground: #ffffff;
+  --card: #13212f;
+  --card-foreground: #ffffff;
+  --popover: #1b2a41;
+  --popover-foreground: #ffffff;
+  --primary: #2dd4bf;
+  --primary-foreground: #0c1821;
+  --secondary: #1b2a41;
+  --secondary-foreground: #ffffff;
+  --muted: #1b2a41;
+  --muted-foreground: #ccc9dc;
+  --accent: #1b2a41;
+  --accent-foreground: #ffffff;
+  --destructive: #f87171;
+  --border: #23364b;
+  --input: #324a5f;
+  --ring: #2dd4bf;
+
+  --sidebar: #0f1d29;
+  --sidebar-foreground: #ccc9dc;
+  --sidebar-primary: #2dd4bf;
+  --sidebar-primary-foreground: #0c1821;
+  --sidebar-accent: #1b2a41;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1b2a41;
+  --sidebar-ring: #2dd4bf;
+
+  --success: #4ade80;
+  --warning: #fbbf24;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/*
+ * Relationship tree (see components/shared/relation-tree.tsx).
+ * Orthogonal connectors with rounded elbows, after the Luma reference.
+ */
+@layer components {
+  .relation-tree {
+    --tree-gap: 1.75rem;
+    --tree-line: var(--input);
+  }
+  .relation-tree ul {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-top: var(--tree-gap);
+  }
+  .relation-tree > ul {
+    padding-top: 0;
+  }
+  .relation-tree li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--tree-gap) 0.375rem 0;
+  }
+  .relation-tree > ul > li {
+    padding-top: 0;
+  }
+  .relation-tree li::before,
+  .relation-tree li::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+    height: var(--tree-gap);
+    border-top: 1px solid var(--tree-line);
+  }
+  .relation-tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 1px solid var(--tree-line);
+  }
+  .relation-tree > ul > li::before,
+  .relation-tree > ul > li::after,
+  .relation-tree li:only-child::before {
+    display: none;
+  }
+  .relation-tree li:only-child::after {
+    border-top: 0;
+  }
+  .relation-tree li:first-child::before,
+  .relation-tree li:last-child::after {
+    border: 0 none;
+  }
+  .relation-tree li:last-child:not(:only-child)::before {
+    border-right: 1px solid var(--tree-line);
+    border-radius: 0 0.625rem 0 0;
+  }
+  .relation-tree li:first-child:not(:only-child)::after {
+    border-radius: 0.625rem 0 0 0;
+  }
+  .relation-tree ul ul::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: var(--tree-gap);
+    border-left: 1px solid var(--tree-line);
+  }
+}
+
+/* Dotted canvas behind graphs, after the Luma reference. */
+@utility bg-dot-grid {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--muted-foreground) 22%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+}
