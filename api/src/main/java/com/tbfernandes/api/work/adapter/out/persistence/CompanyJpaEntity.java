@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.tbfernandes.api.work.domain.company.CompanyRelationship;
 import com.tbfernandes.api.work.domain.company.CompanyStatus;
+import com.tbfernandes.api.shared.infrastructure.persistence.AuditedEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

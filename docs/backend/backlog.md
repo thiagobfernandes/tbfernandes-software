@@ -64,13 +64,13 @@ Critérios de aceite principais:
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| KNW-01 | Notas: CRUD com tags (RF-KNW-01) | M | ⬜ |
-| KNW-02 | Snippets: CRUD (RF-KNW-02, RN-11) | M | ⬜ |
-| KNW-03 | Vínculos com projetos e tarefas (RF-KNW-03) | P | ⬜ |
-| KNW-04 | Busca por texto (`tsvector`) e por tag (RF-KNW-04) | M | ⬜ |
-| KNW-05 | Endpoint do grafo: nós e arestas (RF-KNW-05) | M | ⬜ |
-| KNW-06 | Ouvir `TaskDeleted` e remover vínculos | P | ⬜ |
-| KNW-07 | Métodos: CRUD com passos e exemplos (RF-KNW-06) | M | ⬜ |
+| KNW-01 | Notas: CRUD com tags (RF-KNW-01) | M | ✅ |
+| KNW-02 | Snippets: CRUD (RF-KNW-02, RN-11) | M | ✅ |
+| KNW-03 | Vínculos com projetos e tarefas (RF-KNW-03) | P | ✅ |
+| KNW-04 | Busca por texto (`tsvector`) e por tag (RF-KNW-04) | M | ✅ |
+| KNW-05 | Endpoint do grafo: nós e arestas (RF-KNW-05). Movido para o módulo assistant, que já lê todos os módulos | M | ⬜ |
+| KNW-06 | Ouvir `TaskDeleted` e remover vínculos | P | ✅ |
+| KNW-07 | Métodos: CRUD com passos e exemplos (RF-KNW-06) | M | ✅ |
 | KNW-08 | Ligar telas Knowledge, Snippets, Graph e Methods à API | G | ⬜ |
 
 ## Épico GOL — Goals

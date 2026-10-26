@@ -11,6 +11,7 @@ import com.tbfernandes.api.work.domain.task.TaskStatus;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
+import com.tbfernandes.api.shared.infrastructure.persistence.AuditedEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

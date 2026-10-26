@@ -22,8 +22,8 @@ erDiagram
     PROJECT ||--o{ TASK : "project_id"
     TASK ||--o{ TASK_CHECKLIST_ITEM : "task_id"
 
-    NOTE ||--o{ ITEM_LINK : "item_id (NOTE)"
-    SNIPPET ||--o{ ITEM_LINK : "item_id (SNIPPET)"
+    NOTE ||--o{ NOTE_LINK : "note_id"
+    SNIPPET ||--o{ SNIPPET_LINK : "snippet_id"
     METHOD ||--o{ METHOD_STEP : ""
     METHOD ||--o{ METHOD_EXAMPLE : ""
 
@@ -96,6 +96,7 @@ erDiagram
         varchar title
         text body
         text_array tags
+        tsvector search "gerada"
     }
     SNIPPET {
         uuid id PK
@@ -106,9 +107,13 @@ erDiagram
         varchar source_url
         text_array tags
     }
-    ITEM_LINK {
-        text item_type PK
-        uuid item_id PK
+    NOTE_LINK {
+        uuid note_id PK, FK
+        text target_type PK "PROJECT|TASK"
+        uuid target_id PK "work.*"
+    }
+    SNIPPET_LINK {
+        uuid snippet_id PK, FK
         text target_type PK "PROJECT|TASK"
         uuid target_id PK "work.*"
     }
@@ -240,8 +245,8 @@ erDiagram
 | `companies` | `Company` | `work.company` | |
 | `projects` | `Project` | `work.project` | `goalId` → `goal_id` sem FK |
 | `tasks` | `Task` | `work.task` + `work.task_checklist_item` | `checklist {done,total}` → `checklist_done/total`; `checklistItems` → tabela filha ordenada |
-| `notes` | `Note` | `knowledge.note` + `knowledge.item_link` | `projectIds`/`taskIds` → linhas em `item_link` |
-| `snippets` | `Snippet` | `knowledge.snippet` + `knowledge.item_link` | idem |
+| `notes` | `Note` | `knowledge.note` + `knowledge.note_link` | `projectIds`/`taskIds` → linhas em `note_link` |
+| `snippets` | `Snippet` | `knowledge.snippet` + `knowledge.snippet_link` | idem, em `snippet_link` |
 | `methods` | `Method` | `knowledge.method` + `method_step` + `method_example` | `steps` e `examples` ordenados por `position` |
 | `goals` | `Goal` | `goals.goal` | `indicator` → quatro colunas `indicator_*` |
 | `milestones` | `Milestone` | `goals.milestone` | |
@@ -270,5 +275,4 @@ Ids: o frontend usa ids curtos (`t-1a2b3c4d`); a API usa UUID. Na migração dos
 |---|---|---|
 | `finance.bank_connection`, `finance.bank_account` | FIN-OF | conexões Pluggy e contas |
 | `identity.session` ou Spring Session JDBC | IDN | login |
-| `knowledge.note` com `tsvector` | KNW-04 | busca de texto |
 | `assistant.embedding` (pgvector) | AST | busca semântica para a IA |

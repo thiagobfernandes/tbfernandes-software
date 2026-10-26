@@ -84,18 +84,21 @@ group by p.name
 order by overdue desc;', NULL, NULL, ARRAY['postgres','reports']::text[], '2026-10-22', '2026-10-22')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO knowledge.item_link (item_type, item_id, target_type, target_id) VALUES
-  ('NOTE', '2d71fd08-006d-5683-add8-7e553b6a652f', 'PROJECT', '9cc39cfc-63d8-5404-9bc1-b8d3250bf432'),
-  ('NOTE', '2d71fd08-006d-5683-add8-7e553b6a652f', 'TASK', 'afb289ce-5697-5de2-bc43-4b90eccb092e'),
-  ('NOTE', '6e489101-1a1c-5509-892a-c2e3fecd775c', 'PROJECT', '0dac5543-7d3f-5da5-aad0-9138f86f30e7'),
-  ('NOTE', '6e489101-1a1c-5509-892a-c2e3fecd775c', 'TASK', 'd1273647-a602-5992-bece-74ffbd9100c6'),
-  ('NOTE', '8699903d-79a7-5ac4-a455-7ab06b393069', 'PROJECT', '5f7a9ebf-4f29-5ff7-8df4-5ff87bb95ae0'),
-  ('NOTE', '8699903d-79a7-5ac4-a455-7ab06b393069', 'TASK', 'bc9a6b51-97ee-557a-82e8-dcf9c62158bb'),
-  ('SNIPPET', 'ea1ff87a-55b0-5b06-8bc1-c34f702251a0', 'PROJECT', '0dac5543-7d3f-5da5-aad0-9138f86f30e7'),
-  ('SNIPPET', 'ea1ff87a-55b0-5b06-8bc1-c34f702251a0', 'TASK', '5fa96b34-b49e-5cf8-8a27-76e6cfa185ef'),
-  ('SNIPPET', '24a91ffe-cf1c-5744-aa0e-37eae90a4d5b', 'PROJECT', '9cc39cfc-63d8-5404-9bc1-b8d3250bf432'),
-  ('SNIPPET', '24a91ffe-cf1c-5744-aa0e-37eae90a4d5b', 'TASK', 'afb289ce-5697-5de2-bc43-4b90eccb092e'),
-  ('SNIPPET', 'bd08cb36-b3ff-5485-9d7a-4b5ab726b0e0', 'PROJECT', '0dac5543-7d3f-5da5-aad0-9138f86f30e7')
+INSERT INTO knowledge.note_link (note_id, target_type, target_id) VALUES
+  ('2d71fd08-006d-5683-add8-7e553b6a652f', 'PROJECT', '9cc39cfc-63d8-5404-9bc1-b8d3250bf432'),
+  ('2d71fd08-006d-5683-add8-7e553b6a652f', 'TASK', 'afb289ce-5697-5de2-bc43-4b90eccb092e'),
+  ('6e489101-1a1c-5509-892a-c2e3fecd775c', 'PROJECT', '0dac5543-7d3f-5da5-aad0-9138f86f30e7'),
+  ('6e489101-1a1c-5509-892a-c2e3fecd775c', 'TASK', 'd1273647-a602-5992-bece-74ffbd9100c6'),
+  ('8699903d-79a7-5ac4-a455-7ab06b393069', 'PROJECT', '5f7a9ebf-4f29-5ff7-8df4-5ff87bb95ae0'),
+  ('8699903d-79a7-5ac4-a455-7ab06b393069', 'TASK', 'bc9a6b51-97ee-557a-82e8-dcf9c62158bb')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO knowledge.snippet_link (snippet_id, target_type, target_id) VALUES
+  ('ea1ff87a-55b0-5b06-8bc1-c34f702251a0', 'PROJECT', '0dac5543-7d3f-5da5-aad0-9138f86f30e7'),
+  ('ea1ff87a-55b0-5b06-8bc1-c34f702251a0', 'TASK', '5fa96b34-b49e-5cf8-8a27-76e6cfa185ef'),
+  ('24a91ffe-cf1c-5744-aa0e-37eae90a4d5b', 'PROJECT', '9cc39cfc-63d8-5404-9bc1-b8d3250bf432'),
+  ('24a91ffe-cf1c-5744-aa0e-37eae90a4d5b', 'TASK', 'afb289ce-5697-5de2-bc43-4b90eccb092e'),
+  ('bd08cb36-b3ff-5485-9d7a-4b5ab726b0e0', 'PROJECT', '0dac5543-7d3f-5da5-aad0-9138f86f30e7')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO knowledge.method (id, owner_id, title, summary, category, tags, last_reviewed) VALUES

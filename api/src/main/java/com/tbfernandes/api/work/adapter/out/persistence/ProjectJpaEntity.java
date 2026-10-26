@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.tbfernandes.api.work.domain.project.ProjectCategory;
 import com.tbfernandes.api.work.domain.project.ProjectColor;
 import com.tbfernandes.api.work.domain.project.ProjectStatus;
+import com.tbfernandes.api.shared.infrastructure.persistence.AuditedEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

@@ -1,4 +1,4 @@
-package com.tbfernandes.api.work.adapter.out.persistence;
+package com.tbfernandes.api.shared.infrastructure.persistence;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -10,25 +10,29 @@ import jakarta.persistence.Version;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-/** Columns every table has: id, owner_id, created_at, updated_at and version (optimistic lock). */
+/**
+ * Columns every aggregate-root table has: id, owner_id, created_at, updated_at and version
+ * (optimistic lock). Fields are public so each module's persistence adapter can map them
+ * directly; only adapters ever see these entities.
+ */
 @MappedSuperclass
-abstract class AuditedEntity {
+public abstract class AuditedEntity {
 
 	@Id
-	UUID id;
+	public UUID id;
 
 	@Column(name = "owner_id", nullable = false, updatable = false)
-	UUID ownerId;
+	public UUID ownerId;
 
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
-	Instant createdAt;
+	public Instant createdAt;
 
 	@UpdateTimestamp
 	@Column(name = "updated_at", nullable = false)
-	Instant updatedAt;
+	public Instant updatedAt;
 
 	@Version
-	long version;
+	public long version;
 
 }
