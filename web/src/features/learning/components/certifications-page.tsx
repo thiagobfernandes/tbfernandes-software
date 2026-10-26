@@ -18,7 +18,7 @@ import type {
 } from "@/features/learning/types/learning";
 import { daysBetween, formatShort } from "@/lib/dates";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const columns: CertificationStatus[] = [
@@ -40,7 +40,7 @@ function expiresSoon(certification: Certification) {
   return (
     certification.status === "obtained" &&
     certification.expiresAt !== undefined &&
-    daysBetween(SAMPLE_TODAY, certification.expiresAt) <= 90
+    daysBetween(currentDay(), certification.expiresAt) <= 90
   );
 }
 

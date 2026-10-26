@@ -3,7 +3,8 @@ import { projectPurchase } from "@/features/finance/lib/projection";
 import { daysBetween, describeDue } from "@/lib/dates";
 import { formatBRL } from "@/lib/money";
 import type { AppData } from "@/lib/sample-data/store";
-import { isOpenTask, SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { isOpenTask } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 export type Reference = { kind: string; label: string; href: string };
 export type Answer = { text: string; references: Reference[] };
@@ -74,7 +75,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
         `**${project.name}** is ${project.status}: ${done} of ${tasks.length} tasks done (${tasks.length ? Math.round((done / tasks.length) * 100) : 0}%).`,
         project.nextDelivery && `Next delivery: ${project.nextDelivery}.`,
         open.length
-          ? `Open tasks:\n${open.map((t) => `- ${t.title}${t.dueDate ? ` (${describeDue(t.dueDate, SAMPLE_TODAY).label.toLowerCase()})` : ""}`).join("\n")}`
+          ? `Open tasks:\n${open.map((t) => `- ${t.title}${t.dueDate ? ` (${describeDue(t.dueDate, currentDay()).label.toLowerCase()})` : ""}`).join("\n")}`
           : "No open tasks.",
         blocked.length &&
           `⚠ ${blocked.length} blocked: ${blocked.map((t) => t.title).join(", ")}.`,
@@ -101,11 +102,11 @@ export function answer(rawQuestion: string, data: AppData): Answer {
 
   if (has(question, intents.overdue)) {
     const overdue = openTasks.filter(
-      (t) => t.dueDate && t.dueDate < SAMPLE_TODAY,
+      (t) => t.dueDate && t.dueDate < currentDay(),
     );
     return {
       text: overdue.length
-        ? `You have ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""}:\n${overdue.map((t) => `- **${t.title}**, ${describeDue(t.dueDate!, SAMPLE_TODAY).label.toLowerCase()}${t.status === "blocked" ? " (blocked)" : ""}`).join("\n")}\n\nStart with blocked items: they usually need a message, not work.`
+        ? `You have ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""}:\n${overdue.map((t) => `- **${t.title}**, ${describeDue(t.dueDate!, currentDay()).label.toLowerCase()}${t.status === "blocked" ? " (blocked)" : ""}`).join("\n")}\n\nStart with blocked items: they usually need a message, not work.`
         : "Nothing is overdue. 🎉",
       references: overdue.map((t) => taskRef(t.title)),
     };
@@ -113,7 +114,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
 
   if (has(question, intents.focus)) {
     const focus = openTasks
-      .filter((t) => t.dueDate && daysBetween(SAMPLE_TODAY, t.dueDate) <= 2)
+      .filter((t) => t.dueDate && daysBetween(currentDay(), t.dueDate) <= 2)
       .sort((a, b) => {
         const rank = { urgent: 0, high: 1, normal: 2, low: 3 };
         return (
@@ -123,7 +124,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
       });
     return {
       text: focus.length
-        ? `For today, in this order:\n${focus.map((t, i) => `${i + 1}. **${t.title}** · ${t.priority} · ${describeDue(t.dueDate!, SAMPLE_TODAY).label.toLowerCase()}`).join("\n")}\n\nOrdered by priority, then due date.`
+        ? `For today, in this order:\n${focus.map((t, i) => `${i + 1}. **${t.title}** · ${t.priority} · ${describeDue(t.dueDate!, currentDay()).label.toLowerCase()}`).join("\n")}\n\nOrdered by priority, then due date.`
         : "Nothing is due in the next two days. Good moment for backlog or study.",
       references: focus.map((t) => taskRef(t.title)),
     };
@@ -155,7 +156,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
   }
 
   if (has(question, intents.money)) {
-    const month = SAMPLE_TODAY.slice(0, 7);
+    const month = currentDay().slice(0, 7);
     const sum = (scope: string, kind: string) =>
       data.financeEntries
         .filter(
@@ -193,12 +194,12 @@ export function answer(rawQuestion: string, data: AppData): Answer {
   if (has(question, intents.contacts)) {
     const due = data.contacts
       .filter(
-        (c) => c.nextContact && daysBetween(SAMPLE_TODAY, c.nextContact) <= 7,
+        (c) => c.nextContact && daysBetween(currentDay(), c.nextContact) <= 7,
       )
       .sort((a, b) => a.nextContact!.localeCompare(b.nextContact!));
     return {
       text: due.length
-        ? `Follow up this week:\n${due.map((c) => `- **${c.name}** (${c.role ?? "contact"}), ${describeDue(c.nextContact!, SAMPLE_TODAY).label.toLowerCase()}`).join("\n")}`
+        ? `Follow up this week:\n${due.map((c) => `- **${c.name}** (${c.role ?? "contact"}), ${describeDue(c.nextContact!, currentDay()).label.toLowerCase()}`).join("\n")}`
         : "No follow-ups due this week.",
       references: due.map((c) => ({
         kind: "Contact",

@@ -45,7 +45,7 @@ import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
 import { projectColorClasses } from "@/lib/project-colors";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { daysBetween } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
@@ -63,7 +63,7 @@ export function DashboardPage() {
         task.status !== "done" &&
         task.status !== "canceled" &&
         task.dueDate &&
-        daysBetween(SAMPLE_TODAY, task.dueDate) <= 2,
+        daysBetween(currentDay(), task.dueDate) <= 2,
     )
     .sort((a, b) => a.dueDate!.localeCompare(b.dueDate!));
 
@@ -83,13 +83,13 @@ export function DashboardPage() {
     (task) => task.status !== "done" && task.status !== "canceled",
   );
   const overdue = openTasks.filter(
-    (task) => task.dueDate && task.dueDate < SAMPLE_TODAY,
+    (task) => task.dueDate && task.dueDate < currentDay(),
   ).length;
   const doneThisWeek = sampleTasks.filter(
     (task) =>
       task.status === "done" &&
       task.dueDate &&
-      daysBetween(task.dueDate, SAMPLE_TODAY) < 7,
+      daysBetween(task.dueDate, currentDay()) < 7,
   ).length;
 
   return (
@@ -232,7 +232,7 @@ export function DashboardPage() {
                         <span className="hidden sm:block">
                           <DueChip
                             dueDate={task.dueDate!}
-                            today={SAMPLE_TODAY}
+                            today={currentDay()}
                           />
                         </span>
                       </li>
@@ -322,7 +322,7 @@ export function DashboardPage() {
             </Card>
           </div>
           <div className="2xl:sticky 2xl:top-20 2xl:self-start">
-            <AgendaPanel tasks={sampleTasks} today={SAMPLE_TODAY} />
+            <AgendaPanel tasks={sampleTasks} today={currentDay()} />
           </div>
         </div>
         <TaskDetailSheet

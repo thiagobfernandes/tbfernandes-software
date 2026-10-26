@@ -49,7 +49,7 @@ import {
 import { formatShort } from "@/lib/dates";
 import { projectColorClasses } from "@/lib/project-colors";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 type TaskDetailSheetProps = {
@@ -84,7 +84,7 @@ export function TaskDetailSheet({
                   {task.dueDate && (
                     <DueChip
                       dueDate={task.dueDate}
-                      today={SAMPLE_TODAY}
+                      today={currentDay()}
                       done={task.status === "done"}
                     />
                   )}

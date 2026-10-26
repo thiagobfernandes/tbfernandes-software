@@ -46,11 +46,11 @@ import {
 } from "@/lib/sample-data/life";
 import { sampleMethods } from "@/lib/sample-data/methods";
 import {
-  SAMPLE_TODAY,
   sampleCompanies,
   sampleProjects,
   sampleTasks,
 } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 export type AppData = {
   companies: Company[];
@@ -251,7 +251,7 @@ export const workActions = {
   addTask: (task: Omit<Task, "id">) =>
     dataActions.create("tasks", {
       ...task,
-      completedAt: task.status === "done" ? SAMPLE_TODAY : undefined,
+      completedAt: task.status === "done" ? currentDay() : undefined,
     }),
   updateTask(id: string, patch: Partial<Task>) {
     const task = dataActions.get("tasks", id);
@@ -259,7 +259,7 @@ export const workActions = {
     const next = { ...task, ...patch };
     // Completing a task records when; reopening it clears that.
     if (next.status === "done" && task.status !== "done")
-      next.completedAt = SAMPLE_TODAY;
+      next.completedAt = currentDay();
     if (next.status !== "done") next.completedAt = undefined;
     dataActions.update("tasks", id, next);
   },

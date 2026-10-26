@@ -39,7 +39,7 @@ import {
   formatMonth,
 } from "@/lib/money";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 type ScopeFilter = EntryScope | "all";
@@ -56,7 +56,7 @@ function totals(entries: FinanceEntry[]) {
 
 export function CashFlowPage() {
   const { financeEntries } = useAppData();
-  const [month, setMonth] = useState(SAMPLE_TODAY.slice(0, 7));
+  const [month, setMonth] = useState(currentDay().slice(0, 7));
   const [scope, setScope] = useState<ScopeFilter>("all");
   const [editing, setEditing] = useState<FinanceEntry>();
 

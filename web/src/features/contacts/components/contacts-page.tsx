@@ -47,7 +47,7 @@ import type {
 import { DueChip } from "@/features/tasks/components/due-chip";
 import { formatShort } from "@/lib/dates";
 import { dataActions, useAppData, workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const interactionMeta: Record<
@@ -90,7 +90,7 @@ export function ContactsPage() {
   const selectedId = searchParams.get("contact") ?? visible[0]?.id;
   const selected = data.contacts.find((contact) => contact.id === selectedId);
   const dueSoon = data.contacts.filter(
-    (contact) => contact.nextContact && contact.nextContact <= SAMPLE_TODAY,
+    (contact) => contact.nextContact && contact.nextContact <= currentDay(),
   ).length;
 
   function select(id?: string) {
@@ -174,7 +174,7 @@ export function ContactsPage() {
                       {contact.nextContact && (
                         <DueChip
                           dueDate={contact.nextContact}
-                          today={SAMPLE_TODAY}
+                          today={currentDay()}
                         />
                       )}
                     </button>
@@ -226,7 +226,7 @@ function ContactDetail({
     .filter((interaction) => interaction.contactId === contact.id)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const [date, setDate] = useState(SAMPLE_TODAY);
+  const [date, setDate] = useState(currentDay());
   const [kind, setKind] = useState<InteractionKind>("meeting");
   const [summary, setSummary] = useState("");
   const [followUp, setFollowUp] = useState("");
@@ -365,7 +365,7 @@ function ContactDetail({
             <DueChip
               className="w-fit"
               dueDate={contact.nextContact}
-              today={SAMPLE_TODAY}
+              today={currentDay()}
             />
           ) : (
             <span className="text-sm text-muted-foreground">

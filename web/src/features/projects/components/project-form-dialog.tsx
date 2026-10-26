@@ -33,7 +33,7 @@ import {
 import type { Project, ProjectColor } from "@/features/projects/types/project";
 import { projectColorClasses } from "@/lib/project-colors";
 import { useWorkData, workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const NONE = "none";
@@ -63,7 +63,7 @@ export function ProjectFormDialog({
       category: project?.category ?? "professional",
       status: project?.status ?? "active",
       color: project?.color ?? "teal",
-      startDate: project?.startDate ?? SAMPLE_TODAY,
+      startDate: project?.startDate ?? currentDay(),
       dueDate: project?.dueDate ?? "",
       nextDelivery: project?.nextDelivery ?? "",
       description: project?.description ?? "",

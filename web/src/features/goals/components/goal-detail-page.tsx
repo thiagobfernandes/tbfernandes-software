@@ -48,7 +48,7 @@ import { TasksList } from "@/features/tasks/components/tasks-list";
 import { describeDue, formatShort } from "@/lib/dates";
 import { projectColorClasses } from "@/lib/project-colors";
 import { dataActions, selectors, useAppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 export function GoalDetailPage({ goalId }: { goalId: string }) {
@@ -129,7 +129,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
               {goal.dueDate && (
                 <span className="flex items-center gap-1">
                   <CalendarDays className="size-3.5" aria-hidden />
-                  {describeDue(goal.dueDate, SAMPLE_TODAY).label}
+                  {describeDue(goal.dueDate, currentDay()).label}
                 </span>
               )}
             </div>
@@ -298,7 +298,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
               <TasksList
                 tasks={tasks}
                 projectsById={projectsById}
-                today={SAMPLE_TODAY}
+                today={currentDay()}
                 onSelectTask={setSelectedTaskId}
               />
             </CardContent>

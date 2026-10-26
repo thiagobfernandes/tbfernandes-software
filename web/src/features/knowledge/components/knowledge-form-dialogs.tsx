@@ -14,7 +14,7 @@ import {
   type Snippet,
 } from "@/features/knowledge/types/knowledge";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 type DialogProps<T> = {
   trigger?: React.ReactNode;
@@ -84,7 +84,7 @@ export function NoteFormDialog({
         if (item) {
           dataActions.update("notes", item.id, {
             ...values,
-            updatedAt: SAMPLE_TODAY,
+            updatedAt: currentDay(),
           });
           toast.success("Note updated");
           onSaved?.({ ...item, ...values });
@@ -92,8 +92,8 @@ export function NoteFormDialog({
           const created = dataActions.create("notes", {
             ...values,
             body: values.body ?? "",
-            createdAt: SAMPLE_TODAY,
-            updatedAt: SAMPLE_TODAY,
+            createdAt: currentDay(),
+            updatedAt: currentDay(),
           });
           toast.success(`Note "${created.title}" created`);
           onSaved?.(created);
@@ -172,15 +172,15 @@ export function SnippetFormDialog({
         if (item) {
           dataActions.update("snippets", item.id, {
             ...values,
-            updatedAt: SAMPLE_TODAY,
+            updatedAt: currentDay(),
           });
           toast.success("Snippet updated");
           onSaved?.({ ...item, ...values });
         } else {
           const created = dataActions.create("snippets", {
             ...values,
-            createdAt: SAMPLE_TODAY,
-            updatedAt: SAMPLE_TODAY,
+            createdAt: currentDay(),
+            updatedAt: currentDay(),
           });
           toast.success(`Snippet "${created.title}" created`);
           onSaved?.(created);

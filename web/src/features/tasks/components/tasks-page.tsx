@@ -17,7 +17,7 @@ import { TasksList } from "@/features/tasks/components/tasks-list";
 import type { TaskPriority } from "@/features/tasks/types/task";
 import { projectColorClasses } from "@/lib/project-colors";
 import { selectors, useWorkData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const priorities: TaskPriority[] = ["urgent", "high", "normal", "low"];
@@ -138,7 +138,7 @@ export function TasksPage() {
           <TasksList
             tasks={tasks}
             projectsById={projectsById}
-            today={SAMPLE_TODAY}
+            today={currentDay()}
             onSelectTask={setSelectedTaskId}
           />
         </TabsContent>
@@ -146,7 +146,7 @@ export function TasksPage() {
           <TasksBoard
             tasks={tasks}
             projectsById={projectsById}
-            today={SAMPLE_TODAY}
+            today={currentDay()}
             onSelectTask={setSelectedTaskId}
             allowCreate
             defaultProjectId={projectId}

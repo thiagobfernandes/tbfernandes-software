@@ -35,7 +35,7 @@ import {
 } from "@/features/methods/schemas/method-schema";
 import type { Method, MethodCategory } from "@/features/methods/types/method";
 import { dataActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 type MethodFormDialogProps = {
   trigger: React.ReactNode;
@@ -96,7 +96,7 @@ function MethodForm({
         detail: step.detail || undefined,
       })),
       examples: values.examples.length ? values.examples : undefined,
-      lastReviewed: SAMPLE_TODAY,
+      lastReviewed: currentDay(),
     };
     if (method) {
       dataActions.update("methods", method.id, data);

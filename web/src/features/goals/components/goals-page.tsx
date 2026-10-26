@@ -28,7 +28,7 @@ import { goalProgress, tasksOfGoal } from "@/features/goals/lib/goal-progress";
 import { goalAreaLabels, type Goal } from "@/features/goals/types/goal";
 import { daysBetween, formatShort } from "@/lib/dates";
 import { useAppData, type AppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 type Filter = "open" | "completed" | "all";
 
@@ -56,7 +56,7 @@ export function GoalsPage() {
     (item) =>
       !item.done &&
       item.dueDate &&
-      daysBetween(SAMPLE_TODAY, item.dueDate) <= 30,
+      daysBetween(currentDay(), item.dueDate) <= 30,
   ).length;
   const areas = Object.keys(goalAreaLabels) as Goal["area"][];
 

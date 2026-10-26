@@ -12,7 +12,7 @@ import type {
   PurchaseGoal,
 } from "@/features/finance/types/finance";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 type DialogProps<T> = {
   trigger?: React.ReactNode;
@@ -43,7 +43,7 @@ export function EntryFormDialog({
         description: item?.description ?? "",
         category: item?.category ?? "",
         amount: item?.amount as number,
-        date: item?.date ?? SAMPLE_TODAY,
+        date: item?.date ?? currentDay(),
         recurring: item?.recurring ?? false,
       }}
       fields={[

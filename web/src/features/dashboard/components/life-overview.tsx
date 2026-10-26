@@ -17,7 +17,7 @@ import { DueChip } from "@/features/tasks/components/due-chip";
 import { daysBetween } from "@/lib/dates";
 import { formatBRL } from "@/lib/money";
 import type { AppData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 /** Goals, money, people and learning: the non-work areas in one row. */
@@ -25,7 +25,7 @@ export function LifeOverview({ data }: { data: AppData }) {
   const goals = data.goals
     .filter((goal) => goal.status === "active")
     .slice(0, 3);
-  const month = SAMPLE_TODAY.slice(0, 7);
+  const month = currentDay().slice(0, 7);
   const balance = (scope: "personal" | "business") =>
     data.financeEntries
       .filter((entry) => entry.scope === scope && entry.date.startsWith(month))
@@ -38,7 +38,7 @@ export function LifeOverview({ data }: { data: AppData }) {
     .filter(
       (contact) =>
         contact.nextContact &&
-        daysBetween(SAMPLE_TODAY, contact.nextContact) <= 7,
+        daysBetween(currentDay(), contact.nextContact) <= 7,
     )
     .sort((a, b) => a.nextContact!.localeCompare(b.nextContact!));
   const studies = data.studies.filter(
@@ -123,7 +123,7 @@ export function LifeOverview({ data }: { data: AppData }) {
                 >
                   {contact.name}
                 </Link>
-                <DueChip dueDate={contact.nextContact!} today={SAMPLE_TODAY} />
+                <DueChip dueDate={contact.nextContact!} today={currentDay()} />
               </li>
             ))}
           </ul>

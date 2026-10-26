@@ -43,7 +43,8 @@ import { TasksList } from "@/features/tasks/components/tasks-list";
 import { addDays, daysBetween, formatShort } from "@/lib/dates";
 import { projectColorClasses } from "@/lib/project-colors";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY, isOpenTask } from "@/lib/sample-data/work";
+import { isOpenTask } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const TIMELINE_DAYS = 14;
@@ -63,7 +64,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
   const inProgress = tasks.filter((task) => task.status === "in_progress");
   const done = tasks.filter((task) => task.status === "done");
   const overdue = open.filter(
-    (task) => task.dueDate && task.dueDate < SAMPLE_TODAY,
+    (task) => task.dueDate && task.dueDate < currentDay(),
   );
   const color = projectColorClasses[project.color];
 
@@ -71,11 +72,11 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
     ? daysBetween(project.startDate, project.dueDate)
     : 0;
   const elapsed = Math.min(
-    Math.max(daysBetween(project.startDate, SAMPLE_TODAY), 0),
+    Math.max(daysBetween(project.startDate, currentDay()), 0),
     totalDays,
   );
   const daysLeft = project.dueDate
-    ? daysBetween(SAMPLE_TODAY, project.dueDate)
+    ? daysBetween(currentDay(), project.dueDate)
     : undefined;
 
   return (
@@ -212,9 +213,9 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
             <ProjectTimeline
               tasks={tasks}
               projectsById={projectsById}
-              start={addDays(SAMPLE_TODAY, -4)}
+              start={addDays(currentDay(), -4)}
               days={TIMELINE_DAYS}
-              today={SAMPLE_TODAY}
+              today={currentDay()}
               onSelectTask={setSelectedTaskId}
             />
           </TabsContent>
@@ -222,7 +223,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
             <TasksBoard
               tasks={tasks}
               projectsById={projectsById}
-              today={SAMPLE_TODAY}
+              today={currentDay()}
               onSelectTask={setSelectedTaskId}
               allowCreate
               defaultProjectId={project.id}
@@ -232,7 +233,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
             <TasksList
               tasks={tasks}
               projectsById={projectsById}
-              today={SAMPLE_TODAY}
+              today={currentDay()}
               onSelectTask={setSelectedTaskId}
             />
           </TabsContent>

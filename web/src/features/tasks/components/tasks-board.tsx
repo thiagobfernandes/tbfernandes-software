@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/features/tasks/components/task-card";
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
+import { useTouchDrag } from "@/features/tasks/hooks/use-touch-drag";
 import {
   taskStatuses,
   taskStatusLabels,
@@ -46,6 +47,41 @@ export function TasksBoard({
 }: TasksBoardProps) {
   const [draggingId, setDraggingId] = useState<string>();
   const [overStatus, setOverStatus] = useState<TaskStatus>();
+  const [touchDragging, setTouchDragging] = useState(false);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  // Touch screens: press and hold a card, then move it to another column.
+  const {
+    ghostRef,
+    handlers: touchHandlers,
+    isTouchDragging,
+  } = useTouchDrag({
+    targetAt: (x, y) =>
+      document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-status]")
+        ?.dataset.status,
+    onStart: (id) => {
+      setDraggingId(id);
+      setTouchDragging(true);
+    },
+    onOver: (status) => setOverStatus(status as TaskStatus | undefined),
+    // Near the screen edge, scroll the board so off-screen columns come in.
+    onMove: (x) => {
+      const scroller = scrollerRef.current;
+      if (!scroller) return;
+      const edge = 48;
+      if (x < edge) scroller.scrollBy({ left: -24 });
+      else if (x > window.innerWidth - edge) scroller.scrollBy({ left: 24 });
+    },
+    onDrop: (status) => {
+      setTouchDragging(false);
+      if (status) drop(status as TaskStatus);
+      else {
+        setDraggingId(undefined);
+        setOverStatus(undefined);
+      }
+    },
+  });
+  const draggedTask = tasks.find((task) => task.id === draggingId);
 
   // Dropping a card on a column moves the task to that status.
   function drop(status: TaskStatus) {
@@ -65,13 +101,17 @@ export function TasksBoard({
   }
 
   return (
-    <div className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6">
+    <div
+      ref={scrollerRef}
+      className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6"
+    >
       <div className="grid auto-cols-[17rem] grid-flow-col gap-4">
         {taskStatuses.map((status) => {
           const column = tasks.filter((task) => task.status === status);
           return (
             <section
               key={status}
+              data-status={status}
               aria-label={taskStatusLabels[status]}
               onDragOver={(event) => {
                 if (!draggingId) return;
@@ -131,7 +171,12 @@ export function TasksBoard({
                   <div
                     key={task.id}
                     draggable
+                    {...touchHandlers(task.id)}
                     onDragStart={(event) => {
+                      if (isTouchDragging()) {
+                        event.preventDefault();
+                        return;
+                      }
                       event.dataTransfer.effectAllowed = "move";
                       event.dataTransfer.setData("text/plain", task.id);
                       setDraggingId(task.id);
@@ -141,7 +186,7 @@ export function TasksBoard({
                       setOverStatus(undefined);
                     }}
                     className={cn(
-                      "cursor-grab active:cursor-grabbing",
+                      "cursor-grab select-none [-webkit-touch-callout:none] active:cursor-grabbing",
                       draggingId === task.id && "opacity-40",
                     )}
                   >
@@ -162,6 +207,23 @@ export function TasksBoard({
           );
         })}
       </div>
+      {touchDragging && draggedTask && (
+        <div
+          ref={ghostRef}
+          aria-hidden
+          className="pointer-events-none fixed top-0 left-0 z-50 rotate-2 opacity-90 shadow-xl"
+        >
+          <TaskCard
+            task={draggedTask}
+            project={
+              draggedTask.projectId
+                ? projectsById.get(draggedTask.projectId)
+                : undefined
+            }
+            today={today}
+          />
+        </div>
+      )}
     </div>
   );
 }

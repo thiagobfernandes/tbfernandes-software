@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -131,6 +132,12 @@ export function AgendaPanel({
             );
           })}
         </div>
+        <Link
+          href="/calendar"
+          className="self-end text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Open full calendar
+        </Link>
       </section>
 
       <section aria-label="To-do" className="flex flex-col gap-3">

@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  CalendarDays,
   Briefcase,
   Building2,
   Code2,
@@ -44,6 +45,7 @@ export function isNavGroup(entry: NavEntry): entry is NavGroup {
 // with `soon` to show it in the map before it is built.
 export const mainNavigation: NavEntry[] = [
   { title: "Overview", href: "/", icon: LayoutDashboard },
+  { title: "Calendar", href: "/calendar", icon: CalendarDays },
   { title: "Assistant", href: "/assistant", icon: Sparkles },
   {
     title: "Work",

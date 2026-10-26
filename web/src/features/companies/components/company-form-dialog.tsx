@@ -32,7 +32,7 @@ import {
 } from "@/features/companies/schemas/company-schema";
 import type { Company } from "@/features/projects/types/project";
 import { workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 type CompanyFormDialogProps = {
   trigger: React.ReactNode;
@@ -54,7 +54,7 @@ export function CompanyFormDialog({
       tradeName: company?.tradeName ?? "",
       relationship: company?.relationship ?? "client",
       status: company?.status ?? "active",
-      startDate: company?.startDate ?? SAMPLE_TODAY,
+      startDate: company?.startDate ?? currentDay(),
       mainContact: company?.mainContact ?? "",
       description: company?.description ?? "",
     },

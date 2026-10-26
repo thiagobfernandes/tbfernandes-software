@@ -33,7 +33,8 @@ import { ProjectCard } from "@/features/projects/components/project-card";
 import { TasksList } from "@/features/tasks/components/tasks-list";
 import { formatShort, parseDay } from "@/lib/dates";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY, isOpenTask } from "@/lib/sample-data/work";
+import { isOpenTask } from "@/lib/sample-data/work";
+import { currentDay } from "@/lib/today";
 
 export function CompanyDetailPage({ companyId }: { companyId: string }) {
   const data = useWorkData();
@@ -52,7 +53,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
   );
   const open = tasks.filter(isOpenTask);
   const overdue = open.filter(
-    (task) => task.dueDate && task.dueDate < SAMPLE_TODAY,
+    (task) => task.dueDate && task.dueDate < currentDay(),
   );
   const done = tasks.filter((task) => task.status === "done");
 
@@ -185,7 +186,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
         <TasksList
           tasks={tasks}
           projectsById={projectsById}
-          today={SAMPLE_TODAY}
+          today={currentDay()}
           onSelectTask={setSelectedTaskId}
         />
       </section>

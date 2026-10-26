@@ -14,15 +14,16 @@ import { ProjectTimeline } from "@/features/projects/components/project-timeline
 import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { addDays, formatShort } from "@/lib/dates";
 import { selectors, useWorkData } from "@/lib/sample-data/store";
-import { SAMPLE_TODAY } from "@/lib/sample-data/work";
+import { useToday } from "@/lib/today";
 
-const TIMELINE_START = addDays(SAMPLE_TODAY, -4);
 const TIMELINE_DAYS = 14;
 
 export function ProjectsPage() {
   const data = useWorkData();
   const { findCompany, tasksOfProject, projectsById } = selectors(data);
   const [selectedTaskId, setSelectedTaskId] = useState<string>();
+  const today = useToday();
+  const timelineStart = addDays(today, -4);
 
   return (
     <PageContainer className="max-w-none">
@@ -68,15 +69,15 @@ export function ProjectsPage() {
 
         <TabsContent value="timeline" className="flex flex-col gap-3">
           <p className="text-sm text-muted-foreground">
-            {formatShort(TIMELINE_START)} –{" "}
-            {formatShort(addDays(TIMELINE_START, TIMELINE_DAYS - 1))}
+            {formatShort(timelineStart)} –{" "}
+            {formatShort(addDays(timelineStart, TIMELINE_DAYS - 1))}
           </p>
           <ProjectTimeline
             tasks={data.tasks}
             projectsById={projectsById}
-            start={TIMELINE_START}
+            start={timelineStart}
             days={TIMELINE_DAYS}
-            today={SAMPLE_TODAY}
+            today={today}
             onSelectTask={setSelectedTaskId}
           />
         </TabsContent>
