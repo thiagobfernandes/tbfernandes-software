@@ -25,7 +25,7 @@ public final class FinanceEntry extends Aggregate<FinanceEntry.Details> {
 	}
 
 	public static FinanceEntry create(UUID ownerId, Details details) {
-		return new FinanceEntry(Ids.newId(), ownerId, details, EntrySource.MANUAL, null, true);
+		return new FinanceEntry(Ids.forNewAggregate(), ownerId, details, EntrySource.MANUAL, null, true);
 	}
 
 	/** Entry imported from open finance; externalId keeps imports idempotent (RN-16). */

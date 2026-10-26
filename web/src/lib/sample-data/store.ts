@@ -1,10 +1,15 @@
 "use client";
 
-// Client-side store that simulates the API: starts from the sample data and
-// keeps changes in this browser (localStorage). Replace with API calls once
-// the Spring Boot endpoints exist.
+// Client-side store behind every screen. With NEXT_PUBLIC_DATA_SOURCE=local
+// (default) it simulates the API: starts from the sample data and keeps
+// changes in this browser (localStorage). With "api" it starts empty, loads
+// from the Spring Boot API and sends each change there (lib/api/remote-store).
 
 import { useSyncExternalStore } from "react";
+
+import { connectRemote, remote } from "@/lib/api/remote-store";
+import { uuidv7 } from "@/lib/api/uuid";
+import { env } from "@/lib/env";
 
 import type { Contact, Interaction } from "@/features/contacts/types/contact";
 import type {
@@ -73,7 +78,8 @@ export type WorkData = AppData;
 export type CollectionKey = keyof AppData;
 type Item<K extends CollectionKey> = AppData[K][number];
 
-const STORAGE_KEY = "tbf-sample-data-v2";
+/** Where the simulated data lives in this browser; also read by the import. */
+export const STORAGE_KEY = "tbf-sample-data-v2";
 const LEGACY_WORK_KEY = "tbf-sample-work-v1";
 
 const initialData: AppData = {
@@ -116,11 +122,37 @@ const idPrefixes: Record<CollectionKey, string> = {
   interactions: "i",
 };
 
+const useApi = env.dataSource === "api";
+
+const emptyData = Object.fromEntries(
+  Object.keys(initialData).map((key) => [key, []]),
+) as unknown as AppData;
+
 let state: AppData | undefined;
 const listeners = new Set<() => void>();
 
 function load(): AppData {
   if (state) return state;
+  if (useApi) {
+    state = emptyData;
+    if (typeof window !== "undefined") {
+      connectRemote({
+        replaceAll: (data) => commit(data),
+        replaceItem(key, item) {
+          const data = load();
+          const items = data[key] as { id: string }[];
+          if (!items.some((current) => current.id === item.id)) return;
+          commit({
+            ...data,
+            [key]: items.map((current) =>
+              current.id === item.id ? item : current,
+            ),
+          });
+        },
+      });
+    }
+    return state;
+  }
   try {
     const raw =
       localStorage.getItem(STORAGE_KEY) ??
@@ -138,6 +170,10 @@ function load(): AppData {
 
 function commit(next: AppData) {
   state = next;
+  if (useApi) {
+    listeners.forEach((listener) => listener());
+    return;
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch {
@@ -152,7 +188,9 @@ function subscribe(listener: () => void) {
 }
 
 export function useAppData() {
-  return useSyncExternalStore(subscribe, load, () => initialData);
+  return useSyncExternalStore(subscribe, load, () =>
+    useApi ? emptyData : initialData,
+  );
 }
 
 export const useWorkData = useAppData;
@@ -162,10 +200,14 @@ export const dataActions = {
   create<K extends CollectionKey>(key: K, item: Omit<Item<K>, "id">) {
     const created = {
       ...item,
-      id: `${idPrefixes[key]}-${crypto.randomUUID().slice(0, 8)}`,
+      // With the API the browser picks a UUID the API accepts (ADR-007).
+      id: useApi
+        ? uuidv7()
+        : `${idPrefixes[key]}-${crypto.randomUUID().slice(0, 8)}`,
     } as Item<K>;
     const data = load();
     commit({ ...data, [key]: [...data[key], created] });
+    if (useApi) remote.create(key, created);
     return created;
   },
   update<K extends CollectionKey>(key: K, id: string, patch: Partial<Item<K>>) {
@@ -176,6 +218,8 @@ export const dataActions = {
         item.id === id ? { ...item, ...patch } : item,
       ),
     });
+    const updated = dataActions.get(key, id);
+    if (useApi && updated) remote.update(key, updated);
   },
   remove<K extends CollectionKey>(key: K, id: string) {
     const data = load();
@@ -183,11 +227,14 @@ export const dataActions = {
       ...data,
       [key]: (data[key] as Item<K>[]).filter((item) => item.id !== id),
     });
+    if (useApi) remote.remove(key, id);
   },
   get<K extends CollectionKey>(key: K, id?: string) {
     return (load()[key] as Item<K>[]).find((item) => item.id === id);
   },
+  /** Local mode only: back to the sample data. */
   reset() {
+    if (useApi) return;
     commit(initialData);
   },
 };
@@ -233,6 +280,7 @@ export const workActions = {
       notes: data.notes.map(unlink),
       snippets: data.snippets.map(unlink),
     });
+    if (useApi) remote.remove("projects", id);
   },
   /** Only companies without projects can be deleted; contacts are unlinked. */
   deleteCompany(id: string) {
@@ -247,6 +295,7 @@ export const workActions = {
           : contact,
       ),
     });
+    if (useApi) remote.remove("companies", id);
   },
   reset: () => dataActions.reset(),
 };

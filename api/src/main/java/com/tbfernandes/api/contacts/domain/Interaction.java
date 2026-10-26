@@ -16,7 +16,7 @@ public final class Interaction extends Aggregate<Interaction.Details> {
 	}
 
 	public static Interaction create(UUID ownerId, Details details) {
-		return new Interaction(Ids.newId(), ownerId, details, true);
+		return new Interaction(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Interaction restore(UUID id, UUID ownerId, Details details) {

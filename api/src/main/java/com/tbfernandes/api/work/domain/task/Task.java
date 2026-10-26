@@ -29,7 +29,7 @@ public final class Task {
 	}
 
 	public static Task create(UUID ownerId, TaskDetails details, TaskStatus status, Clock clock) {
-		Task task = new Task(Ids.newId(), Require.present(ownerId, "ownerId"), validated(details), TaskStatus.BACKLOG,
+		Task task = new Task(Ids.forNewAggregate(), Require.present(ownerId, "ownerId"), validated(details), TaskStatus.BACKLOG,
 				null);
 		task.changeStatus(status == null ? TaskStatus.BACKLOG : status, clock);
 		return task;

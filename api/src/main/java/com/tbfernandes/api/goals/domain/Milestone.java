@@ -15,7 +15,7 @@ public final class Milestone extends Aggregate<Milestone.Details> {
 	}
 
 	public static Milestone create(UUID ownerId, Details details) {
-		return new Milestone(Ids.newId(), ownerId, details, true);
+		return new Milestone(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Milestone restore(UUID id, UUID ownerId, Details details) {

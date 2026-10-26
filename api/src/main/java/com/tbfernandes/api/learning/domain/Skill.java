@@ -17,7 +17,7 @@ public final class Skill extends Aggregate<Skill.Details> {
 	}
 
 	public static Skill create(UUID ownerId, Details details) {
-		return new Skill(Ids.newId(), ownerId, details, true);
+		return new Skill(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Skill restore(UUID id, UUID ownerId, Details details) {

@@ -6,7 +6,10 @@ import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.Version;
+import com.tbfernandes.api.shared.domain.ClientIds;
+import com.tbfernandes.api.shared.domain.Conflict;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -34,5 +37,16 @@ public abstract class AuditedEntity {
 
 	@Version
 	public long version;
+
+	/**
+	 * ADR-007: a row loaded with the id the client chose for a new record already existed, so
+	 * the create would overwrite it. Refuse instead (409), whoever owns that row.
+	 */
+	@PostLoad
+	void refuseTakenClientId() {
+		if (ClientIds.assignedInThisRequest(id)) {
+			throw new Conflict("ADR-007", "The id " + id + " is already in use");
+		}
+	}
 
 }

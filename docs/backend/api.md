@@ -7,6 +7,8 @@ Versão 0.2 · 2026-10-26 · O contrato executável é o OpenAPI em `http://loca
 - Base: `/api/v1`. JSON em camelCase, enums em minúsculas (`"in_progress"`), datas ISO 8601 (`2026-10-26`), meses `YYYY-MM`.
 - Ids são UUID v7. O corpo de resposta tem o mesmo formato dos tipos do frontend: `{ "id": "...", ...campos }`.
 - `POST` cria e responde `201` com `Location`; `PUT` substitui os campos editáveis; `PATCH` muda uma parte (status, indicador); `DELETE` responde `204`.
+- **Id escolhido pelo cliente (ADR-007)**: um `POST` pode enviar `X-Client-Id: <uuid>` para definir o id do registro criado. Se o id já existir, a resposta é 409 e nada é alterado. Sem o cabeçalho, a API gera o id.
+- Campos desconhecidos no corpo são ignorados, então o frontend pode devolver o registro inteiro num `PUT`.
 - **Paginação (PLT-09)**: toda lista aceita `page` (a partir de 0) e `size` (1 a 200, padrão 50). Sem `page`, a lista vem inteira. Os totais vão nos cabeçalhos `X-Total-Count`, `X-Page` e `X-Page-Size`, e o corpo continua um array.
 - **Autenticação**: no modo `single-user` não há login. No modo `session`, toda rota fora de `/auth/*` exige sessão (401 sem ela), e toda escrita exige o cabeçalho `X-XSRF-TOKEN` com o valor do cookie `XSRF-TOKEN`. Ver [arquitetura](arquitetura.md#autenticação-etapa-6).
 - Erros em Problem Details (RFC 9457):

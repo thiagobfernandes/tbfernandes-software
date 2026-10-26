@@ -28,7 +28,7 @@ public final class Company {
 	}
 
 	public static Company create(UUID ownerId, CompanyDetails details) {
-		Company company = new Company(Ids.newId(), Require.present(ownerId, "ownerId"));
+		Company company = new Company(Ids.forNewAggregate(), Require.present(ownerId, "ownerId"));
 		company.apply(details);
 		return company;
 	}

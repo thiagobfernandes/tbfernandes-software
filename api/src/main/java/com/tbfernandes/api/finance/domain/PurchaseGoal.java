@@ -19,7 +19,7 @@ public final class PurchaseGoal extends Aggregate<PurchaseGoal.Details> {
 	}
 
 	public static PurchaseGoal create(UUID ownerId, Details details) {
-		return new PurchaseGoal(Ids.newId(), ownerId, details, true);
+		return new PurchaseGoal(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static PurchaseGoal restore(UUID id, UUID ownerId, Details details) {

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "api:types": "npx --yes openapi-typescript@7.13.0 ${API_DOCS_URL:-http://localhost:8080/v3/api-docs} -o src/lib/api/schema.d.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",

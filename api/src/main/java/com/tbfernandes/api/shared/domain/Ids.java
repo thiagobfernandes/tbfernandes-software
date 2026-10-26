@@ -19,6 +19,12 @@ public final class Ids {
 		return newId(Clock.systemUTC());
 	}
 
+	/** Id for a new aggregate root: the one the client asked for (ADR-007), or a new one. */
+	public static UUID forNewAggregate() {
+		UUID requested = ClientIds.take();
+		return requested != null ? requested : newId();
+	}
+
 	static UUID newId(Clock clock) {
 		long millis = clock.millis();
 		long msb = (millis << 16) | 0x7000L | (RANDOM.nextInt() & 0x0FFFL);

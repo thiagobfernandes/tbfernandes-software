@@ -17,7 +17,7 @@ public final class Study extends Aggregate<Study.Details> {
 	}
 
 	public static Study create(UUID ownerId, Details details) {
-		return new Study(Ids.newId(), ownerId, details, true);
+		return new Study(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Study restore(UUID id, UUID ownerId, Details details) {

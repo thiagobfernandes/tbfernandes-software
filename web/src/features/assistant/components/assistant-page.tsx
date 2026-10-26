@@ -10,6 +10,9 @@ import { PageHeading } from "@/components/shared/page-heading";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { answer, type Answer } from "@/features/assistant/lib/answer";
+import { apiFetch } from "@/lib/api/client";
+import type { components } from "@/lib/api/schema";
+import { env } from "@/lib/env";
 import { useAppData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
 
@@ -49,14 +52,31 @@ export function AssistantPage() {
     ]);
     setDraft("");
     setThinking(true);
-    // A short pause so the exchange reads like the real assistant will.
-    setTimeout(() => {
+    const reply = (result: Answer) => {
       setMessages((current) => [
         ...current,
-        { id: nextId.current++, role: "assistant", ...answer(text, data) },
+        { id: nextId.current++, role: "assistant", ...result },
       ]);
       setThinking(false);
-    }, 450);
+    };
+    if (env.dataSource === "api") {
+      // Same rules, answered by the API (and by the AI model once one is set).
+      const body: components["schemas"]["QuestionRequest"] = { question: text };
+      apiFetch<Answer>("/api/v1/assistant/questions", {
+        method: "POST",
+        body,
+      })
+        .then(reply)
+        .catch(() =>
+          reply({
+            text: "The assistant could not be reached. Try again in a moment.",
+            references: [],
+          }),
+        );
+      return;
+    }
+    // A short pause so the exchange reads like the real assistant will.
+    setTimeout(() => reply(answer(text, data)), 450);
   }
 
   return (
@@ -73,9 +93,9 @@ export function AssistantPage() {
         }
       />
       <p className="rounded-xl border border-dashed px-4 py-2.5 text-xs text-muted-foreground">
-        Simulated: answers come from your data through fixed rules. The AI
-        assistant replaces this once the backend exists, and will always show
-        where an answer came from.
+        {env.dataSource === "api"
+          ? "Answers come from your data in the API through fixed rules. Once an AI model is connected it writes the text, and the links still point to the records used."
+          : "Simulated: answers come from your data through fixed rules. The AI assistant replaces this once the backend exists, and will always show where an answer came from."}
       </p>
 
       <div

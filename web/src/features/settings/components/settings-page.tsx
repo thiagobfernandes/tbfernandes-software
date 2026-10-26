@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AppearanceSettings } from "@/features/settings/components/appearance-settings";
-import { SampleDataSettings } from "@/features/settings/components/sample-data-settings";
+import { DataSettings } from "@/features/settings/components/data-settings";
 
 export function SettingsPage() {
   return (
@@ -28,13 +28,13 @@ export function SettingsPage() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Sample data</CardTitle>
+          <CardTitle className="text-base">Data</CardTitle>
           <CardDescription>
-            Simulated records used until the backend is connected.
+            Where your records are kept, and a JSON copy of all of them.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SampleDataSettings />
+          <DataSettings />
         </CardContent>
       </Card>
     </PageContainer>

@@ -17,7 +17,7 @@ public final class Material extends Aggregate<Material.Details> {
 	}
 
 	public static Material create(UUID ownerId, Details details) {
-		return new Material(Ids.newId(), ownerId, details, true);
+		return new Material(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Material restore(UUID id, UUID ownerId, Details details) {

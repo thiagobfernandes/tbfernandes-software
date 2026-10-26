@@ -28,7 +28,7 @@ public final class Snippet {
 	}
 
 	public static Snippet create(UUID ownerId, SnippetDetails details, KnowledgeLinks links) {
-		Snippet snippet = new Snippet(Ids.newId(), Require.present(ownerId, "ownerId"));
+		Snippet snippet = new Snippet(Ids.forNewAggregate(), Require.present(ownerId, "ownerId"));
 		snippet.edit(details, links);
 		return snippet;
 	}

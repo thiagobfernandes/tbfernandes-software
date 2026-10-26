@@ -17,7 +17,7 @@ public final class Education extends Aggregate<Education.Details> {
 	}
 
 	public static Education create(UUID ownerId, Details details) {
-		return new Education(Ids.newId(), ownerId, details, true);
+		return new Education(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Education restore(UUID id, UUID ownerId, Details details) {

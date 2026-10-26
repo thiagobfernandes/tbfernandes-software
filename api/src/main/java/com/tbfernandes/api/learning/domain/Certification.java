@@ -17,7 +17,7 @@ public final class Certification extends Aggregate<Certification.Details> {
 	}
 
 	public static Certification create(UUID ownerId, Details details) {
-		return new Certification(Ids.newId(), ownerId, details, true);
+		return new Certification(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Certification restore(UUID id, UUID ownerId, Details details) {

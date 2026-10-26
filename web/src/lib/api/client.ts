@@ -19,18 +19,33 @@ export class ApiError extends Error {
   }
 }
 
-type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
+type RequestOptions = Omit<RequestInit, "body"> & {
+  body?: unknown;
+  /** Id for the record a POST creates (ADR-007). */
+  clientId?: string;
+};
+
+/** CSRF token the API sets in a cookie when login is on (session mode). */
+function csrfToken() {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
 
 export async function apiFetch<T>(
   path: string,
-  { body, headers, ...init }: RequestOptions = {},
+  { body, headers, clientId, ...init }: RequestOptions = {},
 ): Promise<T> {
+  const method = (init.method ?? "GET").toUpperCase();
+  const token = method === "GET" ? undefined : csrfToken();
   const response = await fetch(`${env.apiUrl}${path}`, {
     ...init,
     credentials: "include",
     headers: {
       Accept: "application/json",
       ...(body !== undefined && { "Content-Type": "application/json" }),
+      ...(token && { "X-XSRF-TOKEN": token }),
+      ...(clientId && { "X-Client-Id": clientId }),
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,

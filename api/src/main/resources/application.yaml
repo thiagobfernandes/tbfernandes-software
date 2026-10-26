@@ -15,6 +15,8 @@ spring:
     mapper:
       accept-case-insensitive-enums: true
     deserialization:
+      # The frontend sends whole records back on PUT, including read-only fields (completedAt, createdAt).
+      fail-on-unknown-properties: false
       # Missing booleans in a request (e.g. milestone "done") mean false, as in the frontend.
       fail-on-null-for-primitives: false
     datatype:

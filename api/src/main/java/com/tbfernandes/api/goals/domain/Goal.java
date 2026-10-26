@@ -16,7 +16,7 @@ public final class Goal extends Aggregate<GoalDetails> {
 	}
 
 	public static Goal create(UUID ownerId, GoalDetails details) {
-		return new Goal(Ids.newId(), ownerId, details, true);
+		return new Goal(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Goal restore(UUID id, UUID ownerId, GoalDetails details) {

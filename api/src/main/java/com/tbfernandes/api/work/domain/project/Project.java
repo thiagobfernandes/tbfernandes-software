@@ -19,7 +19,7 @@ public final class Project {
 	}
 
 	public static Project create(UUID ownerId, ProjectDetails details) {
-		return new Project(Ids.newId(), Require.present(ownerId, "ownerId"), validated(details));
+		return new Project(Ids.forNewAggregate(), Require.present(ownerId, "ownerId"), validated(details));
 	}
 
 	public static Project restore(UUID id, UUID ownerId, ProjectDetails details) {

@@ -148,6 +148,11 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 **Decisão:** `db/dev/R__dev_seed.sql` é gerado a partir de `web/src/lib/sample-data`, com ids UUIDv5 dos ids do frontend.
 **Consequências:** as telas mostram os mesmos registros com a API real; o seed nunca roda fora do perfil `dev`.
 
+### ADR-007 — O cliente pode escolher o id do registro que cria
+**Contexto:** o store do frontend aplica cada mudança na hora e envia para a API depois. Se o id só existisse depois da resposta, a tela teria que trocar ids já usados (seleção, vínculos, uma interação que aponta para a tarefa de follow-up criada no mesmo clique).
+**Decisão:** `POST` aceita o cabeçalho opcional `X-Client-Id` com um UUID; o primeiro agregado criado na requisição usa esse id (`Ids.forNewAggregate()`). Se uma linha com esse id já existir, de qualquer dono, a API responde 409 em vez de sobrescrever (`AuditedEntity` recusa no `@PostLoad`). Itens filhos, como os do checklist, continuam com ids do servidor.
+**Consequências:** criação otimista com id estável, e importação idempotente: importar duas vezes os mesmos dados não duplica nada. O frontend gera UUIDv7, como a API.
+
 ## 8. Ambiente local
 
 ```
@@ -156,3 +161,7 @@ WSL (Ubuntu)
 ```
 
 Veja [README do backend](../../api/README.md) para os comandos.
+
+### Frontend com a API (etapa 9)
+
+`NEXT_PUBLIC_DATA_SOURCE=api` no `web/.env.local` troca o armazenamento simulado pela API sem mudar as telas: o store (`web/src/lib/sample-data/store.ts`) continua sendo o que as telas leem, mas começa vazio, carrega as 17 coleções da API e envia cada mudança por `web/src/lib/api/remote-store.ts`, uma de cada vez e em ordem. Se a API recusar uma mudança, o store recarrega tudo da API e mostra o motivo. No modo `session`, a tela de login aparece antes do painel.

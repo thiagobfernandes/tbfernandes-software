@@ -27,7 +27,7 @@ public final class Note {
 	}
 
 	public static Note create(UUID ownerId, String title, String body, List<String> tags, KnowledgeLinks links) {
-		Note note = new Note(Ids.newId(), Require.present(ownerId, "ownerId"));
+		Note note = new Note(Ids.forNewAggregate(), Require.present(ownerId, "ownerId"));
 		note.edit(title, body, tags, links);
 		return note;
 	}

@@ -22,7 +22,7 @@ public final class Method {
 	}
 
 	public static Method create(UUID ownerId, MethodDetails details) {
-		return new Method(Ids.newId(), Require.present(ownerId, "ownerId"), validated(details));
+		return new Method(Ids.forNewAggregate(), Require.present(ownerId, "ownerId"), validated(details));
 	}
 
 	public static Method restore(UUID id, UUID ownerId, MethodDetails details) {

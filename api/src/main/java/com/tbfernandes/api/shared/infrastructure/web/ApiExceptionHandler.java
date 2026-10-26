@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.tbfernandes.api.shared.domain.BusinessRuleViolation;
 import com.tbfernandes.api.shared.domain.Conflict;
 import com.tbfernandes.api.shared.domain.NotFound;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -39,6 +40,15 @@ class ApiExceptionHandler {
 	ProblemDetail staleVersion(OptimisticLockingFailureException ex) {
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
 				"The record was changed by another request; reload and try again");
+		problem.setTitle("Conflict");
+		return problem;
+	}
+
+	/** A unique key or primary key already taken, e.g. two creates racing with the same client id. */
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	ProblemDetail integrity(DataIntegrityViolationException ex) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+				"The request conflicts with existing data");
 		problem.setTitle("Conflict");
 		return problem;
 	}

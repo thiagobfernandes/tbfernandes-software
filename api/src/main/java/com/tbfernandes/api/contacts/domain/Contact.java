@@ -21,7 +21,7 @@ public final class Contact extends Aggregate<Contact.Details> {
 	}
 
 	public static Contact create(UUID ownerId, Details details) {
-		return new Contact(Ids.newId(), ownerId, details, true);
+		return new Contact(Ids.forNewAggregate(), ownerId, details, true);
 	}
 
 	public static Contact restore(UUID id, UUID ownerId, Details details) {

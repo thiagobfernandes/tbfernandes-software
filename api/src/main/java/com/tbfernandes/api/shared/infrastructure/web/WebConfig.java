@@ -28,6 +28,8 @@ class WebConfig implements WebMvcConfigurer {
 		registry.addMapping("/api/**")
 			.allowedOrigins(properties.allowedOrigins().toArray(String[]::new))
 			.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+			// Paging totals and the new resource's URL are read by the frontend (PLT-09).
+			.exposedHeaders("X-Total-Count", "X-Page", "X-Page-Size", "Location")
 			.allowCredentials(true);
 	}
 

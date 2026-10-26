@@ -34,7 +34,7 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | PLT-05 | Testes de arquitetura (Spring Modulith + ArchUnit) e documentação dos módulos gerada | P | ✅ |
 | PLT-06 | CI no GitHub Actions: `./mvnw verify` e `npm run build` em cada PR | P | ✅ |
 | PLT-07 | Job de verificação de referências órfãs entre módulos (ADR-003) | M | ⬜ |
-| PLT-08 | Gerar tipos TS a partir do OpenAPI (`openapi-typescript`) e usar em `web/src/lib/api` | M | ⬜ |
+| PLT-08 | Gerar tipos TS a partir do OpenAPI (`openapi-typescript`) e usar em `web/src/lib/api` | M | ✅ etapa 9 |
 | PLT-09 | Paginação padrão (`page`, `size`, `sort`) e resposta paginada | P | ✅ |
 | PLT-10 | Tratamento de conflito de versão e de estado (409) | P | ✅ |
 | PLT-11 | Logs JSON e perfil `prod` | P | ✅ |
@@ -148,8 +148,8 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 | IDN-02 | `OwnerContext` a partir do usuário logado | P | ✅ |
 | IDN-03 | Configurações do usuário (RF-GEN-03) | P | ✅ |
 | IDN-06 | Limitar tentativas de login por IP/e-mail | P | ⬜ |
-| IDN-04 | Exportar todos os dados em JSON (RF-GEN-01). Feito no frontend, que já tem o formato `AppData`, lendo da API | M | ⬜ |
-| IDN-05 | Importar dados do localStorage do modo simulado (RF-GEN-02). Feito no frontend, gravando pela API | M | ⬜ |
+| IDN-04 | Exportar todos os dados em JSON (RF-GEN-01). Feito no frontend, que já tem o formato `AppData`, lendo da API | M | ✅ etapa 9 |
+| IDN-05 | Importar dados do localStorage do modo simulado (RF-GEN-02). Feito no frontend, gravando pela API | M | ✅ etapa 9 |
 
 ---
 
@@ -165,3 +165,4 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 | 6 | IDN-01..05, PLT-09..11 | login e pronto para deploy |
 | 7 | FIN-OF-01..08 | Open Finance com Pluggy |
 | 8 | AST-01, AST-02, KNW-05 | assistente por regras e grafo na API; IA (AST-03, AST-04) em aberto |
+| 9 | PLT-08, IDN-04, IDN-05 | todas as telas lendo e gravando pela API (`NEXT_PUBLIC_DATA_SOURCE=api`), login, exportar e importar |
