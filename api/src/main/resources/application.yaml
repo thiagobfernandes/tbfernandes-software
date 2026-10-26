@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: tbfernandes-api
+  profiles:
+    default: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    locations: classpath:db/migration
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+    datatype:
+      enum:
+        write-enums-to-lowercase: true
+  docker:
+    compose:
+      lifecycle-management: start-only
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: false
+      republish-outstanding-events-on-restart: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,modulith
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+tbf:
+  owner:
+    # Single-user phase (see OwnerContext). Matches the owner seeded in db/dev.
+    id: 0192f000-0000-7000-8000-000000000001
+  cors:
+    allowed-origins: ${TBF_CORS_ORIGINS:http://localhost:3000}
+  pluggy:
+    enabled: ${PLUGGY_ENABLED:false}
+    base-url: https://api.pluggy.ai
+    client-id: ${PLUGGY_CLIENT_ID:}
+    client-secret: ${PLUGGY_CLIENT_SECRET:}

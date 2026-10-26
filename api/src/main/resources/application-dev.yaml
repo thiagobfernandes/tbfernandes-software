@@ -1,0 +1,10 @@
+# Local development: compose.yaml provides the database; db/dev adds sample data
+# equivalent to the frontend's web/src/lib/sample-data.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev
+  datasource:
+    # Used only when Docker Compose support is off (e.g. a PostgreSQL installed in WSL).
+    url: jdbc:postgresql://localhost:5432/tbfernandes
+    username: tbf
+    password: tbf
