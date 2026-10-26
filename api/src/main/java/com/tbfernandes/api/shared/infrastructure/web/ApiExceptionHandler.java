@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.tbfernandes.api.shared.domain.BusinessRuleViolation;
+import com.tbfernandes.api.shared.domain.Conflict;
 import com.tbfernandes.api.shared.domain.NotFound;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +24,23 @@ class ApiExceptionHandler {
 	@ExceptionHandler(NotFound.class)
 	ProblemDetail notFound(NotFound ex) {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+	}
+
+	@ExceptionHandler(Conflict.class)
+	ProblemDetail conflict(Conflict ex) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+		problem.setTitle("Conflict");
+		problem.setProperty("rule", ex.rule());
+		return problem;
+	}
+
+	/** RNF-CONF-01: someone else changed the record first. */
+	@ExceptionHandler(OptimisticLockingFailureException.class)
+	ProblemDetail staleVersion(OptimisticLockingFailureException ex) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+				"The record was changed by another request; reload and try again");
+		problem.setTitle("Conflict");
+		return problem;
 	}
 
 	@ExceptionHandler(BusinessRuleViolation.class)

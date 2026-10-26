@@ -52,6 +52,16 @@ class ProjectPersistenceAdapter implements ProjectRepository {
 		return projects.existsByOwnerIdAndId(ownerId, id);
 	}
 
+	@Override
+	public boolean anyForCompany(UUID ownerId, UUID companyId) {
+		return projects.existsByOwnerIdAndCompanyId(ownerId, companyId);
+	}
+
+	@Override
+	public void delete(Project project) {
+		projects.deleteById(project.id());
+	}
+
 	private static Project toDomain(ProjectJpaEntity e) {
 		return Project.restore(e.id, e.ownerId, new ProjectDetails(e.name, e.description, e.companyId, e.category,
 				e.status, e.color, e.startDate, e.dueDate, e.nextDelivery, e.goalId));

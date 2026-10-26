@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,6 +56,12 @@ class ProjectController {
 	@PutMapping("/{id}")
 	ProjectResponse update(@PathVariable UUID id, @Valid @RequestBody ProjectRequest request) {
 		return ProjectResponse.from(service.update(id, request.toDetails()));
+	}
+
+	@DeleteMapping("/{id}")
+	ResponseEntity<Void> delete(@PathVariable UUID id) {
+		service.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 
 	record ProjectRequest(@NotBlank @Size(max = 120) String name, @Size(max = 2000) String description,

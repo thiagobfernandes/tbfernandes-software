@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.tbfernandes.api.shared.application.OwnerContext;
 import com.tbfernandes.api.shared.domain.NotFound;
 import com.tbfernandes.api.work.TaskCompleted;
+import com.tbfernandes.api.work.TaskDeleted;
 import com.tbfernandes.api.work.domain.project.ProjectRepository;
 import com.tbfernandes.api.work.domain.task.Task;
 import com.tbfernandes.api.work.domain.task.TaskDetails;
@@ -65,7 +66,9 @@ public class TaskService {
 	}
 
 	public void delete(UUID id) {
-		tasks.delete(get(id));
+		Task task = get(id);
+		tasks.delete(task);
+		events.publishEvent(new TaskDeleted(task.ownerId(), id));
 	}
 
 	@Transactional(readOnly = true)

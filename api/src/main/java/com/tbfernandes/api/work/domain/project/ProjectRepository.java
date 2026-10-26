@@ -15,4 +15,8 @@ public interface ProjectRepository {
 
 	boolean exists(UUID ownerId, UUID id);
 
+	boolean anyForCompany(UUID ownerId, UUID companyId);
+
+	void delete(Project project);
+
 }

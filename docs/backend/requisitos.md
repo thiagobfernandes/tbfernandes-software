@@ -39,7 +39,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | ID | Requisito | Prio |
 |---|---|---|
 | RF-WRK-04 | Cadastrar projeto com nome, descrição, empresa (opcional), categoria, status, cor, datas de início e prazo, próxima entrega e meta vinculada. | M |
-| RF-WRK-05 | Editar projeto e mudar o status (`planned`, `active`, `paused`, `completed`). Excluir só projeto sem tarefas (RN-01). | M |
+| RF-WRK-05 | Editar projeto e mudar o status (`planned`, `active`, `paused`, `completed`). Excluir projeto mantém as tarefas, sem projeto (RN-01). | M |
 | RF-WRK-06 | Listar projetos, filtrando por empresa, e ver o detalhe com tarefas, notas e snippets vinculados. | M |
 
 ### 2.3 Work — Tarefas (`/tasks`)
@@ -125,7 +125,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 
 | ID | Regra | Onde |
 |---|---|---|
-| RN-01 | Empresa com projetos e projeto com tarefas não são excluídos (409); são encerrados ou concluídos, porque o histórico aponta para eles. Sem dependentes, a exclusão é permitida. | Work |
+| RN-01 | Empresa com projetos não é excluída (409); deve ser encerrada. Excluir um projeto mantém suas tarefas, sem projeto, e remove os vínculos de notas e snippets. Excluir uma empresa desvincula os contatos. Igual ao comportamento do frontend. | Work |
 | RN-02 | Uma data de fim (prazo, término, validade) nunca é anterior à data de início. | Todos (`Require.dateOrder`) |
 | RN-03 | A empresa do projeto precisa existir; empresa encerrada não recebe projeto ativo. | `ProjectService` |
 | RN-04 | Todo dado pertence a um dono; uma requisição nunca lê nem altera dado de outro dono (retorna 404). | Todos |

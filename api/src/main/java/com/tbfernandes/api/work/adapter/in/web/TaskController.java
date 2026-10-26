@@ -1,6 +1,7 @@
 package com.tbfernandes.api.work.adapter.in.web;
 
 import java.net.URI;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -35,15 +36,20 @@ import org.springframework.web.bind.annotation.RestController;
 class TaskController {
 
 	private final TaskService service;
+	private final Clock clock;
 
-	TaskController(TaskService service) {
+	TaskController(TaskService service, Clock clock) {
 		this.service = service;
+		this.clock = clock;
 	}
 
+	/** WRK-06: overdue=true returns open tasks due before today. */
 	@GetMapping
 	List<TaskResponse> list(@RequestParam(required = false) UUID projectId,
-			@RequestParam(required = false) TaskStatus status) {
-		return service.list(new TaskFilter(projectId, status)).stream().map(TaskResponse::from).toList();
+			@RequestParam(required = false) TaskStatus status, @RequestParam(required = false) LocalDate dueFrom,
+			@RequestParam(required = false) LocalDate dueTo, @RequestParam(defaultValue = "false") boolean overdue) {
+		TaskFilter filter = new TaskFilter(projectId, status, dueFrom, dueTo, overdue ? LocalDate.now(clock) : null);
+		return service.list(filter).stream().map(TaskResponse::from).toList();
 	}
 
 	@GetMapping("/{id}")

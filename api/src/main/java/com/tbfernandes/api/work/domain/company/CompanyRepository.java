@@ -15,4 +15,6 @@ public interface CompanyRepository {
 
 	boolean exists(UUID ownerId, UUID id);
 
+	void delete(Company company);
+
 }

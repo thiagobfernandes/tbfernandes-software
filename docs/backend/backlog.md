@@ -32,29 +32,29 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | PLT-03 | Migrações Flyway de todos os módulos + seed `dev` gerado do frontend | M | ✅ |
 | PLT-04 | Shared kernel: UUIDv7, `OwnerContext`, Problem Details, CORS, enums em minúsculas | M | ✅ |
 | PLT-05 | Testes de arquitetura (Spring Modulith + ArchUnit) e documentação dos módulos gerada | P | ✅ |
-| PLT-06 | CI no GitHub Actions: `./mvnw verify` e `npm run build` em cada PR | P | ⬜ |
+| PLT-06 | CI no GitHub Actions: `./mvnw verify` e `npm run build` em cada PR | P | ✅ |
 | PLT-07 | Job de verificação de referências órfãs entre módulos (ADR-003) | M | ⬜ |
 | PLT-08 | Gerar tipos TS a partir do OpenAPI (`openapi-typescript`) e usar em `web/src/lib/api` | M | ⬜ |
 | PLT-09 | Paginação padrão (`page`, `size`, `sort`) e resposta paginada | P | ⬜ |
-| PLT-10 | Tratamento de conflito de versão (409) e `ETag` opcional | P | ⬜ |
+| PLT-10 | Tratamento de conflito de versão e de estado (409) | P | ✅ |
 | PLT-11 | Logs JSON e perfil `prod` | P | ⬜ |
-| PLT-12 | Título, versão e descrição no OpenAPI | P | ⬜ |
+| PLT-12 | Título, versão e descrição no OpenAPI | P | ✅ |
 
 ## Épico WRK — Work
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| WRK-01 | Empresas: criar, editar, listar, detalhar (RF-WRK-01..03, RN-01) | M | ✅ API · ⬜ tela |
-| WRK-02 | Projetos: criar, editar, listar por empresa, detalhar (RF-WRK-04..06, RN-02, RN-03) | M | ✅ API · ⬜ tela |
-| WRK-03 | Tarefas: CRUD, filtro por projeto e status (RF-WRK-07, 08, 10, 11) | M | ✅ API · ⬜ tela |
-| WRK-04 | Mudança de status com `completedAt` e evento `TaskCompleted` (RF-WRK-09, RN-06, RN-07) | P | ✅ API · ⬜ tela |
-| WRK-05 | Checklist itemizado (RF-WRK-12, RN-08) | P | ✅ API · ⬜ tela |
-| WRK-06 | Filtro por prazo (`dueFrom`, `dueTo`, `overdue=true`) para linha do tempo e atrasadas | P | ⬜ |
-| WRK-07 | Resumo do painel: abertas, atrasadas, concluídas na semana, projetos ativos (RF-WRK-13) | M | ⬜ |
-| WRK-08 | `WorkLookup` público para outros módulos validarem empresa/projeto/tarefa | P | ⬜ |
-| WRK-09 | Evento `TaskDeleted` para limpar vínculos de conhecimento e follow-ups | P | ⬜ |
+| WRK-01 | Empresas: criar, editar, listar, detalhar (RF-WRK-01..03, RN-01) | M | ✅ |
+| WRK-02 | Projetos: criar, editar, listar por empresa, detalhar (RF-WRK-04..06, RN-02, RN-03) | M | ✅ |
+| WRK-03 | Tarefas: CRUD, filtro por projeto e status (RF-WRK-07, 08, 10, 11) | M | ✅ |
+| WRK-04 | Mudança de status com `completedAt` e evento `TaskCompleted` (RF-WRK-09, RN-06, RN-07) | P | ✅ |
+| WRK-05 | Checklist itemizado (RF-WRK-12, RN-08) | P | ✅ |
+| WRK-06 | Filtro por prazo (`dueFrom`, `dueTo`, `overdue=true`) para linha do tempo e atrasadas | P | ✅ |
+| WRK-07 | Resumo do painel: abertas, atrasadas, concluídas na semana, projetos ativos (RF-WRK-13) | M | ✅ |
+| WRK-08 | `WorkLookup` público para outros módulos validarem empresa/projeto/tarefa | P | ✅ |
+| WRK-09 | Evento `TaskDeleted` para limpar vínculos de conhecimento e follow-ups | P | ✅ |
 | WRK-10 | Ligar telas Companies, Projects e Tasks à API (trocar `workActions` por `apiFetch`) | G | ⬜ |
-| WRK-11 | Excluir empresa e projeto sem dependentes; com dependentes, 409 sugerindo encerrar (RN-01). A tela já tem o botão de excluir | P | ⬜ |
+| WRK-11 | Excluir empresa sem projetos (com projetos: 409) e projeto, mantendo as tarefas sem projeto (RN-01) | P | ✅ |
 
 Critérios de aceite principais:
 - WRK-04: mover para `done` preenche `completedAt`; sair de `done` limpa; `blocked → done` retorna 422 com `rule: "RN-07"`.

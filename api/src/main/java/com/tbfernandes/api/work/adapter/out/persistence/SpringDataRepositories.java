@@ -1,11 +1,13 @@
 package com.tbfernandes.api.work.adapter.out.persistence;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.tbfernandes.api.work.domain.task.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 interface CompanyJpaRepository extends JpaRepository<CompanyJpaEntity, UUID> {
@@ -30,18 +32,20 @@ interface ProjectJpaRepository extends JpaRepository<ProjectJpaEntity, UUID> {
 
 	boolean existsByOwnerIdAndId(UUID ownerId, UUID id);
 
+	boolean existsByOwnerIdAndCompanyId(UUID ownerId, UUID companyId);
+
 }
 
-interface TaskJpaRepository extends JpaRepository<TaskJpaEntity, UUID> {
+interface TaskJpaRepository extends JpaRepository<TaskJpaEntity, UUID>, JpaSpecificationExecutor<TaskJpaEntity> {
 
 	Optional<TaskJpaEntity> findByOwnerIdAndId(UUID ownerId, UUID id);
 
-	@Query("""
-			select t from TaskJpaEntity t
-			where t.ownerId = :ownerId
-			  and (:projectId is null or t.projectId = :projectId)
-			  and (:status is null or t.status = :status)
-			order by t.dueDate asc nulls last, t.createdAt""")
-	List<TaskJpaEntity> search(UUID ownerId, UUID projectId, TaskStatus status);
+	boolean existsByOwnerIdAndId(UUID ownerId, UUID id);
+
+	long countByOwnerIdAndCompletedAtGreaterThanEqual(UUID ownerId, Instant since);
+
+	@Modifying
+	@Query("update TaskJpaEntity t set t.projectId = null where t.ownerId = :ownerId and t.projectId = :projectId")
+	void unlinkProject(UUID ownerId, UUID projectId);
 
 }

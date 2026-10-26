@@ -53,6 +53,11 @@ class CompanyPersistenceAdapter implements CompanyRepository {
 		return companies.existsByOwnerIdAndId(ownerId, id);
 	}
 
+	@Override
+	public void delete(Company company) {
+		companies.deleteById(company.id());
+	}
+
 	private static Company toDomain(CompanyJpaEntity e) {
 		return Company.restore(e.id, e.ownerId, new CompanyDetails(e.name, e.tradeName, e.relationship, e.status,
 				e.description, e.startDate, e.mainContact));

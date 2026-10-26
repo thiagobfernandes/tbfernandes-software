@@ -80,6 +80,53 @@ class WorkApiIntegrationTests {
 			.hasPathSatisfying("$.rule", rule -> assertThat(rule).isEqualTo("RN-03"));
 	}
 
+	@Test
+	void companyWithProjectsCannotBeDeletedButAnEmptyOneCan() {
+		String busy = idOf(post("/api/v1/companies", """
+				{"name": "Busy", "relationship": "client", "startDate": "2026-01-01"}"""));
+		idOf(post("/api/v1/projects", """
+				{"name": "P", "companyId": "%s", "category": "personal", "startDate": "2026-01-01"}""".formatted(busy)));
+		String empty = idOf(post("/api/v1/companies", """
+				{"name": "Empty", "relationship": "client", "startDate": "2026-01-01"}"""));
+
+		assertThat(mvc.delete().uri("/api/v1/companies/{id}", busy)).hasStatus(409)
+			.bodyJson()
+			.hasPathSatisfying("$.rule", rule -> assertThat(rule).isEqualTo("RN-01"));
+		assertThat(mvc.delete().uri("/api/v1/companies/{id}", empty)).hasStatus(204);
+		assertThat(mvc.get().uri("/api/v1/companies/{id}", empty)).hasStatus(404);
+	}
+
+	@Test
+	void deletingAProjectKeepsItsTasksWithoutProject() {
+		String projectId = idOf(post("/api/v1/projects", """
+				{"name": "Short lived", "category": "personal", "startDate": "2026-01-01"}"""));
+		String taskId = idOf(post("/api/v1/tasks", """
+				{"title": "Survivor", "projectId": "%s"}""".formatted(projectId)));
+
+		assertThat(mvc.delete().uri("/api/v1/projects/{id}", projectId)).hasStatus(204);
+		assertThat(mvc.get().uri("/api/v1/tasks/{id}", taskId)).hasStatusOk()
+			.bodyJson()
+			.hasPathSatisfying("$.projectId", id -> assertThat(id).isNull());
+	}
+
+	@Test
+	void overdueFilterAndDashboardSummary() {
+		idOf(post("/api/v1/tasks", """
+				{"title": "Very late", "status": "todo", "dueDate": "2020-01-01"}"""));
+		idOf(post("/api/v1/tasks", """
+				{"title": "Late but done", "status": "done", "dueDate": "2020-01-01"}"""));
+
+		assertThat(mvc.get().uri("/api/v1/tasks?overdue=true")).hasStatusOk()
+			.bodyJson()
+			.extractingPath("$[*].title")
+			.asArray()
+			.contains("Very late")
+			.doesNotContain("Late but done");
+		assertThat(mvc.get().uri("/api/v1/dashboard/summary")).hasStatusOk()
+			.bodyJson()
+			.hasPathSatisfying("$.overdueTasks", count -> assertThat(count).asNumber().isNotEqualTo(0));
+	}
+
 	private MvcTestResult post(String uri, String json) {
 		return mvc.post().uri(uri).contentType(MediaType.APPLICATION_JSON).content(json).exchange();
 	}
