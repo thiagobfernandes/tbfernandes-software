@@ -145,17 +145,24 @@ public class FinanceService implements FinanceLookup {
 	public List<PurchaseView> purchases(UUID ownerId) {
 		return repository.findPurchases(ownerId)
 			.stream()
-			.map(p -> new PurchaseView(p.id(), p.details().name(), p.details().status().name().toLowerCase(),
-					p.details().goalId(), p.details().estimated(), p.details().reserved()))
+			.map(p -> {
+				PurchaseGoal.Projection projection = p.project(LocalDate.now(clock));
+				return new PurchaseView(p.id(), p.details().name(), p.details().status().name().toLowerCase(),
+						p.details().goalId(), p.details().estimated(), p.details().reserved(), projection.missing(),
+						projection.ready(), projection.months(), projection.onTime());
+			})
 			.toList();
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public MonthView month(UUID ownerId, YearMonth month) {
-		List<FinanceEntry> entries = repository.findEntries(ownerId, month.atDay(1), month.atEndOfMonth(),
+		List<FinanceEntry> personal = repository.findEntries(ownerId, month.atDay(1), month.atEndOfMonth(),
 				EntryScope.PERSONAL);
-		return new MonthView(month, sum(entries, EntryKind.INCOME), sum(entries, EntryKind.EXPENSE));
+		List<FinanceEntry> business = repository.findEntries(ownerId, month.atDay(1), month.atEndOfMonth(),
+				EntryScope.BUSINESS);
+		return new MonthView(month, sum(personal, EntryKind.INCOME), sum(personal, EntryKind.EXPENSE),
+				sum(business, EntryKind.INCOME), sum(business, EntryKind.EXPENSE));
 	}
 
 }

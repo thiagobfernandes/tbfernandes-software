@@ -1,6 +1,8 @@
 /**
- * Assistant: answers questions over the data of the other modules, read-only in v1
- * (RN-20). Uses only their public query APIs; AI provider behind an output port (backlog AST-*).
+ * Assistant: answers questions over the data of the other modules and builds the knowledge
+ * graph, read-only (RN-20). Uses only their public lookups ({@code *Lookup}); the AI provider
+ * sits behind the output port {@link com.tbfernandes.api.assistant.application.port.out.LanguageModel},
+ * disabled by default (backlog AST-03).
  */
 @ApplicationModule(displayName = "Assistant")
 package com.tbfernandes.api.assistant;

@@ -80,10 +80,12 @@ flowchart TB
     pluggy["Pluggy API"]
 
     web -- "REST /api/v1 (JSON)" --> api
-    work -- "TaskCompleted (evento)" --> goals
-    contacts -- "WorkLookup / criar follow-up" --> work
-    knowledge -. "ids de projeto/tarefa" .-> work
-    assistant -- "consultas só leitura" --> work & knowledge & goals & finance & contacts & learning
+    work -- "TaskCompleted, *Deleted (eventos)" --> goals & knowledge & contacts
+    contacts -- "WorkLookup / FollowUpTasks" --> work
+    knowledge -- "WorkLookup (validar vínculos)" --> work
+    goals -- "WorkLookup, LearningLookup, FinanceLookup" --> work & learning & finance
+    assistant -- "*Lookup (só leitura)" --> work & knowledge & goals & finance & contacts & learning
+    assistant -- "LanguageModel (porta, desligada)" --> ai["Provedor de IA"]
     finance -- "OpenFinanceGateway (porta)" --> pluggy
     api --> db
 ```

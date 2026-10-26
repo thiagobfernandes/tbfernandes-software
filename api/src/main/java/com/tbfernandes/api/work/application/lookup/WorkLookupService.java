@@ -51,6 +51,13 @@ class WorkLookupService implements WorkLookup, FollowUpTasks {
 	}
 
 	@Override
+	public List<CompanyView> companies(UUID ownerId) {
+		return companies.findAll(ownerId).stream()
+			.map(company -> new CompanyView(company.id(), company.details().name(), lower(company.status())))
+			.toList();
+	}
+
+	@Override
 	public List<ProjectView> projects(UUID ownerId) {
 		return projects.findAll(ownerId, null).stream().map(project -> {
 			var d = project.details();
@@ -63,7 +70,7 @@ class WorkLookupService implements WorkLookup, FollowUpTasks {
 	public List<TaskView> tasks(UUID ownerId) {
 		return tasks.findAll(ownerId, TaskFilter.all()).stream().map(task -> {
 			var d = task.details();
-			return new TaskView(task.id(), d.title(), lower(task.status()), lower(d.priority()), d.projectId(),
+			return new TaskView(task.id(), d.title(), d.description(), lower(task.status()), lower(d.priority()), d.projectId(),
 					d.goalId(), d.dueDate());
 		}).toList();
 	}

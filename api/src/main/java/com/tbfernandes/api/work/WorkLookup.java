@@ -16,9 +16,15 @@ public interface WorkLookup {
 
 	boolean taskExists(UUID ownerId, UUID taskId);
 
+	List<CompanyView> companies(UUID ownerId);
+
 	List<ProjectView> projects(UUID ownerId);
 
 	List<TaskView> tasks(UUID ownerId);
+
+	/** Lightweight copy of a company, safe to hold outside the module. */
+	record CompanyView(UUID id, String name, String status) {
+	}
 
 	/** Lightweight copy of a project, safe to hold outside the module. */
 	record ProjectView(UUID id, String name, String status, UUID companyId, UUID goalId, LocalDate dueDate,
@@ -26,8 +32,8 @@ public interface WorkLookup {
 	}
 
 	/** Lightweight copy of a task, safe to hold outside the module. */
-	record TaskView(UUID id, String title, String status, String priority, UUID projectId, UUID goalId,
-			LocalDate dueDate) {
+	record TaskView(UUID id, String title, String description, String status, String priority, UUID projectId,
+			UUID goalId, LocalDate dueDate) {
 
 		public boolean open() {
 			return !"done".equals(status) && !"canceled".equals(status);

@@ -11,7 +11,7 @@ public interface LearningLookup {
 
 	List<CertificationView> certifications(UUID ownerId);
 
-	record StudyView(UUID id, String name, String status, UUID goalId, LocalDate dueDate) {
+	record StudyView(UUID id, String name, String status, UUID goalId, LocalDate dueDate, String nextActivity) {
 	}
 
 	record CertificationView(UUID id, String name, String issuer, String status, LocalDate expiresAt) {

@@ -62,7 +62,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RF-KNW-02 | CRUD de snippets de código com linguagem, explicação, URL de origem e tags. | M |
 | RF-KNW-03 | Vincular notas e snippets a projetos e tarefas (muitos para muitos). | M |
 | RF-KNW-04 | Buscar notas e snippets por texto e por tag. | S |
-| RF-KNW-05 | Grafo de conhecimento: nós (notas, snippets, projetos, tarefas, tags) e arestas, para a tela de grafo. | S |
+| RF-KNW-05 | Grafo de conhecimento: nós (metas, empresas, projetos, tarefas, notas, snippets, contatos) e arestas, para a tela de grafo. A posição dos nós continua sendo calculada no navegador. | S |
 | RF-KNW-06 | CRUD de métodos de trabalho com categoria, passos ordenados, exemplos e data da última revisão. | M |
 
 ### 2.5 Goals (`/goals`)
@@ -110,7 +110,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 
 | ID | Requisito | Prio |
 |---|---|---|
-| RF-AST-01 | Responder perguntas sobre os dados (projetos, tarefas atrasadas, metas, finanças) com links para os registros usados, igual à versão por regras do frontend. | S |
+| RF-AST-01 | Responder perguntas sobre os dados (projetos, tarefas atrasadas, metas, finanças) com links para os registros usados, igual à versão por regras do frontend. Perguntas em português ou inglês. | S |
 | RF-AST-02 | Responder com um modelo de IA, usando só leitura (RN-20). | W |
 
 ### 2.10 Transversais
@@ -182,6 +182,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RNF-DES-02 | Listagens com mais de 100 itens possíveis são paginadas (`page`, `size`). |
 | RNF-CONF-01 | Concorrência otimista com coluna `version`; conflito retorna 409. |
 | RNF-CONF-02 | Eventos entre módulos persistidos no registro do Spring Modulith (`event_publication`) e republicados após reinício. |
+| RNF-CONF-04 | O assistente responde mesmo se o provedor de IA falhar ou estiver desligado: cai para as respostas por regras. |
 | RNF-CONF-03 | Backup diário do PostgreSQL quando houver ambiente fora da máquina local. |
 
 ### 4.4 Qualidade e operação

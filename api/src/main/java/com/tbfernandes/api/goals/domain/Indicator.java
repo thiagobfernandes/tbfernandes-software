@@ -21,6 +21,15 @@ public record Indicator(String label, BigDecimal current, BigDecimal target, Str
 		return new Indicator(label, value, target, unit);
 	}
 
+	/** Progress from 0 to 100, rounded like the frontend (Math.round), capped. */
+	public int roundedPercent() {
+		return current.multiply(BigDecimal.valueOf(100))
+			.divide(target, 0, java.math.RoundingMode.HALF_UP)
+			.min(BigDecimal.valueOf(100))
+			.max(BigDecimal.ZERO)
+			.intValue();
+	}
+
 	/** Progress from 0 to 100, capped (the current value may pass the target). */
 	public int percent() {
 		return current.multiply(BigDecimal.valueOf(100)).divide(target, 0, java.math.RoundingMode.DOWN).min(

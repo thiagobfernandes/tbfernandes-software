@@ -196,7 +196,7 @@ public class LearningService implements LearningLookup {
 		return repository.findStudies(ownerId)
 			.stream()
 			.map(s -> new StudyView(s.id(), s.details().name(), s.details().status().name().toLowerCase(),
-					s.details().goalId(), s.details().dueDate()))
+					s.details().goalId(), s.details().dueDate(), s.details().nextActivity()))
 			.toList();
 	}
 

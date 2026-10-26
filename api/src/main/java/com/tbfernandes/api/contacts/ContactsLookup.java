@@ -9,7 +9,7 @@ public interface ContactsLookup {
 
 	List<ContactView> contacts(UUID ownerId);
 
-	record ContactView(UUID id, String name, UUID companyId, String companyName, LocalDate nextContact) {
+	record ContactView(UUID id, String name, String role, UUID companyId, String companyName, LocalDate nextContact) {
 	}
 
 }

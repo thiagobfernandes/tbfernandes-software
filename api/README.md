@@ -21,7 +21,32 @@ cd api
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - Saúde e módulos: http://localhost:8080/actuator/health, http://localhost:8080/actuator/modulith
 
-O frontend já aponta para `http://localhost:8080` (`web/.env.example`).
+O frontend já aponta para `http://localhost:8080` (`web/.env.example`). Para as telas lerem da API em vez do armazenamento simulado, use `NEXT_PUBLIC_DATA_SOURCE=api` no `web/.env.local`.
+
+## Modos de autenticação
+
+| `TBF_AUTH_MODE` | Uso |
+|---|---|
+| `single-user` (padrão) | desenvolvimento local, sem login; tudo pertence ao dono do seed |
+| `session` | login por e-mail e senha, sessão em cookie e CSRF; forçado no perfil `prod` |
+
+No modo `session`, a conta é criada na primeira subida com `TBF_AUTH_BOOTSTRAP_EMAIL`, `TBF_AUTH_BOOTSTRAP_PASSWORD` (12 a 128 caracteres) e `TBF_AUTH_BOOTSTRAP_NAME`.
+
+```bash
+TBF_AUTH_MODE=session TBF_AUTH_BOOTSTRAP_EMAIL=voce@exemplo.com \
+TBF_AUTH_BOOTSTRAP_PASSWORD='uma senha bem longa' TBF_AUTH_BOOTSTRAP_NAME=Thiago ./mvnw spring-boot:run
+```
+
+## Outras variáveis
+
+| Variável | Padrão | Uso |
+|---|---|---|
+| `TBF_CORS_ORIGINS` | `http://localhost:3000` | origens do frontend |
+| `TBF_ASSISTANT_MODEL` | `none` | provedor de IA do assistente (só `none` existe hoje) |
+| `PLUGGY_ENABLED`, `PLUGGY_CLIENT_ID`, `PLUGGY_CLIENT_SECRET` | desligado | Open Finance (em aberto) |
+| `TBF_DB_URL`, `TBF_DB_USER`, `TBF_DB_PASSWORD` | — | banco no perfil `prod` |
+
+Listas aceitam `?page=0&size=50`; o total vem no cabeçalho `X-Total-Count`. Contrato completo em [docs/backend/api.md](../docs/backend/api.md).
 
 ## Banco local
 
@@ -40,17 +65,26 @@ As migrações ficam em `src/main/resources/db/migration` (uma por módulo). O p
 ```
 
 - `ArchitectureTests`: fronteiras entre módulos (Spring Modulith) e regra de dependência da clean architecture (ArchUnit). Também gera os diagramas dos módulos em `target/spring-modulith-docs`.
-- `TaskTest`: regras de negócio da tarefa, sem Spring.
-- `WorkApiIntegrationTests` e `TbfernandesApiApplicationTests`: HTTP → caso de uso → PostgreSQL real (Testcontainers; precisa do Docker rodando).
+- `*Test`: regras de domínio sem Spring (`TaskTest`, `RuleBasedAssistantTest`, `KnowledgeGraphTest`).
+- `*ApiIntegrationTests`, um por módulo: HTTP → caso de uso → PostgreSQL real (Testcontainers; precisa do Docker rodando).
+
+São 46 testes. O registro de cada etapa está em [docs/backend/implementacao](../docs/backend/implementacao/README.md).
 
 ## Estrutura
 
 ```
 src/main/java/com/tbfernandes/api
 ├── shared/       kernel compartilhado
-├── work/         referência completa: domain · application · adapter/in/web · adapter/out/persistence
-├── finance/      porta OpenFinanceGateway + adaptadores Pluggy (em aberto)
-└── identity/ knowledge/ goals/ learning/ contacts/ assistant/   módulos declarados, implementação no backlog
+├── identity/     conta, login, sessão, perfil
+├── work/         empresas, projetos, tarefas, painel (módulo de referência)
+├── knowledge/    notas, snippets, métodos, busca
+├── goals/        metas, marcos, indicador, progresso
+├── learning/     estudos, materiais, habilidades, certificações, formação
+├── finance/      lançamentos, fluxo de caixa, compras; porta OpenFinanceGateway (Pluggy em aberto)
+├── contacts/     contatos, interações, follow-up
+└── assistant/    perguntas e grafo, só leitura; porta LanguageModel (IA em aberto)
+
+Cada módulo: domain · application · adapter/in/web · adapter/out/persistence
 ```
 
 ## Origem do projeto

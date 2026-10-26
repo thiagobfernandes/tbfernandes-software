@@ -22,7 +22,7 @@ Versão 0.1 · 2026-10-26 · Complementa [decisoes-tecnicas.md](../decisoes-tecn
 | Learning | `learning` | `learning` | estudos, materiais, habilidades, certificações, formação | Learning, Certifications |
 | Finance | `finance` | `finance` | lançamentos, metas de compra, porta Open Finance | Finance |
 | Contacts | `contacts` | `contacts` | contatos e interações | Contacts |
-| Assistant | `assistant` | — | perguntas sobre os dados (só leitura) | Assistant |
+| Assistant | `assistant` | — | perguntas sobre os dados e grafo (só leitura) | Assistant, Graph |
 
 A lista de módulos agrupa `company`, `project` e `task` da proposta inicial em um único módulo **Work** (ADR-002).
 
@@ -96,21 +96,27 @@ Clean architecture "completa" teria uma interface de caso de uso por operação,
 
 O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`), então nenhum outro módulo muda ao trocar de modo. Não há cadastro público: a conta é criada no início pela configuração `tbf.auth.bootstrap.*`.
 
-### IA do assistente
+### IA do assistente (etapa 8)
 
-Mesmo padrão: porta `assistant.application.port.out.LanguageModel`, adaptador por provedor, desligado por padrão. Épico AST.
+- Porta: `assistant.application.port.out.LanguageModel`. O modelo só reescreve o texto: recebe a pergunta, a resposta das regras e o retrato dos dados, e as referências continuam as que as regras acharam. Assim todo link aponta para um registro real (RN-20).
+- Adaptador padrão: `DisabledLanguageModel` (`tbf.assistant.model.provider=none`). Um provedor real é o item AST-03.
+- Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
+
+### Leitura entre módulos do assistant
+
+O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `WorkLookup`, `KnowledgeLookup`, `GoalsLookup`, `LearningLookup`, `FinanceLookup` e `ContactsLookup`. As respostas (`RuleBasedAssistant`) e o grafo (`KnowledgeGraph`) são funções puras desse retrato, testadas sem Spring.
 
 ## 6. Convenções
 
 | Tema | Convenção |
 |---|---|
 | Ids | UUID v7 gerado na aplicação (`shared.domain.Ids`): ordenado no tempo, bom para índice. |
-| Dono | `OwnerContext.currentOwnerId()`; hoje vem de `tbf.owner.id`, depois do usuário logado. |
-| Erros | `NotFound` → 404, `BusinessRuleViolation` → 422 com `rule`, validação → 400 com `errors`. |
+| Dono | `OwnerContext.currentOwnerId()`: no modo `single-user` vem de `tbf.auth.owner-id`; no modo `session`, do usuário logado. |
+| Erros | `NotFound` → 404, `Conflict` → 409, `BusinessRuleViolation` → 422 com `rule`, validação → 400 com `errors`. |
 | Enums | Maiúsculas no Java e no banco (CHECK); minúsculas no JSON e nos parâmetros de URL. |
 | Datas | `LocalDate` para dias, `Instant` (UTC) para momentos. |
 | Auditoria | `created_at`, `updated_at`, `version` em toda tabela de agregado. |
-| Rotas | `/api/v1/<recurso-no-plural>`; mudança de status em `PATCH /{id}/status`. |
+| Rotas | `/api/v1/<recurso-no-plural>`, um recurso plano por coleção do frontend; mudança de status em `PATCH /{id}/status`. |
 | Testes | `*Test` para unidade, `*Tests` com Spring; integração sempre com PostgreSQL do Testcontainers. |
 
 ## 7. Decisões de arquitetura (ADR)

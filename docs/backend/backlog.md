@@ -68,7 +68,7 @@ Critérios de aceite principais:
 | KNW-02 | Snippets: CRUD (RF-KNW-02, RN-11) | M | ✅ |
 | KNW-03 | Vínculos com projetos e tarefas (RF-KNW-03) | P | ✅ |
 | KNW-04 | Busca por texto (`tsvector`) e por tag (RF-KNW-04) | M | ✅ |
-| KNW-05 | Endpoint do grafo: nós e arestas (RF-KNW-05). Movido para o módulo assistant, que já lê todos os módulos | M | ⬜ |
+| KNW-05 | Endpoint do grafo: nós e arestas (RF-KNW-05). Movido para o módulo assistant, que já lê todos os módulos | M | ✅ etapa 8 |
 | KNW-06 | Ouvir `TaskDeleted` e remover vínculos | P | ✅ |
 | KNW-07 | Métodos: CRUD com passos e exemplos (RF-KNW-06) | M | ✅ |
 | KNW-08 | Ligar telas Knowledge, Snippets, Graph e Methods à API | G | ⬜ |
@@ -135,8 +135,8 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| AST-01 | Portar o assistente por regras (`web/src/features/assistant/lib/answer.ts`) para a API (RF-AST-01) | M | ⬜ |
-| AST-02 | Porta `LanguageModel` e adaptador desligado | P | ⬜ |
+| AST-01 | Portar o assistente por regras (`web/src/features/assistant/lib/answer.ts`) para a API (RF-AST-01) | M | ✅ etapa 8 |
+| AST-02 | Porta `LanguageModel` e adaptador desligado | P | ✅ etapa 8 |
 | AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ⬜ |
 | AST-04 | pgvector e embeddings de notas e snippets | G | ⬜ |
 
@@ -164,4 +164,4 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 | 5 | FIN-01..05, CTC-01..05 | Finance manual e Contacts |
 | 6 | IDN-01..05, PLT-09..11 | login e pronto para deploy |
 | 7 | FIN-OF-01..08 | Open Finance com Pluggy |
-| 8 | AST-01..04 | assistente com IA |
+| 8 | AST-01, AST-02, KNW-05 | assistente por regras e grafo na API; IA (AST-03, AST-04) em aberto |

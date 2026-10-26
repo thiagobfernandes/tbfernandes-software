@@ -116,7 +116,7 @@ public class ContactService implements ContactsLookup {
 	public List<ContactView> contacts(UUID ownerId) {
 		return repository.findContacts(ownerId)
 			.stream()
-			.map(c -> new ContactView(c.id(), c.details().name(), c.details().companyId(), c.details().companyName(),
+			.map(c -> new ContactView(c.id(), c.details().name(), c.details().role(), c.details().companyId(), c.details().companyName(),
 					c.details().nextContact()))
 			.toList();
 	}

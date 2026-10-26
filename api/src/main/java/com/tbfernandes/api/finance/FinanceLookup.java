@@ -12,12 +12,17 @@ public interface FinanceLookup {
 
 	MonthView month(UUID ownerId, YearMonth month);
 
+	/**
+	 * A purchase goal with its FIN-04 projection: money still missing, whether it is fully
+	 * reserved, and in how many months it becomes affordable (null without a monthly saving).
+	 */
 	record PurchaseView(UUID id, String name, String status, UUID goalId, BigDecimal estimated,
-			BigDecimal reserved) {
+			BigDecimal reserved, BigDecimal missing, boolean ready, Integer months, Boolean onTime) {
 	}
 
-	/** Personal scope only: business revenue is not personal income (RN-12). */
-	record MonthView(YearMonth month, BigDecimal personalIncome, BigDecimal personalExpense) {
+	/** Totals per scope. They are never added together: business revenue is not personal income (RN-12). */
+	record MonthView(YearMonth month, BigDecimal personalIncome, BigDecimal personalExpense,
+			BigDecimal businessIncome, BigDecimal businessExpense) {
 	}
 
 }

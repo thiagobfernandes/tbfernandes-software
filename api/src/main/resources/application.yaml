@@ -63,6 +63,10 @@ tbf:
       name: ${TBF_AUTH_BOOTSTRAP_NAME:}
   cors:
     allowed-origins: ${TBF_CORS_ORIGINS:http://localhost:3000}
+  assistant:
+    model:
+      # none: rule-based answers only (default). An AI provider adapter is epic AST-03.
+      provider: ${TBF_ASSISTANT_MODEL:none}
   pluggy:
     enabled: ${PLUGGY_ENABLED:false}
     base-url: https://api.pluggy.ai
