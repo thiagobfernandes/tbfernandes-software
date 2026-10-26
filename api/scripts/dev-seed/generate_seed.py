@@ -56,8 +56,8 @@ goals = sorted(d['sampleGoals'], key=lambda g: g.get('parentId') is not None)
 ins('goals.goal', ['id','owner_id','parent_id','name','description','area','status','priority','current_state','desired_result','done_criteria','due_date','indicator_label','indicator_current','indicator_target','indicator_unit'],
     [[uid(g['id']),O,uid(g.get('parentId')),s(g['name']),s(g.get('description')),e(g['area']),e(g['status']),e(g['priority']),s(g.get('currentState')),s(g['desiredResult']),s(g.get('doneCriteria')),s(g.get('dueDate')),
       *( [s(g['indicator']['label']),s(g['indicator']['current']),s(g['indicator']['target']),s(g['indicator']['unit'])] if g.get('indicator') else ['NULL']*4)] for g in goals])
-ins('goals.milestone', ['id','goal_id','title','due_date','done','position'],
-    [[uid(m['id']),uid(m['goalId']),s(m['title']),s(m.get('dueDate')),s(m['done']),str(i)] for i,m in enumerate(d['sampleMilestones'])])
+ins('goals.milestone', ['id','owner_id','goal_id','title','due_date','done','position'],
+    [[uid(m['id']),O,uid(m['goalId']),s(m['title']),s(m.get('dueDate')),s(m['done']),str(i)] for i,m in enumerate(d['sampleMilestones'])])
 ins('learning.skill', ['id','owner_id','name','level','evidence'],
     [[uid(k['id']),O,s(k['name']),s(k['level']),s(k.get('evidence'))] for k in d['sampleSkills']])
 ins('learning.study', ['id','owner_id','name','description','status','goal_id','start_date','due_date','next_activity'],
@@ -76,6 +76,6 @@ ins('finance.purchase_goal', ['id','owner_id','name','description','estimated','
     [[uid(x['id']),O,s(x['name']),s(x.get('description')),s(x['estimated']),s(x['reserved']),s(x.get('monthlySaving')),e(x['priority']),s(x.get('desiredDate')),uid(x.get('goalId')),e(x['status']),s(x.get('paid'))] for x in d['samplePurchases']])
 ins('contacts.contact', ['id','owner_id','name','company_id','company_name','role','email','phone','profile_url','specialties','context','next_contact','notes'],
     [[uid(x['id']),O,s(x['name']),uid(x.get('companyId')),s(x.get('companyName')),s(x.get('role')),s(x.get('email')),s(x.get('phone')),s(x.get('profileUrl')),arr(x.get('specialties')),s(x.get('context')),s(x.get('nextContact')),s(x.get('notes'))] for x in d['sampleContacts']])
-ins('contacts.interaction', ['id','contact_id','occurred_on','kind','summary','follow_up_task_id'],
-    [[uid(x['id']),uid(x['contactId']),s(x['date']),e(x['kind']),s(x['summary']),uid(x.get('followUpTaskId'))] for x in d['sampleInteractions']])
+ins('contacts.interaction', ['id','owner_id','contact_id','occurred_on','kind','summary','follow_up_task_id'],
+    [[uid(x['id']),O,uid(x['contactId']),s(x['date']),e(x['kind']),s(x['summary']),uid(x.get('followUpTaskId'))] for x in d['sampleInteractions']])
 open(sys.argv[2],'w').write("\n".join(out))

@@ -77,23 +77,23 @@ Critérios de aceite principais:
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| GOL-01 | Metas: CRUD com indicador (RF-GOL-01, RF-GOL-04) | M | ⬜ |
-| GOL-02 | Submetas sem ciclos (RF-GOL-02, RN-19) | P | ⬜ |
-| GOL-03 | Marcos (RF-GOL-03, RN-09) | P | ⬜ |
-| GOL-04 | Itens vinculados à meta, via consultas públicas dos outros módulos (RF-GOL-05) | M | ⬜ |
-| GOL-05 | Ouvir `TaskCompleted` e registrar progresso (RF-GOL-06) | P | ⬜ |
+| GOL-01 | Metas: CRUD com indicador (RF-GOL-01, RF-GOL-04) | M | ✅ |
+| GOL-02 | Submetas sem ciclos (RF-GOL-02, RN-19) | P | ✅ |
+| GOL-03 | Marcos (RF-GOL-03, RN-09) | P | ✅ |
+| GOL-04 | Itens vinculados à meta, via consultas públicas dos outros módulos (RF-GOL-05) | M | ✅ |
+| GOL-05 | Ouvir `TaskCompleted` e registrar progresso (RF-GOL-06) | P | ✅ |
 | GOL-06 | Ligar telas Goals e Goal detail à API | M | ⬜ |
 
 ## Épico LRN — Learning
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| LRN-01 | Estudos com habilidades (RF-LRN-01) | M | ⬜ |
-| LRN-02 | Materiais (RF-LRN-02) | P | ⬜ |
-| LRN-03 | Habilidades (RF-LRN-03, RN-13) | P | ⬜ |
-| LRN-04 | Certificações (RF-LRN-04, RN-14) | P | ⬜ |
-| LRN-05 | Formação (RF-LRN-05) | P | ⬜ |
-| LRN-06 | Aviso de certificações vencendo (RF-LRN-06) | P | ⬜ |
+| LRN-01 | Estudos com habilidades (RF-LRN-01) | M | ✅ |
+| LRN-02 | Materiais (RF-LRN-02) | P | ✅ |
+| LRN-03 | Habilidades (RF-LRN-03, RN-13) | P | ✅ |
+| LRN-04 | Certificações (RF-LRN-04, RN-14) | P | ✅ |
+| LRN-05 | Formação (RF-LRN-05) | P | ✅ |
+| LRN-06 | Aviso de certificações vencendo (RF-LRN-06) | P | ✅ |
 | LRN-07 | Ligar telas Learning e Certifications à API | M | ⬜ |
 
 ## Épico FIN — Finance (manual)

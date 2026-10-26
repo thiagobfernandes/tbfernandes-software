@@ -74,7 +74,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RF-GOL-03 | CRUD de marcos (milestones) de uma meta, marcando como feitos. | M |
 | RF-GOL-04 | Atualizar o valor atual do indicador. | M |
 | RF-GOL-05 | Mostrar o que está vinculado a uma meta: projetos, tarefas, estudos e compras. | S |
-| RF-GOL-06 | Atualizar o progresso da meta quando uma tarefa vinculada é concluída (evento `TaskCompleted`). | C |
+| RF-GOL-06 | Atualizar o progresso da meta quando uma tarefa vinculada é concluída (evento `TaskCompleted`, RN-22). | C |
 
 ### 2.6 Learning (`/learning`, `/certifications`)
 
@@ -145,6 +145,8 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RN-18 | Valor reservado pode passar do estimado (sinaliza folga), mas nunca é negativo. | Finance |
 | RN-19 | Uma meta não pode ser submeta dela mesma nem de uma descendente (sem ciclos). | Goals |
 | RN-20 | O assistente só lê dados; nunca cria, altera ou exclui. | Assistant |
+| RN-21 | Só uma meta com indicador aceita atualização de progresso. | Goals |
+| RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais
 

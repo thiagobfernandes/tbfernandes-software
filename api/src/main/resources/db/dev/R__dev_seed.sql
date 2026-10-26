@@ -151,12 +151,12 @@ INSERT INTO goals.goal (id, owner_id, parent_id, name, description, area, status
   ('e79d39ca-b71c-5715-b303-773aaa2b9033', '0192f000-0000-7000-8000-000000000001', 'fe97e479-9046-5429-8bdd-3eaaeadd09b3', 'Pass the CKAD exam', NULL, 'LEARNING', 'PLANNED', 'NORMAL', NULL, 'CKAD certification obtained.', NULL, '2027-02-28', NULL, NULL, NULL, NULL)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO goals.milestone (id, goal_id, title, due_date, done, position) VALUES
-  ('4e59d1ab-fb80-5d52-83ec-380590511cb1', 'b9dff122-5016-535e-b04d-c6910a7b892d', 'Frontend shell', '2026-10-23', true, 0),
-  ('d4d4cf55-86c2-5fe1-ab9e-b81b95e70ec9', 'b9dff122-5016-535e-b04d-c6910a7b892d', 'Companies & projects API', '2026-11-01', false, 1),
-  ('babe31f9-a58a-5291-a357-010eab4b8a33', 'b9dff122-5016-535e-b04d-c6910a7b892d', 'Tasks API and deploy', '2026-11-15', false, 2),
-  ('e72f7385-76b9-5c6b-b7f8-c235336a4b38', 'fe97e479-9046-5429-8bdd-3eaaeadd09b3', 'Distributed systems lab', '2026-11-30', false, 3),
-  ('3187c5f7-044a-5925-a548-73e2fe41a356', 'ea76c01b-8d1a-52a3-952c-50b6e52b3b86', 'Three months saved', '2026-12-31', false, 4)
+INSERT INTO goals.milestone (id, owner_id, goal_id, title, due_date, done, position) VALUES
+  ('4e59d1ab-fb80-5d52-83ec-380590511cb1', '0192f000-0000-7000-8000-000000000001', 'b9dff122-5016-535e-b04d-c6910a7b892d', 'Frontend shell', '2026-10-23', true, 0),
+  ('d4d4cf55-86c2-5fe1-ab9e-b81b95e70ec9', '0192f000-0000-7000-8000-000000000001', 'b9dff122-5016-535e-b04d-c6910a7b892d', 'Companies & projects API', '2026-11-01', false, 1),
+  ('babe31f9-a58a-5291-a357-010eab4b8a33', '0192f000-0000-7000-8000-000000000001', 'b9dff122-5016-535e-b04d-c6910a7b892d', 'Tasks API and deploy', '2026-11-15', false, 2),
+  ('e72f7385-76b9-5c6b-b7f8-c235336a4b38', '0192f000-0000-7000-8000-000000000001', 'fe97e479-9046-5429-8bdd-3eaaeadd09b3', 'Distributed systems lab', '2026-11-30', false, 3),
+  ('3187c5f7-044a-5925-a548-73e2fe41a356', '0192f000-0000-7000-8000-000000000001', 'ea76c01b-8d1a-52a3-952c-50b6e52b3b86', 'Three months saved', '2026-12-31', false, 4)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO learning.skill (id, owner_id, name, level, evidence) VALUES
@@ -224,9 +224,9 @@ INSERT INTO contacts.contact (id, owner_id, name, company_id, company_name, role
   ('2ef0a47d-2e1c-5395-b6ba-bc20d7fdf97d', '0192f000-0000-7000-8000-000000000001', 'Lucas Pereira', NULL, 'Java community', 'Staff engineer', NULL, NULL, 'https://www.linkedin.com/', ARRAY['Kubernetes','Distributed systems']::text[], 'Met at a Java meetup; offered to review my Raft lab.', NULL, NULL)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO contacts.interaction (id, contact_id, occurred_on, kind, summary, follow_up_task_id) VALUES
-  ('04645064-d941-50e0-b2d3-85e9b2edadec', '5ce72274-9717-5391-af4d-b5e56b054c73', '2026-10-20', 'MEETING', 'Weekly sync: VPN access still pending, agreed on the monthly report format.', NULL),
-  ('565e0eba-123c-517a-9d42-50cd341ebe42', 'de9a99e4-06fd-5d6e-b169-2dbb3af201dd', '2026-10-10', 'MESSAGE', 'Asked about renewing the contract for 2027.', 'ff191190-0a88-50f6-af54-896d2939160e'),
-  ('27157793-4740-55e5-966b-bbcf7923a608', '2ef0a47d-2e1c-5395-b6ba-bc20d7fdf97d', '2026-09-28', 'EVENT', 'Talked about Raft and CKAD preparation at the meetup.', NULL),
-  ('169cec07-18c7-5b03-980a-3ef88ef2d732', '5ce72274-9717-5391-af4d-b5e56b054c73', '2026-10-06', 'CALL', 'Kick-off for the ingestion alert investigation.', NULL)
+INSERT INTO contacts.interaction (id, owner_id, contact_id, occurred_on, kind, summary, follow_up_task_id) VALUES
+  ('04645064-d941-50e0-b2d3-85e9b2edadec', '0192f000-0000-7000-8000-000000000001', '5ce72274-9717-5391-af4d-b5e56b054c73', '2026-10-20', 'MEETING', 'Weekly sync: VPN access still pending, agreed on the monthly report format.', NULL),
+  ('565e0eba-123c-517a-9d42-50cd341ebe42', '0192f000-0000-7000-8000-000000000001', 'de9a99e4-06fd-5d6e-b169-2dbb3af201dd', '2026-10-10', 'MESSAGE', 'Asked about renewing the contract for 2027.', 'ff191190-0a88-50f6-af54-896d2939160e'),
+  ('27157793-4740-55e5-966b-bbcf7923a608', '0192f000-0000-7000-8000-000000000001', '2ef0a47d-2e1c-5395-b6ba-bc20d7fdf97d', '2026-09-28', 'EVENT', 'Talked about Raft and CKAD preparation at the meetup.', NULL),
+  ('169cec07-18c7-5b03-980a-3ef88ef2d732', '0192f000-0000-7000-8000-000000000001', '5ce72274-9717-5391-af4d-b5e56b054c73', '2026-10-06', 'CALL', 'Kick-off for the ingestion alert investigation.', NULL)
 ON CONFLICT DO NOTHING;
