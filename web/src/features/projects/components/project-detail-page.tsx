@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Building2,
   CalendarDays,
@@ -13,9 +15,11 @@ import {
   Plus,
   SearchX,
   Tag,
+  Trash2,
 } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
+import { ConfirmDelete } from "@/components/shared/confirm-delete";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MetricCard } from "@/components/shared/metric-card";
 import { DotRow, ProgressRing } from "@/components/shared/metric-visuals";
@@ -38,7 +42,7 @@ import { TasksBoard } from "@/features/tasks/components/tasks-board";
 import { TasksList } from "@/features/tasks/components/tasks-list";
 import { addDays, daysBetween, formatShort } from "@/lib/dates";
 import { projectColorClasses } from "@/lib/project-colors";
-import { selectors, useWorkData } from "@/lib/sample-data/store";
+import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
 import { SAMPLE_TODAY, isOpenTask } from "@/lib/sample-data/work";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +52,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
   const data = useWorkData();
   const { findCompany, findProject, tasksOfProject } = selectors(data);
   const [selectedTaskId, setSelectedTaskId] = useState<string>();
+  const router = useRouter();
   const project = findProject(projectId);
   if (!project) return <MissingProject />;
 
@@ -127,6 +132,24 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
                 <Pencil /> Edit
               </Button>
             }
+          />
+          <ConfirmDelete
+            noun="project"
+            name={project.name}
+            consequence="Its tasks, notes and snippets are kept without a project."
+            trigger={
+              <Button
+                variant="outline"
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 /> Delete
+              </Button>
+            }
+            onConfirm={() => {
+              workActions.deleteProject(project.id);
+              toast.success("Project deleted");
+              router.push("/projects");
+            }}
           />
           <TaskFormDialog
             defaultProjectId={project.id}

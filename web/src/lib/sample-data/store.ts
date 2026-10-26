@@ -217,6 +217,37 @@ export const workActions = {
     dataActions.update("tasks", id, next);
   },
   deleteTask: (id: string) => dataActions.remove("tasks", id),
+  /** Removes the project; its tasks and knowledge stay, unlinked. */
+  deleteProject(id: string) {
+    const data = load();
+    const unlink = <T extends { projectIds: string[] }>(item: T) =>
+      item.projectIds.includes(id)
+        ? { ...item, projectIds: item.projectIds.filter((p) => p !== id) }
+        : item;
+    commit({
+      ...data,
+      projects: data.projects.filter((project) => project.id !== id),
+      tasks: data.tasks.map((task) =>
+        task.projectId === id ? { ...task, projectId: undefined } : task,
+      ),
+      notes: data.notes.map(unlink),
+      snippets: data.snippets.map(unlink),
+    });
+  },
+  /** Only companies without projects can be deleted; contacts are unlinked. */
+  deleteCompany(id: string) {
+    const data = load();
+    if (data.projects.some((project) => project.companyId === id)) return;
+    commit({
+      ...data,
+      companies: data.companies.filter((company) => company.id !== id),
+      contacts: data.contacts.map((contact) =>
+        contact.companyId === id
+          ? { ...contact, companyId: undefined }
+          : contact,
+      ),
+    });
+  },
   reset: () => dataActions.reset(),
 };
 

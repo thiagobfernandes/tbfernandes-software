@@ -21,6 +21,10 @@ type ConfirmDeleteProps = {
   name: string;
   onConfirm: () => void;
   trigger?: React.ReactNode;
+  /** What else happens on delete, e.g. linked records that are kept. */
+  consequence?: string;
+  /** When set, deleting is not allowed and this explains why. */
+  blockedReason?: string;
 };
 
 export function ConfirmDelete({
@@ -28,6 +32,8 @@ export function ConfirmDelete({
   name,
   onConfirm,
   trigger,
+  consequence,
+  blockedReason,
 }: ConfirmDeleteProps) {
   return (
     <AlertDialog>
@@ -45,19 +51,32 @@ export function ConfirmDelete({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this {noun}?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {blockedReason
+              ? `This ${noun} can't be deleted yet`
+              : `Delete this ${noun}?`}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            &ldquo;{name}&rdquo; will be removed. This cannot be undone.
+            {blockedReason ?? (
+              <>
+                &ldquo;{name}&rdquo; will be removed. {consequence}
+                {consequence && " "}This cannot be undone.
+              </>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onConfirm}
-            className="bg-destructive text-white hover:bg-destructive/90"
-          >
-            Delete
-          </AlertDialogAction>
+          <AlertDialogCancel>
+            {blockedReason ? "OK" : "Cancel"}
+          </AlertDialogCancel>
+          {!blockedReason && (
+            <AlertDialogAction
+              onClick={onConfirm}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -33,6 +33,7 @@ import {
   Sparkline,
   TickBars,
 } from "@/components/shared/metric-visuals";
+import { LifeOverview } from "@/features/dashboard/components/life-overview";
 import { AgendaPanel } from "@/features/dashboard/components/agenda-panel";
 import { sampleTrends } from "@/features/dashboard/data/sample-dashboard";
 import { NoteFormDialog } from "@/features/knowledge/components/knowledge-form-dialogs";
@@ -288,6 +289,8 @@ export function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
+
+            <LifeOverview data={data} />
 
             <Card className="gap-4 rounded-2xl">
               <CardHeader>

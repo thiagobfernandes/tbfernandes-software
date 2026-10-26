@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Building2,
   CalendarDays,
@@ -9,10 +11,12 @@ import {
   Pencil,
   Plus,
   SearchX,
+  Trash2,
   UserRound,
 } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
+import { ConfirmDelete } from "@/components/shared/confirm-delete";
 import { MetricCard } from "@/components/shared/metric-card";
 import { DotRow, ProgressRing } from "@/components/shared/metric-visuals";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -28,13 +32,14 @@ import {
 import { ProjectCard } from "@/features/projects/components/project-card";
 import { TasksList } from "@/features/tasks/components/tasks-list";
 import { formatShort, parseDay } from "@/lib/dates";
-import { selectors, useWorkData } from "@/lib/sample-data/store";
+import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
 import { SAMPLE_TODAY, isOpenTask } from "@/lib/sample-data/work";
 
 export function CompanyDetailPage({ companyId }: { companyId: string }) {
   const data = useWorkData();
   const { findCompany, projectsOfCompany, tasksOfProject } = selectors(data);
   const [selectedTaskId, setSelectedTaskId] = useState<string>();
+  const router = useRouter();
   const company = findCompany(companyId);
   if (!company) return <MissingCompany />;
 
@@ -100,6 +105,29 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
                 <Pencil /> Edit
               </Button>
             }
+          />
+          <ConfirmDelete
+            noun="company"
+            name={company.name}
+            consequence="Contacts linked to it are kept."
+            blockedReason={
+              projects.length
+                ? `"${company.name}" still has ${projects.length} project${projects.length === 1 ? "" : "s"}. Move them to another company or delete them first.`
+                : undefined
+            }
+            trigger={
+              <Button
+                variant="outline"
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 /> Delete
+              </Button>
+            }
+            onConfirm={() => {
+              workActions.deleteCompany(company.id);
+              toast.success("Company deleted");
+              router.push("/companies");
+            }}
           />
           <ProjectFormDialog
             defaultCompanyId={company.id}

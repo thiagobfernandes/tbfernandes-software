@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 
-import { HeaderSearch } from "@/components/layout/header-search";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { NavigationBreadcrumbs } from "@/components/layout/navigation-breadcrumbs";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { CommandPalette } from "@/features/search/command-palette";
 
 export function AppHeader() {
   return (
@@ -15,7 +15,7 @@ export function AppHeader() {
         </Suspense>
       </div>
       <div className="flex flex-1 justify-center">
-        <HeaderSearch />
+        <CommandPalette />
       </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
