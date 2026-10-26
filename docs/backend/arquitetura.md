@@ -87,6 +87,15 @@ Clean architecture "completa" teria uma interface de caso de uso por operação,
 - Credenciais por `PLUGGY_CLIENT_ID` e `PLUGGY_CLIENT_SECRET`.
 - Tabelas `finance.bank_connection` e `finance.bank_account` entram junto com o épico; `finance.entry` já tem `source` e `external_id` para receber transações importadas sem duplicar (RN-16).
 
+### Autenticação (etapa 6)
+
+| Modo (`tbf.auth.mode`) | Uso | Comportamento |
+|---|---|---|
+| `single-user` | desenvolvimento local (padrão do perfil `dev`) | sem login; toda requisição age como `tbf.auth.owner-id` |
+| `session` | qualquer ambiente compartilhado (forçado no perfil `prod`) | login por `POST /api/v1/auth/login`, sessão em cookie HttpOnly/SameSite=Lax, CSRF no cookie `XSRF-TOKEN` devolvido no cabeçalho `X-XSRF-TOKEN` |
+
+O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`), então nenhum outro módulo muda ao trocar de modo. Não há cadastro público: a conta é criada no início pela configuração `tbf.auth.bootstrap.*`.
+
 ### IA do assistente
 
 Mesmo padrão: porta `assistant.application.port.out.LanguageModel`, adaptador por provedor, desligado por padrão. Épico AST.

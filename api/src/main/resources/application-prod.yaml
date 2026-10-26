@@ -1,0 +1,40 @@
+# Any shared or deployed environment (PLT-11). Everything sensitive comes from environment
+# variables; there are no defaults for them on purpose.
+spring:
+  datasource:
+    url: ${TBF_DB_URL}
+    username: ${TBF_DB_USER}
+    password: ${TBF_DB_PASSWORD}
+  docker:
+    compose:
+      enabled: false
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        secure: true
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+tbf:
+  auth:
+    mode: session

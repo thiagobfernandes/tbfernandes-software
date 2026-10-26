@@ -35,9 +35,9 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | PLT-06 | CI no GitHub Actions: `./mvnw verify` e `npm run build` em cada PR | P | ✅ |
 | PLT-07 | Job de verificação de referências órfãs entre módulos (ADR-003) | M | ⬜ |
 | PLT-08 | Gerar tipos TS a partir do OpenAPI (`openapi-typescript`) e usar em `web/src/lib/api` | M | ⬜ |
-| PLT-09 | Paginação padrão (`page`, `size`, `sort`) e resposta paginada | P | ⬜ |
+| PLT-09 | Paginação padrão (`page`, `size`, `sort`) e resposta paginada | P | ✅ |
 | PLT-10 | Tratamento de conflito de versão e de estado (409) | P | ✅ |
-| PLT-11 | Logs JSON e perfil `prod` | P | ⬜ |
+| PLT-11 | Logs JSON e perfil `prod` | P | ✅ |
 | PLT-12 | Título, versão e descrição no OpenAPI | P | ✅ |
 
 ## Épico WRK — Work
@@ -144,11 +144,12 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| IDN-01 | Login com Spring Security, sessão em cookie HttpOnly (RNF-SEG-01) | G | ⬜ |
-| IDN-02 | `OwnerContext` a partir do usuário logado | P | ⬜ |
-| IDN-03 | Configurações do usuário (RF-GEN-03) | P | ⬜ |
-| IDN-04 | Exportar todos os dados em JSON (RF-GEN-01) | M | ⬜ |
-| IDN-05 | Importar dados do localStorage do modo simulado (RF-GEN-02) | M | ⬜ |
+| IDN-01 | Login com Spring Security, sessão em cookie HttpOnly (RNF-SEG-01) | G | ✅ |
+| IDN-02 | `OwnerContext` a partir do usuário logado | P | ✅ |
+| IDN-03 | Configurações do usuário (RF-GEN-03) | P | ✅ |
+| IDN-06 | Limitar tentativas de login por IP/e-mail | P | ⬜ |
+| IDN-04 | Exportar todos os dados em JSON (RF-GEN-01). Feito no frontend, que já tem o formato `AppData`, lendo da API | M | ⬜ |
+| IDN-05 | Importar dados do localStorage do modo simulado (RF-GEN-02). Feito no frontend, gravando pela API | M | ⬜ |
 
 ---
 

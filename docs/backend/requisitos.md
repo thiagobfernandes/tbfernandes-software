@@ -148,6 +148,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RN-21 | Só uma meta com indicador aceita atualização de progresso. | Goals |
 | RN-23 | Um contato aponta para uma empresa cadastrada ou só para o nome de uma organização, nunca os dois. | Contacts |
 | RN-24 | Uma interação gera no máximo uma tarefa de follow-up. | Contacts |
+| RN-25 | Senha entre 12 e 128 caracteres, sem regras de composição; trocar a senha exige a atual. Login errado responde igual para e-mail desconhecido e senha errada. | Identity |
 | RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais

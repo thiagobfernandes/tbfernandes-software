@@ -40,10 +40,27 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+server:
+  servlet:
+    session:
+      timeout: 7d
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${TBF_COOKIE_SECURE:false}
+
 tbf:
-  owner:
-    # Single-user phase (see OwnerContext). Matches the owner seeded in db/dev.
-    id: 0192f000-0000-7000-8000-000000000001
+  time-zone: America/Sao_Paulo
+  auth:
+    # single-user: no login, every request acts as owner-id (local development).
+    # session: login required (any shared environment; the prod profile forces it).
+    mode: ${TBF_AUTH_MODE:single-user}
+    # Matches the owner seeded in db/dev.
+    owner-id: 0192f000-0000-7000-8000-000000000001
+    bootstrap:
+      email: ${TBF_AUTH_BOOTSTRAP_EMAIL:}
+      password: ${TBF_AUTH_BOOTSTRAP_PASSWORD:}
+      name: ${TBF_AUTH_BOOTSTRAP_NAME:}
   cors:
     allowed-origins: ${TBF_CORS_ORIGINS:http://localhost:3000}
   pluggy:

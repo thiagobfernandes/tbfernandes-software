@@ -62,6 +62,13 @@ class WorkApiIntegrationTests {
 	}
 
 	@Test
+	void listsPageWhenAskedAndReportTheTotal() {
+		MvcTestResult page = mvc.get().uri("/api/v1/tasks?page=0&size=2").exchange();
+		assertThat(page).hasStatusOk().bodyJson().extractingPath("$.length()").isEqualTo(2);
+		assertThat(Integer.parseInt(page.getResponse().getHeader("X-Total-Count"))).isGreaterThan(2);
+	}
+
+	@Test
 	void invalidRequestReturnsProblemDetailsWithFieldErrors() {
 		assertThat(post("/api/v1/companies", "{\"relationship\": \"client\"}")).hasStatus(400)
 			.bodyJson()
