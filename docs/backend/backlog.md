@@ -100,10 +100,10 @@ Critérios de aceite principais:
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| FIN-01 | Lançamentos: CRUD com escopo (RF-FIN-01, RN-12) | M | ⬜ |
-| FIN-02 | Fluxo de caixa mensal por escopo (RF-FIN-02) | M | ⬜ |
-| FIN-03 | Metas de compra (RF-FIN-03, RN-17, RN-18) | M | ⬜ |
-| FIN-04 | Projeção de data da meta de compra (RF-FIN-04) | P | ⬜ |
+| FIN-01 | Lançamentos: CRUD com escopo (RF-FIN-01, RN-12) | M | ✅ |
+| FIN-02 | Fluxo de caixa mensal por escopo (RF-FIN-02) | M | ✅ |
+| FIN-03 | Metas de compra (RF-FIN-03, RN-17, RN-18) | M | ✅ |
+| FIN-04 | Projeção de data da meta de compra (RF-FIN-04) | P | ✅ |
 | FIN-05 | Ligar telas Cash flow e Purchases à API | M | ⬜ |
 
 ## Épico FIN-OF — Open Finance com Pluggy (em aberto)
@@ -125,10 +125,10 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| CTC-01 | Contatos: CRUD (RF-CTC-01) | M | ⬜ |
-| CTC-02 | Interações (RF-CTC-02, RN-10) | P | ⬜ |
-| CTC-03 | Follow-up: cria tarefa pelo `work` e guarda o id (RF-CTC-03) | M | ⬜ |
-| CTC-04 | Próximos contatos e vencidos (RF-CTC-04) | P | ⬜ |
+| CTC-01 | Contatos: CRUD (RF-CTC-01) | M | ✅ |
+| CTC-02 | Interações (RF-CTC-02, RN-10) | P | ✅ |
+| CTC-03 | Follow-up: cria tarefa pelo `work` e guarda o id (RF-CTC-03) | M | ✅ |
+| CTC-04 | Próximos contatos e vencidos (RF-CTC-04) | P | ✅ |
 | CTC-05 | Ligar tela Contacts à API | M | ⬜ |
 
 ## Épico AST — Assistant

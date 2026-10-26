@@ -3,6 +3,8 @@ package com.tbfernandes.api.goals.application;
 import java.util.List;
 import java.util.UUID;
 
+import com.tbfernandes.api.finance.FinanceLookup;
+import com.tbfernandes.api.finance.FinanceLookup.PurchaseView;
 import com.tbfernandes.api.learning.LearningLookup;
 import com.tbfernandes.api.learning.LearningLookup.StudyView;
 import com.tbfernandes.api.shared.application.OwnerContext;
@@ -14,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * GOL-04: what points to a goal, read through the other modules' public lookups.
- * The goals module depends on work and learning, never the other way round.
+ * The goals module depends on work, learning and finance, never the other way round.
  */
 @Service
 @Transactional(readOnly = true)
@@ -23,12 +25,15 @@ public class GoalLinksService {
 	private final GoalService goals;
 	private final WorkLookup work;
 	private final LearningLookup learning;
+	private final FinanceLookup finance;
 	private final OwnerContext owner;
 
-	GoalLinksService(GoalService goals, WorkLookup work, LearningLookup learning, OwnerContext owner) {
+	GoalLinksService(GoalService goals, WorkLookup work, LearningLookup learning, FinanceLookup finance,
+			OwnerContext owner) {
 		this.goals = goals;
 		this.work = work;
 		this.learning = learning;
+		this.finance = finance;
 		this.owner = owner;
 	}
 
@@ -38,10 +43,15 @@ public class GoalLinksService {
 		List<ProjectView> projects = work.projects(ownerId).stream().filter(p -> goalId.equals(p.goalId())).toList();
 		List<TaskView> tasks = work.tasks(ownerId).stream().filter(t -> goalId.equals(t.goalId())).toList();
 		List<StudyView> studies = learning.studies(ownerId).stream().filter(s -> goalId.equals(s.goalId())).toList();
-		return new GoalLinks(projects, tasks, studies);
+		List<PurchaseView> purchases = finance.purchases(ownerId)
+			.stream()
+			.filter(p -> goalId.equals(p.goalId()))
+			.toList();
+		return new GoalLinks(projects, tasks, studies, purchases);
 	}
 
-	public record GoalLinks(List<ProjectView> projects, List<TaskView> tasks, List<StudyView> studies) {
+	public record GoalLinks(List<ProjectView> projects, List<TaskView> tasks, List<StudyView> studies,
+			List<PurchaseView> purchases) {
 	}
 
 }
