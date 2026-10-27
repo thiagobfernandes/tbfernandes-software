@@ -29,7 +29,7 @@ class DisabledOpenFinanceGateway implements OpenFinanceGateway {
 	}
 
 	private static BusinessRuleViolation disabled() {
-		return new BusinessRuleViolation("RN-15", "Open finance is disabled; use manual entries");
+		return new BusinessRuleViolation("RN-15", "O Open Finance está desativado; use lançamentos manuais");
 	}
 
 }

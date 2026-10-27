@@ -27,7 +27,7 @@ public final class Skill extends Aggregate<Skill.Details> {
 	@Override
 	protected Details validate(Details d) {
 		if (d.level() < 1 || d.level() > 5) {
-			throw new BusinessRuleViolation("RN-13", "Skill level goes from 1 to 5");
+			throw new BusinessRuleViolation("RN-13", "O nível da habilidade vai de 1 a 5");
 		}
 		return new Details(Require.text(d.name(), "name", 120), d.level(), Require.optionalText(d.evidence(), "evidence", 2000));
 	}

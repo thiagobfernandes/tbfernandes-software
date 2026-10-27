@@ -8,7 +8,7 @@ import java.util.Locale;
 /** Due date labels, same wording as describeDue in web/src/lib/dates.ts. */
 final class Due {
 
-	private static final DateTimeFormatter SHORT = DateTimeFormatter.ofPattern("MMM d", Locale.ENGLISH);
+	private static final DateTimeFormatter SHORT = DateTimeFormatter.ofPattern("d 'de' MMM", Locale.of("pt", "BR"));
 
 	private Due() {
 	}
@@ -17,26 +17,26 @@ final class Due {
 		return ChronoUnit.DAYS.between(from, to);
 	}
 
-	/** "overdue 2d", "due today", "due tomorrow", "due in 4d" or "due oct 30" (lower case, as the answers use it). */
+	/** "atrasada 2d", "vence hoje", "vence amanhã", "vence em 4d" ou "vence 30 de out." (minúsculas, como as respostas usam). */
 	static String label(LocalDate dueDate, LocalDate today) {
 		long diff = daysBetween(today, dueDate);
 		String label;
 		if (diff < 0) {
-			label = "Overdue " + -diff + "d";
+			label = "Atrasada " + -diff + "d";
 		}
 		else if (diff == 0) {
-			label = "Due today";
+			label = "Vence hoje";
 		}
 		else if (diff == 1) {
-			label = "Due tomorrow";
+			label = "Vence amanhã";
 		}
 		else if (diff <= 7) {
-			label = "Due in " + diff + "d";
+			label = "Vence em " + diff + "d";
 		}
 		else {
-			label = "Due " + SHORT.format(dueDate);
+			label = "Vence " + SHORT.format(dueDate);
 		}
-		return label.toLowerCase(Locale.ROOT);
+		return label.toLowerCase(Locale.of("pt", "BR"));
 	}
 
 }

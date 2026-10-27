@@ -31,7 +31,7 @@ class SecurityOwnerContext implements OwnerContext {
 		if (!properties.sessionMode()) {
 			return properties.ownerId();
 		}
-		throw new AuthenticationCredentialsNotFoundException("Not signed in");
+		throw new AuthenticationCredentialsNotFoundException("Sem login");
 	}
 
 }

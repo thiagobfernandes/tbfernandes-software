@@ -47,7 +47,7 @@ public class CompanyService {
 	public void delete(UUID id) {
 		Company company = get(id);
 		if (projects.anyForCompany(company.ownerId(), id)) {
-			throw new Conflict("RN-01", "The company has projects; close it instead of deleting");
+			throw new Conflict("RN-01", "A empresa tem projetos; encerre-a em vez de excluir");
 		}
 		companies.delete(company);
 		events.publishEvent(new CompanyDeleted(company.ownerId(), id));

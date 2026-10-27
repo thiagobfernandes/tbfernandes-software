@@ -53,7 +53,7 @@ public final class Task {
 			return false;
 		}
 		if (status == TaskStatus.BLOCKED && next == TaskStatus.DONE) {
-			throw new BusinessRuleViolation("RN-07", "Unblock the task before completing it");
+			throw new BusinessRuleViolation("RN-07", "Desbloqueie a tarefa antes de concluí-la");
 		}
 		this.status = next;
 		if (next == TaskStatus.DONE) {
@@ -69,7 +69,7 @@ public final class Task {
 		Integer done = d.checklistDone();
 		Integer total = d.checklistTotal();
 		if ((done == null) != (total == null) || (total != null && (done < 0 || total < done))) {
-			throw new BusinessRuleViolation("RN-08", "Checklist progress needs 0 <= done <= total");
+			throw new BusinessRuleViolation("RN-08", "O progresso da checklist precisa de 0 <= feitos <= total");
 		}
 		return new TaskDetails(Require.text(d.title(), "title", 200),
 				Require.optionalText(d.description(), "description", 5000), d.projectId(),

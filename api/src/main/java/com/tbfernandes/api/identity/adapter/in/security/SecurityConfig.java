@@ -44,7 +44,7 @@ class SecurityConfig {
 				.anyRequest()
 				.authenticated())
 			.exceptionHandling(errors -> errors.authenticationEntryPoint((request, response, ex) -> {
-				ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Sign in first");
+				ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Entre primeiro");
 				response.setStatus(401);
 				response.setContentType("application/problem+json");
 				json.writeValue(response.getOutputStream(), problem);

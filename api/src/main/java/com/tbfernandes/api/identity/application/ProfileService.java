@@ -40,7 +40,7 @@ public class ProfileService {
 	public void changePassword(String current, String next) {
 		AppUser user = me();
 		if (user.canLogIn() && (current == null || !passwords.matches(current, user.passwordHash()))) {
-			throw new BusinessRuleViolation("RN-25", "The current password is wrong");
+			throw new BusinessRuleViolation("RN-25", "A senha atual está errada");
 		}
 		user.changePasswordHash(passwords.encode(PasswordPolicy.check(next)));
 		users.save(user);

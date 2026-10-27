@@ -39,7 +39,7 @@ class ApiExceptionHandler {
 	@ExceptionHandler(OptimisticLockingFailureException.class)
 	ProblemDetail staleVersion(OptimisticLockingFailureException ex) {
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
-				"The record was changed by another request; reload and try again");
+				"O registro foi alterado por outra requisição; recarregue e tente de novo");
 		problem.setTitle("Conflict");
 		return problem;
 	}
@@ -48,7 +48,7 @@ class ApiExceptionHandler {
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	ProblemDetail integrity(DataIntegrityViolationException ex) {
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
-				"The request conflicts with existing data");
+				"A requisição conflita com dados existentes");
 		problem.setTitle("Conflict");
 		return problem;
 	}
@@ -56,7 +56,7 @@ class ApiExceptionHandler {
 	@ExceptionHandler(BusinessRuleViolation.class)
 	ProblemDetail businessRule(BusinessRuleViolation ex) {
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
-		problem.setTitle("Business rule violated");
+		problem.setTitle("Regra de negócio violada");
 		problem.setProperty("rule", ex.rule());
 		return problem;
 	}
@@ -73,7 +73,7 @@ class ApiExceptionHandler {
 			.stream()
 			.collect(Collectors.groupingBy(error -> error.getField(),
 					Collectors.mapping(error -> error.getDefaultMessage(), Collectors.toList())));
-		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Invalid request");
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Requisição inválida");
 		problem.setProperty("errors", errors);
 		return problem;
 	}

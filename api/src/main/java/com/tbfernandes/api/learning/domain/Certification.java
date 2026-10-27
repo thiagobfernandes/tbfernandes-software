@@ -28,10 +28,10 @@ public final class Certification extends Aggregate<Certification.Details> {
 	protected Details validate(Details d) {
 		CertificationStatus status = d.status() == null ? CertificationStatus.PLANNED : d.status();
 		if (status == CertificationStatus.OBTAINED && d.obtainedAt() == null) {
-			throw new BusinessRuleViolation("RN-14", "An obtained certification needs the date it was obtained");
+			throw new BusinessRuleViolation("RN-14", "Uma certificação obtida precisa da data de obtenção");
 		}
 		if (d.obtainedAt() != null && d.expiresAt() != null && !d.expiresAt().isAfter(d.obtainedAt())) {
-			throw new BusinessRuleViolation("RN-14", "Expiry must be after the date obtained");
+			throw new BusinessRuleViolation("RN-14", "O vencimento precisa ser depois da data de obtenção");
 		}
 		return new Details(Require.text(d.name(), "name", 200), Require.text(d.issuer(), "issuer", 120), status,
 				d.obtainedAt(), d.expiresAt(), Require.optionalText(d.validationUrl(), "validationUrl", 2000),

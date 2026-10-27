@@ -32,7 +32,7 @@ public final class Contact extends Aggregate<Contact.Details> {
 	protected Details validate(Details d) {
 		String companyName = Require.optionalText(d.companyName(), "companyName", 120);
 		if (d.companyId() != null && companyName != null) {
-			throw new BusinessRuleViolation("RN-23", "Use either a registered company or a company name");
+			throw new BusinessRuleViolation("RN-23", "Use uma empresa cadastrada ou um nome de empresa, não os dois");
 		}
 		String email = Require.optionalText(d.email(), "email", 254);
 		if (email != null && !email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")) {

@@ -32,7 +32,7 @@ public final class Interaction extends Aggregate<Interaction.Details> {
 	/** RF-CTC-03: one follow-up per interaction. */
 	public void followUpCreated(UUID taskId) {
 		if (details().followUpTaskId() != null) {
-			throw new BusinessRuleViolation("RN-24", "This interaction already has a follow-up task");
+			throw new BusinessRuleViolation("RN-24", "Esta interação já tem uma tarefa de follow-up");
 		}
 		Details d = details();
 		update(new Details(d.contactId(), d.date(), d.kind(), d.summary(), taskId));

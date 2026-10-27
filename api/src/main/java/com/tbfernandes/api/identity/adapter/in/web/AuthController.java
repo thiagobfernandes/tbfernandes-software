@@ -77,7 +77,7 @@ class AuthController {
 	/** Same answer for unknown e-mail and wrong password, so accounts cannot be probed. */
 	@ExceptionHandler(AuthenticationException.class)
 	ProblemDetail badCredentials() {
-		return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "E-mail or password is wrong");
+		return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "E-mail ou senha incorretos");
 	}
 
 	record LoginRequest(@NotBlank String email, @NotBlank String password) {

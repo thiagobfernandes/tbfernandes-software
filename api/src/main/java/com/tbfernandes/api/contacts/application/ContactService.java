@@ -105,7 +105,7 @@ public class ContactService implements ContactsLookup {
 	public Interaction createFollowUp(UUID interactionId, String title, LocalDate dueDate) {
 		Interaction interaction = interaction(interactionId);
 		Contact contact = contact(interaction.details().contactId());
-		String taskTitle = title == null || title.isBlank() ? "Follow up with " + contact.details().name() : title;
+		String taskTitle = title == null || title.isBlank() ? "Follow-up com " + contact.details().name() : title;
 		UUID taskId = followUps.create(taskTitle, interaction.details().summary(), dueDate);
 		interaction.followUpCreated(taskId);
 		return repository.save(interaction);

@@ -13,7 +13,7 @@ final class PasswordPolicy {
 	static String check(String password) {
 		if (password == null || password.length() < MIN_LENGTH || password.length() > 128) {
 			throw new BusinessRuleViolation("RN-25",
-					"The password needs between " + MIN_LENGTH + " and 128 characters");
+					"A senha precisa ter entre " + MIN_LENGTH + " e 128 caracteres");
 		}
 		return password;
 	}

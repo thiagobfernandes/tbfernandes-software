@@ -46,6 +46,12 @@ public final class RuleBasedAssistant {
 
 	private static final Map<String, Integer> PRIORITY_RANK = Map.of("urgent", 0, "high", 1, "normal", 2, "low", 3);
 
+	private static final Map<String, String> PRIORITY_TEXT = Map.of("urgent", "urgente", "high", "alta", "normal",
+			"normal", "low", "baixa");
+
+	private static final Map<String, String> PROJECT_STATUS_TEXT = Map.of("planned", "planejado", "active", "ativo",
+			"paused", "pausado", "completed", "concluído");
+
 	private RuleBasedAssistant() {
 	}
 
@@ -97,26 +103,29 @@ public final class RuleBasedAssistant {
 
 		List<String> parts = new ArrayList<>();
 		long percent = tasks.isEmpty() ? 0 : Math.round(done * 100.0 / tasks.size());
-		parts.add("**%s** is %s: %d of %d tasks done (%d%%).".formatted(project.name(), project.status(), done,
+		parts.add("**%s** está %s: %d de %d tarefas concluídas (%d%%).".formatted(project.name(),
+				PROJECT_STATUS_TEXT.getOrDefault(project.status(), project.status()), done,
 				tasks.size(), percent));
 		if (present(project.nextDelivery())) {
-			parts.add("Next delivery: " + project.nextDelivery() + ".");
+			parts.add("Próxima entrega: " + project.nextDelivery() + ".");
 		}
-		parts.add(open.isEmpty() ? "No open tasks."
-				: "Open tasks:\n" + open.stream()
+		parts.add(open.isEmpty() ? "Nenhuma tarefa aberta."
+				: "Tarefas abertas:\n" + open.stream()
 					.map(t -> "- " + t.title()
 							+ (t.dueDate() == null ? "" : " (" + Due.label(t.dueDate(), data.today()) + ")"))
 					.collect(Collectors.joining("\n")));
 		if (!blocked.isEmpty()) {
-			parts.add("⚠ %d blocked: %s.".formatted(blocked.size(),
+			parts.add("⚠ %d bloqueada%s: %s.".formatted(blocked.size(), blocked.size() > 1 ? "s" : "",
 					blocked.stream().map(TaskView::title).collect(Collectors.joining(", "))));
 		}
 		if (!notes.isEmpty()) {
-			parts.add("%d linked note%s may help.".formatted(notes.size(), notes.size() > 1 ? "s" : ""));
+			String plural = notes.size() > 1 ? "s" : "";
+			parts.add("%d nota%s vinculada%s pode%s ajudar.".formatted(notes.size(), plural, plural,
+					notes.size() > 1 ? "m" : ""));
 		}
 
 		List<Reference> references = new ArrayList<>();
-		references.add(new Reference("Project", project.name(), "/projects/" + project.id()));
+		references.add(new Reference("Projeto", project.name(), "/projects/" + project.id()));
 		open.stream().limit(4).map(t -> taskRef(t.title())).forEach(references::add);
 		notes.stream().map(RuleBasedAssistant::noteRef).forEach(references::add);
 		return rules(String.join("\n\n", parts), references);
@@ -126,11 +135,11 @@ public final class RuleBasedAssistant {
 		List<TaskView> overdue = openTasks.stream()
 			.filter(t -> t.dueDate() != null && t.dueDate().isBefore(data.today()))
 			.toList();
-		String text = overdue.isEmpty() ? "Nothing is overdue. 🎉"
-				: "You have %d overdue task%s:\n%s\n\nStart with blocked items: they usually need a message, not work."
-					.formatted(overdue.size(), overdue.size() > 1 ? "s" : "", overdue.stream()
+		String text = overdue.isEmpty() ? "Nada atrasado. 🎉"
+				: "Você tem %d tarefa%s atrasada%s:\n%s\n\nComece pelas bloqueadas: elas geralmente precisam de uma mensagem, não de trabalho."
+					.formatted(overdue.size(), overdue.size() > 1 ? "s" : "", overdue.size() > 1 ? "s" : "", overdue.stream()
 						.map(t -> "- **" + t.title() + "**, " + Due.label(t.dueDate(), data.today())
-								+ ("blocked".equals(t.status()) ? " (blocked)" : ""))
+								+ ("blocked".equals(t.status()) ? " (bloqueada)" : ""))
 						.collect(Collectors.joining("\n")));
 		return rules(text, overdue.stream().map(t -> taskRef(t.title())).toList());
 	}
@@ -141,10 +150,11 @@ public final class RuleBasedAssistant {
 			.sorted(Comparator.<TaskView>comparingInt(t -> PRIORITY_RANK.getOrDefault(t.priority(), 2))
 				.thenComparing(TaskView::dueDate))
 			.toList();
-		String text = focus.isEmpty() ? "Nothing is due in the next two days. Good moment for backlog or study."
-				: "For today, in this order:\n%s\n\nOrdered by priority, then due date.".formatted(IntStream
+		String text = focus.isEmpty() ? "Nada vence nos próximos dois dias. Bom momento para o backlog ou para estudar."
+				: "Para hoje, nesta ordem:\n%s\n\nOrdenado por prioridade e depois por prazo.".formatted(IntStream
 					.range(0, focus.size())
-					.mapToObj(i -> "%d. **%s** · %s · %s".formatted(i + 1, focus.get(i).title(), focus.get(i).priority(),
+					.mapToObj(i -> "%d. **%s** · prioridade %s · %s".formatted(i + 1, focus.get(i).title(),
+							PRIORITY_TEXT.getOrDefault(focus.get(i).priority(), focus.get(i).priority()),
 							Due.label(focus.get(i).dueDate(), data.today())))
 					.collect(Collectors.joining("\n")));
 		return rules(text, focus.stream().map(t -> taskRef(t.title())).toList());
@@ -152,39 +162,39 @@ public final class RuleBasedAssistant {
 
 	private static Answer purchases(List<PurchaseView> purchases) {
 		List<PurchaseView> open = purchases.stream().filter(p -> !"bought".equals(p.status())).toList();
-		String text = open.isEmpty() ? "No planned purchases." : open.stream().map(p -> {
+		String text = open.isEmpty() ? "Nenhuma compra planejada." : open.stream().map(p -> {
 			if (p.ready()) {
-				return "- **" + p.name() + "**: fully reserved, ready to buy.";
+				return "- **" + p.name() + "**: valor todo reservado, pronto para comprar.";
 			}
 			if (p.months() == null) {
-				return "- **" + p.name() + "**: " + brl(p.missing()) + " missing, no monthly saving set.";
+				return "- **" + p.name() + "**: " + brl(p.missing()) + " faltando, sem economia mensal definida.";
 			}
-			return "- **%s**: %s missing, affordable in %d months%s.".formatted(p.name(), brl(p.missing()), p.months(),
-					Boolean.FALSE.equals(p.onTime()) ? " (later than you wanted)" : "");
+			return "- **%s**: %s faltando, dá para comprar em %d meses%s.".formatted(p.name(), brl(p.missing()), p.months(),
+					Boolean.FALSE.equals(p.onTime()) ? " (depois do que você queria)" : "");
 		}).collect(Collectors.joining("\n"));
-		return rules(text, List.of(new Reference("Finance", "Planned purchases", "/finance/purchases")));
+		return rules(text, List.of(new Reference("Finanças", "Compras planejadas", "/finance/purchases")));
 	}
 
 	private static Answer money(MonthView month) {
 		String text = """
-				This month:
-				- **Personal**: %s in, %s out, balance %s.
-				- **Business**: %s in, %s out, balance %s.
+				Neste mês:
+				- **Pessoal**: %s de entrada, %s de saída, saldo %s.
+				- **Empresa**: %s de entrada, %s de saída, saldo %s.
 
-				Remember that business balance is not personal money until you transfer it."""
+				Lembre que o saldo da empresa não é dinheiro pessoal até você transferir."""
 			.formatted(brl(month.personalIncome()), brl(month.personalExpense()),
 					brl(month.personalIncome().subtract(month.personalExpense())), brl(month.businessIncome()),
 					brl(month.businessExpense()), brl(month.businessIncome().subtract(month.businessExpense())));
-		return rules(text, List.of(new Reference("Finance", "Cash flow", "/finance")));
+		return rules(text, List.of(new Reference("Finanças", "Fluxo de caixa", "/finance")));
 	}
 
 	private static Answer goals(List<GoalView> goals) {
 		List<GoalView> active = goals.stream().filter(g -> "active".equals(g.status())).toList();
-		String text = active.isEmpty() ? "No active goals."
-				: "Active goals:\n" + active.stream()
-					.map(g -> "- **%s**: %d%% (%s)".formatted(g.name(), g.percent(), g.basis().toLowerCase(Locale.ROOT)))
+		String text = active.isEmpty() ? "Nenhuma meta ativa."
+				: "Metas ativas:\n" + active.stream()
+					.map(g -> "- **%s**: %d%% (%s)".formatted(g.name(), g.percent(), g.basis().toLowerCase(Locale.of("pt", "BR"))))
 					.collect(Collectors.joining("\n"));
-		return rules(text, active.stream().map(g -> new Reference("Goal", g.name(), "/goals/" + g.id())).toList());
+		return rules(text, active.stream().map(g -> new Reference("Meta", g.name(), "/goals/" + g.id())).toList());
 	}
 
 	private static Answer contacts(List<ContactView> contacts, Workspace data) {
@@ -192,28 +202,28 @@ public final class RuleBasedAssistant {
 			.filter(c -> c.nextContact() != null && Due.daysBetween(data.today(), c.nextContact()) <= 7)
 			.sorted(Comparator.comparing(ContactView::nextContact))
 			.toList();
-		String text = due.isEmpty() ? "No follow-ups due this week."
-				: "Follow up this week:\n" + due.stream()
-					.map(c -> "- **%s** (%s), %s".formatted(c.name(), present(c.role()) ? c.role() : "contact",
+		String text = due.isEmpty() ? "Nenhum follow-up nesta semana."
+				: "Follow-ups desta semana:\n" + due.stream()
+					.map(c -> "- **%s** (%s), %s".formatted(c.name(), present(c.role()) ? c.role() : "contato",
 							Due.label(c.nextContact(), data.today())))
 					.collect(Collectors.joining("\n"));
 		return rules(text,
-				due.stream().map(c -> new Reference("Contact", c.name(), "/contacts?contact=" + c.id())).toList());
+				due.stream().map(c -> new Reference("Contato", c.name(), "/contacts?contact=" + c.id())).toList());
 	}
 
 	private static Answer learning(List<StudyView> studies) {
 		List<StudyView> ongoing = studies.stream().filter(s -> !"completed".equals(s.status())).toList();
-		String text = ongoing.isEmpty() ? "No ongoing studies."
-				: "Ongoing studies:\n" + ongoing.stream()
+		String text = ongoing.isEmpty() ? "Nenhum estudo em andamento."
+				: "Estudos em andamento:\n" + ongoing.stream()
 					.map(s -> "- **" + s.name() + "**: "
-							+ (present(s.nextActivity()) ? s.nextActivity() : "no next activity set"))
+							+ (present(s.nextActivity()) ? s.nextActivity() : "sem próxima atividade definida"))
 					.collect(Collectors.joining("\n"));
-		return rules(text, List.of(new Reference("Learning", "Learning", "/learning")));
+		return rules(text, List.of(new Reference("Aprendizado", "Aprendizado", "/learning")));
 	}
 
 	/** Fallback: search knowledge and tasks for the question's words. */
 	private static Answer search(String question, Workspace data) {
-		List<String> words = Arrays.stream(question.split("\\W+")).filter(w -> w.length() > 3).toList();
+		List<String> words = Arrays.stream(question.split("[^\\p{L}\\p{N}]+")).filter(w -> w.length() > 3).toList();
 		java.util.function.Predicate<String> matches = text -> {
 			String lower = text.toLowerCase(Locale.ROOT);
 			return words.stream().anyMatch(lower::contains);
@@ -236,9 +246,9 @@ public final class RuleBasedAssistant {
 			.map(t -> taskRef(t.title()))
 			.forEach(references::add);
 		String text = references.isEmpty()
-				? "I could not find anything about that yet. Try asking about today's focus, overdue tasks, a project by name, goals, money, purchases, contacts or studies."
-				: "I found %d related item%s in your workspace. Open them below.".formatted(references.size(),
-						references.size() > 1 ? "s" : "");
+				? "Ainda não encontrei nada sobre isso. Pergunte sobre o foco de hoje, tarefas atrasadas, um projeto pelo nome, metas, dinheiro, compras, contatos ou estudos."
+				: "Encontrei %d %s nos seus dados. Abra abaixo.".formatted(references.size(),
+						references.size() > 1 ? "itens relacionados" : "item relacionado");
 		return rules(text, references);
 	}
 
@@ -247,7 +257,7 @@ public final class RuleBasedAssistant {
 	}
 
 	private static Reference taskRef(String title) {
-		return new Reference("Task", title, "/tasks?q=" + encodeUriComponent(title));
+		return new Reference("Tarefa", title, "/tasks?q=" + encodeUriComponent(title));
 	}
 
 	/** Same output as JavaScript's encodeURIComponent, so links match the frontend's. */
@@ -262,7 +272,7 @@ public final class RuleBasedAssistant {
 	}
 
 	private static Reference noteRef(NoteView note) {
-		return new Reference("Note", note.title(), "/knowledge?note=" + note.id());
+		return new Reference("Nota", note.title(), "/knowledge?note=" + note.id());
 	}
 
 	/** Whole reais, like formatBRL in web/src/lib/money.ts ("R$ 1.234"). */

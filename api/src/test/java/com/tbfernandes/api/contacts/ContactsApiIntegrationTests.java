@@ -46,7 +46,7 @@ class ContactsApiIntegrationTests extends ApiTestSupport {
 		assertThat(followed).hasStatusOk();
 		String taskId = read(followed, "$.followUpTaskId");
 		assertThat(get("/api/v1/tasks/{id}", taskId)).bodyJson()
-			.hasPathSatisfying("$.title", title -> assertThat(title).isEqualTo("Follow up with Bruno"));
+			.hasPathSatisfying("$.title", title -> assertThat(title).isEqualTo("Follow-up com Bruno"));
 		assertThat(post("/api/v1/interactions/" + interactionId + "/follow-up", "{}")).hasStatus(422);
 
 		List<String> due = read(get("/api/v1/contacts?dueWithinDays=7"), "$[*].id");

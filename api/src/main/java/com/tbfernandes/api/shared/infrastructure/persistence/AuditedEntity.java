@@ -45,7 +45,7 @@ public abstract class AuditedEntity {
 	@PostLoad
 	void refuseTakenClientId() {
 		if (ClientIds.assignedInThisRequest(id)) {
-			throw new Conflict("ADR-007", "The id " + id + " is already in use");
+			throw new Conflict("ADR-007", "O id " + id + " já está em uso");
 		}
 	}
 

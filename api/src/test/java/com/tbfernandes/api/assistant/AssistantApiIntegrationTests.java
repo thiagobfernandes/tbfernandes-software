@@ -28,7 +28,7 @@ class AssistantApiIntegrationTests extends ApiTestSupport {
 		assertThat(answer).hasStatusOk();
 		assertThat(answer).bodyJson()
 			.hasPathSatisfying("$.source", source -> assertThat(source).isEqualTo("rules"))
-			.hasPathSatisfying("$.text", text -> assertThat(text).asString().contains("0 of 1 tasks done"));
+			.hasPathSatisfying("$.text", text -> assertThat(text).asString().contains("0 de 1 tarefas concluídas"));
 		List<String> hrefs = read(answer, "$.references[*].href");
 		assertThat(hrefs).contains("/projects/" + projectId, "/knowledge?note=" + noteId);
 
@@ -53,7 +53,7 @@ class AssistantApiIntegrationTests extends ApiTestSupport {
 		var answer = post("/api/v1/assistant/questions", "{\"question\": \"How are my goals?\"}");
 		assertThat(answer).bodyJson()
 			.hasPathSatisfying("$.text",
-					text -> assertThat(text).asString().contains("- **%s**: 50%% (1/2 milestones)".formatted(name)));
+					text -> assertThat(text).asString().contains("- **%s**: 50%% (1/2 marcos)".formatted(name)));
 	}
 
 	@Test

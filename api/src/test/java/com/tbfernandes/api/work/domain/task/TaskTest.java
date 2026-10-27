@@ -37,7 +37,7 @@ class TaskTest {
 		Task task = Task.create(UUID.randomUUID(), details(), TaskStatus.BLOCKED, CLOCK);
 
 		assertThatThrownBy(() -> task.changeStatus(TaskStatus.DONE, CLOCK)).isInstanceOf(BusinessRuleViolation.class)
-			.hasMessageContaining("Unblock");
+			.hasMessageContaining("Desbloqueie");
 	}
 
 	@Test

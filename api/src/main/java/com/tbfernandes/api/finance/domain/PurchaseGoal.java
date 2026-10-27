@@ -30,7 +30,7 @@ public final class PurchaseGoal extends Aggregate<PurchaseGoal.Details> {
 	protected Details validate(Details d) {
 		BigDecimal reserved = d.reserved() == null ? BigDecimal.ZERO : Money.scale(d.reserved());
 		if (reserved.signum() < 0) {
-			throw new BusinessRuleViolation("RN-18", "Reserved money cannot be negative");
+			throw new BusinessRuleViolation("RN-18", "O valor reservado não pode ser negativo");
 		}
 		PurchaseStatus status = d.status() == null ? PurchaseStatus.PLANNED : d.status();
 		if (status == PurchaseStatus.BOUGHT && d.paid() == null) {

@@ -41,7 +41,7 @@ public final class Goal extends Aggregate<GoalDetails> {
 	/** RF-GOL-04. */
 	public void recordProgress(BigDecimal current) {
 		if (details().indicator() == null) {
-			throw new BusinessRuleViolation("RN-21", "The goal has no indicator to update");
+			throw new BusinessRuleViolation("RN-21", "A meta não tem indicador para atualizar");
 		}
 		update(with(details().status(), details().indicator().withCurrent(current)));
 	}
