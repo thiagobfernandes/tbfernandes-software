@@ -53,7 +53,7 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | WRK-07 | Resumo do painel: abertas, atrasadas, concluídas na semana, projetos ativos (RF-WRK-13) | M | ✅ |
 | WRK-08 | `WorkLookup` público para outros módulos validarem empresa/projeto/tarefa | P | ✅ |
 | WRK-09 | Evento `TaskDeleted` para limpar vínculos de conhecimento e follow-ups | P | ✅ |
-| WRK-10 | Ligar telas Companies, Projects e Tasks à API (trocar `workActions` por `apiFetch`) | G | ⬜ |
+| WRK-10 | Ligar telas Companies, Projects e Tasks à API (trocar `workActions` por `apiFetch`) | G | ✅ etapa 9 |
 | WRK-11 | Excluir empresa sem projetos (com projetos: 409) e projeto, mantendo as tarefas sem projeto (RN-01) | P | ✅ |
 
 Critérios de aceite principais:
@@ -71,7 +71,7 @@ Critérios de aceite principais:
 | KNW-05 | Endpoint do grafo: nós e arestas (RF-KNW-05). Movido para o módulo assistant, que já lê todos os módulos | M | ✅ etapa 8 |
 | KNW-06 | Ouvir `TaskDeleted` e remover vínculos | P | ✅ |
 | KNW-07 | Métodos: CRUD com passos e exemplos (RF-KNW-06) | M | ✅ |
-| KNW-08 | Ligar telas Knowledge, Snippets, Graph e Methods à API | G | ⬜ |
+| KNW-08 | Ligar telas Knowledge, Snippets, Graph e Methods à API | G | ✅ etapa 9 |
 
 ## Épico GOL — Goals
 
@@ -82,7 +82,7 @@ Critérios de aceite principais:
 | GOL-03 | Marcos (RF-GOL-03, RN-09) | P | ✅ |
 | GOL-04 | Itens vinculados à meta, via consultas públicas dos outros módulos (RF-GOL-05) | M | ✅ |
 | GOL-05 | Ouvir `TaskCompleted` e registrar progresso (RF-GOL-06) | P | ✅ |
-| GOL-06 | Ligar telas Goals e Goal detail à API | M | ⬜ |
+| GOL-06 | Ligar telas Goals e Goal detail à API | M | ✅ etapa 9 |
 
 ## Épico LRN — Learning
 
@@ -94,7 +94,7 @@ Critérios de aceite principais:
 | LRN-04 | Certificações (RF-LRN-04, RN-14) | P | ✅ |
 | LRN-05 | Formação (RF-LRN-05) | P | ✅ |
 | LRN-06 | Aviso de certificações vencendo (RF-LRN-06) | P | ✅ |
-| LRN-07 | Ligar telas Learning e Certifications à API | M | ⬜ |
+| LRN-07 | Ligar telas Learning e Certifications à API | M | ✅ etapa 9 |
 
 ## Épico FIN — Finance (manual)
 
@@ -104,7 +104,7 @@ Critérios de aceite principais:
 | FIN-02 | Fluxo de caixa mensal por escopo (RF-FIN-02) | M | ✅ |
 | FIN-03 | Metas de compra (RF-FIN-03, RN-17, RN-18) | M | ✅ |
 | FIN-04 | Projeção de data da meta de compra (RF-FIN-04) | P | ✅ |
-| FIN-05 | Ligar telas Cash flow e Purchases à API | M | ⬜ |
+| FIN-05 | Ligar telas Cash flow e Purchases à API | M | ✅ etapa 9 |
 
 ## Épico FIN-OF — Open Finance com Pluggy (em aberto)
 
@@ -129,7 +129,7 @@ Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o es
 | CTC-02 | Interações (RF-CTC-02, RN-10) | P | ✅ |
 | CTC-03 | Follow-up: cria tarefa pelo `work` e guarda o id (RF-CTC-03) | M | ✅ |
 | CTC-04 | Próximos contatos e vencidos (RF-CTC-04) | P | ✅ |
-| CTC-05 | Ligar tela Contacts à API | M | ⬜ |
+| CTC-05 | Ligar tela Contacts à API | M | ✅ etapa 9 |
 
 ## Épico AST — Assistant
 

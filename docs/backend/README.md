@@ -6,8 +6,8 @@
 | [arquitetura.md](arquitetura.md) | Módulos, camadas da clean architecture, comunicação entre módulos, integrações e ADRs |
 | [diagramas.md](diagramas.md) | UML: casos de uso, componentes, camadas, classes, estados, sequências e implantação |
 | [modelo-de-dados.md](modelo-de-dados.md) | Diagrama ER, convenções do banco e mapeamento frontend → tabelas |
-| [api.md](api.md) | Contrato REST: todos os endpoints, paginação, autenticação e erros |
+| [api.md](api.md) | Contrato REST: endpoints prontos e planejados |
 | [backlog.md](backlog.md) | Épicos, itens, critérios, Definition of Done e sequência de entregas |
-| [implementacao/](implementacao/README.md) | Registro de cada etapa implementada: mudanças, decisões e testes |
+| [implementacao/](implementacao/README.md) | Registro do que foi feito em cada etapa |
 
-Código: [api/](../../api/README.md). Decisões gerais do projeto: [decisoes-tecnicas.md](../decisoes-tecnicas.md).
+Código: [api/](../../api/README.md). Índice geral: [docs/README.md](../README.md). Padrões: [padroes-de-codigo.md](../padroes-de-codigo.md).

@@ -1,22 +1,25 @@
 # TBFernandes Software
 
-Personal and professional management platform: companies, projects, tasks, knowledge, and (later) goals, learning, finance, contacts, and an AI assistant.
+Plataforma de gestão pessoal e profissional: empresas, projetos, tarefas, conhecimento, metas, aprendizado, finanças, contatos e um assistente.
 
-| Folder | Contents |
+| Pasta | Conteúdo |
 |---|---|
-| `web/` | Next.js frontend (App Router, TypeScript, Tailwind CSS, shadcn/ui) |
-| `api/` | Spring Boot backend (not created yet) |
-| `docs/` | Product and technical decisions |
+| `web/` | Frontend Next.js 16 (App Router, TypeScript, Tailwind CSS 4, shadcn/ui) |
+| `api/` | Backend Spring Boot 4.1 (Java 25, Spring Modulith, PostgreSQL 17, Flyway) |
+| `docs/` | Requisitos, arquitetura, padrões de código, design e backlog ([índice](docs/README.md)) |
 
-## Frontend
+## Rodar
 
 ```bash
-cd web
-cp .env.example .env.local
-npm install
-npm run dev
+# backend (precisa do Docker)
+cd api && ./mvnw spring-boot:run
+
+# frontend
+cd web && cp .env.example .env.local && npm install && npm run dev
 ```
 
-Open http://localhost:3000. The dashboard shows sample data, marked as such, until the API exists.
+Abra http://localhost:3000. Por padrão o frontend usa dados de exemplo no navegador; com `NEXT_PUBLIC_DATA_SOURCE=api` no `web/.env.local` ele lê e grava na API. Passo a passo em [docs/como-rodar.md](docs/como-rodar.md).
 
-See [docs/decisoes-tecnicas.md](docs/decisoes-tecnicas.md) for the architecture, patterns, and stack.
+## Para quem programa (e para o Claude Code)
+
+Comece pelo [CLAUDE.md](CLAUDE.md): regras do projeto e links para cada documento.

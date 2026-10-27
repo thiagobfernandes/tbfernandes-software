@@ -1,6 +1,8 @@
 # Decisões técnicas — TBFernandes Software
 
-Status: proposta inicial (2026-10-23). Cada decisão pode ser revista quando um problema real justificar.
+Status: proposta inicial (2026-10-23), revisada em 2026-10-27. Cada decisão pode ser revista quando um problema real justificar.
+
+> **Atualizações desde a proposta:** os módulos do backend ficaram `shared`, `identity`, `work` (empresas, projetos e tarefas, ADR-002), `knowledge`, `goals`, `learning`, `finance`, `contacts` e `assistant`; as camadas de cada módulo são `domain`, `application`, `adapter/in/web` e `adapter/out/persistence` (veja [backend/arquitetura.md](backend/arquitetura.md)). Desde 2026-10-27 os **textos de interface são em português (pt-BR)**; código continua em inglês.
 
 ## 1. Arquitetura: monólito modular
 
@@ -30,7 +32,7 @@ Por quê: um usuário, um time de uma pessoa e domínio ainda em descoberta. O m
 - Código organizado por feature em `src/features/<feature>`; páginas em `src/app` são finas.
 - shadcn/ui como base; cores só via tokens em `globals.css`.
 - Formulários: React Hook Form + Zod. TanStack Query só quando houver mutações frequentes que justifiquem.
-- Código, rotas e textos de interface em inglês (conforme o documento de arquitetura do frontend).
+- Código e rotas em inglês; textos de interface em pt-BR (mudança de 2026-10-27). Detalhes em [frontend/arquitetura.md](frontend/arquitetura.md).
 
 ### Processo
 - Entregas pequenas por funcionalidade, de ponta a ponta (migration → API → tela).
