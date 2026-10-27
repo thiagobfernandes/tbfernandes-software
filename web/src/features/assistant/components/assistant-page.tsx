@@ -21,14 +21,14 @@ type Message =
   | ({ id: number; role: "assistant" } & Answer);
 
 const suggestions = [
-  "What should I focus on today?",
-  "What is overdue?",
-  "How is TBFernandes Software going?",
-  "How are my goals?",
-  "How is my money this month?",
-  "When can I afford my planned purchases?",
-  "Who should I follow up with?",
-  "Anything about Kafka?",
+  "No que devo focar hoje?",
+  "O que está atrasado?",
+  "Como está o TBFernandes Software?",
+  "Como estão minhas metas?",
+  "Como está meu dinheiro neste mês?",
+  "Quando consigo fazer minhas compras planejadas?",
+  "Com quem devo fazer follow-up?",
+  "Tem algo sobre Kafka?",
 ];
 
 export function AssistantPage() {
@@ -69,7 +69,7 @@ export function AssistantPage() {
         .then(reply)
         .catch(() =>
           reply({
-            text: "The assistant could not be reached. Try again in a moment.",
+            text: "Não foi possível falar com o assistente. Tente de novo em instantes.",
             references: [],
           }),
         );
@@ -82,26 +82,26 @@ export function AssistantPage() {
   return (
     <PageContainer className="h-[calc(100svh-3.5rem)] max-w-3xl gap-4">
       <PageHeading
-        title="Assistant"
-        description="Ask about your tasks, projects, goals, money and contacts."
+        title="Assistente"
+        description="Pergunte sobre suas tarefas, projetos, metas, dinheiro e contatos."
         actions={
           messages.length > 0 && (
             <Button variant="outline" size="sm" onClick={() => setMessages([])}>
-              <RotateCcw /> New chat
+              <RotateCcw /> Nova conversa
             </Button>
           )
         }
       />
       <p className="rounded-xl border border-dashed px-4 py-2.5 text-xs text-muted-foreground">
         {env.dataSource === "api"
-          ? "Answers come from your data in the API through fixed rules. Once an AI model is connected it writes the text, and the links still point to the records used."
-          : "Simulated: answers come from your data through fixed rules. The AI assistant replaces this once the backend exists, and will always show where an answer came from."}
+          ? "As respostas vêm dos seus dados na API por meio de regras fixas. Quando um modelo de IA for conectado, ele escreve o texto, e os links continuam apontando para os registros usados."
+          : "Simulado: as respostas vêm dos seus dados por meio de regras fixas. O assistente com IA substitui isto quando o backend estiver ligado, e sempre vai mostrar de onde veio cada resposta."}
       </p>
 
       <div
         role="log"
         aria-live="polite"
-        aria-label="Conversation"
+        aria-label="Conversa"
         className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto"
       >
         {messages.length === 0 && (
@@ -109,7 +109,7 @@ export function AssistantPage() {
             <span className="flex size-14 items-center justify-center rounded-2xl bg-primary/15 text-primary shadow-[0_0_40px_-6px_color-mix(in_oklab,var(--primary)_60%,transparent)]">
               <Sparkles className="size-7" aria-hidden />
             </span>
-            <p className="text-lg font-medium">How can I help?</p>
+            <p className="text-lg font-medium">Como posso ajudar?</p>
             <ul className="grid w-full gap-2 sm:grid-cols-2">
               {suggestions.map((suggestion) => (
                 <li key={suggestion}>
@@ -143,7 +143,7 @@ export function AssistantPage() {
                 {message.references.length > 0 && (
                   <div className="flex flex-col gap-1.5 border-t pt-3">
                     <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-                      Sources
+                      Fontes
                     </span>
                     <ul className="flex flex-wrap gap-1.5">
                       {message.references.map((reference) => (
@@ -167,7 +167,7 @@ export function AssistantPage() {
           ),
         )}
         {thinking && (
-          <div className="flex items-center gap-1 pl-10" aria-label="Thinking">
+          <div className="flex items-center gap-1 pl-10" aria-label="Pensando">
             {[0, 1, 2].map((dot) => (
               <span
                 key={dot}
@@ -197,14 +197,14 @@ export function AssistantPage() {
             }
           }}
           rows={1}
-          placeholder="Ask anything about your work and life…"
-          aria-label="Message"
+          placeholder="Pergunte qualquer coisa sobre seu trabalho e sua vida…"
+          aria-label="Mensagem"
           className="max-h-40 min-h-12 resize-none rounded-2xl py-3 pr-14"
         />
         <Button
           type="submit"
           size="icon"
-          aria-label="Send"
+          aria-label="Enviar"
           disabled={!draft.trim() || thinking}
           className={cn("absolute right-2 bottom-2 rounded-xl")}
         >

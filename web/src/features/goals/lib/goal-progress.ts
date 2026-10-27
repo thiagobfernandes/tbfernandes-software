@@ -20,7 +20,7 @@ export function tasksOfGoal(data: AppData, goalId: string) {
  * decide; without milestones, the share of finished linked tasks.
  */
 export function goalProgress(data: AppData, goal: Goal) {
-  if (goal.status === "completed") return { percent: 100, basis: "Completed" };
+  if (goal.status === "completed") return { percent: 100, basis: "Concluída" };
   if (goal.indicator && goal.indicator.target > 0) {
     return {
       percent: Math.min(
@@ -35,7 +35,7 @@ export function goalProgress(data: AppData, goal: Goal) {
     const done = milestones.filter((item) => item.done).length;
     return {
       percent: Math.round((done / milestones.length) * 100),
-      basis: `${done}/${milestones.length} milestones`,
+      basis: `${done}/${milestones.length} marcos`,
     };
   }
   const tasks = tasksOfGoal(data, goal.id).filter(
@@ -45,19 +45,19 @@ export function goalProgress(data: AppData, goal: Goal) {
     const done = tasks.filter((task) => task.status === "done").length;
     return {
       percent: Math.round((done / tasks.length) * 100),
-      basis: `${done}/${tasks.length} tasks`,
+      basis: `${done}/${tasks.length} tarefas`,
     };
   }
-  return { percent: 0, basis: "No progress measure yet" };
+  return { percent: 0, basis: "Ainda sem medida de progresso" };
 }
 
 export function formatIndicator(value: number, unit: string) {
   if (unit === "BRL") {
-    return value.toLocaleString("en-US", {
+    return value.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
       maximumFractionDigits: 0,
     });
   }
-  return `${value.toLocaleString("en-US")} ${unit}`;
+  return `${value.toLocaleString("pt-BR")} ${unit}`;
 }

@@ -35,7 +35,7 @@ const statusTone: Record<CertificationStatus, string> = {
   expired: "bg-destructive",
 };
 
-/** Obtained certifications expiring within 90 days need a renewal plan. */
+/** Obtida em certifications expiring within 90 days need a renewal plan. */
 function expiresSoon(certification: Certification) {
   return (
     certification.status === "obtained" &&
@@ -51,15 +51,15 @@ export function CertificationsPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Certifications"
-        description="Planned, in-progress and obtained certifications, with expiry reminders."
+        title="Certificações"
+        description="Certificações planejadas, em andamento e obtidas, com lembretes de vencimento."
         actions={
           <>
             <SampleDataBadge />
             <CertificationFormDialog
               trigger={
                 <Button>
-                  <Plus /> New certification
+                  <Plus /> Nova certificação
                 </Button>
               }
             />
@@ -68,7 +68,7 @@ export function CertificationsPage() {
       />
 
       {certifications.length === 0 ? (
-        <EmptyState icon={Medal} title="No certifications yet" />
+        <EmptyState icon={Medal} title="Nenhuma certificação ainda" />
       ) : (
         <div className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6">
           <div className="grid auto-cols-[18rem] grid-flow-col gap-4 xl:auto-cols-fr">
@@ -96,7 +96,7 @@ export function CertificationsPage() {
                   </header>
                   {items.length === 0 && (
                     <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
-                      None
+                      Nenhuma
                     </p>
                   )}
                   {items.map((certification) => {
@@ -125,15 +125,15 @@ export function CertificationsPage() {
                         {expiresSoon(certification) && (
                           <p className="flex items-center gap-1.5 rounded-lg bg-warning/15 px-2 py-1 text-xs text-warning">
                             <AlertTriangle className="size-3.5" aria-hidden />
-                            Expires {formatShort(certification.expiresAt!)}:
-                            plan the renewal
+                            Vence {formatShort(certification.expiresAt!)}:
+                            planeje a renovação
                           </p>
                         )}
                         <dl className="grid grid-cols-2 gap-2 text-xs">
                           {certification.obtainedAt && (
                             <div>
                               <dt className="text-muted-foreground">
-                                Obtained
+                                Obtida em
                               </dt>
                               <dd>
                                 {formatShort(certification.obtainedAt)}{" "}
@@ -143,7 +143,7 @@ export function CertificationsPage() {
                           )}
                           {certification.expiresAt && (
                             <div>
-                              <dt className="text-muted-foreground">Expires</dt>
+                              <dt className="text-muted-foreground">Vence</dt>
                               <dd>
                                 {formatShort(certification.expiresAt)}{" "}
                                 {certification.expiresAt.slice(0, 4)}
@@ -153,7 +153,7 @@ export function CertificationsPage() {
                         </dl>
                         {related.length > 0 && (
                           <p className="text-xs text-muted-foreground">
-                            Study:{" "}
+                            Estudo:{" "}
                             {related.map((study) => study.name).join(", ")}
                           </p>
                         )}
@@ -165,7 +165,7 @@ export function CertificationsPage() {
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <ExternalLink /> Validate
+                                <ExternalLink /> Validar
                               </a>
                             </Button>
                           )}
@@ -173,20 +173,20 @@ export function CertificationsPage() {
                             variant="ghost"
                             size="icon-sm"
                             className="ml-auto"
-                            aria-label="Edit certification"
+                            aria-label="Editar certificação"
                             onClick={() => setEditing(certification)}
                           >
                             <Pencil />
                           </Button>
                           <ConfirmDelete
-                            noun="certification"
+                            noun="certificação"
                             name={certification.name}
                             onConfirm={() => {
                               dataActions.remove(
                                 "certifications",
                                 certification.id,
                               );
-                              toast.success("Certification deleted");
+                              toast.success("Certificação excluída");
                             }}
                           />
                         </div>

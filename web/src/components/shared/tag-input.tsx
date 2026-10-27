@@ -18,7 +18,7 @@ export function TagInput({
   id,
   value,
   onChange,
-  placeholder = "Add a tag and press Enter",
+  placeholder = "Digite uma tag e pressione Enter",
   className,
 }: TagInputProps) {
   const [draft, setDraft] = useState("");
@@ -44,7 +44,7 @@ export function TagInput({
           #{tag}
           <button
             type="button"
-            aria-label={`Remove tag ${tag}`}
+            aria-label={`Remover tag ${tag}`}
             onClick={() => onChange(value.filter((item) => item !== tag))}
             className="rounded text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
           >

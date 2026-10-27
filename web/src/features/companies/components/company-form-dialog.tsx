@@ -65,10 +65,10 @@ export function CompanyFormDialog({
     const data = emptyToUndefined(values) as Omit<Company, "id">;
     if (company) {
       workActions.updateCompany(company.id, data);
-      toast.success("Company updated");
+      toast.success("Empresa atualizada");
     } else {
       const created = workActions.addCompany(data);
-      toast.success(`Company "${created.name}" created`);
+      toast.success(`Empresa "${created.name}" criada`);
       form.reset();
     }
     setOpen(false);
@@ -85,9 +85,11 @@ export function CompanyFormDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit company" : "New company"}</DialogTitle>
+          <DialogTitle>
+            {editing ? "Editar empresa" : "Nova empresa"}
+          </DialogTitle>
           <DialogDescription>
-            Organizations give context to projects and tasks.
+            Empresas dão contexto a projetos e tarefas.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -98,7 +100,7 @@ export function CompanyFormDialog({
         >
           <FormField
             id="company-name"
-            label="Name"
+            label="Nome"
             required
             error={errors.name?.message}
           >
@@ -109,10 +111,10 @@ export function CompanyFormDialog({
               {...form.register("name")}
             />
           </FormField>
-          <FormField id="company-trade-name" label="Trade name">
+          <FormField id="company-trade-name" label="Nome fantasia">
             <Input id="company-trade-name" {...form.register("tradeName")} />
           </FormField>
-          <FormField id="company-relationship" label="Relationship">
+          <FormField id="company-relationship" label="Relação">
             <Controller
               control={form.control}
               name="relationship"
@@ -123,11 +125,11 @@ export function CompanyFormDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="contractor">
-                      Contractor (I work for them)
+                      Contratante (trabalho para ela)
                     </SelectItem>
-                    <SelectItem value="client">Client</SelectItem>
-                    <SelectItem value="partner">Partner</SelectItem>
-                    <SelectItem value="own">My company</SelectItem>
+                    <SelectItem value="client">Cliente</SelectItem>
+                    <SelectItem value="partner">Parceira</SelectItem>
+                    <SelectItem value="own">Minha empresa</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -143,9 +145,9 @@ export function CompanyFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="active">Ativa</SelectItem>
+                    <SelectItem value="inactive">Inativa</SelectItem>
+                    <SelectItem value="closed">Encerrada</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -153,7 +155,7 @@ export function CompanyFormDialog({
           </FormField>
           <FormField
             id="company-start"
-            label="Relationship since"
+            label="Relação desde"
             required
             error={errors.startDate?.message}
           >
@@ -164,12 +166,12 @@ export function CompanyFormDialog({
               {...form.register("startDate")}
             />
           </FormField>
-          <FormField id="company-contact" label="Main contact">
+          <FormField id="company-contact" label="Contato principal">
             <Input id="company-contact" {...form.register("mainContact")} />
           </FormField>
           <FormField
             id="company-description"
-            label="Description"
+            label="Descrição"
             className="sm:col-span-2"
           >
             <Textarea
@@ -181,10 +183,10 @@ export function CompanyFormDialog({
         </form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
           <Button type="submit" form="company-form">
-            {editing ? "Save changes" : "Create company"}
+            {editing ? "Salvar alterações" : "Criar empresa"}
           </Button>
         </DialogFooter>
       </DialogContent>

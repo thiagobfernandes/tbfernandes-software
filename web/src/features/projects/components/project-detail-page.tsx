@@ -45,6 +45,7 @@ import { projectColorClasses } from "@/lib/project-colors";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
 import { isOpenTask } from "@/lib/sample-data/work";
 import { currentDay } from "@/lib/today";
+import { projectStatusLabels } from "@/features/projects/types/project";
 import { cn } from "@/lib/utils";
 
 const TIMELINE_DAYS = 14;
@@ -85,7 +86,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
         href="/projects"
         className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronLeft className="size-4" aria-hidden /> Projects
+        <ChevronLeft className="size-4" aria-hidden /> Projetos
       </Link>
 
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -107,7 +108,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
                   {company.name}
                 </Link>
               ) : (
-                "Personal initiative"
+                "Iniciativa pessoal"
               )}
             </span>
             <span className="flex items-center gap-1.5 capitalize">
@@ -120,7 +121,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
               {project.dueDate && ` – ${formatShort(project.dueDate)}`}
             </span>
             <span className="text-xs font-medium text-success capitalize">
-              {project.status}
+              {projectStatusLabels[project.status]}
             </span>
           </div>
         </div>
@@ -130,25 +131,25 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
             project={project}
             trigger={
               <Button variant="outline">
-                <Pencil /> Edit
+                <Pencil /> Editar
               </Button>
             }
           />
           <ConfirmDelete
-            noun="project"
+            noun="projeto"
             name={project.name}
-            consequence="Its tasks, notes and snippets are kept without a project."
+            consequence="As tarefas, notas e snippets dele continuam, sem projeto."
             trigger={
               <Button
                 variant="outline"
                 className="text-destructive hover:text-destructive"
               >
-                <Trash2 /> Delete
+                <Trash2 /> Excluir
               </Button>
             }
             onConfirm={() => {
               workActions.deleteProject(project.id);
-              toast.success("Project deleted");
+              toast.success("Projeto excluído");
               router.push("/projects");
             }}
           />
@@ -156,7 +157,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
             defaultProjectId={project.id}
             trigger={
               <Button>
-                <Plus /> Add task
+                <Plus /> Nova tarefa
               </Button>
             }
           />
@@ -164,30 +165,30 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
       </header>
 
       <section
-        aria-label="Key numbers"
+        aria-label="Indicadores"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         <MetricCard
-          label="Open tasks"
+          label="Tarefas abertas"
           value={open.length}
-          unit={`${inProgress.length} in progress`}
+          unit={`${inProgress.length} em andamento`}
         />
         <MetricCard
-          label="Overdue"
+          label="Atrasadas"
           value={overdue.length}
-          unit="tasks"
+          unit="tarefas"
           visual={<DotRow active={overdue.length} total={6} />}
         />
         <MetricCard
-          label="Done"
+          label="Concluídas"
           value={done.length}
           unit={`/ ${tasks.length}`}
           visual={<ProgressRing value={done.length} total={tasks.length} />}
         />
         <MetricCard
-          label="Time left"
+          label="Tempo restante"
           value={daysLeft ?? "—"}
-          unit={daysLeft !== undefined ? "days" : "no deadline"}
+          unit={daysLeft !== undefined ? "days" : "sem prazo"}
           visual={
             totalDays > 0 ? (
               <ProgressRing value={elapsed} total={totalDays} />
@@ -200,13 +201,13 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
         <Tabs defaultValue="timeline" className="min-w-0">
           <TabsList>
             <TabsTrigger value="timeline">
-              <GanttChart /> Timeline
+              <GanttChart /> Linha do tempo
             </TabsTrigger>
             <TabsTrigger value="board">
-              <Columns3 /> Board
+              <Columns3 /> Quadro
             </TabsTrigger>
             <TabsTrigger value="list">
-              <List /> List
+              <List /> Lista
             </TabsTrigger>
           </TabsList>
           <TabsContent value="timeline">
@@ -242,11 +243,11 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
         <aside className="flex flex-col gap-4">
           <Card className="gap-3 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-base">About</CardTitle>
+              <CardTitle className="text-base">Sobre</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">
               <p className="text-muted-foreground">
-                {project.description ?? "No description yet."}
+                {project.description ?? "Ainda sem descrição."}
               </p>
               {project.nextDelivery && (
                 <div
@@ -256,7 +257,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
                   )}
                 >
                   <span className="text-xs text-muted-foreground">
-                    Next delivery
+                    Próxima entrega
                   </span>
                   <p className="font-medium">{project.nextDelivery}</p>
                 </div>
@@ -265,9 +266,9 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
           </Card>
           <Card className="gap-3 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-base">Notes &amp; snippets</CardTitle>
+              <CardTitle className="text-base">Notas e snippets</CardTitle>
               <CardDescription>
-                Programming knowledge for this project.
+                Conhecimento de programação deste projeto.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -289,11 +290,11 @@ function MissingProject() {
     <PageContainer>
       <EmptyState
         icon={SearchX}
-        title="Project not found"
-        description="It may have been removed, or the link is wrong."
+        title="Projeto não encontrado"
+        description="O registro pode ter sido removido ou o link está errado."
         action={
           <Button asChild size="sm">
-            <Link href="/projects">Back to projects</Link>
+            <Link href="/projects">Voltar para projetos</Link>
           </Button>
         }
       />

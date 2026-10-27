@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const taskSchema = z
   .object({
-    title: z.string().trim().min(1, "Title is required").max(160),
+    title: z.string().trim().min(1, "Informe o título").max(160),
     description: z.string().trim().max(2000),
     doneCriteria: z.string().trim().max(500),
     projectId: z.string(),
@@ -25,7 +25,7 @@ export const taskSchema = z
       !value.startDate || !value.dueDate || value.dueDate >= value.startDate,
     {
       path: ["dueDate"],
-      message: "Due date must be on or after the start date",
+      message: "O prazo deve ser igual ou posterior à data de início",
     },
   );
 

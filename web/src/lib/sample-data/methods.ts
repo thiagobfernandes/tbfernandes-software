@@ -6,39 +6,39 @@ import type { Method } from "@/features/methods/types/method";
 export const sampleMethods: Method[] = [
   {
     id: "commit",
-    title: "Commit method",
-    summary: "Prepare small, reviewed commits with a consistent message.",
+    title: "Método de commit",
+    summary: "Preparar commits pequenos e revisados, com mensagem consistente.",
     category: "development",
     tags: ["git", "review"],
     lastReviewed: "2026-10-23",
     steps: [
       {
-        title: "Review the diff",
+        title: "Revisar o diff",
         detail:
-          "Read every changed line with git diff --staged before committing.",
+          "Ler cada linha alterada com git diff --staged antes de commitar.",
       },
       {
-        title: "Keep the change focused",
+        title: "Manter a mudança focada",
         detail:
-          "One intent per commit. Split unrelated changes with git add -p.",
+          "Uma intenção por commit. Separe mudanças sem relação com git add -p.",
       },
       {
-        title: "Run checks",
-        detail: "Tests, lint, and build as appropriate for the change.",
+        title: "Rodar as verificações",
+        detail: "Testes, lint e build conforme a mudança.",
       },
       {
-        title: "Write the message",
+        title: "Escrever a mensagem",
         detail:
-          "Conventional Commits: type(scope): summary in the imperative, under 72 characters.",
+          "Conventional Commits: tipo(escopo): resumo no imperativo, com menos de 72 caracteres.",
       },
       {
-        title: "Explain the why",
-        detail: "Add a body when the reason is not obvious from the diff.",
+        title: "Explicar o porquê",
+        detail: "Adicione um corpo quando o motivo não for óbvio pelo diff.",
       },
     ],
     examples: [
       {
-        title: "Commit messages",
+        title: "Mensagens de commit",
         content: [
           "feat(tasks): add board view grouped by status",
           "fix(projects): keep timeline bars inside the visible range",
@@ -50,58 +50,58 @@ export const sampleMethods: Method[] = [
   },
   {
     id: "bug-fixing",
-    title: "Bug-fixing method",
-    summary: "From reproduction to a tested, documented fix.",
+    title: "Método de correção de bugs",
+    summary: "Da reprodução até uma correção testada e documentada.",
     category: "quality",
     tags: ["debugging", "testing"],
     lastReviewed: "2026-10-23",
     steps: [
-      { title: "Reproduce the bug" },
-      { title: "Record expected vs. actual behavior" },
-      { title: "Gather logs and relevant context" },
-      { title: "Find a minimal reproduction" },
+      { title: "Reproduzir o bug" },
+      { title: "Registrar o comportamento esperado e o real" },
+      { title: "Reunir logs e contexto relevante" },
+      { title: "Encontrar uma reprodução mínima" },
       {
-        title: "Form and test a hypothesis",
+        title: "Formular e testar uma hipótese",
         detail:
-          "Change one thing at a time and confirm the cause before fixing.",
+          "Mudar uma coisa por vez e confirmar a causa antes de corrigir.",
       },
-      { title: "Implement the smallest safe fix" },
+      { title: "Implementar a menor correção segura" },
       {
-        title: "Add or update regression tests",
-        detail: "The test must fail without the fix.",
+        title: "Adicionar ou atualizar testes de regressão",
+        detail: "O teste precisa falhar sem a correção.",
       },
-      { title: "Review the diff and validate the fix" },
+      { title: "Revisar o diff e validar a correção" },
       {
-        title: "Record the root cause and lessons",
-        detail: "Link the note to the project or task.",
+        title: "Registrar a causa raiz e os aprendizados",
+        detail: "Vincular a nota ao projeto ou à tarefa.",
       },
     ],
   },
   {
     id: "meeting",
-    title: "Meeting method",
-    summary: "Meetings with a clear goal, decisions, and follow-up.",
+    title: "Método de reunião",
+    summary: "Reuniões com objetivo claro, decisões e follow-up.",
     category: "communication",
     tags: ["meetings", "follow-up"],
     lastReviewed: "2026-10-23",
     steps: [
-      { title: "Define the objective and agenda" },
-      { title: "Gather the context you need beforehand" },
-      { title: "Record decisions" },
-      { title: "Record action items with owners and deadlines" },
-      { title: "Share a concise summary afterward" },
-      { title: "Follow up on open actions" },
+      { title: "Definir o objetivo e a pauta" },
+      { title: "Reunir antes o contexto necessário" },
+      { title: "Registrar as decisões" },
+      { title: "Registrar os encaminhamentos com responsáveis e prazos" },
+      { title: "Compartilhar um resumo curto depois" },
+      { title: "Acompanhar as ações em aberto" },
     ],
     examples: [
       {
-        title: "Summary template",
+        title: "Modelo de resumo",
         content: [
-          "Objective:",
-          "Decisions:",
+          "Objetivo:",
+          "Decisões:",
           "- ",
-          "Action items (owner, deadline):",
+          "Encaminhamentos (responsável, prazo):",
           "- ",
-          "Open questions:",
+          "Dúvidas em aberto:",
           "- ",
         ].join("\n"),
       },

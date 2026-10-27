@@ -27,15 +27,15 @@ export function DataSettings() {
   const browserData = api ? readBrowserData() : undefined;
 
   async function runImport(source: ReturnType<typeof parseExport>) {
-    setProgress("Starting…");
+    setProgress("Iniciando…");
     try {
       const result: ImportResult = await importIntoApi(source, (done, total) =>
-        setProgress(`${done} of ${total}`),
+        setProgress(`${done} de ${total}`),
       );
-      const message = `${result.created} records imported, ${result.skipped} already existed`;
+      const message = `${result.created} registros importados, ${result.skipped} já existiam`;
       if (result.failed.length) {
         toast.warning(message, {
-          description: `${result.failed.length} could not be imported. First: ${result.failed[0]}`,
+          description: `${result.failed.length} não puderam ser importados. Primeiro: ${result.failed[0]}`,
         });
       } else {
         toast.success(message);
@@ -49,7 +49,7 @@ export function DataSettings() {
     try {
       await runImport(parseExport(await file.text()));
     } catch {
-      toast.error("That file is not a TBFernandes export");
+      toast.error("Esse arquivo não é uma exportação do TBFernandes");
     }
   }
 
@@ -57,11 +57,11 @@ export function DataSettings() {
     <div className="flex flex-col gap-5">
       {api ? (
         <p className="text-sm text-muted-foreground">
-          Connected to the API at <code>{env.apiUrl}</code>
+          Conectado à API em <code>{env.apiUrl}</code>
           {status.state === "ready" &&
             (status.mode === "session"
-              ? ", signed in."
-              : ", without login (local development).")}
+              ? ", com login."
+              : ", sem login (desenvolvimento local).")}
         </p>
       ) : (
         <SampleDataSettings />
@@ -69,7 +69,7 @@ export function DataSettings() {
 
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => downloadExport(data)}>
-          <Download /> Export JSON
+          <Download /> Exportar JSON
         </Button>
         {api && (
           <>
@@ -78,7 +78,7 @@ export function DataSettings() {
               disabled={Boolean(progress)}
               onClick={() => fileInput.current?.click()}
             >
-              <Upload /> Import JSON file
+              <Upload /> Importar arquivo JSON
             </Button>
             {browserData && (
               <Button
@@ -86,12 +86,12 @@ export function DataSettings() {
                 disabled={Boolean(progress)}
                 onClick={() => void runImport(browserData)}
               >
-                <Upload /> Import data saved in this browser
+                <Upload /> Importar dados salvos neste navegador
               </Button>
             )}
             {status.state === "ready" && status.mode === "session" && (
               <Button variant="ghost" onClick={() => void signOut()}>
-                <LogOut /> Sign out
+                <LogOut /> Sair
               </Button>
             )}
           </>
@@ -110,13 +110,13 @@ export function DataSettings() {
       </div>
       {progress && (
         <p role="status" className="text-sm text-muted-foreground">
-          Importing: {progress}
+          Importando: {progress}
         </p>
       )}
       {api && (
         <p className="text-xs text-muted-foreground">
-          Import keeps the ids, so records that already exist are skipped and
-          importing twice creates nothing new.
+          A importação mantém os ids: registros que já existem são ignorados e
+          importar duas vezes não cria nada novo.
         </p>
       )}
     </div>

@@ -13,7 +13,7 @@ import { addDays, daysBetween, parseDay, toDay } from "@/lib/dates";
 import { workActions } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
 
-const weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const weekdays = ["S", "T", "Q", "Q", "S", "S", "D"];
 
 /**
  * Right-hand rail after the Cindr reference: month calendar with due-date
@@ -36,7 +36,7 @@ export function AgendaPanel({
       1,
     ),
   );
-  const monthLabel = new Intl.DateTimeFormat("en", {
+  const monthLabel = new Intl.DateTimeFormat("pt-BR", {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
@@ -68,9 +68,9 @@ export function AgendaPanel({
 
   function complete(task: Task) {
     workActions.updateTask(task.id, { status: "done" });
-    toast.success("Task completed", {
+    toast.success("Tarefa concluída", {
       action: {
-        label: "Undo",
+        label: "Desfazer",
         onClick: () => workActions.updateTask(task.id, { status: task.status }),
       },
     });
@@ -78,7 +78,7 @@ export function AgendaPanel({
 
   return (
     <aside className="flex flex-col gap-6 rounded-2xl border bg-card p-5">
-      <section aria-label="Calendar" className="flex flex-col gap-3">
+      <section aria-label="Calendário" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold">{monthLabel}</h2>
           <div className="flex gap-1">
@@ -86,7 +86,7 @@ export function AgendaPanel({
               variant="outline"
               size="icon-sm"
               className="size-7"
-              aria-label="Previous month"
+              aria-label="Mês anterior"
               onClick={() => setMonthOffset((value) => value - 1)}
             >
               <ChevronLeft />
@@ -95,7 +95,7 @@ export function AgendaPanel({
               variant="outline"
               size="icon-sm"
               className="size-7"
-              aria-label="Next month"
+              aria-label="Próximo mês"
               onClick={() => setMonthOffset((value) => value + 1)}
             >
               <ChevronRight />
@@ -136,28 +136,28 @@ export function AgendaPanel({
           href="/calendar"
           className="self-end text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          Open full calendar
+          Abrir calendário completo
         </Link>
       </section>
 
-      <section aria-label="To-do" className="flex flex-col gap-3">
+      <section aria-label="A fazer" className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold">
-          To-do{" "}
+          A fazer{" "}
           <span className="font-normal text-muted-foreground">
             ({open.length})
           </span>
         </h2>
         <Tabs defaultValue="today" className="gap-3">
           <TabsList className="w-full">
-            <TabsTrigger value="today">Today</TabsTrigger>
-            <TabsTrigger value="week">Next 7 days</TabsTrigger>
-            <TabsTrigger value="later">Later</TabsTrigger>
+            <TabsTrigger value="today">Hoje</TabsTrigger>
+            <TabsTrigger value="week">Próximos 7 dias</TabsTrigger>
+            <TabsTrigger value="later">Depois</TabsTrigger>
           </TabsList>
           {(Object.keys(groups) as (keyof typeof groups)[]).map((key) => (
             <TabsContent key={key} value={key}>
               {groups[key].length === 0 ? (
                 <p className="py-4 text-center text-xs text-muted-foreground">
-                  Nothing here.
+                  Nada aqui.
                 </p>
               ) : (
                 <ul className="flex flex-col gap-1">
@@ -166,7 +166,7 @@ export function AgendaPanel({
                       <label className="flex cursor-pointer items-start gap-2.5 rounded-md px-1 py-1.5 text-sm hover:bg-accent/50">
                         <Checkbox
                           checked={false}
-                          aria-label={`Mark "${task.title}" as done`}
+                          aria-label={`Marcar "${task.title}" como concluída`}
                           onCheckedChange={() => complete(task)}
                           className="mt-0.5"
                         />

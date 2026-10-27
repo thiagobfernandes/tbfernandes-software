@@ -11,7 +11,7 @@ export const methodCategoryMeta: Record<
   MethodCategory,
   { label: string; icon: LucideIcon }
 > = {
-  development: { label: "Development", icon: GitCommitHorizontal },
-  quality: { label: "Quality", icon: Bug },
-  communication: { label: "Communication", icon: MessagesSquare },
+  development: { label: "Desenvolvimento", icon: GitCommitHorizontal },
+  quality: { label: "Qualidade", icon: Bug },
+  communication: { label: "Comunicação", icon: MessagesSquare },
 };

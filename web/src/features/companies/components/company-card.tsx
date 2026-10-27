@@ -54,11 +54,11 @@ export function CompanyCard({
           <span className="text-2xl font-light tabular-nums">
             {projects.length}
           </span>
-          <span className="text-xs text-muted-foreground">projects</span>
+          <span className="text-xs text-muted-foreground">projetos</span>
         </div>
         <div className="flex flex-col">
           <span className="text-2xl font-light tabular-nums">{openTasks}</span>
-          <span className="text-xs text-muted-foreground">open tasks</span>
+          <span className="text-xs text-muted-foreground">tarefas abertas</span>
         </div>
       </div>
 
@@ -76,12 +76,12 @@ export function CompanyCard({
           ))}
           <span className="truncate">
             {projects.map((project) => project.name).join(", ") ||
-              "No projects yet"}
+              "Nenhum projeto ainda"}
           </span>
         </span>
         <span className="flex shrink-0 items-center gap-1">
           <CalendarDays className="size-3.5" aria-hidden />
-          Since {formatShort(company.startDate)}{" "}
+          Desde {formatShort(company.startDate)}{" "}
           {parseDay(company.startDate).getUTCFullYear()}
         </span>
       </div>

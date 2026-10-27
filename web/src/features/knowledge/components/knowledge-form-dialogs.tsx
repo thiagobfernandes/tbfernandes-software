@@ -39,10 +39,10 @@ export function NoteFormDialog({
     <EntityFormDialog
       {...dialog}
       className="sm:max-w-2xl"
-      title={item ? "Edit note" : "New note"}
-      description="Markdown is supported: headings, lists, tables, code and checklists."
+      title={item ? "Editar nota" : "Nova nota"}
+      description="Aceita Markdown: títulos, listas, tabelas, código e checklists."
       schema={noteSchema}
-      submitLabel={item ? "Save changes" : "Create note"}
+      submitLabel={item ? "Salvar alterações" : "Criar nota"}
       defaults={{
         title: item?.title ?? "",
         body: item?.body ?? "",
@@ -54,28 +54,28 @@ export function NoteFormDialog({
       fields={[
         {
           name: "title",
-          label: "Title",
+          label: "Título",
           type: "text",
           required: true,
           full: true,
         },
         {
           name: "body",
-          label: "Content",
+          label: "Conteúdo",
           type: "code",
           rows: 10,
-          placeholder: "## Context\n\nWrite in Markdown…",
+          placeholder: "## Contexto\n\nEscreva em Markdown…",
         },
         { name: "tags", label: "Tags", type: "tags" },
         {
           name: "projectIds",
-          label: "Linked projects",
+          label: "Projetos vinculados",
           type: "multi",
           options: options.projects,
         },
         {
           name: "taskIds",
-          label: "Linked tasks",
+          label: "Tarefas vinculadas",
           type: "multi",
           options: options.tasks,
         },
@@ -86,7 +86,7 @@ export function NoteFormDialog({
             ...values,
             updatedAt: currentDay(),
           });
-          toast.success("Note updated");
+          toast.success("Nota atualizada");
           onSaved?.({ ...item, ...values });
         } else {
           const created = dataActions.create("notes", {
@@ -95,7 +95,7 @@ export function NoteFormDialog({
             createdAt: currentDay(),
             updatedAt: currentDay(),
           });
-          toast.success(`Note "${created.title}" created`);
+          toast.success(`Nota "${created.title}" criada`);
           onSaved?.(created);
         }
       }}
@@ -116,10 +116,10 @@ export function SnippetFormDialog({
     <EntityFormDialog
       {...dialog}
       className="sm:max-w-2xl"
-      title={item ? "Edit snippet" : "New snippet"}
-      description="Code is stored as text and only displayed, never executed."
+      title={item ? "Editar snippet" : "Novo snippet"}
+      description="O código é guardado como texto e só exibido, nunca executado."
       schema={snippetSchema}
-      submitLabel={item ? "Save changes" : "Create snippet"}
+      submitLabel={item ? "Salvar alterações" : "Criar snippet"}
       defaults={{
         title: item?.title ?? "",
         language:
@@ -133,23 +133,29 @@ export function SnippetFormDialog({
         taskIds: item?.taskIds ?? [],
       }}
       fields={[
-        { name: "title", label: "Title", type: "text", required: true },
+        { name: "title", label: "Título", type: "text", required: true },
         {
           name: "language",
-          label: "Language",
+          label: "Linguagem",
           type: "select",
           options: snippetLanguages.map((value) => ({ value, label: value })),
         },
-        { name: "code", label: "Code", type: "code", rows: 9, required: true },
+        {
+          name: "code",
+          label: "Código",
+          type: "code",
+          rows: 9,
+          required: true,
+        },
         {
           name: "explanation",
-          label: "Explanation",
+          label: "Explicação",
           type: "textarea",
           rows: 2,
         },
         {
           name: "sourceUrl",
-          label: "Source URL",
+          label: "URL de origem",
           type: "url",
           full: true,
           placeholder: "https://",
@@ -157,13 +163,13 @@ export function SnippetFormDialog({
         { name: "tags", label: "Tags", type: "tags" },
         {
           name: "projectIds",
-          label: "Linked projects",
+          label: "Projetos vinculados",
           type: "multi",
           options: options.projects,
         },
         {
           name: "taskIds",
-          label: "Linked tasks",
+          label: "Tarefas vinculadas",
           type: "multi",
           options: options.tasks,
         },
@@ -174,7 +180,7 @@ export function SnippetFormDialog({
             ...values,
             updatedAt: currentDay(),
           });
-          toast.success("Snippet updated");
+          toast.success("Snippet atualizado");
           onSaved?.({ ...item, ...values });
         } else {
           const created = dataActions.create("snippets", {
@@ -182,7 +188,7 @@ export function SnippetFormDialog({
             createdAt: currentDay(),
             updatedAt: currentDay(),
           });
-          toast.success(`Snippet "${created.title}" created`);
+          toast.success(`Snippet "${created.title}" criado`);
           onSaved?.(created);
         }
       }}

@@ -9,11 +9,11 @@ export default function NotFound() {
     <main className="flex min-h-svh items-center justify-center p-6">
       <EmptyState
         icon={SearchX}
-        title="Page not found"
-        description="This page does not exist or has not been built yet."
+        title="Página não encontrada"
+        description="Esta página não existe ou ainda não foi construída."
         action={
           <Button asChild size="sm">
-            <Link href="/">Back to dashboard</Link>
+            <Link href="/">Voltar ao início</Link>
           </Button>
         }
         className="w-full max-w-md"

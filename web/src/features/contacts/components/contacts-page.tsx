@@ -54,11 +54,11 @@ const interactionMeta: Record<
   InteractionKind,
   { label: string; icon: LucideIcon }
 > = {
-  meeting: { label: "Meeting", icon: Video },
-  call: { label: "Call", icon: PhoneCall },
-  message: { label: "Message", icon: MessageSquare },
-  event: { label: "Event", icon: Users },
-  referral: { label: "Referral", icon: Share2 },
+  meeting: { label: "Reunião", icon: Video },
+  call: { label: "Ligação", icon: PhoneCall },
+  message: { label: "Mensagem", icon: MessageSquare },
+  event: { label: "Evento", icon: Users },
+  referral: { label: "Indicação", icon: Share2 },
 };
 
 function initials(name: string) {
@@ -102,11 +102,11 @@ export function ContactsPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Contacts"
+        title="Contatos"
         description={
           dueSoon
-            ? `${dueSoon} contact${dueSoon === 1 ? "" : "s"} due for a follow-up.`
-            : "People who matter to your work, with the history of each relationship."
+            ? `${dueSoon} contato${dueSoon === 1 ? "" : "s"} para fazer follow-up.`
+            : "Pessoas que importam para o seu trabalho, com o histórico de cada relação."
         }
         actions={
           <>
@@ -115,7 +115,7 @@ export function ContactsPage() {
               onSaved={(contact) => select(contact.id)}
               trigger={
                 <Button>
-                  <Plus /> New contact
+                  <Plus /> Novo contato
                 </Button>
               }
             />
@@ -124,18 +124,18 @@ export function ContactsPage() {
       />
 
       {data.contacts.length === 0 ? (
-        <EmptyState icon={Users} title="No contacts yet" />
+        <EmptyState icon={Users} title="Nenhum contato ainda" />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
           <aside className="flex flex-col gap-3">
             <label className="relative">
-              <span className="sr-only">Search contacts</span>
+              <span className="sr-only">Buscar contatos</span>
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search name, role or specialty"
+                placeholder="Buscar por nome, cargo ou especialidade"
                 className="pl-9"
               />
             </label>
@@ -183,7 +183,7 @@ export function ContactsPage() {
               })}
               {visible.length === 0 && (
                 <li className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
-                  No contacts match.
+                  Nenhum contato encontrado.
                 </li>
               )}
             </ul>
@@ -196,7 +196,7 @@ export function ContactsPage() {
               onDeleted={() => select(undefined)}
             />
           ) : (
-            <EmptyState icon={Users} title="Select a contact" />
+            <EmptyState icon={Users} title="Selecione um contato" />
           )}
         </div>
       )}
@@ -251,7 +251,7 @@ function ContactDetail({
           status: "todo",
           priority: "normal",
           tag: "Follow-up",
-          description: `Follow-up with ${contact.name}.`,
+          description: `Follow-up com ${contact.name}.`,
         })
       : undefined;
     dataActions.create("interactions", {
@@ -265,8 +265,8 @@ function ContactDetail({
     setFollowUp("");
     toast.success(
       task
-        ? "Interaction logged and follow-up task created"
-        : "Interaction logged",
+        ? "Interação registrada e tarefa de follow-up criada"
+        : "Interação registrada",
     );
   }
 
@@ -316,7 +316,7 @@ function ContactDetail({
             {contact.profileUrl && (
               <Button variant="outline" size="sm" asChild>
                 <a href={contact.profileUrl} target="_blank" rel="noreferrer">
-                  <ExternalLink /> Profile
+                  <ExternalLink /> Perfil
                 </a>
               </Button>
             )}
@@ -326,20 +326,20 @@ function ContactDetail({
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Edit contact"
+            aria-label="Editar contato"
             onClick={onEdit}
           >
             <Pencil />
           </Button>
           <ConfirmDelete
-            noun="contact"
+            noun="contato"
             name={contact.name}
             onConfirm={() => {
               interactions.forEach((item) =>
                 dataActions.remove("interactions", item.id),
               );
               dataActions.remove("contacts", contact.id);
-              toast.success("Contact deleted");
+              toast.success("Contato excluído");
               onDeleted();
             }}
           />
@@ -349,17 +349,17 @@ function ContactDetail({
       <div className="grid gap-3 md:grid-cols-2">
         <div className="flex flex-col gap-1 rounded-xl border p-3">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Handshake className="size-3.5" aria-hidden /> Context
+            <Handshake className="size-3.5" aria-hidden /> Contexto
           </span>
           <p className="text-sm">
             {contact.context || (
-              <span className="text-muted-foreground">Not recorded.</span>
+              <span className="text-muted-foreground">Não registrado.</span>
             )}
           </p>
         </div>
         <div className="flex flex-col gap-2 rounded-xl border p-3">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <CalendarClock className="size-3.5" aria-hidden /> Next contact
+            <CalendarClock className="size-3.5" aria-hidden /> Próximo contato
           </span>
           {contact.nextContact ? (
             <DueChip
@@ -368,9 +368,7 @@ function ContactDetail({
               today={currentDay()}
             />
           ) : (
-            <span className="text-sm text-muted-foreground">
-              Not scheduled.
-            </span>
+            <span className="text-sm text-muted-foreground">Não agendado.</span>
           )}
           {contact.specialties.length > 0 && (
             <ul className="flex flex-wrap gap-1">
@@ -393,7 +391,7 @@ function ContactDetail({
       )}
 
       <section className="flex flex-col gap-3">
-        <h3 className="text-sm font-semibold">History</h3>
+        <h3 className="text-sm font-semibold">Histórico</h3>
         <form
           onSubmit={addInteraction}
           className="flex flex-col gap-3 rounded-xl border bg-muted/30 p-3"
@@ -401,7 +399,7 @@ function ContactDetail({
         >
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="interaction-kind">Type</Label>
+              <Label htmlFor="interaction-kind">Tipo</Label>
               <Select
                 value={kind}
                 onValueChange={(value) => setKind(value as InteractionKind)}
@@ -419,7 +417,7 @@ function ContactDetail({
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="interaction-date">Date</Label>
+              <Label htmlFor="interaction-date">Data</Label>
               <Input
                 id="interaction-date"
                 type="date"
@@ -429,7 +427,7 @@ function ContactDetail({
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="interaction-summary">What happened</Label>
+            <Label htmlFor="interaction-summary">O que aconteceu</Label>
             <Textarea
               id="interaction-summary"
               rows={2}
@@ -440,12 +438,12 @@ function ContactDetail({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="interaction-follow-up">
-              Follow-up task (optional)
+              Tarefa de follow-up (opcional)
             </Label>
             <Input
               id="interaction-follow-up"
               value={followUp}
-              placeholder="e.g. Send the proposal"
+              placeholder="ex.: Enviar a proposta"
               onChange={(event) => setFollowUp(event.target.value)}
             />
           </div>
@@ -455,12 +453,14 @@ function ContactDetail({
             </p>
           )}
           <Button type="submit" variant="outline" className="w-fit">
-            <Plus /> Log interaction
+            <Plus /> Registrar interação
           </Button>
         </form>
 
         {interactions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No interactions yet.</p>
+          <p className="text-sm text-muted-foreground">
+            Nenhuma interação ainda.
+          </p>
         ) : (
           <ol className="relative flex flex-col gap-4 before:absolute before:top-2 before:bottom-2 before:left-[15px] before:w-px before:bg-border">
             {interactions.map((interaction) => {
@@ -485,7 +485,7 @@ function ContactDetail({
                       {interaction.date.slice(0, 4)}
                       <span className="ml-auto opacity-0 group-hover/i:opacity-100 focus-within:opacity-100">
                         <ConfirmDelete
-                          noun="interaction"
+                          noun="interação"
                           name={interaction.summary.slice(0, 40)}
                           onConfirm={() =>
                             dataActions.remove("interactions", interaction.id)
@@ -500,7 +500,7 @@ function ContactDetail({
                         className="w-fit rounded-full border px-2.5 py-0.5 text-xs hover:border-primary hover:text-primary"
                       >
                         Follow-up: {task.title} ·{" "}
-                        {task.status === "done" ? "done" : "open"}
+                        {task.status === "done" ? "concluída" : "aberta"}
                       </Link>
                     )}
                   </div>

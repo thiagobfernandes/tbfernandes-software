@@ -37,10 +37,12 @@ export function CodeBlock({
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
-      toast.success("Copied to clipboard");
+      toast.success("Copiado para a área de transferência");
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast.error("Could not copy. Select the code and copy it manually.");
+      toast.error(
+        "Não foi possível copiar. Selecione o código e copie manualmente.",
+      );
     }
   }
 
@@ -60,7 +62,7 @@ export function CodeBlock({
           size="icon-sm"
           className="size-7"
           onClick={copy}
-          aria-label="Copy code"
+          aria-label="Copiar código"
         >
           {copied ? <Check className="text-success" /> : <Copy />}
         </Button>

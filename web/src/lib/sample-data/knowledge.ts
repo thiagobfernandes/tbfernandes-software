@@ -5,21 +5,21 @@ import type { Note, Snippet } from "@/features/knowledge/types/knowledge";
 export const sampleNotes: Note[] = [
   {
     id: "n1",
-    title: "Telemetry ingestion: where alerts come from",
-    body: `## Context
+    title: "Ingestão de telemetria: de onde vêm os alertas",
+    body: `## Contexto
 
-The ingestion alert fires when the **lag** of the \`telemetry-events\` consumer group passes 5 minutes.
+O alerta de ingestão dispara quando o **lag** do consumer group \`telemetry-events\` passa de 5 minutos.
 
-## What to check first
+## O que verificar primeiro
 
-1. Consumer lag per partition in Grafana
-2. Recent deploys of the ingestion service
-3. Database connection pool saturation
+1. Lag do consumer por partição no Grafana
+2. Deploys recentes do serviço de ingestão
+3. Saturação do pool de conexões do banco
 
-> Most incidents so far were a slow query in the device lookup.
+> A maioria dos incidentes até agora foi uma query lenta na busca de dispositivos.
 
-- [x] Document the dashboard links
-- [ ] Ask for read access to the production logs`,
+- [x] Documentar os links dos dashboards
+- [ ] Pedir acesso de leitura aos logs de produção`,
     tags: ["telemetry", "incident", "kafka"],
     projectIds: ["p1"],
     taskIds: ["t1"],
@@ -28,16 +28,16 @@ The ingestion alert fires when the **lag** of the \`telemetry-events\` consumer 
   },
   {
     id: "n2",
-    title: "Modular monolith boundaries",
-    body: `Each module owns its tables and exposes a small API to the others.
+    title: "Fronteiras do monólito modular",
+    body: `Cada módulo é dono das suas tabelas e expõe uma API pequena para os outros.
 
-| Module | Owns |
+| Módulo | Dono de |
 | --- | --- |
-| work | companies, projects, tasks |
-| knowledge | notes, snippets, links |
-| finance | entries, purchase goals |
+| work | empresas, projetos, tarefas |
+| knowledge | notas, snippets, vínculos |
+| finance | lançamentos, metas de compra |
 
-Cross-module reads go through **application services**, never through repositories of another module.`,
+Leituras entre módulos passam por **serviços de aplicação**, nunca pelos repositórios de outro módulo.`,
     tags: ["architecture", "spring"],
     projectIds: ["p2"],
     taskIds: ["t2"],
@@ -46,10 +46,10 @@ Cross-module reads go through **application services**, never through repositori
   },
   {
     id: "n3",
-    title: "Raft: leader election notes",
-    body: `Election timeout must be randomized (150–300 ms) to avoid split votes.
+    title: "Raft: anotações sobre eleição de líder",
+    body: `O timeout de eleição precisa ser aleatório (150–300 ms) para evitar votos divididos.
 
-A node becomes **candidate** after the timeout, votes for itself and sends \`RequestVote\` to its peers.`,
+Um nó vira **candidato** depois do timeout, vota em si mesmo e envia \`RequestVote\` para os pares.`,
     tags: ["distributed-systems", "raft"],
     projectIds: ["p3"],
     taskIds: ["t7"],
@@ -61,7 +61,7 @@ A node becomes **candidate** after the timeout, votes for itself and sends \`Req
 export const sampleSnippets: Snippet[] = [
   {
     id: "s1",
-    title: "Problem Details exception handler",
+    title: "Handler de exceções com Problem Details",
     language: "java",
     code: `@RestControllerAdvice
 class ApiExceptionHandler {
@@ -74,7 +74,7 @@ class ApiExceptionHandler {
     }
 }`,
     explanation:
-      "Returns RFC 9457 Problem Details so the frontend can show the same error shape everywhere.",
+      "Retorna Problem Details (RFC 9457) para o frontend mostrar o mesmo formato de erro em todo lugar.",
     tags: ["spring", "errors"],
     projectIds: ["p2"],
     taskIds: ["t9"],
@@ -83,12 +83,12 @@ class ApiExceptionHandler {
   },
   {
     id: "s2",
-    title: "Consumer lag per partition",
+    title: "Lag do consumer por partição",
     language: "bash",
     code: `kafka-consumer-groups.sh \\
   --bootstrap-server localhost:9092 \\
   --describe --group telemetry-events`,
-    explanation: "First check when the ingestion alert fires.",
+    explanation: "Primeira verificação quando o alerta de ingestão dispara.",
     sourceUrl: "https://kafka.apache.org/documentation/",
     tags: ["kafka", "telemetry"],
     projectIds: ["p1"],
@@ -98,7 +98,7 @@ class ApiExceptionHandler {
   },
   {
     id: "s3",
-    title: "Tasks overdue per project",
+    title: "Tarefas atrasadas por projeto",
     language: "sql",
     code: `select p.name, count(*) as overdue
 from task t

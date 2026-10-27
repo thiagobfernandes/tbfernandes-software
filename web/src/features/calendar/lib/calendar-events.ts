@@ -15,14 +15,14 @@ export const eventKinds = [
 export type EventKind = (typeof eventKinds)[number];
 
 export const eventKindLabels: Record<EventKind, string> = {
-  task: "Tasks",
-  project: "Project deadlines",
-  milestone: "Milestones",
-  goal: "Goal deadlines",
-  study: "Studies",
+  task: "Tarefas",
+  project: "Prazos de projetos",
+  milestone: "Marcos",
+  goal: "Prazos de metas",
+  study: "Estudos",
   "follow-up": "Follow-ups",
-  certification: "Certification expiry",
-  purchase: "Planned purchases",
+  certification: "Vencimento de certificações",
+  purchase: "Compras planejadas",
 };
 
 export type CalendarEvent = {
@@ -110,7 +110,7 @@ export function buildCalendarEvents(data: AppData): CalendarEvent[] {
         id: `follow-up:${contact.id}`,
         day: contact.nextContact,
         kind: "follow-up",
-        title: `Talk to ${contact.name}`,
+        title: `Falar com ${contact.name}`,
         href: `/contacts?contact=${contact.id}`,
         done: false,
       },
@@ -122,7 +122,7 @@ export function buildCalendarEvents(data: AppData): CalendarEvent[] {
         id: `certification:${certification.id}`,
         day: certification.expiresAt,
         kind: "certification",
-        title: `${certification.name} expires`,
+        title: `${certification.name} vence`,
         href: "/certifications",
         done: false,
       },

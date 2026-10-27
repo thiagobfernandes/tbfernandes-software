@@ -6,7 +6,7 @@ export function SampleDataBadge() {
   if (env.dataSource === "api") return null;
   return (
     <Badge variant="outline" className="border-dashed text-muted-foreground">
-      Sample data
+      Dados de exemplo
     </Badge>
   );
 }

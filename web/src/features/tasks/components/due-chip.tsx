@@ -15,7 +15,7 @@ export function DueChip({
   className?: string;
 }) {
   const { label, tone } = done
-    ? { label: `Due ${formatShort(dueDate)}`, tone: "normal" as const }
+    ? { label: `Vence ${formatShort(dueDate)}`, tone: "normal" as const }
     : describeDue(dueDate, today);
   return (
     <span

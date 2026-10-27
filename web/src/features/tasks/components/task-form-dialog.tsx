@@ -93,10 +93,10 @@ export function TaskFormDialog({
     }) as Omit<Task, "id">;
     if (task) {
       workActions.updateTask(task.id, data);
-      toast.success("Task updated");
+      toast.success("Tarefa atualizada");
     } else {
       const created = workActions.addTask(data);
-      toast.success(`Task "${created.title}" created`);
+      toast.success(`Tarefa "${created.title}" criada`);
     }
     setOpen(false);
   }
@@ -106,9 +106,9 @@ export function TaskFormDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit task" : "New task"}</DialogTitle>
+          <DialogTitle>{editing ? "Editar tarefa" : "Nova tarefa"}</DialogTitle>
           <DialogDescription>
-            Describe the expected result, not just the intention.
+            Descreva o resultado esperado, não só a intenção.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -119,7 +119,7 @@ export function TaskFormDialog({
         >
           <FormField
             id="task-title"
-            label="Title"
+            label="Título"
             required
             error={errors.title?.message}
             className="sm:col-span-2"
@@ -127,14 +127,14 @@ export function TaskFormDialog({
             <Input
               id="task-title"
               autoFocus
-              placeholder="Configure a local multi-node cluster and document the setup"
+              placeholder="Configurar um cluster local com vários nós e documentar a configuração"
               aria-invalid={Boolean(errors.title)}
               {...form.register("title")}
             />
           </FormField>
           <FormField
             id="task-description"
-            label="Description"
+            label="Descrição"
             className="sm:col-span-2"
           >
             <Textarea
@@ -145,16 +145,16 @@ export function TaskFormDialog({
           </FormField>
           <FormField
             id="task-done-criteria"
-            label="Definition of done"
-            hint="How will you know it is finished?"
+            label="Critério de pronto"
+            hint="Como você vai saber que terminou?"
             className="sm:col-span-2"
           >
             <Input id="task-done-criteria" {...form.register("doneCriteria")} />
           </FormField>
           <FormField
             id="task-project"
-            label="Project"
-            hint="The company comes from the project."
+            label="Projeto"
+            hint="A empresa vem do projeto."
           >
             <Controller
               control={form.control}
@@ -165,7 +165,7 @@ export function TaskFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>No project</SelectItem>
+                    <SelectItem value={NONE}>Sem projeto</SelectItem>
                     {projects.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         <span
@@ -183,7 +183,7 @@ export function TaskFormDialog({
               )}
             />
           </FormField>
-          <FormField id="task-goal" label="Goal">
+          <FormField id="task-goal" label="Meta">
             <Controller
               control={form.control}
               name="goalId"
@@ -193,7 +193,7 @@ export function TaskFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>No goal</SelectItem>
+                    <SelectItem value={NONE}>Sem meta</SelectItem>
                     {goals.map((goal) => (
                       <SelectItem key={goal.id} value={goal.id}>
                         {goal.name}
@@ -207,7 +207,7 @@ export function TaskFormDialog({
           <FormField
             id="task-tag"
             label="Tag"
-            hint="e.g. Backend, Design, Admin"
+            hint="ex.: Backend, Design, Admin"
           >
             <Input id="task-tag" {...form.register("tag")} />
           </FormField>
@@ -231,7 +231,7 @@ export function TaskFormDialog({
               )}
             />
           </FormField>
-          <FormField id="task-priority" label="Priority">
+          <FormField id="task-priority" label="Prioridade">
             <Controller
               control={form.control}
               name="priority"
@@ -241,16 +241,16 @@ export function TaskFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="low">Baixa</SelectItem>
                     <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="high">Alta</SelectItem>
+                    <SelectItem value="urgent">Urgente</SelectItem>
                   </SelectContent>
                 </Select>
               )}
             />
           </FormField>
-          <FormField id="task-start" label="Start date">
+          <FormField id="task-start" label="Data de início">
             <Input
               id="task-start"
               type="date"
@@ -259,7 +259,7 @@ export function TaskFormDialog({
           </FormField>
           <FormField
             id="task-due"
-            label="Due date"
+            label="Prazo"
             error={errors.dueDate?.message}
           >
             <Input
@@ -272,10 +272,10 @@ export function TaskFormDialog({
         </form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
           <Button type="submit" form="task-form">
-            {editing ? "Save changes" : "Create task"}
+            {editing ? "Salvar alterações" : "Criar tarefa"}
           </Button>
         </DialogFooter>
       </DialogContent>

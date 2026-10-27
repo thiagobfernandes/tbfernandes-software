@@ -35,9 +35,9 @@ export type Milestone = {
 };
 
 export const goalAreaLabels: Record<GoalArea, string> = {
-  career: "Career",
-  finance: "Finance",
-  learning: "Learning",
-  health: "Health",
-  personal: "Personal",
+  career: "Carreira",
+  finance: "Finanças",
+  learning: "Aprendizado",
+  health: "Saúde",
+  personal: "Pessoal",
 };

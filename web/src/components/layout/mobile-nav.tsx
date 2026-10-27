@@ -25,7 +25,7 @@ export function MobileNav() {
           variant="ghost"
           size="icon-sm"
           className="md:hidden"
-          aria-label="Open navigation"
+          aria-label="Abrir menu"
         >
           <Menu />
         </Button>
@@ -38,7 +38,7 @@ export function MobileNav() {
             </div>
           </SheetTitle>
           <SheetDescription className="sr-only">
-            Main navigation
+            Menu principal
           </SheetDescription>
         </SheetHeader>
         <div className="flex flex-1 flex-col overflow-y-auto p-3">

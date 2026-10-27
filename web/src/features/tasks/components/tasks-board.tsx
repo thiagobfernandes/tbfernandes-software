@@ -91,10 +91,10 @@ export function TasksBoard({
     if (!task || task.status === status) return;
     const previous = task.status;
     workActions.updateTask(task.id, { status });
-    toast.success(`Moved to ${taskStatusLabels[status]}`, {
+    toast.success(`Movida para ${taskStatusLabels[status]}`, {
       description: task.title,
       action: {
-        label: "Undo",
+        label: "Desfazer",
         onClick: () => workActions.updateTask(task.id, { status: previous }),
       },
     });
@@ -154,7 +154,7 @@ export function TasksBoard({
                         variant="ghost"
                         size="icon-sm"
                         className="size-7"
-                        aria-label={`Add task to ${taskStatusLabels[status]}`}
+                        aria-label={`Adicionar tarefa em ${taskStatusLabels[status]}`}
                       >
                         <Plus />
                       </Button>
@@ -164,7 +164,7 @@ export function TasksBoard({
               </header>
               {column.length === 0 ? (
                 <p className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
-                  {draggingId ? "Drop here" : "No tasks"}
+                  {draggingId ? "Solte aqui" : "Sem tarefas"}
                 </p>
               ) : (
                 column.map((task) => (

@@ -84,22 +84,22 @@ export function KnowledgeGraphPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Graph"
-        description="Explore how goals, companies, projects, tasks, and knowledge relate. Lists and search stay the primary way to navigate."
+        title="Grafo"
+        description="Explore como metas, empresas, projetos, tarefas e conhecimento se relacionam. As listas e a busca continuam sendo o caminho principal de navegação."
         actions={<SampleDataBadge />}
       />
 
       <Tabs defaultValue="network">
         <TabsList>
-          <TabsTrigger value="network">Network</TabsTrigger>
-          <TabsTrigger value="tree">Goal tree</TabsTrigger>
+          <TabsTrigger value="network">Rede</TabsTrigger>
+          <TabsTrigger value="tree">Árvore de metas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="network" className="mt-4 flex flex-col gap-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div
               role="group"
-              aria-label="Show types"
+              aria-label="Mostrar tipos"
               className="flex flex-wrap gap-1.5"
             >
               {graphKinds.map((kind) => {
@@ -141,13 +141,13 @@ export function KnowledgeGraphPage() {
             </div>
             <div className="relative lg:w-72">
               <label className="relative block">
-                <span className="sr-only">Find a node</span>
+                <span className="sr-only">Encontrar um nó</span>
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Find and focus a node"
+                  placeholder="Encontrar e focar um nó"
                   className="pl-9"
                 />
               </label>
@@ -207,7 +207,7 @@ export function KnowledgeGraphPage() {
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label="Clear focus"
+                      aria-label="Limpar foco"
                       onClick={() => setFocusId(undefined)}
                     >
                       <X />
@@ -248,13 +248,14 @@ export function KnowledgeGraphPage() {
               ) : (
                 <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                   <p className="font-medium text-foreground">
-                    {positioned.length} nodes · {visibleEdges.length} links
+                    {positioned.length} nós · {visibleEdges.length} ligações
                   </p>
                   <p>
-                    Click a node to focus it and see what it connects to. Drag
-                    the background to pan; use the buttons to zoom.
+                    Clique em um nó para focar nele e ver com o que ele se
+                    conecta. Arraste o fundo para mover; use os botões para dar
+                    zoom.
                   </p>
-                  <p>Bigger nodes have more connections.</p>
+                  <p>Nós maiores têm mais conexões.</p>
                 </div>
               )}
             </aside>
@@ -264,7 +265,7 @@ export function KnowledgeGraphPage() {
         <TabsContent value="tree" className="mt-4 flex flex-col gap-4">
           {treeGoals.length > 0 && (
             <Select value={tree?.id} onValueChange={setTreeGoalId}>
-              <SelectTrigger className="w-full sm:w-80" aria-label="Goal">
+              <SelectTrigger className="w-full sm:w-80" aria-label="Meta">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -281,7 +282,7 @@ export function KnowledgeGraphPage() {
               <RelationTree root={tree} className="w-full" />
             ) : (
               <p className="w-full text-center text-sm text-muted-foreground">
-                Link projects to a goal to see the tree.
+                Vincule projetos a uma meta para ver a árvore.
               </p>
             )}
           </div>
@@ -329,7 +330,7 @@ function GraphCanvas({
     <div className="relative overflow-hidden rounded-2xl border bg-dot-grid">
       <svg
         role="img"
-        aria-label="Graph of related records"
+        aria-label="Grafo de registros relacionados"
         viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}
         className="h-[32rem] w-full cursor-grab touch-none active:cursor-grabbing"
         onPointerDown={(event) => {
@@ -393,7 +394,7 @@ function GraphCanvas({
                 key={node.id}
                 role="button"
                 tabIndex={0}
-                aria-label={`${node.label} (${node.kind})`}
+                aria-label={`${node.label} (${graphKindLabels[node.kind]})`}
                 aria-pressed={isFocus}
                 transform={`translate(${node.x} ${node.y})`}
                 onPointerDown={(event) => event.stopPropagation()}
@@ -441,7 +442,7 @@ function GraphCanvas({
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Zoom in"
+          aria-label="Aumentar zoom"
           onClick={() => setZoom((z) => Math.min(z * 1.25, 4))}
         >
           <Plus />
@@ -449,7 +450,7 @@ function GraphCanvas({
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Zoom out"
+          aria-label="Diminuir zoom"
           onClick={() => setZoom((z) => Math.max(z / 1.25, 0.5))}
         >
           <Minus />
@@ -457,7 +458,7 @@ function GraphCanvas({
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Reset view"
+          aria-label="Restaurar visualização"
           onClick={() => {
             setZoom(1);
             setPan({ x: 0, y: 0 });

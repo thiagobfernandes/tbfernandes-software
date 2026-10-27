@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const contactSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120),
+  name: z.string().trim().min(1, "Informe o nome").max(120),
   role: z.string().trim().max(120),
   companyId: z.string(),
   companyName: z.string().trim().max(120),
@@ -15,8 +15,8 @@ export const contactSchema = z.object({
 });
 
 export const interactionSchema = z.object({
-  date: z.iso.date("Pick a date"),
+  date: z.iso.date("Escolha uma data"),
   kind: z.enum(["meeting", "call", "message", "event", "referral"]),
-  summary: z.string().trim().min(1, "Summarize what happened").max(1000),
+  summary: z.string().trim().min(1, "Resuma o que aconteceu").max(1000),
   followUp: z.string().trim().max(160),
 });

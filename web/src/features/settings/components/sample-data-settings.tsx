@@ -27,33 +27,33 @@ export function SampleDataSettings() {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-muted-foreground">
-        {records} records ({data.tasks.length} tasks, {data.notes.length} notes,{" "}
-        {data.goals.length} goals and more) are stored in this browser while the
-        API does not exist.
+        {records} registros ({data.tasks.length} tarefas, {data.notes.length}{" "}
+        notas, {data.goals.length} metas e mais) ficam guardados neste navegador
+        enquanto a API não estiver ligada.
       </p>
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button variant="outline">
-            <RotateCcw /> Reset sample data
+            <RotateCcw /> Restaurar dados de exemplo
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset sample data?</AlertDialogTitle>
+            <AlertDialogTitle>Restaurar dados de exemplo?</AlertDialogTitle>
             <AlertDialogDescription>
-              Everything you created or changed in this browser is replaced by
-              the original sample data in every module.
+              Tudo que você criou ou alterou neste navegador será substituído
+              pelos dados de exemplo originais em todos os módulos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 workActions.reset();
-                toast.success("Sample data restored");
+                toast.success("Dados de exemplo restaurados");
               }}
             >
-              Reset
+              Restaurar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

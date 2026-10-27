@@ -25,10 +25,10 @@ export function GoalFormDialog({
     <EntityFormDialog
       trigger={trigger}
       className="sm:max-w-2xl"
-      title={goal ? "Edit goal" : "New goal"}
-      description="A goal turns into milestones, projects and tasks you can track."
+      title={goal ? "Editar meta" : "Nova meta"}
+      description="Uma meta se desdobra em marcos, projetos e tarefas que você acompanha."
       schema={goalSchema}
-      submitLabel={goal ? "Save changes" : "Create goal"}
+      submitLabel={goal ? "Salvar alterações" : "Criar meta"}
       defaults={{
         name: goal?.name ?? "",
         area: goal?.area ?? "career",
@@ -48,14 +48,14 @@ export function GoalFormDialog({
       fields={[
         {
           name: "name",
-          label: "Name",
+          label: "Nome",
           type: "text",
           required: true,
           full: true,
         },
         {
           name: "area",
-          label: "Area",
+          label: "Área",
           type: "select",
           options: Object.entries(goalAreaLabels).map(([value, label]) => ({
             value,
@@ -67,26 +67,26 @@ export function GoalFormDialog({
           label: "Status",
           type: "select",
           options: [
-            { value: "planned", label: "Planned" },
-            { value: "active", label: "Active" },
-            { value: "paused", label: "Paused" },
-            { value: "completed", label: "Completed" },
+            { value: "planned", label: "Planejada" },
+            { value: "active", label: "Ativa" },
+            { value: "paused", label: "Pausada" },
+            { value: "completed", label: "Concluída" },
           ],
         },
         {
           name: "priority",
-          label: "Priority",
+          label: "Prioridade",
           type: "select",
           options: [
-            { value: "low", label: "Low" },
+            { value: "low", label: "Baixa" },
             { value: "normal", label: "Normal" },
-            { value: "high", label: "High" },
+            { value: "high", label: "Alta" },
           ],
         },
-        { name: "dueDate", label: "Due date", type: "date" },
+        { name: "dueDate", label: "Prazo", type: "date" },
         {
           name: "parentId",
-          label: "Part of goal",
+          label: "Parte da meta",
           type: "select",
           optional: true,
           options: parents.map((item) => ({
@@ -97,45 +97,45 @@ export function GoalFormDialog({
         },
         {
           name: "currentState",
-          label: "Where I am now",
+          label: "Onde estou agora",
           type: "textarea",
           rows: 2,
         },
         {
           name: "desiredResult",
-          label: "Desired result",
+          label: "Resultado desejado",
           type: "textarea",
           rows: 2,
           required: true,
         },
         {
           name: "doneCriteria",
-          label: "How I know it is done",
+          label: "Como sei que terminei",
           type: "textarea",
           rows: 2,
         },
         {
           name: "indicatorLabel",
-          label: "Indicator",
+          label: "Indicador",
           type: "text",
-          placeholder: "e.g. Study hours",
-          hint: "Optional measurable number.",
+          placeholder: "ex.: Horas de estudo",
+          hint: "Número mensurável opcional.",
         },
         {
           name: "indicatorUnit",
-          label: "Unit",
+          label: "Unidade",
           type: "text",
-          placeholder: "h, BRL, features",
+          placeholder: "h, BRL, funcionalidades",
         },
         {
           name: "indicatorCurrent",
-          label: "Current value",
+          label: "Valor atual",
           type: "number",
           min: 0,
         },
         {
           name: "indicatorTarget",
-          label: "Target value",
+          label: "Valor alvo",
           type: "number",
           min: 0,
         },
@@ -161,10 +161,10 @@ export function GoalFormDialog({
         } as Omit<Goal, "id">;
         if (goal) {
           dataActions.update("goals", goal.id, data);
-          toast.success("Goal updated");
+          toast.success("Meta atualizada");
         } else {
           const created = dataActions.create("goals", data);
-          toast.success(`Goal "${created.name}" created`);
+          toast.success(`Meta "${created.name}" criada`);
         }
       }}
     />

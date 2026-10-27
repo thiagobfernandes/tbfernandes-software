@@ -13,13 +13,13 @@ export const graphKinds = [
 export type GraphKind = (typeof graphKinds)[number];
 
 export const graphKindLabels: Record<GraphKind, string> = {
-  goal: "Goals",
-  company: "Companies",
-  project: "Projects",
-  task: "Tasks",
-  note: "Notes",
+  goal: "Metas",
+  company: "Empresas",
+  project: "Projetos",
+  task: "Tarefas",
+  note: "Notas",
   snippet: "Snippets",
-  contact: "Contacts",
+  contact: "Contatos",
 };
 
 export type GraphNode = {
@@ -206,14 +206,14 @@ export function buildContextTree(
 
   return {
     id: goal.id,
-    kind: "Goal",
+    kind: "Meta",
     label: goal.name,
     href: `/goals/${goal.id}`,
     children: data.projects
       .filter((project) => project.goalId === goal.id)
       .map((project) => ({
         id: project.id,
-        kind: "Project",
+        kind: "Projeto",
         label: project.name,
         href: `/projects/${project.id}`,
         children: data.tasks

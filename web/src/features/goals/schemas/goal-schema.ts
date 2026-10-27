@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-const optionalNumber = z.number().min(0, "Must be zero or more").optional();
+const optionalNumber = z.number().min(0, "Deve ser zero ou mais").optional();
 
 export const goalSchema = z
   .object({
-    name: z.string().trim().min(1, "Name is required").max(160),
+    name: z.string().trim().min(1, "Informe o nome").max(160),
     area: z.enum(["career", "finance", "learning", "health", "personal"]),
     status: z.enum(["planned", "active", "paused", "completed"]),
     priority: z.enum(["low", "normal", "high"]),
@@ -15,7 +15,7 @@ export const goalSchema = z
     desiredResult: z
       .string()
       .trim()
-      .min(1, "Describe the result you want")
+      .min(1, "Descreva o resultado que você quer")
       .max(1000),
     doneCriteria: z.string().trim().max(1000),
     indicatorLabel: z.string().trim().max(80),
@@ -25,7 +25,7 @@ export const goalSchema = z
   })
   .refine((value) => !value.indicatorLabel || value.indicatorTarget, {
     path: ["indicatorTarget"],
-    message: "Set a target for the indicator",
+    message: "Defina um alvo para o indicador",
   });
 
 export type GoalFormValues = z.infer<typeof goalSchema>;

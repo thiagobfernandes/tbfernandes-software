@@ -52,11 +52,11 @@ export function UseMethodDialog({ method }: { method: Method }) {
         title: title.trim() || method.title,
         status: "todo",
         priority: "normal",
-        description: `Following the "${method.title}" method.`,
+        description: `Seguindo o método "${method.title}".`,
         checklistItems: steps,
       });
       toast.success(
-        `Task "${created.title}" created with ${steps.length} steps`,
+        `Tarefa "${created.title}" criada com ${steps.length} passos`,
       );
     } else {
       const task = dataActions.get("tasks", target)!;
@@ -64,7 +64,7 @@ export function UseMethodDialog({ method }: { method: Method }) {
         checklistItems: [...(task.checklistItems ?? []), ...steps],
         checklist: undefined,
       });
-      toast.success(`${steps.length} steps added to "${task.title}"`);
+      toast.success(`${steps.length} passos adicionados a "${task.title}"`);
     }
     setOpen(false);
     setTitle("");
@@ -75,25 +75,25 @@ export function UseMethodDialog({ method }: { method: Method }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <ListPlus /> Use on a task
+          <ListPlus /> Usar em uma tarefa
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Use &ldquo;{method.title}&rdquo;</DialogTitle>
+          <DialogTitle>Usar &ldquo;{method.title}&rdquo;</DialogTitle>
           <DialogDescription>
-            Its {method.steps.length} steps become checklist items on the task.
+            Os {method.steps.length} passos viram itens da checklist da tarefa.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="use-method-target">Task</Label>
+            <Label htmlFor="use-method-target">Tarefa</Label>
             <Select value={target} onValueChange={setTarget}>
               <SelectTrigger id="use-method-target" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NEW_TASK}>Create a new task</SelectItem>
+                <SelectItem value={NEW_TASK}>Criar uma nova tarefa</SelectItem>
                 {openTasks.map((task) => (
                   <SelectItem key={task.id} value={task.id}>
                     {task.title}
@@ -104,7 +104,7 @@ export function UseMethodDialog({ method }: { method: Method }) {
           </div>
           {target === NEW_TASK && (
             <div className="flex flex-col gap-2">
-              <Label htmlFor="use-method-title">New task title</Label>
+              <Label htmlFor="use-method-title">Título da nova tarefa</Label>
               <Input
                 id="use-method-title"
                 value={title}
@@ -126,9 +126,9 @@ export function UseMethodDialog({ method }: { method: Method }) {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
-          <Button onClick={apply}>Add steps</Button>
+          <Button onClick={apply}>Adicionar passos</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

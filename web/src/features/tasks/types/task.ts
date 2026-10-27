@@ -39,11 +39,11 @@ export type Task = {
 
 export const taskStatusLabels: Record<TaskStatus, string> = {
   backlog: "Backlog",
-  todo: "To do",
-  in_progress: "In progress",
-  blocked: "Blocked",
-  done: "Done",
-  canceled: "Canceled",
+  todo: "A fazer",
+  in_progress: "Em andamento",
+  blocked: "Bloqueada",
+  done: "Concluída",
+  canceled: "Cancelada",
 };
 
 /** Checklist progress from itemized items when present, else the aggregate. */
@@ -56,3 +56,11 @@ export function checklistProgress(task: Task) {
   }
   return task.checklist;
 }
+
+/** Lowercase, for use inside sentences ("prioridade alta"). */
+export const priorityLabels: Record<TaskPriority, string> = {
+  low: "baixa",
+  normal: "normal",
+  high: "alta",
+  urgent: "urgente",
+};

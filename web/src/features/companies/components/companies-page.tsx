@@ -23,15 +23,15 @@ export function CompaniesPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Companies"
-        description="Organizations you work for, serve, or partner with."
+        title="Empresas"
+        description="Organizações para as quais você trabalha, atende ou com quem tem parceria."
         actions={
           <>
             <SampleDataBadge />
             <CompanyFormDialog
               trigger={
                 <Button>
-                  <Plus /> New company
+                  <Plus /> Nova empresa
                 </Button>
               }
             />
@@ -39,8 +39,10 @@ export function CompaniesPage() {
         }
       />
 
-      <CompanyGrid title="Active" companies={active} />
-      {closed.length > 0 && <CompanyGrid title="Past" companies={closed} />}
+      <CompanyGrid title="Ativas" companies={active} />
+      {closed.length > 0 && (
+        <CompanyGrid title="Anteriores" companies={closed} />
+      )}
     </PageContainer>
   );
 }

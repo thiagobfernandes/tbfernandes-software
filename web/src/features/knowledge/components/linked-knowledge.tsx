@@ -26,8 +26,8 @@ export function LinkedKnowledge({ projectId }: { projectId: string }) {
       {linkedNotes.length + linkedSnippets.length === 0 ? (
         <EmptyState
           icon={BookOpen}
-          title="Nothing linked yet"
-          description="Notes and code snippets linked to this project will show here."
+          title="Nada vinculado ainda"
+          description="Notas e snippets de código vinculados a este projeto aparecem aqui."
           className="py-6"
         />
       ) : (
@@ -70,7 +70,7 @@ export function LinkedKnowledge({ projectId }: { projectId: string }) {
           defaultProjectId={projectId}
           trigger={
             <Button variant="outline" size="sm" className="flex-1">
-              <Plus /> Note
+              <Plus /> Nota
             </Button>
           }
         />
@@ -112,7 +112,9 @@ export function TaskKnowledge({ taskId }: { taskId: string }) {
 
   return (
     <section className="flex flex-col gap-1.5">
-      <h3 className="text-xs font-medium text-muted-foreground">Knowledge</h3>
+      <h3 className="text-xs font-medium text-muted-foreground">
+        Conhecimento
+      </h3>
       <ul className="flex flex-col">
         {linked.map(({ id, title, href, icon: Icon }) => (
           <li key={id}>

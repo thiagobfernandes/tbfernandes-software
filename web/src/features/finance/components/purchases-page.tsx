@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { PurchaseFormDialog } from "@/features/finance/components/finance-form-dialogs";
 import { projectPurchase } from "@/features/finance/lib/projection";
 import type { PurchaseGoal } from "@/features/finance/types/finance";
+import { priorityLabels } from "@/features/tasks/types/task";
 import { formatBRL, formatMonth } from "@/lib/money";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
@@ -54,21 +55,21 @@ export function PurchasesPage() {
       status: purchase.status === "planned" ? "saving" : purchase.status,
     });
     setDeposits((current) => ({ ...current, [purchase.id]: "" }));
-    toast.success(`${formatBRL(amount)} reserved for ${purchase.name}`);
+    toast.success(`${formatBRL(amount)} reservados para ${purchase.name}`);
   }
 
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Planned purchases"
-        description="Save for what you want with a clear date for when it becomes affordable."
+        title="Compras planejadas"
+        description="Guarde dinheiro para o que você quer, com uma data clara de quando vai dar para comprar."
         actions={
           <>
             <SampleDataBadge />
             <PurchaseFormDialog
               trigger={
                 <Button>
-                  <Plus /> New purchase
+                  <Plus /> Nova compra
                 </Button>
               }
             />
@@ -76,11 +77,14 @@ export function PurchasesPage() {
         }
       />
 
-      <section aria-label="Totals" className="grid gap-4 sm:grid-cols-3">
-        <MetricCard label="Still to save" value={formatBRL(totalMissing)} />
-        <MetricCard label="Planned monthly saving" value={formatBRL(monthly)} />
+      <section aria-label="Totais" className="grid gap-4 sm:grid-cols-3">
+        <MetricCard label="Falta guardar" value={formatBRL(totalMissing)} />
         <MetricCard
-          label="Bought"
+          label="Economia mensal planejada"
+          value={formatBRL(monthly)}
+        />
+        <MetricCard
+          label="Compradas"
           value={bought.length}
           unit={`/ ${purchases.length}`}
         />
@@ -89,8 +93,8 @@ export function PurchasesPage() {
       {open.length === 0 ? (
         <EmptyState
           icon={ShoppingCart}
-          title="Nothing planned"
-          description="Add something you want to buy and how much you can save per month."
+          title="Nada planejado"
+          description="Adicione algo que você quer comprar e quanto consegue guardar por mês."
         />
       ) : (
         <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
@@ -108,8 +112,8 @@ export function PurchasesPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
                     <span className="text-[11px] font-medium text-muted-foreground uppercase">
-                      {purchase.status === "saving" ? "Saving" : "Planned"} ·{" "}
-                      {purchase.priority} priority
+                      {purchase.status === "saving" ? "Guardando" : "Planejada"}{" "}
+                      · prioridade {priorityLabels[purchase.priority]}
                     </span>
                     <h2 className="font-medium">{purchase.name}</h2>
                     {purchase.description && (
@@ -122,13 +126,13 @@ export function PurchasesPage() {
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label="Edit purchase"
+                      aria-label="Editar compra"
                       onClick={() => setEditing(purchase)}
                     >
                       <Pencil />
                     </Button>
                     <ConfirmDelete
-                      noun="purchase"
+                      noun="compra"
                       name={purchase.name}
                       onConfirm={() =>
                         dataActions.remove("purchases", purchase.id)
@@ -143,12 +147,12 @@ export function PurchasesPage() {
                       {formatBRL(purchase.reserved)}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      of {formatBRL(purchase.estimated)}
+                      de {formatBRL(purchase.estimated)}
                     </span>
                   </div>
                   <ProgressBar
                     value={percent}
-                    label={`${purchase.name} saved`}
+                    label={`${purchase.name} salva`}
                     className="h-2"
                   />
                 </div>
@@ -165,29 +169,29 @@ export function PurchasesPage() {
                     aria-hidden
                   />
                   {projection.ready ? (
-                    <span>Fully reserved: ready to buy.</span>
+                    <span>Valor todo reservado: pronto para comprar.</span>
                   ) : projection.month ? (
                     <span>
-                      Affordable in{" "}
+                      Dá para comprar em{" "}
                       <strong>{formatMonth(projection.month)}</strong> (
-                      {projection.months} months at{" "}
-                      {formatBRL(purchase.monthlySaving!)}/month).
+                      {projection.months} meses guardando{" "}
+                      {formatBRL(purchase.monthlySaving!)}/mês).
                       {projection.onTime === false && (
                         <span className="block text-xs text-warning">
-                          Later than the desired{" "}
+                          Depois da data desejada,{" "}
                           {formatMonth(purchase.desiredDate!.slice(0, 7))}.
                         </span>
                       )}
                       {projection.onTime && (
                         <span className="block text-xs text-success">
-                          On time for the desired date.
+                          Dentro da data desejada.
                         </span>
                       )}
                     </span>
                   ) : (
                     <span className="text-muted-foreground">
-                      {formatBRL(projection.missing)} missing. Set a monthly
-                      saving to see a date.
+                      {formatBRL(projection.missing)} faltando. Defina uma
+                      economia mensal para ver uma data.
                     </span>
                   )}
                 </div>
@@ -203,8 +207,8 @@ export function PurchasesPage() {
                     type="number"
                     min={0}
                     inputMode="decimal"
-                    placeholder="Amount"
-                    aria-label={`Amount to reserve for ${purchase.name}`}
+                    placeholder="Valor"
+                    aria-label={`Valor a reservar para ${purchase.name}`}
                     value={deposits[purchase.id] ?? ""}
                     onChange={(event) =>
                       setDeposits((current) => ({
@@ -214,7 +218,7 @@ export function PurchasesPage() {
                     }
                   />
                   <Button type="submit" variant="outline">
-                    <PiggyBank /> Reserve
+                    <PiggyBank /> Reservar
                   </Button>
                 </form>
 
@@ -237,10 +241,10 @@ export function PurchasesPage() {
                         status: "bought",
                         paid: purchase.paid ?? purchase.estimated,
                       });
-                      toast.success(`${purchase.name} marked as bought`);
+                      toast.success(`${purchase.name} marcada como comprada`);
                     }}
                   >
-                    <Check /> Mark bought
+                    <Check /> Marcar como comprada
                   </Button>
                 </div>
               </article>
@@ -251,7 +255,9 @@ export function PurchasesPage() {
 
       {bought.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-muted-foreground">Bought</h2>
+          <h2 className="text-sm font-medium text-muted-foreground">
+            Compradas
+          </h2>
           <ul className="flex flex-col divide-y rounded-2xl border bg-card">
             {bought.map((purchase) => {
               const difference =
@@ -264,7 +270,7 @@ export function PurchasesPage() {
                   <Check className="size-4 text-success" aria-hidden />
                   <span className="flex-1">{purchase.name}</span>
                   <span className="text-muted-foreground tabular-nums">
-                    paid {formatBRL(purchase.paid ?? purchase.estimated)}
+                    pago {formatBRL(purchase.paid ?? purchase.estimated)}
                   </span>
                   <span
                     className={cn(
@@ -273,13 +279,13 @@ export function PurchasesPage() {
                     )}
                   >
                     {difference <= 0
-                      ? `${formatBRL(-difference)} under`
-                      : `${formatBRL(difference)} over`}
+                      ? `${formatBRL(-difference)} abaixo`
+                      : `${formatBRL(difference)} acima`}
                   </span>
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Edit purchase"
+                    aria-label="Editar compra"
                     onClick={() => setEditing(purchase)}
                   >
                     <Pencil />

@@ -10,7 +10,7 @@ export type Reference = { kind: string; label: string; href: string };
 export type Answer = { text: string; references: Reference[] };
 
 const taskRef = (title: string): Reference => ({
-  kind: "Task",
+  kind: "Tarefa",
   label: title,
   href: `/tasks?q=${encodeURIComponent(title)}`,
 });
@@ -57,6 +57,19 @@ function has(question: string, words: string[]) {
  * Rule-based stand-in for the AI assistant: reads the same data the screens
  * use and answers with links to the records it used.
  */
+const projectStatusText = {
+  planned: "planejado",
+  active: "ativo",
+  paused: "pausado",
+  completed: "concluído",
+};
+const priorityText = {
+  low: "baixa",
+  normal: "normal",
+  high: "alta",
+  urgent: "urgente",
+};
+
 export function answer(rawQuestion: string, data: AppData): Answer {
   const question = rawQuestion.toLowerCase();
   const openTasks = data.tasks.filter(isOpenTask);
@@ -72,27 +85,27 @@ export function answer(rawQuestion: string, data: AppData): Answer {
     const notes = data.notes.filter((n) => n.projectIds.includes(project.id));
     return {
       text: [
-        `**${project.name}** is ${project.status}: ${done} of ${tasks.length} tasks done (${tasks.length ? Math.round((done / tasks.length) * 100) : 0}%).`,
-        project.nextDelivery && `Next delivery: ${project.nextDelivery}.`,
+        `**${project.name}** está ${projectStatusText[project.status]}: ${done} de ${tasks.length} tarefas concluídas (${tasks.length ? Math.round((done / tasks.length) * 100) : 0}%).`,
+        project.nextDelivery && `Próxima entrega: ${project.nextDelivery}.`,
         open.length
-          ? `Open tasks:\n${open.map((t) => `- ${t.title}${t.dueDate ? ` (${describeDue(t.dueDate, currentDay()).label.toLowerCase()})` : ""}`).join("\n")}`
-          : "No open tasks.",
+          ? `Tarefas abertas:\n${open.map((t) => `- ${t.title}${t.dueDate ? ` (${describeDue(t.dueDate, currentDay()).label.toLowerCase()})` : ""}`).join("\n")}`
+          : "Nenhuma tarefa aberta.",
         blocked.length &&
-          `⚠ ${blocked.length} blocked: ${blocked.map((t) => t.title).join(", ")}.`,
+          `⚠ ${blocked.length} bloqueada${blocked.length > 1 ? "s" : ""}: ${blocked.map((t) => t.title).join(", ")}.`,
         notes.length &&
-          `${notes.length} linked note${notes.length > 1 ? "s" : ""} may help.`,
+          `${notes.length} nota${notes.length > 1 ? "s" : ""} vinculada${notes.length > 1 ? "s" : ""} pode${notes.length > 1 ? "m" : ""} ajudar.`,
       ]
         .filter(Boolean)
         .join("\n\n"),
       references: [
         {
-          kind: "Project",
+          kind: "Projeto",
           label: project.name,
           href: `/projects/${project.id}`,
         },
         ...open.slice(0, 4).map((t) => taskRef(t.title)),
         ...notes.map((n) => ({
-          kind: "Note",
+          kind: "Nota",
           label: n.title,
           href: `/knowledge?note=${n.id}`,
         })),
@@ -106,8 +119,8 @@ export function answer(rawQuestion: string, data: AppData): Answer {
     );
     return {
       text: overdue.length
-        ? `You have ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""}:\n${overdue.map((t) => `- **${t.title}**, ${describeDue(t.dueDate!, currentDay()).label.toLowerCase()}${t.status === "blocked" ? " (blocked)" : ""}`).join("\n")}\n\nStart with blocked items: they usually need a message, not work.`
-        : "Nothing is overdue. 🎉",
+        ? `Você tem ${overdue.length} tarefa${overdue.length > 1 ? "s" : ""} atrasada${overdue.length > 1 ? "s" : ""}:\n${overdue.map((t) => `- **${t.title}**, ${describeDue(t.dueDate!, currentDay()).label.toLowerCase()}${t.status === "blocked" ? " (bloqueada)" : ""}`).join("\n")}\n\nComece pelas bloqueadas: elas geralmente precisam de uma mensagem, não de trabalho.`
+        : "Nada atrasado. 🎉",
       references: overdue.map((t) => taskRef(t.title)),
     };
   }
@@ -124,8 +137,8 @@ export function answer(rawQuestion: string, data: AppData): Answer {
       });
     return {
       text: focus.length
-        ? `For today, in this order:\n${focus.map((t, i) => `${i + 1}. **${t.title}** · ${t.priority} · ${describeDue(t.dueDate!, currentDay()).label.toLowerCase()}`).join("\n")}\n\nOrdered by priority, then due date.`
-        : "Nothing is due in the next two days. Good moment for backlog or study.",
+        ? `Para hoje, nesta ordem:\n${focus.map((t, i) => `${i + 1}. **${t.title}** · prioridade ${priorityText[t.priority]} · ${describeDue(t.dueDate!, currentDay()).label.toLowerCase()}`).join("\n")}\n\nOrdenado por prioridade e depois por prazo.`
+        : "Nada vence nos próximos dois dias. Bom momento para o backlog ou para estudar.",
       references: focus.map((t) => taskRef(t.title)),
     };
   }
@@ -138,17 +151,17 @@ export function answer(rawQuestion: string, data: AppData): Answer {
             .map((p) => {
               const projection = projectPurchase(p);
               if (projection.ready)
-                return `- **${p.name}**: fully reserved, ready to buy.`;
+                return `- **${p.name}**: valor todo reservado, pronto para comprar.`;
               if (!projection.month)
-                return `- **${p.name}**: ${formatBRL(projection.missing)} missing, no monthly saving set.`;
-              return `- **${p.name}**: ${formatBRL(projection.missing)} missing, affordable in ${projection.months} months${projection.onTime === false ? " (later than you wanted)" : ""}.`;
+                return `- **${p.name}**: ${formatBRL(projection.missing)} faltando, sem economia mensal definida.`;
+              return `- **${p.name}**: ${formatBRL(projection.missing)} faltando, dá para comprar em ${projection.months} meses${projection.onTime === false ? " (depois do que você queria)" : ""}.`;
             })
             .join("\n")
-        : "No planned purchases.",
+        : "Nenhuma compra planejada.",
       references: [
         {
-          kind: "Finance",
-          label: "Planned purchases",
+          kind: "Finanças",
+          label: "Compras planejadas",
           href: "/finance/purchases",
         },
       ],
@@ -167,8 +180,10 @@ export function answer(rawQuestion: string, data: AppData): Answer {
     const personal = sum("personal", "income") - sum("personal", "expense");
     const business = sum("business", "income") - sum("business", "expense");
     return {
-      text: `This month:\n- **Personal**: ${formatBRL(sum("personal", "income"))} in, ${formatBRL(sum("personal", "expense"))} out, balance ${formatBRL(personal)}.\n- **Business**: ${formatBRL(sum("business", "income"))} in, ${formatBRL(sum("business", "expense"))} out, balance ${formatBRL(business)}.\n\nRemember that business balance is not personal money until you transfer it.`,
-      references: [{ kind: "Finance", label: "Cash flow", href: "/finance" }],
+      text: `Neste mês:\n- **Pessoal**: ${formatBRL(sum("personal", "income"))} de entrada, ${formatBRL(sum("personal", "expense"))} de saída, saldo ${formatBRL(personal)}.\n- **Empresa**: ${formatBRL(sum("business", "income"))} de entrada, ${formatBRL(sum("business", "expense"))} de saída, saldo ${formatBRL(business)}.\n\nLembre que o saldo da empresa não é dinheiro pessoal até você transferir.`,
+      references: [
+        { kind: "Finanças", label: "Fluxo de caixa", href: "/finance" },
+      ],
     };
   }
 
@@ -176,15 +191,15 @@ export function answer(rawQuestion: string, data: AppData): Answer {
     const active = data.goals.filter((g) => g.status === "active");
     return {
       text: active.length
-        ? `Active goals:\n${active
+        ? `Metas ativas:\n${active
             .map((g) => {
               const p = goalProgress(data, g);
               return `- **${g.name}**: ${p.percent}% (${p.basis.toLowerCase()})`;
             })
             .join("\n")}`
-        : "No active goals.",
+        : "Nenhuma meta ativa.",
       references: active.map((g) => ({
-        kind: "Goal",
+        kind: "Meta",
         label: g.name,
         href: `/goals/${g.id}`,
       })),
@@ -199,10 +214,10 @@ export function answer(rawQuestion: string, data: AppData): Answer {
       .sort((a, b) => a.nextContact!.localeCompare(b.nextContact!));
     return {
       text: due.length
-        ? `Follow up this week:\n${due.map((c) => `- **${c.name}** (${c.role ?? "contact"}), ${describeDue(c.nextContact!, currentDay()).label.toLowerCase()}`).join("\n")}`
-        : "No follow-ups due this week.",
+        ? `Follow-ups desta semana:\n${due.map((c) => `- **${c.name}** (${c.role ?? "contato"}), ${describeDue(c.nextContact!, currentDay()).label.toLowerCase()}`).join("\n")}`
+        : "Nenhum follow-up nesta semana.",
       references: due.map((c) => ({
-        kind: "Contact",
+        kind: "Contato",
         label: c.name,
         href: `/contacts?contact=${c.id}`,
       })),
@@ -213,14 +228,18 @@ export function answer(rawQuestion: string, data: AppData): Answer {
     const studies = data.studies.filter((s) => s.status !== "completed");
     return {
       text: studies.length
-        ? `Ongoing studies:\n${studies.map((s) => `- **${s.name}**: ${s.nextActivity ?? "no next activity set"}`).join("\n")}`
-        : "No ongoing studies.",
-      references: [{ kind: "Learning", label: "Learning", href: "/learning" }],
+        ? `Estudos em andamento:\n${studies.map((s) => `- **${s.name}**: ${s.nextActivity ?? "sem próxima atividade definida"}`).join("\n")}`
+        : "Nenhum estudo em andamento.",
+      references: [
+        { kind: "Aprendizado", label: "Aprendizado", href: "/learning" },
+      ],
     };
   }
 
   // Fallback: search knowledge and tasks for the question's words.
-  const words = question.split(/\W+/).filter((word) => word.length > 3);
+  const words = question
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((word) => word.length > 3);
   const matches = (text: string) =>
     words.some((word) => text.toLowerCase().includes(word));
   const notes = data.notes.filter((n) =>
@@ -234,7 +253,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
   );
   const references: Reference[] = [
     ...notes.map((n) => ({
-      kind: "Note",
+      kind: "Nota",
       label: n.title,
       href: `/knowledge?note=${n.id}`,
     })),
@@ -247,8 +266,8 @@ export function answer(rawQuestion: string, data: AppData): Answer {
   ];
   return {
     text: references.length
-      ? `I found ${references.length} related item${references.length > 1 ? "s" : ""} in your workspace. Open them below.`
-      : "I could not find anything about that yet. Try asking about today's focus, overdue tasks, a project by name, goals, money, purchases, contacts or studies.",
+      ? `Encontrei ${references.length} ${references.length > 1 ? "itens relacionados" : "item relacionado"} nos seus dados. Abra abaixo.`
+      : "Ainda não encontrei nada sobre isso. Pergunte sobre o foco de hoje, tarefas atrasadas, um projeto pelo nome, metas, dinheiro, compras, contatos ou estudos.",
     references,
   };
 }

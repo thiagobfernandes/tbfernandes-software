@@ -79,10 +79,10 @@ export function ProjectFormDialog({
     }) as Omit<Project, "id">;
     if (project) {
       workActions.updateProject(project.id, data);
-      toast.success("Project updated");
+      toast.success("Projeto atualizado");
     } else {
       const created = workActions.addProject(data);
-      toast.success(`Project "${created.name}" created`);
+      toast.success(`Projeto "${created.name}" criado`);
       form.reset();
     }
     setOpen(false);
@@ -99,9 +99,11 @@ export function ProjectFormDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit project" : "New project"}</DialogTitle>
+          <DialogTitle>
+            {editing ? "Editar projeto" : "Novo projeto"}
+          </DialogTitle>
           <DialogDescription>
-            A project groups tasks around a concrete outcome.
+            Um projeto agrupa tarefas em torno de um resultado concreto.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -112,7 +114,7 @@ export function ProjectFormDialog({
         >
           <FormField
             id="project-name"
-            label="Name"
+            label="Nome"
             required
             error={errors.name?.message}
             className="sm:col-span-2"
@@ -124,7 +126,7 @@ export function ProjectFormDialog({
               {...form.register("name")}
             />
           </FormField>
-          <FormField id="project-company" label="Company">
+          <FormField id="project-company" label="Empresa">
             <Controller
               control={form.control}
               name="companyId"
@@ -134,7 +136,7 @@ export function ProjectFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>Personal initiative</SelectItem>
+                    <SelectItem value={NONE}>Iniciativa pessoal</SelectItem>
                     {companies.map((company) => (
                       <SelectItem key={company.id} value={company.id}>
                         {company.name}
@@ -145,7 +147,7 @@ export function ProjectFormDialog({
               )}
             />
           </FormField>
-          <FormField id="project-goal" label="Goal">
+          <FormField id="project-goal" label="Meta">
             <Controller
               control={form.control}
               name="goalId"
@@ -155,7 +157,7 @@ export function ProjectFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={NONE}>No goal</SelectItem>
+                    <SelectItem value={NONE}>Sem meta</SelectItem>
                     {goals.map((goal) => (
                       <SelectItem key={goal.id} value={goal.id}>
                         {goal.name}
@@ -166,7 +168,7 @@ export function ProjectFormDialog({
               )}
             />
           </FormField>
-          <FormField id="project-category" label="Category">
+          <FormField id="project-category" label="Categoria">
             <Controller
               control={form.control}
               name="category"
@@ -176,10 +178,10 @@ export function ProjectFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="personal">Personal</SelectItem>
-                    <SelectItem value="study">Study</SelectItem>
-                    <SelectItem value="research">Research</SelectItem>
+                    <SelectItem value="professional">Profissional</SelectItem>
+                    <SelectItem value="personal">Pessoal</SelectItem>
+                    <SelectItem value="study">Estudo</SelectItem>
+                    <SelectItem value="research">Pesquisa</SelectItem>
                   </SelectContent>
                 </Select>
               )}
@@ -195,16 +197,16 @@ export function ProjectFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="planned">Planned</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="paused">Paused</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="planned">Planejado</SelectItem>
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="paused">Pausado</SelectItem>
+                    <SelectItem value="completed">Concluído</SelectItem>
                   </SelectContent>
                 </Select>
               )}
             />
           </FormField>
-          <FormField id="project-color" label="Color">
+          <FormField id="project-color" label="Cor">
             <Controller
               control={form.control}
               name="color"
@@ -212,7 +214,7 @@ export function ProjectFormDialog({
                 <div
                   id="project-color"
                   role="radiogroup"
-                  aria-label="Project color"
+                  aria-label="Cor do projeto"
                   className="flex h-9 items-center gap-2"
                 >
                   {colors.map((color) => (
@@ -236,7 +238,7 @@ export function ProjectFormDialog({
           </FormField>
           <FormField
             id="project-start"
-            label="Start date"
+            label="Data de início"
             required
             error={errors.startDate?.message}
           >
@@ -249,7 +251,7 @@ export function ProjectFormDialog({
           </FormField>
           <FormField
             id="project-due"
-            label="Due date"
+            label="Prazo"
             error={errors.dueDate?.message}
           >
             <Input
@@ -261,15 +263,15 @@ export function ProjectFormDialog({
           </FormField>
           <FormField
             id="project-next"
-            label="Next delivery"
-            hint="e.g. MVP: companies & tasks · Nov 15"
+            label="Próxima entrega"
+            hint="ex.: MVP: empresas e tarefas · 15/11"
             className="sm:col-span-2"
           >
             <Input id="project-next" {...form.register("nextDelivery")} />
           </FormField>
           <FormField
             id="project-description"
-            label="Description"
+            label="Descrição"
             className="sm:col-span-2"
           >
             <Textarea
@@ -281,10 +283,10 @@ export function ProjectFormDialog({
         </form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
           <Button type="submit" form="project-form">
-            {editing ? "Save changes" : "Create project"}
+            {editing ? "Salvar alterações" : "Criar projeto"}
           </Button>
         </DialogFooter>
       </DialogContent>

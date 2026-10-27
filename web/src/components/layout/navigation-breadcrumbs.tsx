@@ -15,7 +15,7 @@ export function NavigationBreadcrumbs() {
   const isDetail = pathname !== match.item.href;
 
   return (
-    <nav aria-label="Breadcrumb" className="min-w-0">
+    <nav aria-label="Navegação estrutural" className="min-w-0">
       <ol className="flex items-center gap-1.5 truncate text-sm text-muted-foreground">
         {match.group && (
           <>

@@ -111,7 +111,7 @@ export function TaskDetailSheet({
                       {project.name}
                     </Link>
                   ) : (
-                    "No project"
+                    "Sem projeto"
                   )}
                   {company && <span>· {company.name}</span>}
                 </SheetDescription>
@@ -130,7 +130,7 @@ export function TaskDetailSheet({
                           status: value as TaskStatus,
                         });
                         toast.success(
-                          `Moved to ${taskStatusLabels[value as TaskStatus]}`,
+                          `Movida para ${taskStatusLabels[value as TaskStatus]}`,
                         );
                       }}
                     >
@@ -150,7 +150,7 @@ export function TaskDetailSheet({
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <span className="text-xs text-muted-foreground">
-                      Priority
+                      Prioridade
                     </span>
                     <Select
                       value={task.priority}
@@ -160,14 +160,14 @@ export function TaskDetailSheet({
                         })
                       }
                     >
-                      <SelectTrigger aria-label="Priority" size="sm">
+                      <SelectTrigger aria-label="Prioridade" size="sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="low">Baixa</SelectItem>
                         <SelectItem value="normal">Normal</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
+                        <SelectItem value="high">Alta</SelectItem>
+                        <SelectItem value="urgent">Urgente</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -176,7 +176,7 @@ export function TaskDetailSheet({
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex flex-col gap-1 rounded-xl border p-3">
                     <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <CalendarDays className="size-3.5" aria-hidden /> Start
+                      <CalendarDays className="size-3.5" aria-hidden /> Início
                     </dt>
                     <dd>
                       {task.startDate ? formatShort(task.startDate) : "—"}
@@ -184,26 +184,26 @@ export function TaskDetailSheet({
                   </div>
                   <div className="flex flex-col gap-1 rounded-xl border p-3">
                     <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <CalendarDays className="size-3.5" aria-hidden /> Due
+                      <CalendarDays className="size-3.5" aria-hidden /> Prazo
                     </dt>
                     <dd>{task.dueDate ? formatShort(task.dueDate) : "—"}</dd>
                   </div>
                   {task.completedAt && (
                     <div className="col-span-2 flex items-center gap-2 rounded-xl border border-success/40 p-3 text-success">
                       <CheckCircle2 className="size-4" aria-hidden />
-                      Completed on {formatShort(task.completedAt)}
+                      Concluída em {formatShort(task.completedAt)}
                     </div>
                   )}
                 </dl>
 
                 <section className="flex flex-col gap-1.5">
                   <h3 className="text-xs font-medium text-muted-foreground">
-                    Description
+                    Descrição
                   </h3>
                   <p className="text-sm whitespace-pre-wrap">
                     {task.description || (
                       <span className="text-muted-foreground">
-                        No description.
+                        Sem descrição.
                       </span>
                     )}
                   </p>
@@ -211,13 +211,13 @@ export function TaskDetailSheet({
 
                 <section className="flex flex-col gap-1.5">
                   <h3 className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Target className="size-3.5" aria-hidden /> Definition of
-                    done
+                    <Target className="size-3.5" aria-hidden /> Critério de
+                    pronto
                   </h3>
                   <p className="text-sm">
                     {task.doneCriteria || (
                       <span className="text-muted-foreground">
-                        Not defined yet. Describe the expected result.
+                        Ainda não definido. Descreva o resultado esperado.
                       </span>
                     )}
                   </p>
@@ -233,7 +233,7 @@ export function TaskDetailSheet({
                   className="flex-1"
                   onClick={() => setEditing(true)}
                 >
-                  <Pencil /> Edit
+                  <Pencil /> Editar
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -241,27 +241,27 @@ export function TaskDetailSheet({
                       variant="outline"
                       className="text-destructive hover:text-destructive"
                     >
-                      <Trash2 /> Delete
+                      <Trash2 /> Excluir
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete this task?</AlertDialogTitle>
+                      <AlertDialogTitle>Excluir esta tarefa?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        &ldquo;{task.title}&rdquo; will be removed. This cannot
-                        be undone.
+                        &ldquo;{task.title}&rdquo; será removida. Essa ação não
+                        pode ser desfeita.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => {
                           workActions.deleteTask(task.id);
                           onOpenChange(false);
-                          toast.success("Task deleted");
+                          toast.success("Tarefa excluída");
                         }}
                       >
-                        Delete
+                        Excluir
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

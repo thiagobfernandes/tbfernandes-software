@@ -33,10 +33,10 @@ export function EntryFormDialog({
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit entry" : "New entry"}
-      description="Keep business and personal money apart: company revenue is not your disposable income."
+      title={item ? "Editar lançamento" : "Novo lançamento"}
+      description="Mantenha o dinheiro da empresa separado do pessoal: faturamento da empresa não é renda disponível sua."
       schema={entrySchema}
-      submitLabel={item ? "Save changes" : "Add entry"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar lançamento"}
       defaults={{
         kind: item?.kind ?? "expense",
         scope: item?.scope ?? "personal",
@@ -49,61 +49,61 @@ export function EntryFormDialog({
       fields={[
         {
           name: "kind",
-          label: "Type",
+          label: "Tipo",
           type: "select",
           options: [
-            { value: "income", label: "Income" },
-            { value: "expense", label: "Expense" },
+            { value: "income", label: "Entrada" },
+            { value: "expense", label: "Saída" },
           ],
         },
         {
           name: "scope",
-          label: "Scope",
+          label: "Escopo",
           type: "select",
           options: [
-            { value: "personal", label: "Personal" },
-            { value: "business", label: "Business (PJ)" },
+            { value: "personal", label: "Pessoal" },
+            { value: "business", label: "Empresa (PJ)" },
           ],
         },
         {
           name: "description",
-          label: "Description",
+          label: "Descrição",
           type: "text",
           required: true,
           full: true,
         },
         {
           name: "category",
-          label: "Category",
+          label: "Categoria",
           type: "text",
           required: true,
           hint: categories.length
-            ? `In use: ${categories.join(", ")}`
+            ? `Em uso: ${categories.join(", ")}`
             : undefined,
         },
         {
           name: "amount",
-          label: "Amount (BRL)",
+          label: "Valor (R$)",
           type: "number",
           min: 0,
           step: 0.01,
           required: true,
         },
-        { name: "date", label: "Date", type: "date", required: true },
+        { name: "date", label: "Data", type: "date", required: true },
         {
           name: "recurring",
-          label: "Recurring",
+          label: "Recorrente",
           type: "checkbox",
-          placeholder: "Repeats every month",
+          placeholder: "Repete todo mês",
         },
       ]}
       onSubmit={(values) => {
         if (item) {
           dataActions.update("financeEntries", item.id, values);
-          toast.success("Entry updated");
+          toast.success("Lançamento atualizado");
         } else {
           dataActions.create("financeEntries", values);
-          toast.success("Entry added");
+          toast.success("Lançamento adicionado");
         }
       }}
     />
@@ -118,10 +118,10 @@ export function PurchaseFormDialog({
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit planned purchase" : "New planned purchase"}
-      description="Set a monthly saving to see when you can afford it."
+      title={item ? "Editar compra planejada" : "Nova compra planejada"}
+      description="Defina quanto vai guardar por mês para ver quando poderá comprar."
       schema={purchaseSchema}
-      submitLabel={item ? "Save changes" : "Add purchase"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar compra"}
       defaults={{
         name: item?.name ?? "",
         description: item?.description ?? "",
@@ -137,39 +137,39 @@ export function PurchaseFormDialog({
       fields={[
         {
           name: "name",
-          label: "Name",
+          label: "Nome",
           type: "text",
           required: true,
           full: true,
         },
         {
           name: "estimated",
-          label: "Estimated price (BRL)",
+          label: "Preço estimado (R$)",
           type: "number",
           min: 0,
           required: true,
         },
         {
           name: "reserved",
-          label: "Already reserved (BRL)",
+          label: "Já reservado (R$)",
           type: "number",
           min: 0,
         },
         {
           name: "monthlySaving",
-          label: "Monthly saving (BRL)",
+          label: "Economia mensal (R$)",
           type: "number",
           min: 0,
         },
-        { name: "desiredDate", label: "Desired date", type: "date" },
+        { name: "desiredDate", label: "Data desejada", type: "date" },
         {
           name: "priority",
-          label: "Priority",
+          label: "Prioridade",
           type: "select",
           options: [
-            { value: "low", label: "Low" },
+            { value: "low", label: "Baixa" },
             { value: "normal", label: "Normal" },
-            { value: "high", label: "High" },
+            { value: "high", label: "Alta" },
           ],
         },
         {
@@ -177,34 +177,34 @@ export function PurchaseFormDialog({
           label: "Status",
           type: "select",
           options: [
-            { value: "planned", label: "Planned" },
-            { value: "saving", label: "Saving" },
-            { value: "bought", label: "Bought" },
+            { value: "planned", label: "Planejada" },
+            { value: "saving", label: "Guardando" },
+            { value: "bought", label: "Comprada" },
           ],
         },
         {
           name: "paid",
-          label: "Price paid (BRL)",
+          label: "Preço pago (R$)",
           type: "number",
           min: 0,
-          hint: "When bought.",
+          hint: "Quando comprada.",
         },
         {
           name: "goalId",
-          label: "Goal",
+          label: "Meta",
           type: "select",
           optional: true,
           options: goals.map((g) => ({ value: g.id, label: g.name })),
         },
-        { name: "description", label: "Notes", type: "textarea", rows: 2 },
+        { name: "description", label: "Notas", type: "textarea", rows: 2 },
       ]}
       onSubmit={(values) => {
         if (item) {
           dataActions.update("purchases", item.id, values);
-          toast.success("Purchase updated");
+          toast.success("Compra atualizada");
         } else {
           dataActions.create("purchases", values);
-          toast.success("Purchase added");
+          toast.success("Compra adicionada");
         }
       }}
     />

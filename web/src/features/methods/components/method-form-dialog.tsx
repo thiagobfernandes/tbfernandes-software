@@ -100,11 +100,11 @@ function MethodForm({
     };
     if (method) {
       dataActions.update("methods", method.id, data);
-      toast.success("Method updated");
+      toast.success("Método atualizado");
       onSaved?.({ ...method, ...data });
     } else {
       const created = dataActions.create("methods", data);
-      toast.success(`Method "${created.title}" created`);
+      toast.success(`Método "${created.title}" criado`);
       onSaved?.(created);
     }
     onDone();
@@ -113,9 +113,9 @@ function MethodForm({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>{method ? "Edit method" : "New method"}</DialogTitle>
+        <DialogTitle>{method ? "Editar método" : "Novo método"}</DialogTitle>
         <DialogDescription>
-          A repeatable workflow: ordered steps, plus templates to copy.
+          Um fluxo repetível: passos em ordem, mais modelos para copiar.
         </DialogDescription>
       </DialogHeader>
       <form
@@ -126,7 +126,7 @@ function MethodForm({
       >
         <FormField
           id="method-title"
-          label="Title"
+          label="Título"
           required
           error={errors.title?.message}
         >
@@ -137,7 +137,7 @@ function MethodForm({
             {...form.register("title")}
           />
         </FormField>
-        <FormField id="method-category" label="Category">
+        <FormField id="method-category" label="Categoria">
           <Controller
             control={form.control}
             name="category"
@@ -164,7 +164,7 @@ function MethodForm({
         </FormField>
         <FormField
           id="method-summary"
-          label="Summary"
+          label="Resumo"
           required
           error={errors.summary?.message}
           className="sm:col-span-2"
@@ -191,7 +191,7 @@ function MethodForm({
 
         <fieldset className="flex flex-col gap-2 sm:col-span-2">
           <legend className="mb-2 text-sm font-medium">
-            Steps<span className="text-destructive">*</span>
+            Passos<span className="text-destructive">*</span>
           </legend>
           <ol className="flex flex-col gap-2">
             {steps.fields.map((field, index) => (
@@ -201,8 +201,8 @@ function MethodForm({
                 </span>
                 <div className="flex flex-1 flex-col gap-1.5">
                   <Input
-                    aria-label={`Step ${index + 1} title`}
-                    placeholder="What to do"
+                    aria-label={`Título do passo ${index + 1}`}
+                    placeholder="O que fazer"
                     aria-invalid={Boolean(errors.steps?.[index]?.title)}
                     {...form.register(`steps.${index}.title`)}
                   />
@@ -212,8 +212,8 @@ function MethodForm({
                     </p>
                   )}
                   <Textarea
-                    aria-label={`Step ${index + 1} detail`}
-                    placeholder="How, or why it matters (optional)"
+                    aria-label={`Detalhe do passo ${index + 1}`}
+                    placeholder="Como fazer, ou por que importa (opcional)"
                     rows={1}
                     className="min-h-9"
                     {...form.register(`steps.${index}.detail`)}
@@ -224,7 +224,7 @@ function MethodForm({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Move step up"
+                    aria-label="Mover passo para cima"
                     disabled={index === 0}
                     onClick={() => steps.move(index, index - 1)}
                   >
@@ -234,7 +234,7 @@ function MethodForm({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Move step down"
+                    aria-label="Mover passo para baixo"
                     disabled={index === steps.fields.length - 1}
                     onClick={() => steps.move(index, index + 1)}
                   >
@@ -244,7 +244,7 @@ function MethodForm({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Remove step"
+                    aria-label="Remover passo"
                     disabled={steps.fields.length === 1}
                     onClick={() => steps.remove(index)}
                   >
@@ -266,25 +266,25 @@ function MethodForm({
             className="w-fit"
             onClick={() => steps.append({ title: "", detail: "" })}
           >
-            <Plus /> Add step
+            <Plus /> Adicionar passo
           </Button>
         </fieldset>
 
         <fieldset className="flex flex-col gap-2 sm:col-span-2">
           <legend className="mb-2 text-sm font-medium">
-            Examples and templates
+            Exemplos e modelos
           </legend>
           {examples.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 rounded-xl border p-2.5">
               <div className="flex flex-1 flex-col gap-1.5">
                 <Input
-                  aria-label={`Example ${index + 1} title`}
-                  placeholder="e.g. Message template"
+                  aria-label={`Título do exemplo ${index + 1}`}
+                  placeholder="ex.: Modelo de mensagem"
                   aria-invalid={Boolean(errors.examples?.[index]?.title)}
                   {...form.register(`examples.${index}.title`)}
                 />
                 <Textarea
-                  aria-label={`Example ${index + 1} content`}
+                  aria-label={`Conteúdo do exemplo ${index + 1}`}
                   className="min-h-20 font-mono text-xs"
                   aria-invalid={Boolean(errors.examples?.[index]?.content)}
                   {...form.register(`examples.${index}.content`)}
@@ -301,7 +301,7 @@ function MethodForm({
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                aria-label="Remove example"
+                aria-label="Remover exemplo"
                 onClick={() => examples.remove(index)}
               >
                 <X />
@@ -315,16 +315,16 @@ function MethodForm({
             className="w-fit"
             onClick={() => examples.append({ title: "", content: "" })}
           >
-            <Plus /> Add example
+            <Plus /> Adicionar exemplo
           </Button>
         </fieldset>
       </form>
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="outline">Cancel</Button>
+          <Button variant="outline">Cancelar</Button>
         </DialogClose>
         <Button type="submit" form="method-form">
-          {method ? "Save changes" : "Create method"}
+          {method ? "Salvar alterações" : "Criar método"}
         </Button>
       </DialogFooter>
     </>

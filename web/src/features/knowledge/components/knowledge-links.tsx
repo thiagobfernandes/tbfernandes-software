@@ -26,7 +26,7 @@ export function KnowledgeLinkChips({
   if (!projects.length && !tasks.length) {
     return (
       <p className={cn("text-xs text-muted-foreground", className)}>
-        Not linked to any project or task.
+        Sem vínculo com projeto ou tarefa.
       </p>
     );
   }
@@ -102,7 +102,7 @@ export function TagFilter({
   return (
     <div
       role="group"
-      aria-label="Filter by tag"
+      aria-label="Filtrar por tag"
       className="flex flex-wrap gap-1.5"
     >
       {tags.map((tag) => {

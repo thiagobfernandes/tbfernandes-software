@@ -14,13 +14,13 @@ export function SettingsPage() {
   return (
     <PageContainer>
       <PageHeading
-        title="Settings"
-        description="Preferences for this device."
+        title="Configurações"
+        description="Preferências deste dispositivo."
       />
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Appearance</CardTitle>
-          <CardDescription>Choose how the interface looks.</CardDescription>
+          <CardTitle className="text-base">Aparência</CardTitle>
+          <CardDescription>Escolha a aparência da interface.</CardDescription>
         </CardHeader>
         <CardContent>
           <AppearanceSettings />
@@ -28,9 +28,10 @@ export function SettingsPage() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Data</CardTitle>
+          <CardTitle className="text-base">Dados</CardTitle>
           <CardDescription>
-            Where your records are kept, and a JSON copy of all of them.
+            Onde seus registros ficam guardados, e uma cópia em JSON de todos
+            eles.
           </CardDescription>
         </CardHeader>
         <CardContent>

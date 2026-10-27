@@ -77,7 +77,7 @@ export function LearningPage() {
       <StudyFormDialog
         trigger={
           <Button>
-            <Plus /> New study
+            <Plus /> Novo estudo
           </Button>
         }
       />
@@ -86,7 +86,7 @@ export function LearningPage() {
       <MaterialFormDialog
         trigger={
           <Button>
-            <Plus /> New material
+            <Plus /> Novo material
           </Button>
         }
       />
@@ -95,7 +95,7 @@ export function LearningPage() {
       <SkillFormDialog
         trigger={
           <Button>
-            <Plus /> New skill
+            <Plus /> Nova habilidade
           </Button>
         }
       />
@@ -104,7 +104,7 @@ export function LearningPage() {
       <EducationFormDialog
         trigger={
           <Button>
-            <Plus /> New education
+            <Plus /> Nova formação
           </Button>
         }
       />
@@ -114,8 +114,8 @@ export function LearningPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Learning"
-        description="Studies, the materials behind them, and the skills they build."
+        title="Aprendizado"
+        description="Estudos, os materiais por trás deles e as habilidades que constroem."
         actions={
           <>
             <SampleDataBadge />
@@ -124,9 +124,9 @@ export function LearningPage() {
         }
       />
 
-      <section aria-label="Key numbers" className="grid gap-4 sm:grid-cols-3">
+      <section aria-label="Indicadores" className="grid gap-4 sm:grid-cols-3">
         <MetricCard
-          label="Studies in progress"
+          label="Estudos em andamento"
           value={activeStudies}
           unit={`/ ${data.studies.length}`}
           visual={
@@ -137,7 +137,7 @@ export function LearningPage() {
           }
         />
         <MetricCard
-          label="Materials consumed"
+          label="Materiais consumidos"
           value={doneMaterials}
           unit={`/ ${data.materials.length}`}
           visual={
@@ -148,27 +148,27 @@ export function LearningPage() {
           }
         />
         <MetricCard
-          label="In the queue"
+          label="Na fila"
           value={queue}
-          unit="to consume"
+          unit="a consumir"
           visual={<DotRow active={queue} total={6} />}
         />
       </section>
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
-          <TabsTrigger value="studies">Studies</TabsTrigger>
-          <TabsTrigger value="materials">Materials</TabsTrigger>
-          <TabsTrigger value="skills">Skills</TabsTrigger>
-          <TabsTrigger value="education">Education</TabsTrigger>
+          <TabsTrigger value="studies">Estudos</TabsTrigger>
+          <TabsTrigger value="materials">Materiais</TabsTrigger>
+          <TabsTrigger value="skills">Habilidades</TabsTrigger>
+          <TabsTrigger value="education">Formação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="studies" className="mt-2">
           {data.studies.length === 0 ? (
             <EmptyState
               icon={GraduationCap}
-              title="No studies yet"
-              description="Start a study to group materials around a topic."
+              title="Nenhum estudo ainda"
+              description="Comece um estudo para agrupar materiais em torno de um tema."
             />
           ) : (
             <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
@@ -207,17 +207,17 @@ export function LearningPage() {
                         <Button
                           variant="ghost"
                           size="icon-sm"
-                          aria-label="Edit study"
+                          aria-label="Editar estudo"
                           onClick={() => setEditingStudy(study)}
                         >
                           <Pencil />
                         </Button>
                         <ConfirmDelete
-                          noun="study"
+                          noun="estudo"
                           name={study.name}
                           onConfirm={() => {
                             dataActions.remove("studies", study.id);
-                            toast.success("Study deleted");
+                            toast.success("Estudo excluído");
                           }}
                         />
                       </div>
@@ -225,7 +225,7 @@ export function LearningPage() {
                     {study.nextActivity && (
                       <div className="rounded-xl border border-l-4 border-l-primary px-3 py-2 text-sm">
                         <span className="text-xs text-muted-foreground">
-                          Next activity
+                          Próxima atividade
                         </span>
                         <p>{study.nextActivity}</p>
                       </div>
@@ -234,13 +234,13 @@ export function LearningPage() {
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>
                           {materials.filter(consumed).length}/{materials.length}{" "}
-                          materials consumed
+                          materiais consumidos
                         </span>
                         <span className="tabular-nums">{percent}%</span>
                       </div>
                       <ProgressBar
                         value={percent}
-                        label={`${study.name} materials consumed`}
+                        label={`${study.name} materiais consumidos`}
                       />
                     </div>
                     {skills.length > 0 && (
@@ -293,10 +293,10 @@ export function LearningPage() {
               <thead>
                 <tr className="border-b text-left text-xs text-muted-foreground">
                   <th className="px-4 py-3 font-medium">Material</th>
-                  <th className="px-4 py-3 font-medium">Study</th>
+                  <th className="px-4 py-3 font-medium">Estudo</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">Ações</span>
                   </th>
                 </tr>
               </thead>
@@ -327,7 +327,7 @@ export function LearningPage() {
                                   href={material.url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  aria-label={`Open ${material.title}`}
+                                  aria-label={`Abrir ${material.title}`}
                                   className="text-muted-foreground hover:text-primary"
                                 >
                                   <ExternalLink className="size-3.5" />
@@ -355,7 +355,7 @@ export function LearningPage() {
                         >
                           <SelectTrigger
                             size="sm"
-                            aria-label={`Status of ${material.title}`}
+                            aria-label={`Status de ${material.title}`}
                             className={cn(
                               "w-36",
                               consumed(material) && "text-success",
@@ -382,7 +382,7 @@ export function LearningPage() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            aria-label="Edit material"
+                            aria-label="Editar material"
                             onClick={() => setEditingMaterial(material)}
                           >
                             <Pencil />
@@ -422,7 +422,7 @@ export function LearningPage() {
                     </div>
                     <div
                       role="radiogroup"
-                      aria-label={`${skill.name} level`}
+                      aria-label={`Nível de ${skill.name}`}
                       className="flex gap-1"
                     >
                       {[1, 2, 3, 4, 5].map((level) => (
@@ -431,7 +431,7 @@ export function LearningPage() {
                           type="button"
                           role="radio"
                           aria-checked={skill.level === level}
-                          aria-label={`Level ${level}: ${skillLevelLabels[level]}`}
+                          aria-label={`Nível ${level}: ${skillLevelLabels[level]}`}
                           onClick={() =>
                             dataActions.update("skills", skill.id, { level })
                           }
@@ -443,20 +443,20 @@ export function LearningPage() {
                       ))}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {skill.evidence || "No evidence recorded yet."}
+                      {skill.evidence || "Nenhuma evidência registrada ainda."}
                     </p>
                   </div>
                   <div className="flex shrink-0">
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label="Edit skill"
+                      aria-label="Editar habilidade"
                       onClick={() => setEditingSkill(skill)}
                     >
                       <Pencil />
                     </Button>
                     <ConfirmDelete
-                      noun="skill"
+                      noun="habilidade"
                       name={skill.name}
                       onConfirm={() => dataActions.remove("skills", skill.id)}
                     />
@@ -493,13 +493,13 @@ export function LearningPage() {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Edit education"
+                    aria-label="Editar formação"
                     onClick={() => setEditingEducation(education)}
                   >
                     <Pencil />
                   </Button>
                   <ConfirmDelete
-                    noun="education"
+                    noun="formação"
                     name={education.course}
                     onConfirm={() =>
                       dataActions.remove("educations", education.id)

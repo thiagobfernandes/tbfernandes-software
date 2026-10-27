@@ -28,28 +28,30 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
   return [
     ...pages.map((page) => ({
       id: `page:${page.href}`,
-      group: "Pages",
+      group: "Páginas",
       title: page.title,
       href: page.href,
     })),
     ...data.tasks.map((task) => ({
       id: `task:${task.id}`,
-      group: "Tasks",
+      group: "Tarefas",
       title: task.title,
-      subtitle: task.projectId ? projectName.get(task.projectId) : "No project",
+      subtitle: task.projectId
+        ? projectName.get(task.projectId)
+        : "Sem projeto",
       href: `/tasks?q=${encodeURIComponent(task.title)}`,
       keywords: `${task.description ?? ""} ${task.tag ?? ""}`,
     })),
     ...data.projects.map((project) => ({
       id: `project:${project.id}`,
-      group: "Projects",
+      group: "Projetos",
       title: project.name,
       subtitle: project.description,
       href: `/projects/${project.id}`,
     })),
     ...data.companies.map((company) => ({
       id: `company:${company.id}`,
-      group: "Companies",
+      group: "Empresas",
       title: company.name,
       subtitle: company.tradeName,
       href: `/companies/${company.id}`,
@@ -57,14 +59,14 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
     })),
     ...data.goals.map((goal) => ({
       id: `goal:${goal.id}`,
-      group: "Goals",
+      group: "Metas",
       title: goal.name,
       subtitle: goal.desiredResult,
       href: `/goals/${goal.id}`,
     })),
     ...data.notes.map((note) => ({
       id: `note:${note.id}`,
-      group: "Notes",
+      group: "Notas",
       title: note.title,
       subtitle: note.tags.map((tag) => `#${tag}`).join(" "),
       href: `/knowledge?note=${note.id}`,
@@ -80,14 +82,14 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
     })),
     ...data.methods.map((method) => ({
       id: `method:${method.id}`,
-      group: "Methods",
+      group: "Métodos",
       title: method.title,
       subtitle: method.summary,
       href: `/methods/${method.id}`,
     })),
     ...data.contacts.map((contact) => ({
       id: `contact:${contact.id}`,
-      group: "Contacts",
+      group: "Contatos",
       title: contact.name,
       subtitle: contact.role,
       href: `/contacts?contact=${contact.id}`,
@@ -95,14 +97,14 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
     })),
     ...data.studies.map((study) => ({
       id: `study:${study.id}`,
-      group: "Learning",
+      group: "Aprendizado",
       title: study.name,
       subtitle: study.nextActivity,
       href: "/learning",
     })),
     ...data.purchases.map((purchase) => ({
       id: `purchase:${purchase.id}`,
-      group: "Purchases",
+      group: "Compras",
       title: purchase.name,
       href: "/finance/purchases",
     })),

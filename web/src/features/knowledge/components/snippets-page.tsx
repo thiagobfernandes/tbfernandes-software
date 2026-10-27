@@ -54,14 +54,14 @@ export function SnippetsPage() {
     <PageContainer className="max-w-none">
       <PageHeading
         title="Snippets"
-        description="Reusable code with an explanation of when to use it."
+        description="Código reutilizável com uma explicação de quando usar."
         actions={
           <>
             <SampleDataBadge />
             <SnippetFormDialog
               trigger={
                 <Button>
-                  <Plus /> New snippet
+                  <Plus /> Novo snippet
                 </Button>
               }
             />
@@ -72,30 +72,30 @@ export function SnippetsPage() {
       {snippets.length === 0 ? (
         <EmptyState
           icon={Code2}
-          title="No snippets yet"
-          description="Save commands, queries and patterns you look up more than once."
+          title="Nenhum snippet ainda"
+          description="Guarde comandos, consultas e padrões que você procura mais de uma vez."
         />
       ) : (
         <>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2 sm:flex-row">
               <label className="relative flex-1 sm:max-w-sm">
-                <span className="sr-only">Search snippets</span>
+                <span className="sr-only">Buscar snippets</span>
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search title, code or tag"
+                  placeholder="Buscar por título, código ou tag"
                   className="pl-9"
                 />
               </label>
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="sm:w-44" aria-label="Language">
+                <SelectTrigger className="sm:w-44" aria-label="Linguagem">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL}>All languages</SelectItem>
+                  <SelectItem value={ALL}>Todas as linguagens</SelectItem>
                   {languages.map((value) => (
                     <SelectItem key={value} value={value}>
                       {value}
@@ -113,7 +113,7 @@ export function SnippetsPage() {
 
           {visible.length === 0 ? (
             <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
-              No snippets match these filters.
+              Nenhum snippet com esses filtros.
             </p>
           ) : (
             <div className="grid gap-4 xl:grid-cols-2">
@@ -138,7 +138,7 @@ export function SnippetsPage() {
                             href={snippet.sourceUrl}
                             target="_blank"
                             rel="noreferrer"
-                            aria-label="Open source"
+                            aria-label="Abrir origem"
                           >
                             <ExternalLink />
                           </a>
@@ -147,7 +147,7 @@ export function SnippetsPage() {
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label="Edit snippet"
+                        aria-label="Editar snippet"
                         onClick={() => setEditing(snippet)}
                       >
                         <Pencil />
@@ -157,7 +157,7 @@ export function SnippetsPage() {
                         name={snippet.title}
                         onConfirm={() => {
                           dataActions.remove("snippets", snippet.id);
-                          toast.success("Snippet deleted");
+                          toast.success("Snippet excluído");
                         }}
                       />
                     </div>

@@ -58,8 +58,8 @@ export function KnowledgePage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Notes"
-        description="Programming notes in Markdown, linked to projects and tasks."
+        title="Notas"
+        description="Notas de programação em Markdown, vinculadas a projetos e tarefas."
         actions={
           <>
             <SampleDataBadge />
@@ -67,7 +67,7 @@ export function KnowledgePage() {
               onSaved={(note) => select(note.id)}
               trigger={
                 <Button>
-                  <Plus /> New note
+                  <Plus /> Nova nota
                 </Button>
               }
             />
@@ -78,20 +78,20 @@ export function KnowledgePage() {
       {notes.length === 0 ? (
         <EmptyState
           icon={BookOpen}
-          title="No notes yet"
-          description="Capture how you solved a problem, then link it to the project or task."
+          title="Nenhuma nota ainda"
+          description="Registre como você resolveu um problema e vincule ao projeto ou tarefa."
         />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
           <aside className="flex flex-col gap-3">
             <label className="relative">
-              <span className="sr-only">Search notes</span>
+              <span className="sr-only">Buscar notas</span>
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search title, content or tag"
+                placeholder="Buscar por título, conteúdo ou tag"
                 className="pl-9"
               />
             </label>
@@ -103,7 +103,7 @@ export function KnowledgePage() {
             <ul className="flex flex-col gap-2">
               {visible.length === 0 && (
                 <li className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
-                  No notes match.
+                  Nenhuma nota encontrada.
                 </li>
               )}
               {visible.map((note) => (
@@ -120,7 +120,7 @@ export function KnowledgePage() {
                   >
                     <span className="text-sm font-medium">{note.title}</span>
                     <span className="line-clamp-2 text-xs text-muted-foreground">
-                      {excerpt(note.body) || "Empty note"}
+                      {excerpt(note.body) || "Nota vazia"}
                     </span>
                     <span className="flex items-center justify-between gap-2">
                       <TagList tags={note.tags.slice(0, 3)} />
@@ -145,24 +145,24 @@ export function KnowledgePage() {
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label="Edit note"
+                      aria-label="Editar nota"
                       onClick={() => setEditing(true)}
                     >
                       <Pencil />
                     </Button>
                     <ConfirmDelete
-                      noun="note"
+                      noun="nota"
                       name={selected.title}
                       onConfirm={() => {
                         dataActions.remove("notes", selected.id);
                         select(undefined);
-                        toast.success("Note deleted");
+                        toast.success("Nota excluída");
                       }}
                     />
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Updated {formatShort(selected.updatedAt)} · created{" "}
+                  Atualizada em {formatShort(selected.updatedAt)} · criada em{" "}
                   {formatShort(selected.createdAt)}
                 </p>
                 <TagList tags={selected.tags} />
@@ -172,7 +172,7 @@ export function KnowledgePage() {
                 <Markdown>{selected.body}</Markdown>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  This note is empty.
+                  Esta nota está vazia.
                 </p>
               )}
               <NoteFormDialog
@@ -184,8 +184,8 @@ export function KnowledgePage() {
           ) : (
             <EmptyState
               icon={BookOpen}
-              title="Select a note"
-              description="Pick a note on the left to read it."
+              title="Selecione uma nota"
+              description="Escolha uma nota à esquerda para ler."
             />
           )}
         </div>

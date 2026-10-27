@@ -26,10 +26,10 @@ const statusStyles: Record<GoalStatus, string> = {
 };
 
 const statusLabels: Record<GoalStatus, string> = {
-  planned: "Planned",
-  active: "Active",
-  paused: "Paused",
-  completed: "Completed",
+  planned: "Planejada",
+  active: "Ativa",
+  paused: "Pausada",
+  completed: "Concluída",
 };
 
 export function GoalStatusBadge({ status }: { status: GoalStatus }) {

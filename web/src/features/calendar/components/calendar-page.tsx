@@ -35,7 +35,7 @@ import { useAppData } from "@/lib/sample-data/store";
 import { useToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
-const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 const MAX_CHIPS = 3;
 
 // Icon and tint per kind: the icon carries the meaning, the tint helps scanning.
@@ -85,14 +85,14 @@ const kindStyles: Record<
   },
 };
 
-const longDay = new Intl.DateTimeFormat("en", {
+const longDay = new Intl.DateTimeFormat("pt-BR", {
   weekday: "long",
   month: "long",
   day: "numeric",
   timeZone: "UTC",
 });
 
-const monthFormat = new Intl.DateTimeFormat("en", {
+const monthFormat = new Intl.DateTimeFormat("pt-BR", {
   month: "long",
   year: "numeric",
   timeZone: "UTC",
@@ -151,14 +151,14 @@ export function CalendarPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Calendar"
-        description="Every date in one place: tasks, deadlines, milestones, follow-ups and renewals."
+        title="Calendário"
+        description="Todas as datas em um só lugar: tarefas, prazos, marcos, follow-ups e renovações."
         actions={<SampleDataBadge />}
       />
 
       <div
         role="group"
-        aria-label="Show on calendar"
+        aria-label="Mostrar no calendário"
         className="flex flex-wrap gap-2"
       >
         {eventKinds.map((kind) => {
@@ -186,7 +186,7 @@ export function CalendarPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <section
-          aria-label="Month"
+          aria-label="Mês"
           className="flex flex-col gap-4 rounded-2xl border bg-card p-4 md:p-5"
         >
           <div className="flex items-center justify-between gap-2">
@@ -195,12 +195,12 @@ export function CalendarPage() {
             </h2>
             <div className="flex gap-1">
               <Button variant="outline" size="sm" onClick={goToToday}>
-                Today
+                Hoje
               </Button>
               <Button
                 variant="outline"
                 size="icon-sm"
-                aria-label="Previous month"
+                aria-label="Mês anterior"
                 onClick={() => setMonthOffset((value) => value - 1)}
               >
                 <ChevronLeft />
@@ -208,7 +208,7 @@ export function CalendarPage() {
               <Button
                 variant="outline"
                 size="icon-sm"
-                aria-label="Next month"
+                aria-label="Próximo mês"
                 onClick={() => setMonthOffset((value) => value + 1)}
               >
                 <ChevronRight />
@@ -237,7 +237,7 @@ export function CalendarPage() {
                   type="button"
                   onClick={() => setSelectedDay(cell)}
                   aria-pressed={isSelected}
-                  aria-label={`${longDay.format(date)}, ${events.length} item${events.length === 1 ? "" : "s"}`}
+                  aria-label={`${longDay.format(date)}, ${events.length} ${events.length === 1 ? "item" : "itens"}`}
                   className={cn(
                     "flex min-h-14 flex-col items-center gap-1 rounded-lg border border-transparent p-1 text-left transition-colors outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 md:min-h-28 md:items-stretch md:p-1.5",
                     !inMonth && "text-muted-foreground/50",
@@ -274,7 +274,7 @@ export function CalendarPage() {
                     ))}
                     {events.length > MAX_CHIPS && (
                       <span className="px-1 text-[11px] text-muted-foreground">
-                        +{events.length - MAX_CHIPS} more
+                        +{events.length - MAX_CHIPS} mais
                       </span>
                     )}
                   </span>
@@ -286,28 +286,28 @@ export function CalendarPage() {
 
         <aside className="flex flex-col gap-6">
           <section
-            aria-label="Selected day"
+            aria-label="Dia selecionado"
             className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
           >
             <h2 className="text-sm font-semibold">
-              {day === today ? "Today · " : ""}
+              {day === today ? "Hoje · " : ""}
               {longDay.format(parseDay(day))}
             </h2>
             <EventList
               events={byDay.get(day) ?? []}
               today={today}
               onOpenTask={setTaskId}
-              empty="Nothing on this day."
+              empty="Nada neste dia."
             />
           </section>
 
           {overdue.length > 0 && (
             <section
-              aria-label="Overdue"
+              aria-label="Atrasados"
               className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
             >
               <h2 className="text-sm font-semibold">
-                Overdue{" "}
+                Atrasados{" "}
                 <span className="font-normal text-muted-foreground">
                   ({overdue.length})
                 </span>
@@ -322,11 +322,11 @@ export function CalendarPage() {
           )}
 
           <section
-            aria-label="Next 14 days"
+            aria-label="Próximos 14 dias"
             className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
           >
             <h2 className="text-sm font-semibold">
-              Next 14 days{" "}
+              Próximos 14 dias{" "}
               <span className="font-normal text-muted-foreground">
                 ({upcoming.length})
               </span>
@@ -336,7 +336,7 @@ export function CalendarPage() {
               today={today}
               onOpenTask={setTaskId}
               showDay
-              empty="Nothing scheduled."
+              empty="Nada agendado."
             />
           </section>
         </aside>
@@ -413,7 +413,7 @@ function EventList({
               <span className="text-xs text-muted-foreground">
                 {eventKindLabels[event.kind]}
                 {showDay &&
-                  ` · ${diff === 0 ? "today" : diff === 1 ? "tomorrow" : diff < 0 ? `${-diff}d ago` : `in ${diff}d`}`}
+                  ` · ${diff === 0 ? "hoje" : diff === 1 ? "amanhã" : diff < 0 ? `há ${-diff}d` : `em ${diff}d`}`}
               </span>
             </span>
           </>

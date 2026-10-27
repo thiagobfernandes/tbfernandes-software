@@ -21,13 +21,13 @@ export const metadata: Metadata = {
     default: "TBFernandes Software",
     template: "%s · TBFernandes",
   },
-  description: "Personal and professional management platform.",
+  description: "Plataforma de gestão pessoal e profissional.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >

@@ -28,15 +28,15 @@ export function ProjectsPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Projects"
-        description="Professional, personal, and study projects grouped by outcome."
+        title="Projetos"
+        description="Projetos profissionais, pessoais e de estudo agrupados por resultado."
         actions={
           <>
             <SampleDataBadge />
             <ProjectFormDialog
               trigger={
                 <Button>
-                  <Plus /> New project
+                  <Plus /> Novo projeto
                 </Button>
               }
             />
@@ -47,10 +47,10 @@ export function ProjectsPage() {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">
-            <LayoutGrid /> Overview
+            <LayoutGrid /> Visão geral
           </TabsTrigger>
           <TabsTrigger value="timeline">
-            <GanttChart /> Timeline
+            <GanttChart /> Linha do tempo
           </TabsTrigger>
         </TabsList>
 

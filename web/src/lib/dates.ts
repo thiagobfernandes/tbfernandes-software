@@ -21,7 +21,7 @@ export function daysBetween(from: string, to: string) {
   );
 }
 
-const shortFormat = new Intl.DateTimeFormat("en", {
+const shortFormat = new Intl.DateTimeFormat("pt-BR", {
   month: "short",
   day: "numeric",
   timeZone: "UTC",
@@ -32,7 +32,7 @@ export function formatShort(day: string) {
 }
 
 export function weekdayInitial(day: string) {
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("pt-BR", {
     weekday: "narrow",
     timeZone: "UTC",
   }).format(parseDay(day));
@@ -43,12 +43,13 @@ export function isWeekend(day: string) {
   return weekday === 0 || weekday === 6;
 }
 
-/** "Overdue 2d", "Due today", "Due tomorrow", "Due in 4d" or "Due Oct 30". */
+/** "Atrasada 2d", "Vence hoje", "Vence amanhã", "Vence em 4d" ou "Vence 30 de out.". */
 export function describeDue(dueDate: string, today: string) {
   const diff = daysBetween(today, dueDate);
-  if (diff < 0) return { label: `Overdue ${-diff}d`, tone: "overdue" as const };
-  if (diff === 0) return { label: "Due today", tone: "soon" as const };
-  if (diff === 1) return { label: "Due tomorrow", tone: "soon" as const };
-  if (diff <= 7) return { label: `Due in ${diff}d`, tone: "normal" as const };
-  return { label: `Due ${formatShort(dueDate)}`, tone: "normal" as const };
+  if (diff < 0)
+    return { label: `Atrasada ${-diff}d`, tone: "overdue" as const };
+  if (diff === 0) return { label: "Vence hoje", tone: "soon" as const };
+  if (diff === 1) return { label: "Vence amanhã", tone: "soon" as const };
+  if (diff <= 7) return { label: `Vence em ${diff}d`, tone: "normal" as const };
+  return { label: `Vence ${formatShort(dueDate)}`, tone: "normal" as const };
 }

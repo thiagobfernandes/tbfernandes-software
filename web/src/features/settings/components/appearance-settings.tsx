@@ -7,9 +7,9 @@ import { useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
 const options = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
+  { value: "light", label: "Claro", icon: Sun },
+  { value: "dark", label: "Escuro", icon: Moon },
+  { value: "system", label: "Sistema", icon: Monitor },
 ] as const;
 
 const subscribe = () => () => {};
@@ -26,7 +26,7 @@ export function AppearanceSettings() {
   return (
     <div
       role="radiogroup"
-      aria-label="Theme"
+      aria-label="Tema"
       className="grid gap-3 sm:grid-cols-3"
     >
       {options.map(({ value, label, icon: Icon }) => {

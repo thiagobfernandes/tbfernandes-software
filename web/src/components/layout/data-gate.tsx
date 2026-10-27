@@ -43,15 +43,15 @@ function ApiGate({ children }: { children: React.ReactNode }) {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CloudOff className="size-6 text-muted-foreground" aria-hidden />
-            <CardTitle>The API is not answering</CardTitle>
+            <CardTitle>A API não está respondendo</CardTitle>
             <CardDescription>
-              Start it with <code>cd api && ./mvnw spring-boot:run</code> and
-              try again. ({status.message})
+              Inicie-a com <code>cd api && ./mvnw spring-boot:run</code> e tente
+              de novo. ({status.message})
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => void reload()}>
-              <RotateCw /> Try again
+              <RotateCw /> Tentar de novo
             </Button>
           </CardContent>
         </Card>
@@ -77,7 +77,7 @@ function SignIn() {
       setError(
         failure instanceof ApiError
           ? failure.message
-          : "The API could not be reached",
+          : "Não foi possível acessar a API",
       );
     } finally {
       setBusy(false);
@@ -90,9 +90,9 @@ function SignIn() {
         <CardHeader className="items-start gap-3">
           <BrandMark />
           <div className="flex flex-col gap-1">
-            <CardTitle>Sign in</CardTitle>
+            <CardTitle>Entrar</CardTitle>
             <CardDescription>
-              Use the account set up for this API.
+              Use a conta configurada para esta API.
             </CardDescription>
           </div>
         </CardHeader>
@@ -108,7 +108,7 @@ function SignIn() {
                 required
               />
             </FormField>
-            <FormField id="password" label="Password" required error={error}>
+            <FormField id="password" label="Senha" required error={error}>
               <Input
                 id="password"
                 type="password"
@@ -120,7 +120,7 @@ function SignIn() {
               />
             </FormField>
             <Button type="submit" disabled={busy || !email || !password}>
-              <LogIn /> {busy ? "Signing in…" : "Sign in"}
+              <LogIn /> {busy ? "Entrando…" : "Entrar"}
             </Button>
           </form>
         </CardContent>

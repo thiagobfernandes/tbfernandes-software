@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { CertificationsPage } from "@/features/learning/components/certifications-page";
 
-export const metadata: Metadata = { title: "Certifications" };
+export const metadata: Metadata = { title: "Certificações" };
 
 export default function Page() {
   return <CertificationsPage />;

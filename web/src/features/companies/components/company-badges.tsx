@@ -1,14 +1,15 @@
-import type {
-  CompanyRelationship,
-  CompanyStatus,
+import {
+  companyStatusLabels,
+  type CompanyRelationship,
+  type CompanyStatus,
 } from "@/features/projects/types/project";
 import { cn } from "@/lib/utils";
 
 const relationshipLabels: Record<CompanyRelationship, string> = {
-  contractor: "Contractor",
-  client: "Client",
-  partner: "Partner",
-  own: "My company",
+  contractor: "Contratante",
+  client: "Cliente",
+  partner: "Parceira",
+  own: "Minha empresa",
 };
 
 const statusStyles: Record<CompanyStatus, string> = {
@@ -38,7 +39,7 @@ export function CompanyStatusLabel({ status }: { status: CompanyStatus }) {
       )}
     >
       <span aria-hidden className="size-1.5 rounded-full bg-current" />
-      {status}
+      {companyStatusLabels[status]}
     </span>
   );
 }

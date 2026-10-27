@@ -48,7 +48,9 @@ export function AppSidebar() {
           variant="ghost"
           size="icon-sm"
           onClick={toggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={
+            collapsed ? "Expandir menu lateral" : "Recolher menu lateral"
+          }
         >
           {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
         </Button>

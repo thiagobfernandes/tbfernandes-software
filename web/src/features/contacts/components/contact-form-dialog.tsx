@@ -25,10 +25,10 @@ export function ContactFormDialog({
     <EntityFormDialog
       {...dialog}
       className="sm:max-w-2xl"
-      title={item ? "Edit contact" : "New contact"}
-      description="Record why the relationship matters, not just how to reach the person."
+      title={item ? "Editar contato" : "Novo contato"}
+      description="Registre por que a relação importa, não só como falar com a pessoa."
       schema={contactSchema}
-      submitLabel={item ? "Save changes" : "Add contact"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar contato"}
       defaults={{
         name: item?.name ?? "",
         role: item?.role ?? "",
@@ -43,47 +43,47 @@ export function ContactFormDialog({
         notes: item?.notes ?? "",
       }}
       fields={[
-        { name: "name", label: "Name", type: "text", required: true },
-        { name: "role", label: "Role", type: "text" },
+        { name: "name", label: "Nome", type: "text", required: true },
+        { name: "role", label: "Cargo", type: "text" },
         {
           name: "companyId",
-          label: "Company",
+          label: "Empresa",
           type: "select",
           optional: true,
           options: companies.map((c) => ({ value: c.id, label: c.name })),
         },
         {
           name: "companyName",
-          label: "Other organization",
+          label: "Outra organização",
           type: "text",
-          hint: "When it is not one of your companies.",
+          hint: "Quando não for uma das suas empresas.",
         },
-        { name: "email", label: "Email", type: "text" },
-        { name: "phone", label: "Phone", type: "text" },
+        { name: "email", label: "E-mail", type: "text" },
+        { name: "phone", label: "Telefone", type: "text" },
         {
           name: "profileUrl",
-          label: "Profile link",
+          label: "Link do perfil",
           type: "url",
           placeholder: "https://",
         },
-        { name: "nextContact", label: "Next contact", type: "date" },
-        { name: "specialties", label: "Specialties", type: "tags" },
+        { name: "nextContact", label: "Próximo contato", type: "date" },
+        { name: "specialties", label: "Especialidades", type: "tags" },
         {
           name: "context",
-          label: "How you met and why it matters",
+          label: "Como vocês se conheceram e por que importa",
           type: "textarea",
           rows: 2,
         },
-        { name: "notes", label: "Notes", type: "textarea", rows: 2 },
+        { name: "notes", label: "Notas", type: "textarea", rows: 2 },
       ]}
       onSubmit={(values) => {
         if (item) {
           dataActions.update("contacts", item.id, values);
-          toast.success("Contact updated");
+          toast.success("Contato atualizado");
           onSaved?.({ ...item, ...values });
         } else {
           const created = dataActions.create("contacts", values);
-          toast.success(`${created.name} added`);
+          toast.success(`${created.name} adicionado`);
           onSaved?.(created);
         }
       }}

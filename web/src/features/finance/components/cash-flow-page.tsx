@@ -89,15 +89,15 @@ export function CashFlowPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Cash flow"
-        description="Income and expenses, with business and personal money kept apart."
+        title="Fluxo de caixa"
+        description="Entradas e saídas, com o dinheiro da empresa separado do pessoal."
         actions={
           <>
             <SampleDataBadge />
             <EntryFormDialog
               trigger={
                 <Button>
-                  <Plus /> New entry
+                  <Plus /> Novo lançamento
                 </Button>
               }
             />
@@ -110,7 +110,7 @@ export function CashFlowPage() {
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Previous month"
+            aria-label="Mês anterior"
             onClick={() => setMonth(addMonths(month, -1))}
           >
             <ChevronLeft />
@@ -124,7 +124,7 @@ export function CashFlowPage() {
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Next month"
+            aria-label="Próximo mês"
             onClick={() => setMonth(addMonths(month, 1))}
           >
             <ChevronRight />
@@ -135,52 +135,52 @@ export function CashFlowPage() {
           onValueChange={(value) => setScope(value as ScopeFilter)}
         >
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="business">Business</TabsTrigger>
+            <TabsTrigger value="all">Todos</TabsTrigger>
+            <TabsTrigger value="personal">Pessoal</TabsTrigger>
+            <TabsTrigger value="business">Empresa</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       {scope === "all" && (
         <p className="rounded-xl border border-dashed px-4 py-2.5 text-xs text-muted-foreground">
-          &ldquo;All&rdquo; adds business and personal entries together, so
-          transfers from the company to you count twice. Use the scope tabs for
-          real numbers.
+          &ldquo;Todos&rdquo; soma os lançamentos da empresa e pessoais, então
+          transferências da empresa para você contam duas vezes. Use as abas de
+          escopo para ver os números reais.
         </p>
       )}
 
       <section
-        aria-label="Month totals"
+        aria-label="Totais do mês"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         <MetricCard
-          label="Income"
+          label="Entradas"
           value={formatBRL(current.income)}
           visual={
             <ArrowUpRight className="size-6 text-chart-income" aria-hidden />
           }
         />
         <MetricCard
-          label="Expenses"
+          label="Saídas"
           value={formatBRL(current.expense)}
           visual={
             <ArrowDownRight className="size-6 text-chart-expense" aria-hidden />
           }
         />
         <MetricCard
-          label="Balance"
+          label="Saldo"
           value={formatBRL(current.balance)}
           className={cn(current.balance < 0 && "border-destructive/50")}
         />
-        <MetricCard label="Saved" value={savingsRate} unit="% of income" />
+        <MetricCard label="Poupado" value={savingsRate} unit="% da renda" />
       </section>
 
       <div className="grid gap-4 xl:grid-cols-5">
         <Card className="gap-4 rounded-2xl xl:col-span-3">
           <CardHeader>
-            <CardTitle className="text-base">Last six months</CardTitle>
-            <CardDescription>Income and expenses per month.</CardDescription>
+            <CardTitle className="text-base">Últimos seis meses</CardTitle>
+            <CardDescription>Entradas e saídas por mês.</CardDescription>
           </CardHeader>
           <CardContent>
             <MonthlyBars series={series} selected={month} onSelect={setMonth} />
@@ -188,13 +188,13 @@ export function CashFlowPage() {
         </Card>
         <Card className="gap-4 rounded-2xl xl:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Expenses by category</CardTitle>
+            <CardTitle className="text-base">Saídas por categoria</CardTitle>
             <CardDescription>{formatMonth(month)}</CardDescription>
           </CardHeader>
           <CardContent>
             {byCategory.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No expenses this month.
+                Nenhuma saída neste mês.
               </p>
             ) : (
               <ul className="flex flex-col gap-3">
@@ -228,7 +228,7 @@ export function CashFlowPage() {
 
       <Card className="gap-3 rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-base">Entries</CardTitle>
+          <CardTitle className="text-base">Lançamentos</CardTitle>
           <CardDescription>
             {ofMonth.length} in {formatMonth(month)}
           </CardDescription>
@@ -236,20 +236,20 @@ export function CashFlowPage() {
         <CardContent className="px-0">
           {ofMonth.length === 0 ? (
             <p className="px-6 text-sm text-muted-foreground">
-              No entries this month.
+              Nenhum lançamento neste mês.
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[40rem] text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs text-muted-foreground">
-                    <th className="px-6 py-2 font-medium">Date</th>
-                    <th className="px-3 py-2 font-medium">Description</th>
-                    <th className="px-3 py-2 font-medium">Category</th>
-                    <th className="px-3 py-2 font-medium">Scope</th>
-                    <th className="px-3 py-2 text-right font-medium">Amount</th>
+                    <th className="px-6 py-2 font-medium">Data</th>
+                    <th className="px-3 py-2 font-medium">Descrição</th>
+                    <th className="px-3 py-2 font-medium">Categoria</th>
+                    <th className="px-3 py-2 font-medium">Escopo</th>
+                    <th className="px-3 py-2 text-right font-medium">Valor</th>
                     <th className="px-6 py-2">
-                      <span className="sr-only">Actions</span>
+                      <span className="sr-only">Ações</span>
                     </th>
                   </tr>
                 </thead>
@@ -268,7 +268,7 @@ export function CashFlowPage() {
                           {entry.recurring && (
                             <Repeat
                               className="size-3.5 text-muted-foreground"
-                              aria-label="Recurring"
+                              aria-label="Recorrente"
                             />
                           )}
                         </span>
@@ -278,12 +278,12 @@ export function CashFlowPage() {
                       </td>
                       <td className="px-3 py-2.5">
                         <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
-                          {entry.scope === "business" ? "Business" : "Personal"}
+                          {entry.scope === "business" ? "Empresa" : "Pessoal"}
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-right font-medium tabular-nums">
                         <span className="sr-only">
-                          {entry.kind === "income" ? "Income" : "Expense"}{" "}
+                          {entry.kind === "income" ? "Entrada" : "Saída"}{" "}
                         </span>
                         <span
                           className={
@@ -299,17 +299,17 @@ export function CashFlowPage() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            aria-label="Edit entry"
+                            aria-label="Editar lançamento"
                             onClick={() => setEditing(entry)}
                           >
                             <Pencil />
                           </Button>
                           <ConfirmDelete
-                            noun="entry"
+                            noun="lançamento"
                             name={entry.description}
                             onConfirm={() => {
                               dataActions.remove("financeEntries", entry.id);
-                              toast.success("Entry deleted");
+                              toast.success("Lançamento excluído");
                             }}
                           />
                         </div>
@@ -355,15 +355,15 @@ function MonthlyBars({
     <div className="flex flex-col gap-3">
       <ul
         className="flex gap-4 text-xs text-muted-foreground"
-        aria-label="Legend"
+        aria-label="Legenda"
       >
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="size-2.5 rounded-sm bg-chart-income" />{" "}
-          Income
+          Entradas
         </li>
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="size-2.5 rounded-sm bg-chart-expense" />{" "}
-          Expenses
+          Saídas
         </li>
       </ul>
       <div className="flex gap-2">
@@ -397,7 +397,7 @@ function MonthlyBars({
                 onMouseLeave={() => setHovered(undefined)}
                 onFocus={() => setHovered(item.month)}
                 onBlur={() => setHovered(undefined)}
-                aria-label={`${formatMonth(item.month)}: income ${formatBRL(item.income)}, expenses ${formatBRL(item.expense)}`}
+                aria-label={`${formatMonth(item.month)}: entradas ${formatBRL(item.income)}, saídas ${formatBRL(item.expense)}`}
                 aria-pressed={active}
                 className={cn(
                   "group/bar relative flex h-full flex-1 flex-col justify-end rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
@@ -435,14 +435,14 @@ function MonthlyBars({
                         aria-hidden
                         className="size-2 rounded-sm bg-chart-income"
                       />
-                      Income {formatBRL(item.income)}
+                      Entradas {formatBRL(item.income)}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <span
                         aria-hidden
                         className="size-2 rounded-sm bg-chart-expense"
                       />
-                      Expenses {formatBRL(item.expense)}
+                      Saídas {formatBRL(item.expense)}
                     </span>
                   </span>
                 )}

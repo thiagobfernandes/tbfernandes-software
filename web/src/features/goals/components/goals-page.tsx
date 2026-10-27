@@ -63,15 +63,15 @@ export function GoalsPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Goals"
-        description="Where you want to be, broken into milestones, projects and tasks."
+        title="Metas"
+        description="Onde você quer chegar, dividido em marcos, projetos e tarefas."
         actions={
           <>
             <SampleDataBadge />
             <GoalFormDialog
               trigger={
                 <Button>
-                  <Plus /> New goal
+                  <Plus /> Nova meta
                 </Button>
               }
             />
@@ -79,9 +79,9 @@ export function GoalsPage() {
         }
       />
 
-      <section aria-label="Key numbers" className="grid gap-4 sm:grid-cols-3">
+      <section aria-label="Indicadores" className="grid gap-4 sm:grid-cols-3">
         <MetricCard
-          label="Active goals"
+          label="Metas ativas"
           value={active.length}
           unit={`/ ${data.goals.length}`}
           visual={
@@ -92,15 +92,15 @@ export function GoalsPage() {
           }
         />
         <MetricCard
-          label="Average progress"
+          label="Progresso médio"
           value={averageProgress}
           unit="%"
           visual={<ProgressRing value={averageProgress} total={100} />}
         />
         <MetricCard
-          label="Milestones in 30 days"
+          label="Marcos em 30 dias"
           value={upcomingMilestones}
-          unit="due"
+          unit="no prazo"
           visual={<DotRow active={upcomingMilestones} total={6} />}
         />
       </section>
@@ -110,17 +110,17 @@ export function GoalsPage() {
         onValueChange={(value) => setFilter(value as Filter)}
       >
         <TabsList>
-          <TabsTrigger value="open">Open</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="open">Abertas</TabsTrigger>
+          <TabsTrigger value="completed">Concluídas</TabsTrigger>
+          <TabsTrigger value="all">Todas</TabsTrigger>
         </TabsList>
       </Tabs>
 
       {visible.length === 0 ? (
         <EmptyState
           icon={Target}
-          title="No goals here"
-          description="Create a goal and link projects and tasks to it."
+          title="Nenhuma meta aqui"
+          description="Crie uma meta e vincule projetos e tarefas a ela."
         />
       ) : (
         areas.map((area) => {
@@ -163,14 +163,14 @@ function GoalCard({ goal, data }: { goal: Goal; data: AppData }) {
         <GoalStatusBadge status={goal.status} />
         {goal.priority === "high" && (
           <span className="text-[11px] font-medium text-warning">
-            High priority
+            Prioridade alta
           </span>
         )}
       </div>
       <div className="flex flex-col gap-1">
         {parent && (
           <span className="text-xs text-muted-foreground">
-            Part of {parent.name}
+            Parte de {parent.name}
           </span>
         )}
         <h3 className="font-medium group-hover:text-primary">{goal.name}</h3>
@@ -183,14 +183,17 @@ function GoalCard({ goal, data }: { goal: Goal; data: AppData }) {
           <span className="text-muted-foreground">{progress.basis}</span>
           <span className="font-medium tabular-nums">{progress.percent}%</span>
         </div>
-        <ProgressBar value={progress.percent} label={`${goal.name} progress`} />
+        <ProgressBar
+          value={progress.percent}
+          label={`Progresso de ${goal.name}`}
+        />
       </div>
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
-          <FolderKanban className="size-3.5" aria-hidden /> {projects} projects
+          <FolderKanban className="size-3.5" aria-hidden /> {projects} projetos
         </span>
         <span className="flex items-center gap-1">
-          <ListChecks className="size-3.5" aria-hidden /> {tasks} tasks
+          <ListChecks className="size-3.5" aria-hidden /> {tasks} tarefas
         </span>
         {goal.dueDate && (
           <span className="ml-auto flex items-center gap-1">

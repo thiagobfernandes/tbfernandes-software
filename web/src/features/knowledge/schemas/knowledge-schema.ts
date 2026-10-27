@@ -9,15 +9,15 @@ const links = {
 };
 
 export const noteSchema = z.object({
-  title: z.string().trim().min(1, "Title is required").max(160),
+  title: z.string().trim().min(1, "Informe o título").max(160),
   body: z.string().max(20000),
   ...links,
 });
 
 export const snippetSchema = z.object({
-  title: z.string().trim().min(1, "Title is required").max(160),
+  title: z.string().trim().min(1, "Informe o título").max(160),
   language: z.enum(snippetLanguages),
-  code: z.string().min(1, "Paste the code").max(20000),
+  code: z.string().min(1, "Cole o código").max(20000),
   explanation: z.string().trim().max(2000),
   sourceUrl: z.union([z.literal(""), z.url("Enter a full URL")]),
   ...links,

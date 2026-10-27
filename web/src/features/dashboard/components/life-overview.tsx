@@ -47,12 +47,12 @@ export function LifeOverview({ data }: { data: AppData }) {
 
   return (
     <section
-      aria-label="Life at a glance"
+      aria-label="Vida em resumo"
       className="grid gap-4 md:grid-cols-2 xl:grid-cols-4"
     >
-      <OverviewCard title="Goals" href="/goals">
+      <OverviewCard title="Metas" href="/goals">
         {goals.length === 0 ? (
-          <Empty>No active goals.</Empty>
+          <Empty>Nenhuma meta ativa.</Empty>
         ) : (
           <ul className="flex flex-col gap-3">
             {goals.map((goal) => {
@@ -70,7 +70,7 @@ export function LifeOverview({ data }: { data: AppData }) {
                   </Link>
                   <ProgressBar
                     value={percent}
-                    label={`${goal.name} progress`}
+                    label={`Progresso de ${goal.name}`}
                   />
                 </li>
               );
@@ -79,7 +79,7 @@ export function LifeOverview({ data }: { data: AppData }) {
         )}
       </OverviewCard>
 
-      <OverviewCard title="Money this month" href="/finance">
+      <OverviewCard title="Dinheiro no mês" href="/finance">
         <dl className="flex flex-col gap-3">
           {(["personal", "business"] as const).map((scope) => {
             const value = balance(scope);
@@ -89,9 +89,7 @@ export function LifeOverview({ data }: { data: AppData }) {
                 className="flex items-baseline justify-between gap-2"
               >
                 <dt className="text-sm text-muted-foreground">
-                  {scope === "personal"
-                    ? "Personal balance"
-                    : "Business balance"}
+                  {scope === "personal" ? "Saldo pessoal" : "Saldo da empresa"}
                 </dt>
                 <dd
                   className={cn(
@@ -107,9 +105,9 @@ export function LifeOverview({ data }: { data: AppData }) {
         </dl>
       </OverviewCard>
 
-      <OverviewCard title="Follow-ups this week" href="/contacts">
+      <OverviewCard title="Follow-ups da semana" href="/contacts">
         {followUps.length === 0 ? (
-          <Empty>Nobody to follow up with.</Empty>
+          <Empty>Ninguém para acompanhar.</Empty>
         ) : (
           <ul className="flex flex-col gap-2">
             {followUps.slice(0, 3).map((contact) => (
@@ -130,16 +128,16 @@ export function LifeOverview({ data }: { data: AppData }) {
         )}
       </OverviewCard>
 
-      <OverviewCard title="Learning" href="/learning">
+      <OverviewCard title="Aprendizado" href="/learning">
         {studies.length === 0 ? (
-          <Empty>No study in progress.</Empty>
+          <Empty>Nenhum estudo em andamento.</Empty>
         ) : (
           <ul className="flex flex-col gap-3">
             {studies.slice(0, 2).map((study) => (
               <li key={study.id} className="flex flex-col gap-0.5">
                 <span className="truncate text-sm">{study.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  Next: {study.nextActivity ?? "not defined"}
+                  Próximo: {study.nextActivity ?? "não definido"}
                 </span>
               </li>
             ))}
@@ -165,7 +163,7 @@ function OverviewCard({
         <CardTitle className="text-base">{title}</CardTitle>
         <CardAction>
           <Button variant="ghost" size="icon-sm" asChild>
-            <Link href={href} aria-label={`Open ${title}`}>
+            <Link href={href} aria-label={`Abrir ${title}`}>
               <ArrowUpRight />
             </Link>
           </Button>

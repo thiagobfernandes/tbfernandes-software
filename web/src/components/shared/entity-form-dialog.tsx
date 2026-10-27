@@ -228,7 +228,7 @@ export function EntityFormDialog<
                             </SelectTrigger>
                             <SelectContent>
                               {field.optional && (
-                                <SelectItem value={NONE}>None</SelectItem>
+                                <SelectItem value={NONE}>Nenhum</SelectItem>
                               )}
                               {field.options.map((option) => (
                                 <SelectItem
@@ -269,7 +269,7 @@ export function EntityFormDialog<
                                 control.onChange(next === true)
                               }
                             />
-                            {field.placeholder ?? "Yes"}
+                            {field.placeholder ?? "Sim"}
                           </label>
                         );
                       default:
@@ -291,7 +291,7 @@ export function EntityFormDialog<
         </form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DialogClose>
           <Button type="submit" form={formId}>
             {submitLabel}

@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TasksPage } from "@/features/tasks/components/tasks-page";
 
-export const metadata: Metadata = { title: "Tasks" };
+export const metadata: Metadata = { title: "Tarefas" };
 
 export default function Page() {
   return (

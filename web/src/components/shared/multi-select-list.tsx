@@ -27,7 +27,7 @@ export function MultiSelectList({
   options,
   value,
   onChange,
-  emptyLabel = "Nothing to link yet.",
+  emptyLabel = "Nada para vincular ainda.",
   className,
 }: MultiSelectListProps) {
   const baseId = useId();
@@ -45,7 +45,7 @@ export function MultiSelectList({
             id={id}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Filter"
+            placeholder="Filtrar"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </label>
@@ -53,7 +53,7 @@ export function MultiSelectList({
       <ul className="max-h-40 overflow-y-auto p-1">
         {visible.length === 0 && (
           <li className="px-2 py-2 text-xs text-muted-foreground">
-            {options.length ? "No matches." : emptyLabel}
+            {options.length ? "Nenhum resultado." : emptyLabel}
           </li>
         )}
         {visible.map((option) => {

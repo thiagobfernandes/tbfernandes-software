@@ -63,7 +63,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
         href="/companies"
         className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronLeft className="size-4" aria-hidden /> Companies
+        <ChevronLeft className="size-4" aria-hidden /> Empresas
       </Link>
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -80,7 +80,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
               <CompanyStatusLabel status={company.status} />
               <span className="flex items-center gap-1">
                 <CalendarDays className="size-3.5" aria-hidden />
-                Since {formatShort(company.startDate)}{" "}
+                Desde {formatShort(company.startDate)}{" "}
                 {parseDay(company.startDate).getUTCFullYear()}
               </span>
               {company.mainContact && (
@@ -103,17 +103,17 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
             company={company}
             trigger={
               <Button variant="outline">
-                <Pencil /> Edit
+                <Pencil /> Editar
               </Button>
             }
           />
           <ConfirmDelete
-            noun="company"
+            noun="empresa"
             name={company.name}
-            consequence="Contacts linked to it are kept."
+            consequence="Os contatos vinculados continuam."
             blockedReason={
               projects.length
-                ? `"${company.name}" still has ${projects.length} project${projects.length === 1 ? "" : "s"}. Move them to another company or delete them first.`
+                ? `"${company.name}" ainda tem ${projects.length} projeto${projects.length === 1 ? "" : "s"}. Mova-os para outra empresa ou exclua-os antes.`
                 : undefined
             }
             trigger={
@@ -121,12 +121,12 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
                 variant="outline"
                 className="text-destructive hover:text-destructive"
               >
-                <Trash2 /> Delete
+                <Trash2 /> Excluir
               </Button>
             }
             onConfirm={() => {
               workActions.deleteCompany(company.id);
-              toast.success("Company deleted");
+              toast.success("Empresa excluída");
               router.push("/companies");
             }}
           />
@@ -134,7 +134,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
             defaultCompanyId={company.id}
             trigger={
               <Button>
-                <Plus /> New project
+                <Plus /> Novo projeto
               </Button>
             }
           />
@@ -142,19 +142,27 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
       </header>
 
       <section
-        aria-label="Key numbers"
+        aria-label="Indicadores"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
-        <MetricCard label="Projects" value={projects.length} unit="linked" />
-        <MetricCard label="Open tasks" value={open.length} unit="tasks" />
         <MetricCard
-          label="Overdue"
+          label="Projetos"
+          value={projects.length}
+          unit="vinculados"
+        />
+        <MetricCard
+          label="Tarefas abertas"
+          value={open.length}
+          unit="tarefas"
+        />
+        <MetricCard
+          label="Atrasadas"
           value={overdue.length}
-          unit="tasks"
+          unit="tarefas"
           visual={<DotRow active={overdue.length} total={6} />}
         />
         <MetricCard
-          label="Done"
+          label="Concluídas"
           value={done.length}
           unit={`/ ${tasks.length}`}
           visual={<ProgressRing value={done.length} total={tasks.length} />}
@@ -162,10 +170,10 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">Projects</h2>
+        <h2 className="text-base font-semibold">Projetos</h2>
         {projects.length === 0 ? (
           <p className="rounded-2xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-            No projects linked to this company.
+            Nenhum projeto vinculado a esta empresa.
           </p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
@@ -182,7 +190,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">Tasks</h2>
+        <h2 className="text-base font-semibold">Tarefas</h2>
         <TasksList
           tasks={tasks}
           projectsById={projectsById}
@@ -203,11 +211,11 @@ function MissingCompany() {
     <PageContainer>
       <EmptyState
         icon={SearchX}
-        title="Company not found"
-        description="It may have been removed, or the link is wrong."
+        title="Empresa não encontrada"
+        description="O registro pode ter sido removido ou o link está errado."
         action={
           <Button asChild size="sm">
-            <Link href="/companies">Back to companies</Link>
+            <Link href="/companies">Voltar para empresas</Link>
           </Button>
         }
       />

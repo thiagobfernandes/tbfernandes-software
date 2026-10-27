@@ -22,8 +22,8 @@ export function MissingRecord({
     <PageContainer>
       <EmptyState
         icon={SearchX}
-        title={`${noun} not found`}
-        description="It may have been removed, or the link is wrong."
+        title={`Não encontramos ${noun}`}
+        description="O registro pode ter sido removido ou o link está errado."
         action={
           <Button variant="outline" asChild>
             <Link href={backHref}>{backLabel}</Link>

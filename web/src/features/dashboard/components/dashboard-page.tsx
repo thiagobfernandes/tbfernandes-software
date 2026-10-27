@@ -101,36 +101,36 @@ export function DashboardPage() {
       />
       <PageContainer className="max-w-none">
         <PageHeading
-          title="Overview"
-          description="What needs your attention across companies, projects, and tasks."
+          title="Visão geral"
+          description="O que precisa da sua atenção em empresas, projetos e tarefas."
           actions={
             <>
               <SampleDataBadge />
               <CompanyFormDialog
                 trigger={
                   <Button variant="outline" size="sm">
-                    <Building2 /> Company
+                    <Building2 /> Empresa
                   </Button>
                 }
               />
               <ProjectFormDialog
                 trigger={
                   <Button variant="outline" size="sm">
-                    <FolderKanban /> Project
+                    <FolderKanban /> Projeto
                   </Button>
                 }
               />
               <TaskFormDialog
                 trigger={
                   <Button variant="outline" size="sm">
-                    <ListChecks /> Task
+                    <ListChecks /> Tarefa
                   </Button>
                 }
               />
               <NoteFormDialog
                 trigger={
                   <Button variant="outline" size="sm">
-                    <BookOpen /> Note
+                    <BookOpen /> Nota
                   </Button>
                 }
               />
@@ -141,23 +141,23 @@ export function DashboardPage() {
         <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="flex min-w-0 flex-col gap-6">
             <section
-              aria-label="Key numbers"
+              aria-label="Indicadores"
               className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
             >
               <MetricCard
-                label="Open tasks"
+                label="Tarefas abertas"
                 value={openTasks.length}
-                unit="tasks"
+                unit="tarefas"
                 visual={<TickBars values={sampleTrends.openTasksPerDay} />}
               />
               <MetricCard
-                label="Overdue"
+                label="Atrasadas"
                 value={overdue}
-                unit="tasks"
+                unit="tarefas"
                 visual={<DotRow active={overdue} total={6} />}
               />
               <MetricCard
-                label="Active projects"
+                label="Projetos ativos"
                 value={activeProjectRows.length}
                 unit={`/ ${data.projects.length}`}
                 visual={
@@ -168,9 +168,9 @@ export function DashboardPage() {
                 }
               />
               <MetricCard
-                label="Done this week"
+                label="Concluídas na semana"
                 value={doneThisWeek}
-                unit="tasks"
+                unit="tarefas"
                 visual={<Sparkline values={sampleTrends.doneLastSevenDays} />}
               />
             </section>
@@ -178,14 +178,14 @@ export function DashboardPage() {
             <div className="grid gap-4 lg:grid-cols-5">
               <Card className="gap-2 rounded-2xl lg:col-span-3">
                 <CardHeader>
-                  <CardTitle className="text-base">Today</CardTitle>
+                  <CardTitle className="text-base">Hoje</CardTitle>
                   <CardDescription>
-                    What needs to be done in the next two days?
+                    O que precisa ser feito nos próximos dois dias?
                   </CardDescription>
                   <CardAction>
                     <Button variant="ghost" size="sm" asChild>
                       <Link href="/tasks">
-                        All tasks <ArrowUpRight />
+                        Todas as tarefas <ArrowUpRight />
                       </Link>
                     </Button>
                   </CardAction>
@@ -199,12 +199,12 @@ export function DashboardPage() {
                       >
                         <button
                           type="button"
-                          aria-label={`Mark "${task.title}" as done`}
+                          aria-label={`Marcar "${task.title}" como concluída`}
                           onClick={() => {
                             workActions.updateTask(task.id, { status: "done" });
-                            toast.success("Task completed", {
+                            toast.success("Tarefa concluída", {
                               action: {
-                                label: "Undo",
+                                label: "Desfazer",
                                 onClick: () =>
                                   workActions.updateTask(task.id, {
                                     status: task.status,
@@ -225,7 +225,7 @@ export function DashboardPage() {
                             {task.title}
                           </button>
                           <span className="truncate text-xs text-muted-foreground">
-                            {findProject(task.projectId)?.name ?? "No project"}
+                            {findProject(task.projectId)?.name ?? "Sem projeto"}
                           </span>
                         </div>
                         <PriorityBadge priority={task.priority} />
@@ -243,9 +243,9 @@ export function DashboardPage() {
 
               <Card className="gap-2 rounded-2xl lg:col-span-2">
                 <CardHeader>
-                  <CardTitle className="text-base">Active projects</CardTitle>
+                  <CardTitle className="text-base">Projetos ativos</CardTitle>
                   <CardDescription>
-                    What is happening in my projects?
+                    O que está acontecendo nos meus projetos?
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -265,7 +265,7 @@ export function DashboardPage() {
                         </div>
                         <div
                           role="progressbar"
-                          aria-label={`${project.name} progress`}
+                          aria-label={`Progresso de ${project.name}`}
                           aria-valuenow={project.progress}
                           aria-valuemin={0}
                           aria-valuemax={100}
@@ -295,15 +295,15 @@ export function DashboardPage() {
             <Card className="gap-4 rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base">
-                  How your work connects
+                  Como seu trabalho se conecta
                 </CardTitle>
                 <CardDescription>
-                  Every task traced back to a project, a company, and a goal.
+                  Cada tarefa ligada a um projeto, uma empresa e uma meta.
                 </CardDescription>
                 <CardAction>
                   <Button variant="ghost" size="sm" asChild>
                     <Link href="/knowledge/graph">
-                      Open graph <ArrowUpRight />
+                      Abrir grafo <ArrowUpRight />
                     </Link>
                   </Button>
                 </CardAction>
@@ -314,7 +314,8 @@ export function DashboardPage() {
                     <RelationTree root={contextTree} />
                   ) : (
                     <p className="text-center text-sm text-muted-foreground">
-                      Link a project to a goal to see how your work connects.
+                      Vincule um projeto a uma meta para ver como seu trabalho
+                      se conecta.
                     </p>
                   )}
                 </div>

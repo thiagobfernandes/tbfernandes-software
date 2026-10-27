@@ -21,7 +21,7 @@ export function TasksList({
   if (tasks.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
-        No tasks match these filters.
+        Nenhuma tarefa com esses filtros.
       </p>
     );
   }
@@ -31,11 +31,11 @@ export function TasksList({
       <table className="w-full min-w-[44rem] text-sm">
         <thead>
           <tr className="border-b text-left text-xs text-muted-foreground">
-            <th className="px-4 py-3 font-medium">Task</th>
-            <th className="px-4 py-3 font-medium">Project</th>
+            <th className="px-4 py-3 font-medium">Tarefa</th>
+            <th className="px-4 py-3 font-medium">Projeto</th>
             <th className="px-4 py-3 font-medium">Status</th>
-            <th className="px-4 py-3 font-medium">Priority</th>
-            <th className="px-4 py-3 font-medium">Due</th>
+            <th className="px-4 py-3 font-medium">Prioridade</th>
+            <th className="px-4 py-3 font-medium">Prazo</th>
           </tr>
         </thead>
         <tbody>
@@ -90,7 +90,7 @@ export function TasksList({
                           : "bg-muted-foreground/40",
                       )}
                     />
-                    {project?.name ?? "No project"}
+                    {project?.name ?? "Sem projeto"}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { ProjectsPage } from "@/features/projects/components/projects-page";
 
-export const metadata: Metadata = { title: "Projects" };
+export const metadata: Metadata = { title: "Projetos" };
 
 export default function Page() {
   return <ProjectsPage />;

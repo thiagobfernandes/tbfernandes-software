@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 type ConfirmDeleteProps = {
-  /** What is being deleted, e.g. "note". */
+  /** What is being deleted, e.g. "nota". */
   noun: string;
   name: string;
   onConfirm: () => void;
@@ -42,7 +42,7 @@ export function ConfirmDelete({
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label={`Delete ${noun}`}
+            aria-label={`Excluir ${noun}`}
             className="text-muted-foreground hover:text-destructive"
           >
             <Trash2 />
@@ -53,28 +53,28 @@ export function ConfirmDelete({
         <AlertDialogHeader>
           <AlertDialogTitle>
             {blockedReason
-              ? `This ${noun} can't be deleted yet`
-              : `Delete this ${noun}?`}
+              ? `Ainda não é possível excluir (${noun})`
+              : `Excluir ${noun}?`}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {blockedReason ?? (
               <>
-                &ldquo;{name}&rdquo; will be removed. {consequence}
-                {consequence && " "}This cannot be undone.
+                &ldquo;{name}&rdquo; será removido. {consequence}
+                {consequence && " "}Essa ação não pode ser desfeita.
               </>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>
-            {blockedReason ? "OK" : "Cancel"}
+            {blockedReason ? "OK" : "Cancelar"}
           </AlertDialogCancel>
           {!blockedReason && (
             <AlertDialogAction
               onClick={onConfirm}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              Delete
+              Excluir
             </AlertDialogAction>
           )}
         </AlertDialogFooter>

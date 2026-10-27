@@ -30,7 +30,7 @@ export function MethodChecklist({ steps }: { steps: MethodStep[] }) {
       <div className="flex items-center gap-3">
         <div
           role="progressbar"
-          aria-label="Steps completed"
+          aria-label="Passos concluídos"
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
@@ -50,7 +50,7 @@ export function MethodChecklist({ steps }: { steps: MethodStep[] }) {
           onClick={() => setDone(new Set())}
           disabled={done.size === 0}
         >
-          <RotateCcw /> Reset
+          <RotateCcw /> Recomeçar
         </Button>
       </div>
 
@@ -100,7 +100,7 @@ export function MethodChecklist({ steps }: { steps: MethodStep[] }) {
                   checked={checked}
                   onCheckedChange={() => toggle(index)}
                   className="mt-0.5"
-                  aria-label={`Mark "${step.title}" as done`}
+                  aria-label={`Marcar "${step.title}" como feito`}
                 />
               </label>
             </li>

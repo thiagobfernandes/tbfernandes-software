@@ -52,7 +52,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
 
   if (collapsed) {
     return (
-      <nav className="flex flex-1 flex-col gap-1" aria-label="Main">
+      <nav className="flex flex-1 flex-col gap-1" aria-label="Principal">
         {mainNavigation.map((entry, index) => {
           const items = (isNavGroup(entry) ? entry.items : [entry]).filter(
             (item) => !item.soon,
@@ -89,7 +89,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
   }
 
   return (
-    <nav className="flex flex-1 flex-col gap-1" aria-label="Main">
+    <nav className="flex flex-1 flex-col gap-1" aria-label="Principal">
       {mainNavigation.map((entry) =>
         isNavGroup(entry) ? (
           <NavGroupSection
@@ -110,7 +110,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
       )}
       <div className="mt-5 flex flex-col gap-0.5">
         <span className="px-3 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-          Active projects
+          Projetos ativos
         </span>
         {pinnedProjects.map((project) => (
           <Link

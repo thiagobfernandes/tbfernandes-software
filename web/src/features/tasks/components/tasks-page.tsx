@@ -47,8 +47,8 @@ export function TasksPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Tasks"
-        description="Actionable work with status, priority, and a clear definition of done."
+        title="Tarefas"
+        description="Trabalho acionável com status, prioridade e um critério de pronto claro."
         actions={
           <>
             <SampleDataBadge />
@@ -56,7 +56,7 @@ export function TasksPage() {
               defaultProjectId={projectId}
               trigger={
                 <Button>
-                  <Plus /> Add task
+                  <Plus /> Nova tarefa
                 </Button>
               }
             />
@@ -68,10 +68,10 @@ export function TasksPage() {
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <TabsList>
             <TabsTrigger value="list">
-              <List /> List
+              <List /> Lista
             </TabsTrigger>
             <TabsTrigger value="board">
-              <Columns3 /> Board
+              <Columns3 /> Quadro
             </TabsTrigger>
           </TabsList>
 
@@ -84,8 +84,8 @@ export function TasksPage() {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search tasks…"
-              aria-label="Search tasks"
+              placeholder="Buscar tarefas…"
+              aria-label="Buscar tarefas"
               className="pl-9"
             />
           </div>
@@ -95,7 +95,7 @@ export function TasksPage() {
               active={!projectId}
               onClick={() => setProjectId(undefined)}
             >
-              All projects
+              Todos os projetos
             </FilterChip>
             {data.projects
               .filter((project) => project.status === "active")

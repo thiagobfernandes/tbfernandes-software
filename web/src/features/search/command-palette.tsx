@@ -29,7 +29,7 @@ export function CommandPalette() {
   const index = useMemo(() => buildSearchIndex(data), [data]);
   const results = query.trim()
     ? searchIndex(index, query)
-    : index.filter((item) => item.group === "Pages");
+    : index.filter((item) => item.group === "Páginas");
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -71,14 +71,14 @@ export function CommandPalette() {
         className="relative hidden h-9 w-full max-w-sm items-center gap-2 rounded-full border border-input bg-muted/50 pr-2 pl-3 text-sm text-muted-foreground outline-none hover:border-primary/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:flex"
       >
         <Search className="size-4" aria-hidden />
-        <span className="flex-1 text-left">Search everything…</span>
+        <span className="flex-1 text-left">Buscar em tudo…</span>
         <kbd className="rounded border bg-background px-1.5 py-0.5 font-mono text-[10px]">
           Ctrl K
         </kbd>
       </button>
       <button
         type="button"
-        aria-label="Search"
+        aria-label="Buscar"
         onClick={() => setOpen(true)}
         className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground sm:hidden"
       >
@@ -90,9 +90,9 @@ export function CommandPalette() {
           showCloseButton={false}
           className="top-[15%] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-xl"
         >
-          <DialogTitle className="sr-only">Search</DialogTitle>
+          <DialogTitle className="sr-only">Buscar</DialogTitle>
           <DialogDescription className="sr-only">
-            Search tasks, projects, notes, goals, contacts and more.
+            Busque tarefas, projetos, notas, metas, contatos e mais.
           </DialogDescription>
           <div className="flex items-center gap-2 border-b px-4">
             <Search
@@ -107,7 +107,7 @@ export function CommandPalette() {
               aria-activedescendant={
                 results.length ? optionId(active) : undefined
               }
-              aria-label="Search everything"
+              aria-label="Buscar em tudo"
               value={query}
               onChange={(event) => {
                 setQuery(event.target.value);
@@ -125,19 +125,19 @@ export function CommandPalette() {
                   choose(results[active]);
                 }
               }}
-              placeholder="Search tasks, projects, notes, goals, contacts…"
+              placeholder="Buscar tarefas, projetos, notas, metas, contatos…"
               className="h-12 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
           <div
             id="search-results"
             role="listbox"
-            aria-label="Results"
+            aria-label="Resultados"
             className="max-h-[60svh] overflow-y-auto p-2"
           >
             {results.length === 0 && (
               <p className="px-3 py-8 text-center text-sm text-muted-foreground">
-                Nothing found for &ldquo;{query}&rdquo;.
+                Nada encontrado para &ldquo;{query}&rdquo;.
               </p>
             )}
             {[...groups].map(([group, items]) => (
@@ -182,9 +182,9 @@ export function CommandPalette() {
             ))}
           </div>
           <div className="flex gap-4 border-t px-4 py-2 text-[11px] text-muted-foreground">
-            <span>↑↓ to move</span>
-            <span>Enter to open</span>
-            <span>Esc to close</span>
+            <span>↑↓ para navegar</span>
+            <span>Enter para abrir</span>
+            <span>Esc para fechar</span>
           </div>
         </DialogContent>
       </Dialog>

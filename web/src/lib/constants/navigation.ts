@@ -44,62 +44,62 @@ export function isNavGroup(entry: NavEntry): entry is NavGroup {
 // One group per product area from the vision doc. Mark a planned module
 // with `soon` to show it in the map before it is built.
 export const mainNavigation: NavEntry[] = [
-  { title: "Overview", href: "/", icon: LayoutDashboard },
-  { title: "Calendar", href: "/calendar", icon: CalendarDays },
-  { title: "Assistant", href: "/assistant", icon: Sparkles },
+  { title: "Visão geral", href: "/", icon: LayoutDashboard },
+  { title: "Calendário", href: "/calendar", icon: CalendarDays },
+  { title: "Assistente", href: "/assistant", icon: Sparkles },
   {
-    title: "Work",
+    title: "Trabalho",
     icon: Briefcase,
     items: [
-      { title: "Companies", href: "/companies", icon: Building2 },
-      { title: "Projects", href: "/projects", icon: FolderKanban },
-      { title: "Tasks", href: "/tasks", icon: ListChecks },
+      { title: "Empresas", href: "/companies", icon: Building2 },
+      { title: "Projetos", href: "/projects", icon: FolderKanban },
+      { title: "Tarefas", href: "/tasks", icon: ListChecks },
     ],
   },
   {
-    title: "Knowledge",
+    title: "Conhecimento",
     icon: BookOpen,
     items: [
-      { title: "Notes", href: "/knowledge", icon: FileText },
+      { title: "Notas", href: "/knowledge", icon: FileText },
       { title: "Snippets", href: "/knowledge/snippets", icon: Code2 },
-      { title: "Graph", href: "/knowledge/graph", icon: Network },
-      { title: "Methods", href: "/methods", icon: Workflow },
+      { title: "Grafo", href: "/knowledge/graph", icon: Network },
+      { title: "Métodos", href: "/methods", icon: Workflow },
     ],
   },
   {
-    title: "Growth",
+    title: "Crescimento",
     icon: Target,
     items: [
-      { title: "Goals", href: "/goals", icon: Target },
-      { title: "Learning", href: "/learning", icon: GraduationCap },
+      { title: "Metas", href: "/goals", icon: Target },
+      { title: "Aprendizado", href: "/learning", icon: GraduationCap },
       {
-        title: "Certifications",
+        title: "Certificações",
         href: "/certifications",
         icon: Medal,
       },
     ],
   },
   {
-    title: "Finance",
+    title: "Finanças",
     icon: Wallet,
     items: [
-      { title: "Cash flow", href: "/finance", icon: Wallet },
+      { title: "Fluxo de caixa", href: "/finance", icon: Wallet },
       {
-        title: "Planned purchases",
+        title: "Compras planejadas",
         href: "/finance/purchases",
         icon: ShoppingCart,
       },
     ],
   },
   {
-    title: "Network",
+    title: "Rede",
     icon: Users,
-    items: [{ title: "Contacts", href: "/contacts", icon: Users }],
+    items: [{ title: "Contatos", href: "/contacts", icon: Users }],
   },
 ];
 
 export const secondaryNavigation: NavItem[] = [
-  { title: "Settings", href: "/settings", icon: Settings },
+  { title: "Configurações", href: "/settings", icon: Settings },
 ];
 
 type NavMatch = { item: NavItem; group?: NavGroup };

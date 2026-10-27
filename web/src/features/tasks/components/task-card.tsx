@@ -86,7 +86,7 @@ export function TaskCard({ task, project, today, onSelect }: TaskCardProps) {
                 : "bg-muted-foreground/40",
             )}
           />
-          <span className="truncate">{project?.name ?? "No project"}</span>
+          <span className="truncate">{project?.name ?? "Sem projeto"}</span>
         </span>
         <PriorityBadge priority={task.priority} />
       </div>

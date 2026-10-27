@@ -42,6 +42,7 @@ import {
   tasksOfGoal,
 } from "@/features/goals/lib/goal-progress";
 import { goalAreaLabels } from "@/features/goals/types/goal";
+import { priorityLabels } from "@/features/tasks/types/task";
 import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
 import { TasksList } from "@/features/tasks/components/tasks-list";
@@ -62,7 +63,11 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
   const goal = data.goals.find((item) => item.id === goalId);
   if (!goal) {
     return (
-      <MissingRecord noun="Goal" backHref="/goals" backLabel="Back to goals" />
+      <MissingRecord
+        noun="esta meta"
+        backHref="/goals"
+        backLabel="Voltar para metas"
+      />
     );
   }
 
@@ -102,7 +107,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
         href="/goals"
         className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronLeft className="size-4" aria-hidden /> Goals
+        <ChevronLeft className="size-4" aria-hidden /> Metas
       </Link>
 
       <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -116,7 +121,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                 href={`/goals/${parent.id}`}
                 className="text-xs text-muted-foreground hover:text-primary"
               >
-                Part of {parent.name}
+                Parte de {parent.name}
               </Link>
             )}
             <h1 className="text-2xl font-semibold tracking-tight">
@@ -125,7 +130,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <GoalStatusBadge status={goal.status} />
               <span>{goalAreaLabels[goal.area]}</span>
-              <span>· {goal.priority} priority</span>
+              <span>· prioridade {priorityLabels[goal.priority]}</span>
               {goal.dueDate && (
                 <span className="flex items-center gap-1">
                   <CalendarDays className="size-3.5" aria-hidden />
@@ -141,19 +146,19 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             goal={goal}
             trigger={
               <Button variant="outline">
-                <Pencil /> Edit
+                <Pencil /> Editar
               </Button>
             }
           />
           <ConfirmDelete
-            noun="goal"
+            noun="meta"
             name={goal.name}
             onConfirm={() => {
               data.milestones
                 .filter((item) => item.goalId === goal.id)
                 .forEach((item) => dataActions.remove("milestones", item.id));
               dataActions.remove("goals", goal.id);
-              toast.success("Goal deleted");
+              toast.success("Meta excluída");
               router.push("/goals");
             }}
           />
@@ -163,16 +168,16 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
           <section
-            aria-label="From where to where"
+            aria-label="De onde para onde"
             className="grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]"
           >
             <div className="flex flex-col gap-1 rounded-2xl border bg-card p-4">
               <span className="text-xs text-muted-foreground">
-                Where I am now
+                Onde estou agora
               </span>
               <p className="text-sm">
                 {goal.currentState || (
-                  <span className="text-muted-foreground">Not described.</span>
+                  <span className="text-muted-foreground">Não descrito.</span>
                 )}
               </p>
             </div>
@@ -181,11 +186,11 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
               aria-hidden
             />
             <div className="flex flex-col gap-1 rounded-2xl border border-primary/40 bg-primary/5 p-4">
-              <span className="text-xs text-primary">Desired result</span>
+              <span className="text-xs text-primary">Resultado desejado</span>
               <p className="text-sm">{goal.desiredResult}</p>
               {goal.doneCriteria && (
                 <p className="mt-2 border-t pt-2 text-xs text-muted-foreground">
-                  Done when: {goal.doneCriteria}
+                  Pronto quando: {goal.doneCriteria}
                 </p>
               )}
             </div>
@@ -193,9 +198,9 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
 
           <Card className="gap-3 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-base">Milestones</CardTitle>
+              <CardTitle className="text-base">Marcos</CardTitle>
               <CardDescription>
-                Checkpoints on the way to the result.
+                Pontos de controle no caminho até o resultado.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
@@ -241,7 +246,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                       )}
                       <button
                         type="button"
-                        aria-label={`Remove milestone "${milestone.title}"`}
+                        aria-label={`Remover marco "${milestone.title}"`}
                         onClick={() =>
                           dataActions.remove("milestones", milestone.id)
                         }
@@ -260,18 +265,18 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                 <Input
                   value={milestoneTitle}
                   onChange={(event) => setMilestoneTitle(event.target.value)}
-                  placeholder="New milestone"
-                  aria-label="Milestone title"
+                  placeholder="Novo marco"
+                  aria-label="Título do marco"
                 />
                 <Input
                   type="date"
                   value={milestoneDate}
                   onChange={(event) => setMilestoneDate(event.target.value)}
-                  aria-label="Milestone date"
+                  aria-label="Data do marco"
                   className="sm:w-44"
                 />
                 <Button type="submit" variant="outline">
-                  <Plus /> Add
+                  <Plus /> Adicionar
                 </Button>
               </form>
             </CardContent>
@@ -279,16 +284,16 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
 
           <Card className="gap-3 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-base">Tasks</CardTitle>
+              <CardTitle className="text-base">Tarefas</CardTitle>
               <CardDescription>
-                Linked to the goal directly or through its projects.
+                Vinculadas à meta diretamente ou pelos projetos dela.
               </CardDescription>
               <CardAction>
                 <TaskFormDialog
                   defaultGoalId={goal.id}
                   trigger={
                     <Button variant="outline" size="sm">
-                      <Plus /> Task
+                      <Plus /> Tarefa
                     </Button>
                   }
                 />
@@ -308,7 +313,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
         <aside className="flex flex-col gap-4">
           <Card className="gap-4 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-base">Progress</CardTitle>
+              <CardTitle className="text-base">Progresso</CardTitle>
               <CardDescription>{progress.basis}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -334,7 +339,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                       indicator: { ...goal.indicator!, current: value },
                     });
                     setIndicatorDraft(undefined);
-                    toast.success("Indicator updated");
+                    toast.success("Indicador atualizado");
                   }}
                 >
                   <span className="text-xs text-muted-foreground">
@@ -343,7 +348,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                       goal.indicator.current,
                       goal.indicator.unit,
                     )}{" "}
-                    of{" "}
+                    de{" "}
                     {formatIndicator(
                       goal.indicator.target,
                       goal.indicator.unit,
@@ -353,7 +358,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                     <Input
                       type="number"
                       min={0}
-                      aria-label={`Current ${goal.indicator.label}`}
+                      aria-label={`${goal.indicator.label} atual`}
                       value={indicatorDraft ?? goal.indicator.current}
                       onChange={(event) =>
                         setIndicatorDraft(event.target.value)
@@ -374,12 +379,13 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
 
           <Card className="gap-3 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-base">Projects</CardTitle>
+              <CardTitle className="text-base">Projetos</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               {projects.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                  No projects linked. Pick this goal when editing a project.
+                  Nenhum projeto vinculado. Escolha esta meta ao editar um
+                  projeto.
                 </p>
               )}
               {projects.map((project) => {
@@ -406,7 +412,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                     </span>
                     <ProgressBar
                       value={percent}
-                      label={`${project.name} progress`}
+                      label={`Progresso de ${project.name}`}
                       barClassName={projectColorClasses[project.color].bg}
                     />
                   </Link>
@@ -420,7 +426,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             purchases.length > 0) && (
             <Card className="gap-3 rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-base">Related</CardTitle>
+                <CardTitle className="text-base">Relacionados</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="flex flex-col gap-1 text-sm">
@@ -428,7 +434,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                     <RelatedLink
                       key={child.id}
                       href={`/goals/${child.id}`}
-                      kind="Sub-goal"
+                      kind="Submeta"
                       label={child.name}
                     />
                   ))}
@@ -436,7 +442,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                     <RelatedLink
                       key={study.id}
                       href="/learning"
-                      kind="Study"
+                      kind="Estudo"
                       label={study.name}
                     />
                   ))}
@@ -444,7 +450,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                     <RelatedLink
                       key={purchase.id}
                       href="/finance/purchases"
-                      kind="Purchase"
+                      kind="Compra"
                       label={purchase.name}
                     />
                   ))}
@@ -456,7 +462,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             defaultParentId={goal.id}
             trigger={
               <Button variant="outline">
-                <Plus /> Sub-goal
+                <Plus /> Submeta
               </Button>
             }
           />

@@ -13,13 +13,13 @@ export function formatBRLCompact(value: number) {
   return value >= 1000 ? `R$ ${Math.round(value / 100) / 10}k` : `R$ ${value}`;
 }
 
-const monthFormat = new Intl.DateTimeFormat("en-US", {
+const monthFormat = new Intl.DateTimeFormat("pt-BR", {
   month: "short",
   year: "numeric",
   timeZone: "UTC",
 });
 
-/** "2026-10" → "Oct 2026". */
+/** "2026-10" → "out. de 2026". */
 export function formatMonth(month: string) {
   return monthFormat.format(new Date(`${month}-01T00:00:00Z`));
 }

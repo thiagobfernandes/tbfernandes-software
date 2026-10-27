@@ -39,10 +39,10 @@ function save<
 >(key: K, noun: string, id: string | undefined, values: object) {
   if (id) {
     dataActions.update(key, id, values);
-    toast.success(`${noun} updated`);
+    toast.success(`${noun}: alterações salvas`);
   } else {
     dataActions.create(key, values as never);
-    toast.success(`${noun} created`);
+    toast.success(`${noun}: registro criado`);
   }
 }
 
@@ -51,10 +51,10 @@ export function StudyFormDialog({ item, ...dialog }: DialogProps<Study>) {
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit study" : "New study"}
-      description="A focused learning effort, usually serving a goal."
+      title={item ? "Editar estudo" : "Novo estudo"}
+      description="Um esforço de aprendizado focado, geralmente a serviço de uma meta."
       schema={studySchema}
-      submitLabel={item ? "Save changes" : "Create study"}
+      submitLabel={item ? "Salvar alterações" : "Criar estudo"}
       defaults={{
         name: item?.name ?? "",
         status: item?.status ?? "planned",
@@ -68,7 +68,7 @@ export function StudyFormDialog({ item, ...dialog }: DialogProps<Study>) {
       fields={[
         {
           name: "name",
-          label: "Name",
+          label: "Nome",
           type: "text",
           required: true,
           full: true,
@@ -81,34 +81,34 @@ export function StudyFormDialog({ item, ...dialog }: DialogProps<Study>) {
         },
         {
           name: "goalId",
-          label: "Goal",
+          label: "Meta",
           type: "select",
           optional: true,
           options: goals.map((g) => ({ value: g.id, label: g.name })),
         },
-        { name: "startDate", label: "Start", type: "date" },
-        { name: "dueDate", label: "Due", type: "date" },
+        { name: "startDate", label: "Início", type: "date" },
+        { name: "dueDate", label: "Prazo", type: "date" },
         {
           name: "nextActivity",
-          label: "Next activity",
+          label: "Próxima atividade",
           type: "text",
           full: true,
         },
         {
           name: "description",
-          label: "Description",
+          label: "Descrição",
           type: "textarea",
           rows: 2,
         },
         {
           name: "skillIds",
-          label: "Skills it develops",
+          label: "Habilidades que desenvolve",
           type: "multi",
           options: skills.map((s) => ({ value: s.id, label: s.name })),
-          emptyLabel: "Add skills first.",
+          emptyLabel: "Cadastre habilidades primeiro.",
         },
       ]}
-      onSubmit={(values) => save("studies", "Study", item?.id, values)}
+      onSubmit={(values) => save("studies", "Estudo", item?.id, values)}
     />
   );
 }
@@ -122,10 +122,10 @@ export function MaterialFormDialog({
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit material" : "New material"}
-      description="Consuming a material is not the same as mastering the topic."
+      title={item ? "Editar material" : "Novo material"}
+      description="Consumir um material não é o mesmo que dominar o assunto."
       schema={materialSchema}
-      submitLabel={item ? "Save changes" : "Add material"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar material"}
       defaults={{
         title: item?.title ?? "",
         type: item?.type ?? "article",
@@ -137,14 +137,14 @@ export function MaterialFormDialog({
       fields={[
         {
           name: "title",
-          label: "Title",
+          label: "Título",
           type: "text",
           required: true,
           full: true,
         },
         {
           name: "type",
-          label: "Type",
+          label: "Tipo",
           type: "select",
           options: materialTypeOptions,
         },
@@ -156,13 +156,13 @@ export function MaterialFormDialog({
         },
         {
           name: "studyId",
-          label: "Study",
+          label: "Estudo",
           type: "select",
           optional: true,
           options: studies.map((s) => ({ value: s.id, label: s.name })),
         },
         { name: "url", label: "Link", type: "url", placeholder: "https://" },
-        { name: "notes", label: "Notes", type: "textarea", rows: 2 },
+        { name: "notes", label: "Notas", type: "textarea", rows: 2 },
       ]}
       onSubmit={(values) => save("materials", "Material", item?.id, values)}
     />
@@ -173,20 +173,20 @@ export function SkillFormDialog({ item, ...dialog }: DialogProps<Skill>) {
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit skill" : "New skill"}
-      description="The level is your own assessment; evidence keeps it honest."
+      title={item ? "Editar habilidade" : "Nova habilidade"}
+      description="O nível é sua própria avaliação; as evidências mantêm a avaliação honesta."
       schema={skillSchema}
-      submitLabel={item ? "Save changes" : "Add skill"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar habilidade"}
       defaults={{
         name: item?.name ?? "",
         level: String(item?.level ?? 2) as "1" | "2" | "3" | "4" | "5",
         evidence: item?.evidence ?? "",
       }}
       fields={[
-        { name: "name", label: "Skill", type: "text", required: true },
+        { name: "name", label: "Habilidade", type: "text", required: true },
         {
           name: "level",
-          label: "Level",
+          label: "Nível",
           type: "select",
           options: [1, 2, 3, 4, 5].map((level) => ({
             value: String(level),
@@ -195,14 +195,14 @@ export function SkillFormDialog({ item, ...dialog }: DialogProps<Skill>) {
         },
         {
           name: "evidence",
-          label: "Evidence",
+          label: "Evidências",
           type: "textarea",
           rows: 2,
-          placeholder: "Projects, results or feedback that show it",
+          placeholder: "Projetos, resultados ou feedbacks que comprovam",
         },
       ]}
       onSubmit={(values) =>
-        save("skills", "Skill", item?.id, {
+        save("skills", "Habilidade", item?.id, {
           ...values,
           level: Number(values.level),
         })
@@ -219,9 +219,9 @@ export function CertificationFormDialog({
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit certification" : "New certification"}
+      title={item ? "Editar certificação" : "Nova certificação"}
       schema={certificationSchema}
-      submitLabel={item ? "Save changes" : "Add certification"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar certificação"}
       defaults={{
         name: item?.name ?? "",
         issuer: item?.issuer ?? "",
@@ -234,36 +234,36 @@ export function CertificationFormDialog({
       fields={[
         {
           name: "name",
-          label: "Name",
+          label: "Nome",
           type: "text",
           required: true,
           full: true,
         },
-        { name: "issuer", label: "Issuer", type: "text", required: true },
+        { name: "issuer", label: "Emissor", type: "text", required: true },
         {
           name: "status",
           label: "Status",
           type: "select",
           options: certificationStatusOptions,
         },
-        { name: "obtainedAt", label: "Obtained on", type: "date" },
-        { name: "expiresAt", label: "Expires on", type: "date" },
+        { name: "obtainedAt", label: "Obtida em", type: "date" },
+        { name: "expiresAt", label: "Vence em", type: "date" },
         {
           name: "validationUrl",
-          label: "Validation link",
+          label: "Link de validação",
           type: "url",
           full: true,
           placeholder: "https://",
         },
         {
           name: "studyIds",
-          label: "Related studies",
+          label: "Estudos relacionados",
           type: "multi",
           options: studies.map((s) => ({ value: s.id, label: s.name })),
         },
       ]}
       onSubmit={(values) =>
-        save("certifications", "Certification", item?.id, values)
+        save("certifications", "Certificação", item?.id, values)
       }
     />
   );
@@ -276,9 +276,9 @@ export function EducationFormDialog({
   return (
     <EntityFormDialog
       {...dialog}
-      title={item ? "Edit education" : "New education"}
+      title={item ? "Editar formação" : "Nova formação"}
       schema={educationSchema}
-      submitLabel={item ? "Save changes" : "Add education"}
+      submitLabel={item ? "Salvar alterações" : "Adicionar formação"}
       defaults={{
         institution: item?.institution ?? "",
         course: item?.course ?? "",
@@ -290,33 +290,33 @@ export function EducationFormDialog({
       fields={[
         {
           name: "institution",
-          label: "Institution",
+          label: "Instituição",
           type: "text",
           required: true,
           full: true,
         },
-        { name: "course", label: "Course", type: "text", required: true },
+        { name: "course", label: "Curso", type: "text", required: true },
         {
           name: "degree",
-          label: "Degree",
+          label: "Grau",
           type: "text",
           required: true,
-          placeholder: "Bachelor, MBA…",
+          placeholder: "Bacharelado, MBA…",
         },
         {
           name: "status",
           label: "Status",
           type: "select",
           options: [
-            { value: "in_progress", label: "In progress" },
-            { value: "completed", label: "Completed" },
-            { value: "paused", label: "Paused" },
+            { value: "in_progress", label: "Em andamento" },
+            { value: "completed", label: "Concluída" },
+            { value: "paused", label: "Pausada" },
           ],
         },
-        { name: "startDate", label: "Start", type: "date", required: true },
-        { name: "endDate", label: "End", type: "date" },
+        { name: "startDate", label: "Início", type: "date", required: true },
+        { name: "endDate", label: "Fim", type: "date" },
       ]}
-      onSubmit={(values) => save("educations", "Education", item?.id, values)}
+      onSubmit={(values) => save("educations", "Formação", item?.id, values)}
     />
   );
 }

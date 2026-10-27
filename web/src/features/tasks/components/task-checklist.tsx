@@ -84,7 +84,7 @@ export function TaskChecklist({ task }: { task: Task }) {
               </label>
               <button
                 type="button"
-                aria-label={`Remove "${item.title}"`}
+                aria-label={`Remover "${item.title}"`}
                 onClick={() =>
                   save(items.filter((current) => current.id !== item.id))
                 }
@@ -106,13 +106,13 @@ export function TaskChecklist({ task }: { task: Task }) {
         <Input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Add an item"
-          aria-label="New checklist item"
+          placeholder="Adicionar item"
+          aria-label="Novo item da checklist"
           className="h-8"
         />
         <button
           type="submit"
-          aria-label="Add item"
+          aria-label="Adicionar"
           className="flex size-8 shrink-0 items-center justify-center rounded-md border text-muted-foreground outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
           <Plus className="size-4" />

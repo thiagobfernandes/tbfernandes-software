@@ -16,13 +16,13 @@ export function MethodsPage() {
   return (
     <PageContainer className="max-w-none">
       <PageHeading
-        title="Methods"
-        description="Reusable workflows and checklists you can follow step by step."
+        title="Métodos"
+        description="Fluxos e checklists reutilizáveis para seguir passo a passo."
         actions={
           <MethodFormDialog
             trigger={
               <Button>
-                <Plus /> New method
+                <Plus /> Novo método
               </Button>
             }
           />
@@ -70,9 +70,9 @@ export function MethodsPage() {
               <div className="mt-auto flex items-center justify-between gap-3 border-t pt-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <ListOrdered className="size-3.5" aria-hidden />
-                  {method.steps.length} steps
+                  {method.steps.length} passos
                 </span>
-                <span>Reviewed {formatShort(method.lastReviewed)}</span>
+                <span>Revisado em {formatShort(method.lastReviewed)}</span>
               </div>
             </Link>
           );

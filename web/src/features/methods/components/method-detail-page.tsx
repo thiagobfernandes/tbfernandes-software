@@ -38,7 +38,7 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
         href="/methods"
         className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ChevronLeft className="size-4" aria-hidden /> Methods
+        <ChevronLeft className="size-4" aria-hidden /> Métodos
       </Link>
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -62,7 +62,7 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
               ))}
               <span className="flex items-center gap-1">
                 <CalendarCheck className="size-3.5" aria-hidden />
-                Reviewed {formatShort(method.lastReviewed)}
+                Revisado em {formatShort(method.lastReviewed)}
               </span>
             </div>
           </div>
@@ -72,16 +72,16 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
             method={method}
             trigger={
               <Button variant="outline">
-                <Pencil /> Edit
+                <Pencil /> Editar
               </Button>
             }
           />
           <ConfirmDelete
-            noun="method"
+            noun="método"
             name={method.title}
             onConfirm={() => {
               dataActions.remove("methods", method.id);
-              toast.success("Method deleted");
+              toast.success("Método excluído");
               router.push("/methods");
             }}
           />
@@ -90,8 +90,8 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <section aria-label="Steps" className="flex flex-col gap-3">
-          <h2 className="text-base font-semibold">Steps</h2>
+        <section aria-label="Passos" className="flex flex-col gap-3">
+          <h2 className="text-base font-semibold">Passos</h2>
           <MethodChecklist steps={method.steps} />
         </section>
 
@@ -101,7 +101,7 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
               <Card key={example.title} className="gap-3 rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-base">{example.title}</CardTitle>
-                  <CardDescription>Copy and adapt.</CardDescription>
+                  <CardDescription>Copie e adapte.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <CodeBlock code={example.content} language="plaintext" />
@@ -120,11 +120,11 @@ function MissingMethod() {
     <PageContainer>
       <EmptyState
         icon={SearchX}
-        title="Method not found"
-        description="It may have been removed, or the link is wrong."
+        title="Método não encontrado"
+        description="O registro pode ter sido removido ou o link está errado."
         action={
           <Button variant="outline" asChild>
-            <Link href="/methods">Back to methods</Link>
+            <Link href="/methods">Voltar para métodos</Link>
           </Button>
         }
       />

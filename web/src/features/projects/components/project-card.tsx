@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Building2 } from "lucide-react";
 
-import type { Company, Project } from "@/features/projects/types/project";
+import {
+  projectStatusLabels,
+  type Company,
+  type Project,
+} from "@/features/projects/types/project";
 import type { Task } from "@/features/tasks/types/task";
 import { projectColorClasses } from "@/lib/project-colors";
 import { cn } from "@/lib/utils";
@@ -46,7 +50,7 @@ export function ProjectCard({
           </h3>
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Building2 className="size-3.5" aria-hidden />
-            {company?.name ?? "Personal initiative"}
+            {company?.name ?? "Iniciativa pessoal"}
           </span>
         </div>
         <span
@@ -55,7 +59,7 @@ export function ProjectCard({
             statusStyles[project.status],
           )}
         >
-          {project.status}
+          {projectStatusLabels[project.status]}
         </span>
       </div>
 
@@ -68,7 +72,7 @@ export function ProjectCard({
       <div className="mt-auto flex flex-col gap-2">
         <div className="flex items-baseline justify-between text-xs text-muted-foreground">
           <span>
-            {open} open · {done} done
+            {open} abertas · {done} concluídas
           </span>
           <span className="tabular-nums">{progress}%</span>
         </div>
@@ -80,7 +84,7 @@ export function ProjectCard({
         </div>
         {project.nextDelivery && (
           <span className="truncate text-xs text-muted-foreground">
-            Next: {project.nextDelivery}
+            Próxima: {project.nextDelivery}
           </span>
         )}
       </div>
