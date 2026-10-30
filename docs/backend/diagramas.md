@@ -2,7 +2,7 @@
 
 Versão 0.1 · 2026-10-26
 
-Os diagramas estão em Mermaid, que o GitHub e o VS Code mostram direto no Markdown. O diagrama de componentes gerado a partir do código fica em `api/target/spring-modulith-docs/` depois de `./mvnw test` (PlantUML/C4), e serve para conferir se este documento continua fiel ao código.
+Os diagramas estão em Mermaid, que o GitHub e o VS Code mostram direto no Markdown. O diagrama de componentes gerado a partir do código fica em `tbfernandes-backend/target/spring-modulith-docs/` depois de `./mvnw test` (PlantUML/C4), e serve para conferir se este documento continua fiel ao código.
 
 O modelo de dados (diagrama entidade-relacionamento) está em [modelo-de-dados.md](modelo-de-dados.md).
 
@@ -61,9 +61,9 @@ Linhas tracejadas para atores externos indicam casos de uso planejados (fora do 
 
 ```mermaid
 flowchart TB
-    web["web/ (Next.js)"]
+    web["tbfernandes-frontend/ (Next.js)"]
 
-    subgraph api["api/ (Spring Boot, monólito modular)"]
+    subgraph api["tbfernandes-backend/ (Spring Boot, monólito modular)"]
         direction TB
         shared["shared<br/>ids · erros · OwnerContext · CORS"]
         identity[identity]
@@ -427,8 +427,8 @@ sequenceDiagram
 flowchart LR
     subgraph pc["Windows + WSL (Ubuntu)"]
         subgraph wsl["~/projects/tbfernandes-software"]
-            next["web/ · npm run dev<br/>:3000"]
-            boot["api/ · ./mvnw spring-boot:run<br/>:8080"]
+            next["tbfernandes-frontend/ · npm run dev<br/>:3000"]
+            boot["tbfernandes-backend/ · ./mvnw spring-boot:run<br/>:8080"]
         end
         subgraph docker["Docker (compose.yaml)"]
             pg[("postgres:17-alpine<br/>:5432 · volume tbf-pgdata")]

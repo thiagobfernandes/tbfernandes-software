@@ -33,7 +33,7 @@ Fechar o módulo Work na API para que as telas de empresas, projetos, tarefas e 
 ## Como verificar
 
 ```bash
-cd api && ./mvnw spring-boot:run
+cd tbfernandes-backend && ./mvnw spring-boot:run
 curl -s localhost:8080/api/v1/dashboard/summary
 curl -s "localhost:8080/api/v1/tasks?overdue=true"
 ```

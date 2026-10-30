@@ -10,26 +10,26 @@ Fazer as telas do frontend lerem e gravarem na API real sem reescrevê-las, mant
 
 | Item | Mudança | Onde |
 |---|---|---|
-| — | `NEXT_PUBLIC_DATA_SOURCE=api\|local`. Em `api`, o store começa vazio, carrega as 17 coleções e envia cada criação, edição e exclusão para o endpoint da coleção. As telas não mudaram: continuam usando `useAppData`, `dataActions` e `workActions`. | `web/src/lib/sample-data/store.ts`, `web/src/lib/api/remote-store.ts` |
+| — | `NEXT_PUBLIC_DATA_SOURCE=api\|local`. Em `api`, o store começa vazio, carrega as 17 coleções e envia cada criação, edição e exclusão para o endpoint da coleção. As telas não mudaram: continuam usando `useAppData`, `dataActions` e `workActions`. | `tbfernandes-frontend/src/lib/sample-data/store.ts`, `tbfernandes-frontend/src/lib/api/remote-store.ts` |
 | — | Mudanças enviadas uma de cada vez, em ordem. A resposta da API substitui o registro local, trazendo campos calculados como `completedAt` e os ids do checklist. Se a API recusa (por exemplo RN-07, tarefa bloqueada concluída), aparece um aviso com o motivo e os dados são recarregados. | `remote-store.ts` |
-| — | Ids gerados no navegador (UUIDv7) e aceitos pela API pelo cabeçalho `X-Client-Id`. O registro tem o mesmo id antes e depois de salvo (ADR-007). | `web/src/lib/api/uuid.ts`, `shared/domain/ClientIds`, `ClientIdFilter` |
-| — | Tela de carregamento, tela "a API não responde" e login no modo `session`. O cliente envia o cabeçalho `X-XSRF-TOKEN` a partir do cookie. | `web/src/components/layout/data-gate.tsx`, `web/src/lib/api/client.ts` |
+| — | Ids gerados no navegador (UUIDv7) e aceitos pela API pelo cabeçalho `X-Client-Id`. O registro tem o mesmo id antes e depois de salvo (ADR-007). | `tbfernandes-frontend/src/lib/api/uuid.ts`, `shared/domain/ClientIds`, `ClientIdFilter` |
+| — | Tela de carregamento, tela "a API não responde" e login no modo `session`. O cliente envia o cabeçalho `X-XSRF-TOKEN` a partir do cookie. | `tbfernandes-frontend/src/components/layout/data-gate.tsx`, `tbfernandes-frontend/src/lib/api/client.ts` |
 | — | O assistente usa `POST /assistant/questions` no modo `api`. O selo "Sample data" some nesse modo. | `assistant-page.tsx`, `sample-data-badge.tsx` |
-| IDN-04 | Configurações → Data → **Export JSON**: baixa todas as coleções no formato `AppData`. Funciona nos dois modos. | `web/src/lib/api/transfer.ts`, `data-settings.tsx` |
+| IDN-04 | Configurações → Data → **Export JSON**: baixa todas as coleções no formato `AppData`. Funciona nos dois modos. | `tbfernandes-frontend/src/lib/api/transfer.ts`, `data-settings.tsx` |
 | IDN-05 | **Import data saved in this browser** e **Import JSON file**: enviam tudo para a API na ordem das dependências (empresas, metas, projetos, tarefas…). Os ids curtos do modo simulado viram o mesmo UUIDv5 do seed de `dev`. Assim, registros que já existem respondem 409 e são pulados, e importar duas vezes não duplica nada. | `transfer.ts` |
-| PLT-08 | `npm run api:types` gera `web/src/lib/api/schema.d.ts` a partir do OpenAPI (`openapi-typescript`, sem entrar no `package-lock.json`). Login e pergunta ao assistente já usam esses tipos. | `web/package.json`, `schema.d.ts` |
+| PLT-08 | `npm run api:types` gera `tbfernandes-frontend/src/lib/api/schema.d.ts` a partir do OpenAPI (`openapi-typescript`, sem entrar no `package-lock.json`). Login e pergunta ao assistente já usam esses tipos. | `tbfernandes-frontend/package.json`, `schema.d.ts` |
 | — | API: CORS expõe `X-Total-Count`, `X-Page`, `X-Page-Size` e `Location`. Campos desconhecidos no corpo são ignorados. `DataIntegrityViolationException` vira 409. | `WebConfig`, `application.yaml`, `ApiExceptionHandler` |
 
 ## Como usar
 
 ```bash
 # terminal 1
-cd api && ./mvnw spring-boot:run
+cd tbfernandes-backend && ./mvnw spring-boot:run
 # terminal 2
-cd web && echo "NEXT_PUBLIC_DATA_SOURCE=api" >> .env.local && npm run dev
+cd tbfernandes-frontend && echo "NEXT_PUBLIC_DATA_SOURCE=api" >> .env.local && npm run dev
 ```
 
-Para testar o login, suba a API com `TBF_AUTH_MODE=session` e as variáveis `TBF_AUTH_BOOTSTRAP_*` ([api/README.md](../../../api/README.md#modos-de-autenticação)). Com o e-mail `owner@tbfernandes.local`, a senha vai para o dono dos dados de exemplo.
+Para testar o login, suba a API com `TBF_AUTH_MODE=session` e as variáveis `TBF_AUTH_BOOTSTRAP_*` ([tbfernandes-backend/README.md](../../../tbfernandes-backend/README.md#modos-de-autenticação)). Com o e-mail `owner@tbfernandes.local`, a senha vai para o dono dos dados de exemplo.
 
 ## Decisões
 

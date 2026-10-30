@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Versão 0.1 · 2026-10-26 · Fonte da verdade: `api/src/main/resources/db/migration`
+Versão 0.1 · 2026-10-26 · Fonte da verdade: `tbfernandes-backend/src/main/resources/db/migration`
 
 ## 1. Convenções
 
@@ -264,7 +264,7 @@ Ids: o frontend usa ids curtos (`t-1a2b3c4d`); a API usa UUID. Na migração dos
 
 ## 4. Banco local
 
-- `api/compose.yaml`: PostgreSQL 17 (`tbfernandes` / usuário `tbf` / senha `tbf`, porta 5432, volume `tbf-pgdata`).
+- `tbfernandes-backend/compose.yaml`: PostgreSQL 17 (`tbfernandes` / usuário `tbf` / senha `tbf`, porta 5432, volume `tbf-pgdata`).
 - Perfil `dev` (padrão): aplica as migrações e o seed `db/dev/R__dev_seed.sql` com os mesmos registros de exemplo do frontend.
 - Para olhar os dados: `docker compose exec postgres psql -U tbf -d tbfernandes`, depois `\dn` (schemas) e `\dt work.*`.
 - Para recomeçar do zero: `docker compose down -v`.

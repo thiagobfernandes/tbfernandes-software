@@ -1,0 +1,64 @@
+# The whole platform behind nginx: `docker compose up -d --build`, then http://localhost.
+# Settings come from .env (see .env.example). How to run and deploy: docs/como-rodar.md.
+name: tbfernandes
+
+include:
+  # The database lives in its own file because `./mvnw spring-boot:run` also uses it.
+  - tbfernandes-backend/compose.yaml
+
+services:
+  backend:
+    build: ./tbfernandes-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${TBF_PROFILE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tbfernandes
+      SPRING_DATASOURCE_USERNAME: tbf
+      SPRING_DATASOURCE_PASSWORD: ${TBF_DB_PASSWORD:-tbf}
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      TBF_AUTH_MODE: ${TBF_AUTH_MODE:-single-user}
+      TBF_AUTH_BOOTSTRAP_EMAIL: ${TBF_AUTH_BOOTSTRAP_EMAIL:-}
+      TBF_AUTH_BOOTSTRAP_PASSWORD: ${TBF_AUTH_BOOTSTRAP_PASSWORD:-}
+      TBF_AUTH_BOOTSTRAP_NAME: ${TBF_AUTH_BOOTSTRAP_NAME:-}
+      TBF_COOKIE_SECURE: ${TBF_COOKIE_SECURE:-false}
+      TBF_ASSISTANT_MODEL: ${TBF_ASSISTANT_MODEL:-none}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PLUGGY_ENABLED: ${PLUGGY_ENABLED:-false}
+      PLUGGY_CLIENT_ID: ${PLUGGY_CLIENT_ID:-}
+      PLUGGY_CLIENT_SECRET: ${PLUGGY_CLIENT_SECRET:-}
+      PLUGGY_WEBHOOK_SECRET: ${PLUGGY_WEBHOOK_SECRET:-}
+    healthcheck:
+      # The JRE image has no curl or wget.
+      test:
+        - CMD
+        - bash
+        - -c
+        - exec 3<>/dev/tcp/localhost/8080 && printf 'GET /actuator/health HTTP/1.0\r\n\r\n' >&3 && grep -q UP <&3
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./tbfernandes-frontend
+      args:
+        # Empty on purpose: the browser calls /api on the same origin, through nginx.
+        NEXT_PUBLIC_API_URL: ""
+        NEXT_PUBLIC_DATA_SOURCE: ${NEXT_PUBLIC_DATA_SOURCE:-api}
+        NEXT_PUBLIC_PLUGGY_SANDBOX: ${NEXT_PUBLIC_PLUGGY_SANDBOX:-false}
+    restart: unless-stopped
+
+  nginx:
+    build: ./tbfernandes-nginx
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+    ports:
+      - "${TBF_HTTP_PORT:-80}:80"

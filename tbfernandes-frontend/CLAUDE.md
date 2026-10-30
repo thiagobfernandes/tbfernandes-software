@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Frontend (web/) — regras para o Claude Code
+# Frontend (tbfernandes-frontend/) — regras para o Claude Code
 
 Leia também: [arquitetura do frontend](../docs/frontend/arquitetura.md), [design](../docs/design/referencias.md) e [padrões de código](../docs/padroes-de-codigo.md#frontend).
 

@@ -32,7 +32,7 @@ Conectar bancos pela Pluggy e transformar as transações em lançamentos do flu
 
 - **Sinal do valor.** No cartão, valor positivo é compra e negativo é pagamento. Na conta, quem manda é o `type` (`DEBIT` ou `CREDIT`). O adaptador normaliza: para o resto do sistema, negativo é dinheiro saindo.
 - **Fatura de cartão.** O pagamento aparece como saída na conta e entrada no cartão. Entradas e saídas ficam infladas pelo valor da fatura, mas o saldo do mês fica certo.
-- **Webhook sem assinatura.** A Pluggy não assina webhooks. Ela devolve o cabeçalho `X-Webhook-Secret` definido no registro (`api/scripts/pluggy-register-webhook.sh`), comparado em tempo constante. Sem `PLUGGY_WEBHOOK_SECRET`, todo webhook recebe 401.
+- **Webhook sem assinatura.** A Pluggy não assina webhooks. Ela devolve o cabeçalho `X-Webhook-Secret` definido no registro (`tbfernandes-backend/scripts/pluggy-register-webhook.sh`), comparado em tempo constante. Sem `PLUGGY_WEBHOOK_SECRET`, todo webhook recebe 401.
 - **Webhook e widget chegam juntos.** O callback do widget pode nem rodar, então o webhook sozinho consegue registrar a conexão: dono e escopo vão no `clientUserId` do token (`ConnectionClaim`). O registro usa `ON CONFLICT DO NOTHING`.
 - **Duas sincronizações ao mesmo tempo.** Cada uma trava a linha da conexão (`FOR UPDATE`), então rodam em fila e a segunda não encontra nada novo. O bloqueio é por SQL nativo e seguido de `refresh`, porque uma consulta com lock sobre uma entidade já carregada na transação falha por versão.
 - **Falha da Pluggy durante a sincronização** não é erro HTTP: fica em `lastError` na conexão, e nada é importado pela metade.

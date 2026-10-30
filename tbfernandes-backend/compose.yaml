@@ -1,0 +1,27 @@
+# Database. `./mvnw spring-boot:run` starts it automatically (spring-boot-docker-compose) and the
+# compose.yaml at the repository root includes it, so both always use the same container.
+name: tbfernandes
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tbfernandes
+      POSTGRES_USER: tbf
+      POSTGRES_PASSWORD: ${TBF_DB_PASSWORD:-tbf}
+    ports:
+      # Local only. 5432 is often taken by other projects on this machine.
+      - "127.0.0.1:${TBF_DB_PORT:-5434}:5432"
+    volumes:
+      - tbf-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tbf -d tbfernandes"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  tbf-pgdata:
+    # The name it got when this file lived in api/. It holds real data: keep it.
+    name: ${TBF_PGDATA_VOLUME:-api_tbf-pgdata}

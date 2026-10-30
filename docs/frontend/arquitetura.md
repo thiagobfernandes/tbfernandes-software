@@ -4,7 +4,7 @@ Versão 0.1 · 2026-10-27 · Complementa [decisoes-tecnicas.md](../decisoes-tecn
 
 ## 1. Resumo
 
-- **Next.js 16 (App Router)**, React 19, TypeScript, Tailwind CSS 4, shadcn/ui, em `web/`.
+- **Next.js 16 (App Router)**, React 19, TypeScript, Tailwind CSS 4, shadcn/ui, em `tbfernandes-frontend/`.
 - **Organização por feature**: páginas finas em `src/app`, código em `src/features/<feature>`.
 - **Um store no cliente** (`src/lib/sample-data/store.ts`) é a fonte de dados de todas as telas. Ele funciona em dois modos:
   - `local` (padrão): simula a API com dados de exemplo salvos no localStorage;
@@ -14,7 +14,7 @@ Versão 0.1 · 2026-10-27 · Complementa [decisoes-tecnicas.md](../decisoes-tecn
 ## 2. Pastas
 
 ```
-web/src
+tbfernandes-frontend/src
 ├── app/
 │   ├── layout.tsx              raiz: fontes, ThemeProvider, Toaster
 │   └── (dashboard)/            shell com sidebar e DataGate; uma pasta por rota
@@ -30,7 +30,7 @@ web/src
 │   └── hooks/                  hooks da feature
 ├── hooks/                      hooks genéricos
 └── lib/
-    ├── api/                    client.ts (apiFetch + Problem Details), remote-store.ts, transfer.ts, uuid.ts, schema.d.ts
+    ├── tbfernandes-backend/                    client.ts (apiFetch + Problem Details), remote-store.ts, transfer.ts, uuid.ts, schema.d.ts
     ├── constants/navigation.ts sidebar
     ├── sample-data/            store.ts e dados de exemplo por área
     ├── dates.ts, money.ts      formatação pt-BR

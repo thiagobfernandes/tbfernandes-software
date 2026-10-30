@@ -13,7 +13,7 @@ Documentação: [docs/backend](../docs/backend/README.md).
 ## Rodar
 
 ```bash
-cd api
+cd tbfernandes-backend
 ./mvnw spring-boot:run        # sobe o PostgreSQL do compose.yaml, aplica as migrações e o seed de dev
 ```
 
@@ -21,7 +21,7 @@ cd api
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - Saúde e módulos: http://localhost:8080/actuator/health, http://localhost:8080/actuator/modulith
 
-O frontend já aponta para `http://localhost:8080` (`web/.env.example`). Para as telas lerem da API em vez do armazenamento simulado, use `NEXT_PUBLIC_DATA_SOURCE=api` no `web/.env.local`.
+O frontend já aponta para `http://localhost:8080` (`tbfernandes-frontend/.env.example`). Para as telas lerem da API em vez do armazenamento simulado, use `NEXT_PUBLIC_DATA_SOURCE=api` no `tbfernandes-frontend/.env.local`.
 
 ## Modos de autenticação
 

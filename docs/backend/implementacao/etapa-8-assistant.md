@@ -28,7 +28,7 @@ Levar para a API as duas telas que leem todos os módulos: o assistente por regr
 ## Como verificar
 
 ```bash
-cd api && ./mvnw spring-boot:run
+cd tbfernandes-backend && ./mvnw spring-boot:run
 curl -s -X POST localhost:8080/api/v1/assistant/questions \
   -H 'Content-Type: application/json' -d '{"question": "o que está atrasado?"}'
 curl -s localhost:8080/api/v1/graph | head -c 400

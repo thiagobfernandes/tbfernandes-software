@@ -10,7 +10,7 @@ def s(x):
     return "'" + str(x).replace("'", "''") + "'"
 def e(x): return 'NULL' if x is None else s(x.upper())
 def arr(xs): return "ARRAY[" + ",".join(s(v) for v in xs) + "]::text[]" if xs else "'{}'"
-out = ["-- Development sample data, generated from web/src/lib/sample-data (same records the",
+out = ["-- Development sample data, generated from tbfernandes-frontend/src/lib/sample-data (same records the",
        "-- frontend shows). Ids are UUIDv5 of the frontend ids, so links stay consistent.",
        "-- Loaded only with the dev profile (spring.flyway.locations includes db/dev).", ""]
 def ins(table, cols, rows):

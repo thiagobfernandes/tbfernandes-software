@@ -1,4 +1,4 @@
-# Backend (api/) — regras para o Claude Code
+# Backend (tbfernandes-backend/) — regras para o Claude Code
 
 Leia também: [arquitetura](../docs/backend/arquitetura.md), [requisitos](../docs/backend/requisitos.md), [modelo de dados](../docs/backend/modelo-de-dados.md), [contrato da API](../docs/backend/api.md), [backlog](../docs/backend/backlog.md) e [padrões de código](../docs/padroes-de-codigo.md#backend).
 
@@ -38,7 +38,7 @@ Direção permitida entre módulos: `goals → work, learning, finance`; `knowle
 - Rotas: `/api/v1/<recurso-no-plural>`, recurso plano por coleção do frontend; status em `PATCH /{id}/status`. Listas aceitam `?page=&size=` e devolvem `X-Total-Count`.
 - Erros em Problem Details: `NotFound` 404, `Conflict` 409, `BusinessRuleViolation` 422 (com `rule`), validação 400 (com `errors`). Mensagens para o usuário em **pt-BR**.
 - Integrações externas (Pluggy, IA) atrás de porta, com adaptador desligado como padrão (ADR-005).
-- Dados de exemplo do perfil `dev` em `db/dev/R__dev_seed.sql`, iguais aos de `web/src/lib/sample-data` (ADR-006).
+- Dados de exemplo do perfil `dev` em `db/dev/R__dev_seed.sql`, iguais aos de `tbfernandes-frontend/src/lib/sample-data` (ADR-006).
 - Mudou contrato, modelo ou regra: atualize `docs/backend/*.md` no mesmo commit e registre a etapa em `docs/backend/implementacao/`.
 
 ## Verificar

@@ -40,7 +40,7 @@ Os sites Dribbble, Behance e obsidian.md não abrem a partir do ambiente do Clau
 - **Barras de progresso** finas com trilho escuro.
 - **Canvas pontilhado** para grafos e árvores.
 - **Ícones** lucide-react, tamanho padrão do shadcn.
-- **Cores só por tokens** de `web/src/app/globals.css` (`--success`, `--warning`, `--destructive`, cores de projeto em `lib/project-colors.ts`). Nada de hex no componente.
+- **Cores só por tokens** de `tbfernandes-frontend/src/app/globals.css` (`--success`, `--warning`, `--destructive`, cores de projeto em `lib/project-colors.ts`). Nada de hex no componente.
 
 ## Estrutura de navegação
 

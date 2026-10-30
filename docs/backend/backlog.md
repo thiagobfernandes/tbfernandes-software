@@ -34,7 +34,7 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | PLT-05 | Testes de arquitetura (Spring Modulith + ArchUnit) e documentação dos módulos gerada | P | ✅ |
 | PLT-06 | CI no GitHub Actions: `./mvnw verify` e `npm run build` em cada PR | P | ✅ |
 | PLT-07 | Job de verificação de referências órfãs entre módulos (ADR-003) | M | ⬜ |
-| PLT-08 | Gerar tipos TS a partir do OpenAPI (`openapi-typescript`) e usar em `web/src/lib/api` | M | ✅ etapa 9 |
+| PLT-08 | Gerar tipos TS a partir do OpenAPI (`openapi-typescript`) e usar em `tbfernandes-frontend/src/lib/api` | M | ✅ etapa 9 |
 | PLT-09 | Paginação padrão (`page`, `size`, `sort`) e resposta paginada | P | ✅ |
 | PLT-10 | Tratamento de conflito de versão e de estado (409) | P | ✅ |
 | PLT-11 | Logs JSON e perfil `prod` | P | ✅ |
@@ -135,7 +135,7 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| AST-01 | Portar o assistente por regras (`web/src/features/assistant/lib/answer.ts`) para a API (RF-AST-01) | M | ✅ etapa 8 |
+| AST-01 | Portar o assistente por regras (`tbfernandes-frontend/src/features/assistant/lib/answer.ts`) para a API (RF-AST-01) | M | ✅ etapa 8 |
 | AST-02 | Porta `LanguageModel` e adaptador desligado | P | ✅ etapa 8 |
 | AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ⬜ |
 | AST-04 | pgvector e embeddings de notas e snippets | G | ⬜ |

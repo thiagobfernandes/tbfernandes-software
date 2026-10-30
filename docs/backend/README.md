@@ -10,4 +10,4 @@
 | [backlog.md](backlog.md) | Épicos, itens, critérios, Definition of Done e sequência de entregas |
 | [implementacao/](implementacao/README.md) | Registro do que foi feito em cada etapa |
 
-Código: [api/](../../api/README.md). Índice geral: [docs/README.md](../README.md). Padrões: [padroes-de-codigo.md](../padroes-de-codigo.md).
+Código: [tbfernandes-backend/](../../tbfernandes-backend/README.md). Índice geral: [docs/README.md](../README.md). Padrões: [padroes-de-codigo.md](../padroes-de-codigo.md).

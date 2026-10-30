@@ -135,7 +135,7 @@ Falha ao falar com a Pluggy responde 502.
 | POST | `/assistant/questions` | `{ question }` (até 500 caracteres) → resposta com referências | AST-01, AST-02 |
 | GET | `/graph` | `{ nodes: [{ id, kind, label, href }], edges: [{ source, target }] }` | KNW-05 |
 
-Exemplo de resposta do assistente. O formato é o de `web/src/features/assistant/lib/answer.ts`, mais o campo `source`:
+Exemplo de resposta do assistente. O formato é o de `tbfernandes-frontend/src/features/assistant/lib/answer.ts`, mais o campo `source`:
 
 ```json
 {
@@ -149,7 +149,7 @@ Exemplo de resposta do assistente. O formato é o de `web/src/features/assistant
 
 ## Exemplo de tarefa
 
-Mesmo formato de `web/src/features/tasks/types/task.ts`:
+Mesmo formato de `tbfernandes-frontend/src/features/tasks/types/task.ts`:
 
 ```json
 {

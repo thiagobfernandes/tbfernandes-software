@@ -2,7 +2,7 @@
 
 Versão 0.1 · 2026-10-26 · Status: proposta para revisão
 
-Este documento descreve o que a API Spring Boot precisa fazer para substituir o armazenamento simulado do frontend (`web/src/lib/sample-data/store.ts`). Os requisitos foram levantados a partir das telas e dos tipos do frontend (`web/src/features/*/types`). Cada requisito tem um identificador usado no código, nos testes e no [backlog](backlog.md).
+Este documento descreve o que a API Spring Boot precisa fazer para substituir o armazenamento simulado do frontend (`tbfernandes-frontend/src/lib/sample-data/store.ts`). Os requisitos foram levantados a partir das telas e dos tipos do frontend (`tbfernandes-frontend/src/features/*/types`). Cada requisito tem um identificador usado no código, nos testes e no [backlog](backlog.md).
 
 Prioridade (MoSCoW): **M** = obrigatório no MVP, **S** = deveria ter, **C** = pode ter, **W** = fora do escopo agora.
 
@@ -15,7 +15,7 @@ Plataforma pessoal e profissional de gestão de um único usuário (por enquanto
 | Ator | Descrição |
 |---|---|
 | Usuário (dono) | Thiago. Único usuário na v1; todas as tabelas já têm `owner_id` para permitir multiusuário. |
-| Frontend web | Next.js em `web/`, cliente HTTP da API. |
+| Frontend web | Next.js em `tbfernandes-frontend/`, cliente HTTP da API. |
 | Provedor Open Finance | Pluggy. Fornece contas e transações bancárias. |
 | Provedor de IA | Planejado para o assistente; atrás de uma porta de saída. |
 

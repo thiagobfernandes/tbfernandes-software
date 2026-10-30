@@ -9,7 +9,7 @@ Status: proposta inicial (2026-10-23), revisada em 2026-10-27. Cada decisão pod
 - **Um único backend implantável** (Spring Boot), dividido em módulos de domínio: `identity`, `company`, `project`, `task`, `goal`, `learning`, `finance`, `contact`, `knowledge`, `assistant`.
 - **Frontend separado** (Next.js) consumindo a API HTTP do backend.
 - **Um único banco** PostgreSQL, com um schema lógico por módulo quando fizer sentido; migrations com Flyway. pgvector entra na fase do assistente.
-- **Monorepo**: `web/` (frontend), `api/` (backend) e `docs/` no mesmo repositório, para versionar contrato e telas juntos.
+- **Monorepo**: `tbfernandes-frontend/` (frontend), `tbfernandes-backend/` (backend) e `docs/` no mesmo repositório, para versionar contrato e telas juntos.
 - Sem microserviços, mensageria externa ou cache distribuído até existir necessidade medida.
 
 Por quê: um usuário, um time de uma pessoa e domínio ainda em descoberta. O monólito modular dá fronteiras claras entre domínios sem o custo operacional de vários serviços, e permite extrair um módulo depois (por exemplo, o orquestrador de IA) se for preciso.
@@ -21,7 +21,7 @@ Por quê: um usuário, um time de uma pessoa e domínio ainda em descoberta. O m
 - **Spring Modulith** para verificar fronteiras entre módulos em teste e publicar **eventos de domínio** entre módulos (ex.: `TaskCompleted` alimenta histórico e dashboard) em vez de chamadas diretas a internals.
 - Módulos se comunicam só por interfaces públicas (`<module>.api`) ou eventos. Nenhum módulo acessa repositório de outro.
 - **DTOs na borda**: entidades JPA nunca saem do módulo.
-- **Erros no formato Problem Details (RFC 9457)**, já tratado pelo cliente do frontend (`web/src/lib/api/client.ts`).
+- **Erros no formato Problem Details (RFC 9457)**, já tratado pelo cliente do frontend (`tbfernandes-frontend/src/lib/api/client.ts`).
 - **Contrato OpenAPI** gerado pelo springdoc; tipos TypeScript do frontend gerados a partir dele (openapi-typescript).
 - Validação com Bean Validation no backend, sempre (o frontend valida só para UX).
 - Auditoria simples: `created_at`, `updated_at` e tabela de eventos para mudanças relevantes.

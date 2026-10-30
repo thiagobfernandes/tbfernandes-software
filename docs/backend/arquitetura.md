@@ -4,7 +4,7 @@ Versão 0.1 · 2026-10-26 · Complementa [decisoes-tecnicas.md](../decisoes-tecn
 
 ## 1. Resumo
 
-- **Um único deploy**: Spring Boot 4.1 com Java 25, em `api/`.
+- **Um único deploy**: Spring Boot 4.1 com Java 25, em `tbfernandes-backend/`.
 - **Monólito modular** com Spring Modulith: cada domínio é um módulo, e o teste `ArchitectureTests` falha se um módulo usar internals de outro.
 - **Clean architecture dentro de cada módulo**: as regras de negócio ficam em classes Java puras; Spring, JPA e HTTP ficam nas bordas.
 - **PostgreSQL 17**, um schema por módulo, migrações Flyway.
@@ -146,7 +146,7 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 **Consequências:** o ambiente local e os testes nunca chamam serviços externos sem querer.
 
 ### ADR-006 — Dados de exemplo iguais aos do frontend no perfil `dev`
-**Decisão:** `db/dev/R__dev_seed.sql` é gerado a partir de `web/src/lib/sample-data`, com ids UUIDv5 dos ids do frontend.
+**Decisão:** `db/dev/R__dev_seed.sql` é gerado a partir de `tbfernandes-frontend/src/lib/sample-data`, com ids UUIDv5 dos ids do frontend.
 **Consequências:** as telas mostram os mesmos registros com a API real; o seed nunca roda fora do perfil `dev`.
 
 ### ADR-007 — O cliente pode escolher o id do registro que cria
@@ -158,11 +158,11 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 
 ```
 WSL (Ubuntu)
-├── web/  Next.js :3000  ──HTTP──▶  api/  Spring Boot :8080  ──JDBC──▶  PostgreSQL 17 :5432 (Docker, compose.yaml)
+├── tbfernandes-frontend/  Next.js :3000  ──HTTP──▶  tbfernandes-backend/  Spring Boot :8080  ──JDBC──▶  PostgreSQL 17 :5432 (Docker, compose.yaml)
 ```
 
-Veja [README do backend](../../api/README.md) para os comandos.
+Veja [README do backend](../../tbfernandes-backend/README.md) para os comandos.
 
 ### Frontend com a API (etapa 9)
 
-`NEXT_PUBLIC_DATA_SOURCE=api` no `web/.env.local` troca o armazenamento simulado pela API sem mudar as telas: o store (`web/src/lib/sample-data/store.ts`) continua sendo o que as telas leem, mas começa vazio, carrega as 17 coleções da API e envia cada mudança por `web/src/lib/api/remote-store.ts`, uma de cada vez e em ordem. Se a API recusar uma mudança, o store recarrega tudo da API e mostra o motivo. No modo `session`, a tela de login aparece antes do painel.
+`NEXT_PUBLIC_DATA_SOURCE=api` no `tbfernandes-frontend/.env.local` troca o armazenamento simulado pela API sem mudar as telas: o store (`tbfernandes-frontend/src/lib/sample-data/store.ts`) continua sendo o que as telas leem, mas começa vazio, carrega as 17 coleções da API e envia cada mudança por `tbfernandes-frontend/src/lib/api/remote-store.ts`, uma de cada vez e em ordem. Se a API recusar uma mudança, o store recarrega tudo da API e mostra o motivo. No modo `session`, a tela de login aparece antes do painel.

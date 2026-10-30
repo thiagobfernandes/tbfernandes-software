@@ -31,7 +31,7 @@ A V3 não foi alterada: migrações já aplicadas nunca mudam. Quem já rodou a 
 ## Outras mudanças
 
 - `AuditedEntity` foi para `shared.infrastructure.persistence`, para os módulos não copiarem as colunas comuns.
-- O seed de `dev` agora é gerado por um script versionado: `api/scripts/dev-seed/generate.sh` lê `web/src/lib/sample-data` e escreve `R__dev_seed.sql`. Rode de novo sempre que os dados de exemplo do frontend mudarem.
+- O seed de `dev` agora é gerado por um script versionado: `tbfernandes-backend/scripts/dev-seed/generate.sh` lê `tbfernandes-frontend/src/lib/sample-data` e escreve `R__dev_seed.sql`. Rode de novo sempre que os dados de exemplo do frontend mudarem.
 
 ## Decisões
 

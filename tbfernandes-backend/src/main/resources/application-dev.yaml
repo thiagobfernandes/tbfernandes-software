@@ -5,6 +5,6 @@ spring:
     locations: classpath:db/migration,classpath:db/dev
   datasource:
     # Used only when Docker Compose support is off (e.g. a PostgreSQL installed in WSL).
-    url: jdbc:postgresql://localhost:5432/tbfernandes
+    url: jdbc:postgresql://localhost:5434/tbfernandes
     username: tbf
     password: tbf

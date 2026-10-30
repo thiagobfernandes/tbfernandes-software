@@ -2,7 +2,7 @@
 # Registers the app's webhook at Pluggy (FIN-OF-06). Run once per public URL.
 #
 #   PLUGGY_CLIENT_ID=... PLUGGY_CLIENT_SECRET=... PLUGGY_WEBHOOK_SECRET=... \
-#     api/scripts/pluggy-register-webhook.sh https://your-host/api/v1/webhooks/pluggy
+#     tbfernandes-backend/scripts/pluggy-register-webhook.sh https://your-host/api/v1/webhooks/pluggy
 #
 # Pluggy needs a public HTTPS URL (for local tests, a tunnel such as ngrok). Pluggy does not sign
 # webhooks: it sends back the X-Webhook-Secret header set here, which the API compares with its

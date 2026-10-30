@@ -23,7 +23,7 @@ Datas e dinheiro sempre formatados com `Intl` em `pt-BR` (dinheiro em BRL).
 
 ## Backend
 
-Base: [arquitetura do backend](backend/arquitetura.md) e [api/CLAUDE.md](../api/CLAUDE.md).
+Base: [arquitetura do backend](backend/arquitetura.md) e [tbfernandes-backend/CLAUDE.md](../tbfernandes-backend/CLAUDE.md).
 
 - **Pacote por módulo** (`com.tbfernandes.api.<modulo>`) e, dentro dele, camadas `domain`, `application`, `adapter/in/web`, `adapter/out/persistence`.
 - **Domínio puro**: entidades e value objects sem anotações de Spring/JPA. Invariantes no construtor ou em métodos de comportamento (`task.changeStatus(next, clock)`), nunca em setters soltos.
@@ -39,7 +39,7 @@ Base: [arquitetura do backend](backend/arquitetura.md) e [api/CLAUDE.md](../api/
 
 ## Frontend
 
-Base: [arquitetura do frontend](frontend/arquitetura.md) e [web/CLAUDE.md](../web/CLAUDE.md).
+Base: [arquitetura do frontend](frontend/arquitetura.md) e [tbfernandes-frontend/CLAUDE.md](../tbfernandes-frontend/CLAUDE.md).
 
 - **TypeScript estrito**, sem `any`. Tipos de domínio em `features/<f>/types`.
 - **Arquivos** em `kebab-case.tsx`; componentes em `PascalCase`; hooks começam com `use`.
