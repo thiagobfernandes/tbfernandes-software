@@ -76,7 +76,7 @@ public final class RuleBasedAssistant {
 			return purchases(data.purchases());
 		}
 		if (has(question, "money")) {
-			return money(data.month());
+			return money(data.month(), "Neste mês:");
 		}
 		if (has(question, "goals")) {
 			return goals(data.goals());
@@ -175,14 +175,14 @@ public final class RuleBasedAssistant {
 		return rules(text, List.of(new Reference("Finanças", "Compras planejadas", "/finance/purchases")));
 	}
 
-	private static Answer money(MonthView month) {
+	static Answer money(MonthView month, String heading) {
 		String text = """
-				Neste mês:
+				%s
 				- **Pessoal**: %s de entrada, %s de saída, saldo %s.
 				- **Empresa**: %s de entrada, %s de saída, saldo %s.
 
 				Lembre que o saldo da empresa não é dinheiro pessoal até você transferir."""
-			.formatted(brl(month.personalIncome()), brl(month.personalExpense()),
+			.formatted(heading, brl(month.personalIncome()), brl(month.personalExpense()),
 					brl(month.personalIncome().subtract(month.personalExpense())), brl(month.businessIncome()),
 					brl(month.businessExpense()), brl(month.businessIncome().subtract(month.businessExpense())));
 		return rules(text, List.of(new Reference("Finanças", "Fluxo de caixa", "/finance")));
@@ -256,7 +256,7 @@ public final class RuleBasedAssistant {
 		return new Answer(text, references, "rules");
 	}
 
-	private static Reference taskRef(String title) {
+	static Reference taskRef(String title) {
 		return new Reference("Tarefa", title, "/tasks?q=" + encodeUriComponent(title));
 	}
 
@@ -271,7 +271,7 @@ public final class RuleBasedAssistant {
 			.replace("%7E", "~");
 	}
 
-	private static Reference noteRef(NoteView note) {
+	static Reference noteRef(NoteView note) {
 		return new Reference("Nota", note.title(), "/knowledge?note=" + note.id());
 	}
 

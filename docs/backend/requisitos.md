@@ -111,7 +111,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | ID | Requisito | Prio |
 |---|---|---|
 | RF-AST-01 | Responder perguntas sobre os dados (projetos, tarefas atrasadas, metas, finanças) com links para os registros usados, igual à versão por regras do frontend. Perguntas em português ou inglês. | S |
-| RF-AST-02 | Responder com um modelo de IA, usando só leitura (RN-20). | W |
+| RF-AST-02 | Responder com um modelo de IA, transformando a pergunta em uma consulta estruturada sobre os dados, usando só leitura (RN-20). | W |
 
 ### 2.10 Transversais
 

@@ -1,10 +1,11 @@
 package com.tbfernandes.api.assistant.adapter.out.model;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import com.tbfernandes.api.assistant.application.port.out.LanguageModel;
 import com.tbfernandes.api.assistant.domain.Answer;
-import com.tbfernandes.api.assistant.domain.Workspace;
+import com.tbfernandes.api.assistant.domain.StructuredQuery;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,12 @@ import org.springframework.stereotype.Component;
 class DisabledLanguageModel implements LanguageModel {
 
 	@Override
-	public Optional<String> answer(String question, Answer grounded, Workspace workspace) {
+	public Optional<StructuredQuery> toQuery(String question, LocalDate today) {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<String> answer(String question, Answer grounded) {
 		return Optional.empty();
 	}
 

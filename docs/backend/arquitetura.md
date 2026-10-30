@@ -99,8 +99,8 @@ O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`),
 
 ### IA do assistente (etapa 8)
 
-- Porta: `assistant.application.port.out.LanguageModel`. O modelo só reescreve o texto: recebe a pergunta, a resposta das regras e o retrato dos dados, e as referências continuam as que as regras acharam. Assim todo link aponta para um registro real (RN-20).
-- Adaptador padrão: `DisabledLanguageModel` (`tbf.assistant.model.provider=none`). Um provedor real é o item AST-03.
+- Porta: `assistant.application.port.out.LanguageModel`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
+- Adaptadores: `DisabledLanguageModel` (padrão, `tbf.assistant.model.provider=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
 - Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
 
 ### Leitura entre módulos do assistant

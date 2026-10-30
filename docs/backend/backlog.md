@@ -137,7 +137,7 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 |---|---|---|---|
 | AST-01 | Portar o assistente por regras (`tbfernandes-frontend/src/features/assistant/lib/answer.ts`) para a API (RF-AST-01) | M | ✅ etapa 8 |
 | AST-02 | Porta `LanguageModel` e adaptador desligado | P | ✅ etapa 8 |
-| AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ⬜ |
+| AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ✅ etapa 10 |
 | AST-04 | pgvector e embeddings de notas e snippets | G | ⬜ |
 
 ## Épico IDN — Identity e segurança
@@ -164,5 +164,6 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | 5 | FIN-01..05, CTC-01..05 | Finance manual e Contacts |
 | 6 | IDN-01..05, PLT-09..11 | login e pronto para deploy |
 | 7 | FIN-OF-01..08 | Open Finance com Pluggy |
-| 8 | AST-01, AST-02, KNW-05 | assistente por regras e grafo na API; IA (AST-03, AST-04) em aberto |
+| 8 | AST-01, AST-02, KNW-05 | assistente por regras e grafo na API; AST-04 em aberto |
 | 9 | PLT-08, IDN-04, IDN-05 | todas as telas lendo e gravando pela API (`NEXT_PUBLIC_DATA_SOURCE=api`), login, exportar e importar |
+| 10 | AST-03 | assistente com IA: saída estruturada e consultas |

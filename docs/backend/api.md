@@ -132,7 +132,7 @@ Falha ao falar com a Pluggy responde 502.
 
 | Método | Rota | Uso | Item |
 |---|---|---|---|
-| POST | `/assistant/questions` | `{ question }` (até 500 caracteres) → resposta com referências | AST-01, AST-02 |
+| POST | `/assistant/questions` | `{ question }` (até 500 caracteres) → resposta com referências | AST-01, AST-02, AST-03 |
 | GET | `/graph` | `{ nodes: [{ id, kind, label, href }], edges: [{ source, target }] }` | KNW-05 |
 
 Exemplo de resposta do assistente. O formato é o de `tbfernandes-frontend/src/features/assistant/lib/answer.ts`, mais o campo `source`:
@@ -145,7 +145,7 @@ Exemplo de resposta do assistente. O formato é o de `tbfernandes-frontend/src/f
 }
 ```
 
-`source` vale `rules` enquanto nenhum modelo de IA estiver configurado (`TBF_ASSISTANT_MODEL=none`). Com um modelo, passa a valer `model`, mas as referências continuam sendo as que as regras encontraram.
+`source` vale `rules` enquanto nenhum modelo de IA estiver configurado (`TBF_ASSISTANT_MODEL=none`) ou quando as regras responderam. Com um modelo, vale `query` quando o texto veio da execução da consulta e `model` quando o modelo o reescreveu. Nos dois casos, o campo `query` traz a consulta usada (`subject`, `aggregate`, `text`, `statuses`, `priorities`, `openOnly`, `project`, `company`, `dueFrom`, `dueTo`, `month`, `sort`, `limit`) e as referências vêm da execução. Com as regras, `query` é `null`.
 
 ## Exemplo de tarefa
 

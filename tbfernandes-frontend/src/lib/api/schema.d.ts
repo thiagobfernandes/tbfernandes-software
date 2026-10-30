@@ -1085,6 +1085,28 @@ export interface components {
             text?: string;
             references?: components["schemas"]["Reference"][];
             source?: string;
+            query?: components["schemas"]["StructuredQuery"];
+        };
+        StructuredQuery: {
+            /** @enum {string} */
+            subject?: "tasks" | "projects" | "companies" | "notes" | "snippets" | "goals" | "studies" | "purchases" | "contacts" | "cash_flow";
+            /** @enum {string} */
+            aggregate?: "list" | "count";
+            text?: string;
+            statuses?: string[];
+            priorities?: string[];
+            openOnly?: boolean;
+            project?: string;
+            company?: string;
+            /** Format: date */
+            dueFrom?: string;
+            /** Format: date */
+            dueTo?: string;
+            month?: string;
+            /** @enum {string} */
+            sort?: "due_date" | "priority" | "name";
+            /** Format: int32 */
+            limit?: number;
         };
         Reference: {
             kind?: string;

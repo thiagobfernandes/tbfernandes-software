@@ -1,19 +1,23 @@
 package com.tbfernandes.api.assistant.application.port.out;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import com.tbfernandes.api.assistant.domain.Answer;
-import com.tbfernandes.api.assistant.domain.Workspace;
+import com.tbfernandes.api.assistant.domain.StructuredQuery;
 
 /**
- * Output port for the AI provider (AST-02). The model only rewrites the text: it receives the
- * question, the rule-based answer and the snapshot it was built from, and the references stay
- * the ones the rules found, so every link points to a real record. The provider adapter is
- * epic AST-03; until then {@code DisabledLanguageModel} is the only one.
+ * Output port for the AI provider (AST-02, AST-03). The model never sees the database: it turns
+ * the question into a query that the application validates and runs, and then rewrites the text
+ * of the answer. The references stay the ones the application found, so every link points to a
+ * real record. Empty means no model is configured or it could not help.
  */
 public interface LanguageModel {
 
-	/** The model's answer text, or empty when no model is configured or it failed. */
-	Optional<String> answer(String question, Answer grounded, Workspace workspace);
+	/** The question as a query, or empty when a lookup cannot answer it. */
+	Optional<StructuredQuery> toQuery(String question, LocalDate today);
+
+	/** The grounded answer's text rewritten for the question. */
+	Optional<String> answer(String question, Answer grounded);
 
 }

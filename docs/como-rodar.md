@@ -114,6 +114,18 @@ export PLUGGY_WEBHOOK_SECRET=$(openssl rand -hex 32)   # o mesmo valor na API
 tbfernandes-backend/scripts/pluggy-register-webhook.sh https://seu-host/api/v1/webhooks/pluggy
 ```
 
+## Assistente com IA
+
+Desligado por padrão: o assistente responde por regras. Para ligar, no `.env` da raiz (ou exportado, fora do Docker):
+
+```bash
+TBF_ASSISTANT_MODEL=anthropic
+ANTHROPIC_API_KEY=...          # https://console.anthropic.com
+# TBF_ASSISTANT_MODEL_NAME=claude-opus-5-5
+```
+
+Com o provedor ligado, a pergunta e o texto da resposta, com os nomes e valores dos registros encontrados, são enviados à Anthropic. Como funciona: [etapa 10](backend/implementacao/etapa-10-assistente-ia.md).
+
 ## Testes e verificação
 
 ```bash

@@ -72,8 +72,10 @@ tbf:
     allowed-origins: ${TBF_CORS_ORIGINS:http://localhost:3000}
   assistant:
     model:
-      # none: rule-based answers only (default). An AI provider adapter is epic AST-03.
+      # none: rule-based answers only (default). anthropic: Claude, with ANTHROPIC_API_KEY.
       provider: ${TBF_ASSISTANT_MODEL:none}
+      name: ${TBF_ASSISTANT_MODEL_NAME:claude-opus-5-5}
+      api-key: ${ANTHROPIC_API_KEY:}
   pluggy:
     enabled: ${PLUGGY_ENABLED:false}
     base-url: https://api.pluggy.ai

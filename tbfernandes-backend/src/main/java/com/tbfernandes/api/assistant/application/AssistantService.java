@@ -3,12 +3,15 @@ package com.tbfernandes.api.assistant.application;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.tbfernandes.api.assistant.application.port.out.LanguageModel;
 import com.tbfernandes.api.assistant.domain.Answer;
 import com.tbfernandes.api.assistant.domain.KnowledgeGraph;
+import com.tbfernandes.api.assistant.domain.QueryEngine;
 import com.tbfernandes.api.assistant.domain.RuleBasedAssistant;
+import com.tbfernandes.api.assistant.domain.StructuredQuery;
 import com.tbfernandes.api.assistant.domain.Workspace;
 import com.tbfernandes.api.contacts.ContactsLookup;
 import com.tbfernandes.api.finance.FinanceLookup;
@@ -21,14 +24,14 @@ import com.tbfernandes.api.work.WorkLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Questions over the owner's data (AST-01, AST-02) and the knowledge graph (KNW-05). Reads
+ * Questions over the owner's data (AST-01 to AST-03) and the knowledge graph (KNW-05). Reads
  * only through the other modules' public lookups and never writes (RN-20).
  */
 @Service
-@Transactional(readOnly = true)
 public class AssistantService {
 
 	private static final Logger log = LoggerFactory.getLogger(AssistantService.class);
@@ -42,10 +45,11 @@ public class AssistantService {
 	private final LanguageModel model;
 	private final OwnerContext owner;
 	private final Clock clock;
+	private final TransactionTemplate reading;
 
 	AssistantService(WorkLookup work, KnowledgeLookup knowledge, GoalsLookup goals, LearningLookup learning,
 			FinanceLookup finance, ContactsLookup contacts, LanguageModel model, OwnerContext owner,
-			Clock clock) {
+			Clock clock, PlatformTransactionManager transactions) {
 		this.work = work;
 		this.knowledge = knowledge;
 		this.goals = goals;
@@ -55,32 +59,49 @@ public class AssistantService {
 		this.model = model;
 		this.owner = owner;
 		this.clock = clock;
+		this.reading = new TransactionTemplate(transactions);
+		this.reading.setReadOnly(true);
 	}
 
+	/** The model is called outside the transaction, so waiting for it does not hold a connection. */
 	public Answer ask(String question) {
 		String text = Require.text(question, "question", 500);
-		Workspace workspace = workspace();
-		Answer grounded = RuleBasedAssistant.answer(text, workspace);
+		LocalDate today = LocalDate.now(clock);
+		Optional<StructuredQuery> query = toQuery(text, today);
+		YearMonth month = query.map(StructuredQuery::month).orElse(YearMonth.from(today));
+		Workspace workspace = reading.execute(status -> workspace(today, month));
+		Answer grounded = query.map(q -> QueryEngine.run(q, workspace))
+			.orElseGet(() -> RuleBasedAssistant.answer(text, workspace));
 		try {
-			return model.answer(text, grounded, workspace).map(t -> grounded.withText(t, "model")).orElse(grounded);
+			return model.answer(text, grounded).map(t -> grounded.withText(t, "model")).orElse(grounded);
 		}
 		catch (RuntimeException ex) {
-			// The rule-based answer is always good enough to show (NFR: the assistant never fails because of the model).
-			log.warn("Language model failed, answering with rules", ex);
+			// The grounded answer is always good enough to show (NFR: the assistant never fails because of the model).
+			log.warn("Language model failed, answering without it", ex);
 			return grounded;
 		}
 	}
 
 	public KnowledgeGraph graph() {
-		return KnowledgeGraph.of(workspace());
+		LocalDate today = LocalDate.now(clock);
+		return reading.execute(status -> KnowledgeGraph.of(workspace(today, YearMonth.from(today))));
 	}
 
-	private Workspace workspace() {
+	private Optional<StructuredQuery> toQuery(String question, LocalDate today) {
+		try {
+			return model.toQuery(question, today);
+		}
+		catch (RuntimeException ex) {
+			log.warn("Language model could not build a query, answering with rules", ex);
+			return Optional.empty();
+		}
+	}
+
+	private Workspace workspace(LocalDate today, YearMonth month) {
 		UUID ownerId = owner.currentOwnerId();
-		LocalDate today = LocalDate.now(clock);
 		return new Workspace(today, work.companies(ownerId), work.projects(ownerId), work.tasks(ownerId),
 				knowledge.notes(ownerId), knowledge.snippets(ownerId), goals.goals(ownerId), learning.studies(ownerId),
-				finance.purchases(ownerId), finance.month(ownerId, YearMonth.from(today)), contacts.contacts(ownerId));
+				finance.purchases(ownerId), finance.month(ownerId, month), contacts.contacts(ownerId));
 	}
 
 }

@@ -15,6 +15,7 @@
 	<description>TBFernandes Software API: modular monolith with clean architecture</description>
 	<properties>
 		<java.version>25</java.version>
+		<anthropic.version>3.3.0</anthropic.version>
 		<spring-modulith.version>2.1.2</spring-modulith.version>
 		<springdoc.version>3.2.0</springdoc.version>
 		<archunit.version>1.5.1</archunit.version>
@@ -47,6 +48,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-restclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.anthropic</groupId>
+			<artifactId>anthropic-java</artifactId>
+			<version>${anthropic.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
