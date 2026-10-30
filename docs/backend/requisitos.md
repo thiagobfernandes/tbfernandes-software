@@ -16,13 +16,13 @@ Plataforma pessoal e profissional de gestão de um único usuário (por enquanto
 |---|---|
 | Usuário (dono) | Thiago. Único usuário na v1; todas as tabelas já têm `owner_id` para permitir multiusuário. |
 | Frontend web | Next.js em `web/`, cliente HTTP da API. |
-| Provedor Open Finance | Pluggy (planejado). Fornece contas e transações bancárias. |
+| Provedor Open Finance | Pluggy. Fornece contas e transações bancárias. |
 | Provedor de IA | Planejado para o assistente; atrás de uma porta de saída. |
 
 ### 1.2 Escopo da v1 (MVP)
 
 Dentro: Work (empresas, projetos, tarefas), Knowledge, Goals, Learning, Finance com lançamentos manuais, Contacts, e o assistente baseado em regras (igual ao do frontend).
-Fora: login multiusuário, integração Pluggy, assistente com IA, notificações, app mobile. Esses itens estão no backlog como épicos futuros.
+Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses itens estão no backlog como épicos futuros.
 
 ## 2. Requisitos funcionais
 
@@ -95,7 +95,7 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RF-FIN-02 | Fluxo de caixa por mês: entradas, saídas e saldo, separados por escopo. | M |
 | RF-FIN-03 | CRUD de metas de compra com valor estimado, reservado, economia mensal, prioridade, data desejada e status. | M |
 | RF-FIN-04 | Projeção de quando a meta de compra será atingida com a economia mensal. | S |
-| RF-FIN-05 | Conectar contas bancárias via Open Finance (Pluggy) e importar transações. | W (épico FIN-OF) |
+| RF-FIN-05 | Conectar contas bancárias via Open Finance (Pluggy) e importar transações. | S (épico FIN-OF) |
 
 ### 2.8 Contacts (`/contacts`)
 
@@ -144,6 +144,9 @@ Fora: login multiusuário, integração Pluggy, assistente com IA, notificaçõe
 | RN-17 | Meta de compra `bought` exige o valor pago. | Finance |
 | RN-18 | Valor reservado pode passar do estimado (sinaliza folga), mas nunca é negativo. | Finance |
 | RN-19 | Uma meta não pode ser submeta dela mesma nem de uma descendente (sem ciclos). | Goals |
+| RN-20 | Cada banco conectado tem um escopo, escolhido ao conectar, e tudo que ele importa entra nesse escopo. | Finance |
+| RN-21 | Uma conexão bancária pertence a uma só conta. | Finance |
+| RN-22 | Só transações liquidadas viram lançamento; pendentes (parcelas futuras, fatura aberta) esperam. | Finance |
 | RN-20 | O assistente só lê dados; nunca cria, altera ou exclui. | Assistant |
 | RN-21 | Só uma meta com indicador aceita atualização de progresso. | Goals |
 | RN-23 | Um contato aponta para uma empresa cadastrada ou só para o nome de uma organização, nunca os dois. | Contacts |

@@ -22,6 +22,11 @@ spring:
     datatype:
       enum:
         write-enums-to-lowercase: true
+  http:
+    clients:
+      # Calls to external providers (Pluggy) never hang a request or hold a sync forever.
+      connect-timeout: 5s
+      read-timeout: 30s
   docker:
     compose:
       lifecycle-management: start-only
@@ -74,3 +79,5 @@ tbf:
     base-url: https://api.pluggy.ai
     client-id: ${PLUGGY_CLIENT_ID:}
     client-secret: ${PLUGGY_CLIENT_SECRET:}
+    # Pluggy sends it back on every webhook. Empty: all webhooks are refused.
+    webhook-secret: ${PLUGGY_WEBHOOK_SECRET:}

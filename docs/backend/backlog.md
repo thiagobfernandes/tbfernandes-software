@@ -106,20 +106,20 @@ Critérios de aceite principais:
 | FIN-04 | Projeção de data da meta de compra (RF-FIN-04) | P | ✅ |
 | FIN-05 | Ligar telas Cash flow e Purchases à API | M | ✅ etapa 9 |
 
-## Épico FIN-OF — Open Finance com Pluggy (em aberto)
+## Épico FIN-OF — Open Finance com Pluggy
 
-Já existe: a porta `OpenFinanceGateway`, o adaptador desligado (padrão) e o esqueleto `PluggyOpenFinanceGateway`, além das colunas `source` e `external_id` em `finance.entry`.
+Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a Pluggy real, com credenciais.
 
 | Id | Item | Tam. | Status |
 |---|---|---|---|
-| FIN-OF-01 | Decidir escopo: quais contas, quanto histórico, categorização própria ou da Pluggy | P | ⬜ |
-| FIN-OF-02 | Autenticação na Pluggy (`/auth`) com cache da API key | P | ⬜ |
-| FIN-OF-03 | Connect token e tela "Conectar banco" com o widget Pluggy Connect | M | ⬜ |
-| FIN-OF-04 | Tabelas `bank_connection` e `bank_account`; salvar conexão (`itemId`) | M | ⬜ |
-| FIN-OF-05 | Importar transações paginadas para `finance.entry` sem duplicar (RN-16) | G | ⬜ |
-| FIN-OF-06 | Webhook `item/updated` para sincronização incremental, com verificação de origem | M | ⬜ |
-| FIN-OF-07 | Teste de contrato do adaptador com WireMock (sem chamar a Pluggy no CI) | M | ⬜ |
-| FIN-OF-08 | Tela de contas conectadas: status, última sincronização, desconectar | M | ⬜ |
+| FIN-OF-01 | Decidir escopo: quais contas, quanto histórico, categorização própria ou da Pluggy | P | ✅ |
+| FIN-OF-02 | Autenticação na Pluggy (`/auth`) com cache da API key | P | ✅ |
+| FIN-OF-03 | Connect token e tela "Conectar banco" com o widget Pluggy Connect | M | ✅ |
+| FIN-OF-04 | Tabelas `bank_connection` e `bank_account`; salvar conexão (`itemId`) | M | ✅ |
+| FIN-OF-05 | Importar transações paginadas para `finance.entry` sem duplicar (RN-16) | G | ✅ |
+| FIN-OF-06 | Webhook `item/updated` para sincronização incremental, com verificação de origem | M | ✅ |
+| FIN-OF-07 | Teste de contrato do adaptador com WireMock (sem chamar a Pluggy no CI) | M | ✅ |
+| FIN-OF-08 | Tela de contas conectadas: status, última sincronização, desconectar | M | ✅ |
 
 ## Épico CTC — Contacts
 

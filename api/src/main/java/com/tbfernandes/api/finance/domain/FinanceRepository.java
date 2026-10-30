@@ -19,6 +19,9 @@ public interface FinanceRepository {
 
 	void delete(FinanceEntry entry);
 
+	/** Entries imported with these provider ids, gone at the provider. */
+	void deleteImported(UUID ownerId, List<String> externalIds);
+
 	PurchaseGoal save(PurchaseGoal purchase);
 
 	Optional<PurchaseGoal> findPurchase(UUID ownerId, UUID id);

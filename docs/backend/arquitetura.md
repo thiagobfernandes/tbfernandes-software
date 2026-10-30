@@ -78,14 +78,15 @@ Clean architecture "completa" teria uma interface de caso de uso por operação,
 
 ## 5. Integrações externas
 
-### Open Finance (Pluggy) — em aberto
+### Open Finance (Pluggy)
 
 - Porta: `finance.application.port.out.OpenFinanceGateway` (token de conexão, contas, transações).
 - Adaptadores em `finance.adapter.out.pluggy`:
   - `DisabledOpenFinanceGateway`: padrão; responde com a regra RN-15.
-  - `PluggyOpenFinanceGateway`: ativo com `tbf.pluggy.enabled=true`; hoje lança `UnsupportedOperationException`. A implementação é o épico **FIN-OF** do backlog.
-- Credenciais por `PLUGGY_CLIENT_ID` e `PLUGGY_CLIENT_SECRET`.
-- Tabelas `finance.bank_connection` e `finance.bank_account` entram junto com o épico; `finance.entry` já tem `source` e `external_id` para receber transações importadas sem duplicar (RN-16).
+  - `PluggyOpenFinanceGateway`: ativo com `tbf.pluggy.enabled=true`. Detalhes na [etapa 7](implementacao/etapa-7-open-finance.md).
+- Credenciais por `PLUGGY_CLIENT_ID` e `PLUGGY_CLIENT_SECRET`; webhook por `PLUGGY_WEBHOOK_SECRET`.
+- Rotas em `/api/v1/webhooks/**` são públicas na segurança, sem sessão nem CSRF: cada controller confere o próprio segredo. Sincronização nunca roda dentro do webhook, que precisa responder em 10 s; roda depois do commit, por evento interno do módulo.
+- Tabelas `finance.bank_connection` e `finance.bank_account`; `finance.entry` recebe as transações com `source` e `external_id`, sem duplicar (RN-16).
 
 ### Autenticação (etapa 6)
 

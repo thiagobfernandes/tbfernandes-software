@@ -24,7 +24,7 @@ import com.tbfernandes.api.shared.domain.NotFound;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Manual finance use cases (RF-FIN-01..04). Open finance (FIN-OF) stays behind OpenFinanceGateway. */
+/** Manual finance use cases (RF-FIN-01..04). Open finance is in OpenFinanceService. */
 @Service
 @Transactional
 public class FinanceService implements FinanceLookup {

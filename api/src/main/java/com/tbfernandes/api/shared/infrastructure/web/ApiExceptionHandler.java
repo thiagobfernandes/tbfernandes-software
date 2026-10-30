@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.tbfernandes.api.shared.domain.BusinessRuleViolation;
 import com.tbfernandes.api.shared.domain.Conflict;
+import com.tbfernandes.api.shared.domain.ExternalServiceFailure;
 import com.tbfernandes.api.shared.domain.NotFound;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -51,6 +52,11 @@ class ApiExceptionHandler {
 				"A requisição conflita com dados existentes");
 		problem.setTitle("Conflict");
 		return problem;
+	}
+
+	@ExceptionHandler(ExternalServiceFailure.class)
+	ProblemDetail externalService(ExternalServiceFailure ex) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
 	}
 
 	@ExceptionHandler(BusinessRuleViolation.class)

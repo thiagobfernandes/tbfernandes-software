@@ -80,7 +80,7 @@ src/main/java/com/tbfernandes/api
 ├── knowledge/    notas, snippets, métodos, busca
 ├── goals/        metas, marcos, indicador, progresso
 ├── learning/     estudos, materiais, habilidades, certificações, formação
-├── finance/      lançamentos, fluxo de caixa, compras; porta OpenFinanceGateway (Pluggy em aberto)
+├── finance/      lançamentos, fluxo de caixa, compras; Open Finance pela Pluggy, atrás da porta OpenFinanceGateway
 ├── contacts/     contatos, interações, follow-up
 └── assistant/    perguntas e grafo, só leitura; porta LanguageModel (IA em aberto)
 

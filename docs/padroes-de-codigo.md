@@ -70,7 +70,6 @@ Nunca desligar ou pular um teste para o CI passar.
 - **Fatia vertical**: migração → domínio → caso de uso → API → tela, no mesmo PR quando couber.
 - **PRs pequenos**, com descrição do que mudou e como verificar.
 - **Docs junto com o código**: regra, modelo, contrato ou tela mudou → `docs/` atualizado no mesmo commit. Etapas grandes ganham uma página em `docs/backend/implementacao/`.
-- Patches entregues fora do GitHub seguem numeração única (`00NN-...patch`), aplicados com `git am`. O próximo número está em [estado-atual.md](estado-atual.md).
 
 ## Definition of Done
 

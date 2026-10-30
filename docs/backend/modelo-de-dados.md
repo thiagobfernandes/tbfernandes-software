@@ -269,10 +269,20 @@ Ids: o frontend usa ids curtos (`t-1a2b3c4d`); a API usa UUID. Na migração dos
 - Para olhar os dados: `docker compose exec postgres psql -U tbf -d tbfernandes`, depois `\dn` (schemas) e `\dt work.*`.
 - Para recomeçar do zero: `docker compose down -v`.
 
-## 5. Planejado
+## 5. Open Finance
+
+`V11__open_finance.sql`. Sem FK para fora do schema.
+
+| Tabela | Colunas principais | Notas |
+|---|---|---|
+| `finance.bank_connection` | `owner_id`, `external_id` (único, item da Pluggy), `institution`, `scope`, `status`, `last_synced_at`, `last_error` | raiz de agregado; o webhook acha o dono pelo `external_id` |
+| `finance.bank_account` | PK (`connection_id`, `external_id`), `name`, `type`, `balance`, `currency` | filha da conexão, substituída a cada sincronização |
+
+Transações importadas vão para `finance.entry` com `source = 'OPEN_FINANCE'` e `external_id` (RN-16).
+
+## 6. Planejado
 
 | Tabela | Épico | Motivo |
 |---|---|---|
-| `finance.bank_connection`, `finance.bank_account` | FIN-OF | conexões Pluggy e contas |
 | `identity.session` ou Spring Session JDBC | IDN | login |
 | `assistant.embedding` (pgvector) | AST | busca semântica para a IA |

@@ -36,9 +36,10 @@ class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 				.build();
 		}
-		return http.csrf(csrf -> csrf.spa())
+		// Webhooks come from outside with no session; each controller checks its own secret.
+		return http.csrf(csrf -> csrf.spa().ignoringRequestMatchers("/api/v1/webhooks/**"))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/v1/auth/**", "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**",
+				.requestMatchers("/api/v1/auth/**", "/api/v1/webhooks/**", "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**",
 						"/swagger-ui.html")
 				.permitAll()
 				.anyRequest()

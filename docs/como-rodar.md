@@ -60,6 +60,28 @@ cd web && echo "NEXT_PUBLIC_DATA_SOURCE=api" >> .env.local && npm run dev
 
 Para levar dados criados no modo local para a API: Configurações → Dados → "Importar dados salvos neste navegador".
 
+## Open Finance (Pluggy)
+
+Desligado por padrão: a tela "Contas conectadas" avisa e os lançamentos manuais seguem normais. Para ligar, com a API em modo `api` no frontend:
+
+```bash
+# Credenciais em https://dashboard.pluggy.ai
+export PLUGGY_ENABLED=true
+export PLUGGY_CLIENT_ID=...
+export PLUGGY_CLIENT_SECRET=...
+cd api && ./mvnw spring-boot:run
+
+# Bancos de teste no widget, em web/.env.local
+NEXT_PUBLIC_PLUGGY_SANDBOX=true
+```
+
+Sem webhook, conectar e o botão "Sincronizar" já funcionam. Para atualizar sozinho, a Pluggy precisa de uma URL HTTPS pública (em local, um túnel como ngrok):
+
+```bash
+export PLUGGY_WEBHOOK_SECRET=$(openssl rand -hex 32)   # o mesmo valor na API
+api/scripts/pluggy-register-webhook.sh https://seu-host/api/v1/webhooks/pluggy
+```
+
 ## Testes e verificação
 
 ```bash

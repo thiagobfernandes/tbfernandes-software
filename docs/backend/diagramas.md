@@ -394,7 +394,7 @@ sequenceDiagram
     G->>DB: atualiza progresso da meta (GOL-05)
 ```
 
-## 8. Sequência — sincronizar banco via Pluggy (planejada, épico FIN-OF)
+## 8. Sequência — sincronizar banco via Pluggy (épico FIN-OF)
 
 ```mermaid
 sequenceDiagram
@@ -407,17 +407,18 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     U->>W: "Conectar banco"
-    W->>A: POST /api/v1/finance/connections/token
-    A->>P: createConnectToken(ownerId)
+    W->>A: POST /api/v1/finance/connections/token {scope}
+    A->>P: createConnectToken(ownerId:scope)
     P->>PL: POST /auth, POST /connect_token
     PL-->>W: widget Pluggy Connect (via token)
     U->>PL: autoriza o banco no widget
-    W->>A: POST /api/v1/finance/connections {itemId}
-    A->>DB: INSERT finance.bank_connection
-    PL-)A: webhook item/updated
+    W->>A: POST /api/v1/finance/connections {itemId, scope}
+    A->>DB: INSERT finance.bank_connection ON CONFLICT DO NOTHING
+    PL-)A: webhook item/updated (X-Webhook-Secret)
+    Note over A: responde 204 e sincroniza depois do commit
     A->>P: listAccounts(itemId), listTransactions(accountId, from, to)
-    P->>PL: GET /accounts, GET /transactions (paginado)
-    A->>DB: UPSERT finance.entry (source=OPEN_FINANCE, external_id) (RN-16)
+    P->>PL: GET /accounts, GET /v2/transactions (cursor)
+    A->>DB: INSERT finance.entry (source=OPEN_FINANCE, external_id) se novo (RN-16)
 ```
 
 ## 9. Implantação local

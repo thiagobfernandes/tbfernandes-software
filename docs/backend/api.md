@@ -101,7 +101,20 @@ Versão 0.2 · 2026-10-26 · O contrato executável é o OpenAPI em `http://loca
 | GET / PUT / DELETE | `/finance/purchases/{id}` | detalhe, edita, exclui | FIN-03 |
 | GET | `/finance/purchases/{id}/projection` | quanto falta e quando a compra cabe no orçamento | FIN-04 |
 
-Open Finance (Pluggy) continua em aberto. As rotas planejadas são `POST /finance/connections/token`, `/finance/connections` e `POST /finance/webhooks/pluggy` (épico FIN-OF).
+Open Finance (épico FIN-OF):
+
+| Método | Rota | O que faz | Item |
+|---|---|---|---|
+| GET | `/finance/connections/availability` | `{enabled}`: se a integração está ligada (RN-15) | FIN-OF-03 |
+| GET | `/finance/connections` | conexões com status, última sincronização e contas | FIN-OF-08 |
+| POST | `/finance/connections/token` | `{scope}` → token do widget | FIN-OF-03 |
+| POST | `/finance/connections` | `{itemId, scope}` → registra a conexão, idempotente, e agenda a sincronização | FIN-OF-04 |
+| POST | `/finance/connections/{id}/token` | token para entrar de novo, com o `itemId` | FIN-OF-08 |
+| POST | `/finance/connections/{id}/sync` | sincroniza agora → `{imported, connection}`. Falha da Pluggy vem em `connection.lastError` | FIN-OF-05 |
+| DELETE | `/finance/connections/{id}` | desconecta na Pluggy e aqui; os lançamentos ficam | FIN-OF-08 |
+| POST | `/webhooks/pluggy` | público, autenticado por `X-Webhook-Secret`; trata `item/updated`, `item/error`, `item/deleted` e `transactions/deleted` | FIN-OF-06 |
+
+Falha ao falar com a Pluggy responde 502.
 
 ## Contacts
 
@@ -160,4 +173,4 @@ Mesmo formato de `web/src/features/tasks/types/task.ts`:
 | Rota | Motivo | Item |
 |---|---|---|
 | exportar e importar JSON | fica no frontend, que já tem o formato `AppData` e lê e grava pela API | IDN-04, IDN-05 |
-| Open Finance | épico em aberto | FIN-OF-* |
+| Open Finance | feito | FIN-OF-* |

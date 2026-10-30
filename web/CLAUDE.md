@@ -29,7 +29,7 @@ O Next.js desta versão tem mudanças em relação ao que você conhece: o bloco
 
 - Textos de interface em **pt-BR**; identificadores em inglês. Datas e dinheiro com `Intl` em `pt-BR` (`lib/dates.ts`, `lib/money.ts`).
 - Server Components por padrão; `"use client"` só onde há interação ou uso do store.
-- Telas leem dados com `useAppData()` e gravam com `dataActions`/`workActions`. Não chame `apiFetch` direto de um componente: o store cuida do modo local e do modo API.
+- Telas leem dados com `useAppData()` e gravam com `dataActions`/`workActions`. Não chame `apiFetch` direto de um componente: o store cuida do modo local e do modo API. A exceção é `features/finance/lib/connections-api.ts`: conexões bancárias só existem no servidor.
 - Ids novos: `uuidv7()` de `lib/api/uuid.ts` (a API aceita via `X-Client-Id`, ADR-007).
 - Formulários: schema Zod em `features/<f>/schemas/`, mensagens de validação em pt-BR; formulários simples usam `EntityFormDialog` com configuração de campos.
 - Cores só por tokens (`bg-card`, `text-muted-foreground`, `text-success`…). Nada de hex solto em componente.

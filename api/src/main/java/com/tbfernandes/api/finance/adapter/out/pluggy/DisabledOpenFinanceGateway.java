@@ -14,7 +14,17 @@ import org.springframework.stereotype.Component;
 class DisabledOpenFinanceGateway implements OpenFinanceGateway {
 
 	@Override
-	public ConnectToken createConnectToken(String clientUserId) {
+	public boolean enabled() {
+		return false;
+	}
+
+	@Override
+	public ConnectToken createConnectToken(String clientUserId, String connectionId) {
+		throw disabled();
+	}
+
+	@Override
+	public ExternalConnection getConnection(String connectionId) {
 		throw disabled();
 	}
 
@@ -24,7 +34,12 @@ class DisabledOpenFinanceGateway implements OpenFinanceGateway {
 	}
 
 	@Override
-	public List<ExternalTransaction> listTransactions(String accountId, LocalDate from, LocalDate to) {
+	public List<ExternalTransaction> listTransactions(ExternalAccount account, LocalDate from, LocalDate to) {
+		throw disabled();
+	}
+
+	@Override
+	public void deleteConnection(String connectionId) {
 		throw disabled();
 	}
 

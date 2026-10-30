@@ -95,6 +95,11 @@ class FinancePersistenceAdapter implements FinanceRepository {
 	}
 
 	@Override
+	public void deleteImported(UUID ownerId, List<String> externalIds) {
+		entries.deleteByOwnerIdAndExternalIdIn(ownerId, externalIds);
+	}
+
+	@Override
 	public PurchaseGoal save(PurchaseGoal purchase) {
 		PurchaseEntity e = purchases.findById(purchase.id()).orElseGet(PurchaseEntity::new);
 		e.id = purchase.id();
@@ -205,6 +210,8 @@ interface EntryJpa extends JpaRepository<FinancePersistenceAdapter.EntryEntity, 
 	Optional<FinancePersistenceAdapter.EntryEntity> findByOwnerIdAndId(UUID ownerId, UUID id);
 
 	boolean existsByOwnerIdAndExternalId(UUID ownerId, String externalId);
+
+	void deleteByOwnerIdAndExternalIdIn(UUID ownerId, List<String> externalIds);
 
 }
 

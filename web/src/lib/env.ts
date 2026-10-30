@@ -5,4 +5,6 @@ export const env = {
    * "api": every screen reads and writes through the Spring Boot API.
    */
   dataSource: process.env.NEXT_PUBLIC_DATA_SOURCE === "api" ? "api" : "local",
+  /** Shows Pluggy's test banks in the connect widget. Never on in production. */
+  pluggySandbox: process.env.NEXT_PUBLIC_PLUGGY_SANDBOX === "true",
 } as const;
