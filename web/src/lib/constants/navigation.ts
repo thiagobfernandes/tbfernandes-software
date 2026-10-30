@@ -68,8 +68,8 @@ export const mainNavigation: NavEntry[] = [
     title: "Growth",
     icon: Target,
     items: [
-      { title: "Goals", href: "/goals", icon: Target, soon: true },
-      { title: "Learning", href: "/learning", icon: GraduationCap, soon: true },
+      { title: "Goals", href: "/goals", icon: Target },
+      { title: "Learning", href: "/learning", icon: GraduationCap },
       {
         title: "Certifications",
         href: "/certifications",
