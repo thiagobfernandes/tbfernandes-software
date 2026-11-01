@@ -12,6 +12,7 @@ import {
   Target,
 } from "lucide-react";
 import { toast } from "sonner";
+import { goalHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { ConfirmDelete } from "@/components/shared/confirm-delete";
@@ -225,7 +226,7 @@ export function PurchasesPage() {
                 <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3 text-xs text-muted-foreground">
                   {goal ? (
                     <Link
-                      href={`/goals/${goal.id}`}
+                      href={goalHref(goal.id)}
                       className="flex items-center gap-1 hover:text-primary"
                     >
                       <Target className="size-3.5" aria-hidden /> {goal.name}

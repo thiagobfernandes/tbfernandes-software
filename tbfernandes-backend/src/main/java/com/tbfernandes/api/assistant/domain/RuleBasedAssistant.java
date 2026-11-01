@@ -125,7 +125,7 @@ public final class RuleBasedAssistant {
 		}
 
 		List<Reference> references = new ArrayList<>();
-		references.add(new Reference("Projeto", project.name(), "/projects/" + project.id()));
+		references.add(new Reference("Projeto", project.name(), "/projects/view?id=" + project.id()));
 		open.stream().limit(4).map(t -> taskRef(t.title())).forEach(references::add);
 		notes.stream().map(RuleBasedAssistant::noteRef).forEach(references::add);
 		return rules(String.join("\n\n", parts), references);
@@ -194,7 +194,7 @@ public final class RuleBasedAssistant {
 				: "Metas ativas:\n" + active.stream()
 					.map(g -> "- **%s**: %d%% (%s)".formatted(g.name(), g.percent(), g.basis().toLowerCase(Locale.of("pt", "BR"))))
 					.collect(Collectors.joining("\n"));
-		return rules(text, active.stream().map(g -> new Reference("Meta", g.name(), "/goals/" + g.id())).toList());
+		return rules(text, active.stream().map(g -> new Reference("Meta", g.name(), "/goals/view?id=" + g.id())).toList());
 	}
 
 	private static Answer contacts(List<ContactView> contacts, Workspace data) {

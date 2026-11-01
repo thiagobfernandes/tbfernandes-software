@@ -143,7 +143,7 @@ public final class QueryEngine {
 					companies.containsKey(p.companyId()) ? companies.get(p.companyId()).name() : ""))
 			.filter(p -> textMatches(query, p.name() + " " + orEmpty(p.nextDelivery())))
 			.map(p -> new Row(p.name(), p.dueDate() == null ? List.of() : List.of(Due.label(p.dueDate(), data.today())),
-					p.dueDate(), 2, new Reference("Projeto", p.name(), "/projects/" + p.id())));
+					p.dueDate(), 2, new Reference("Projeto", p.name(), "/projects/view?id=" + p.id())));
 	}
 
 	private static Stream<Row> companies(StructuredQuery query, Workspace data) {
@@ -152,7 +152,7 @@ public final class QueryEngine {
 			.filter(c -> statusMatches(query, c.status()))
 			.filter(c -> nameMatches(query.company(), c.name()))
 			.filter(c -> textMatches(query, c.name()))
-			.map(c -> new Row(c.name(), List.of(), null, 2, new Reference("Empresa", c.name(), "/companies/" + c.id())));
+			.map(c -> new Row(c.name(), List.of(), null, 2, new Reference("Empresa", c.name(), "/companies/view?id=" + c.id())));
 	}
 
 	private static Stream<Row> notes(StructuredQuery query, Workspace data) {
@@ -180,7 +180,7 @@ public final class QueryEngine {
 			.filter(g -> statusMatches(query, g.status()))
 			.filter(g -> textMatches(query, g.name()))
 			.map(g -> new Row(g.name(), List.of(g.percent() + "%"), null, 2,
-					new Reference("Meta", g.name(), "/goals/" + g.id())));
+					new Reference("Meta", g.name(), "/goals/view?id=" + g.id())));
 	}
 
 	private static Stream<Row> studies(StructuredQuery query, Workspace data) {

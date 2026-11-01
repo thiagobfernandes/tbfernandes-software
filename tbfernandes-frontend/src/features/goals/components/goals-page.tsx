@@ -9,6 +9,7 @@ import {
   Plus,
   Target,
 } from "lucide-react";
+import { goalHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -156,7 +157,7 @@ function GoalCard({ goal, data }: { goal: Goal; data: AppData }) {
 
   return (
     <Link
-      href={`/goals/${goal.id}`}
+      href={goalHref(goal.id)}
       className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <div className="flex items-center justify-between gap-2">

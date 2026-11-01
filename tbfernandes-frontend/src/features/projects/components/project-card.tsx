@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Building2 } from "lucide-react";
+import { projectHref } from "@/lib/routes";
 
 import {
   projectStatusLabels,
@@ -35,7 +36,7 @@ export function ProjectCard({
 
   return (
     <Link
-      href={`/projects/${project.id}`}
+      href={projectHref(project.id)}
       className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition-colors outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <div className="flex items-start justify-between gap-3">

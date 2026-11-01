@@ -67,7 +67,7 @@ class RuleBasedAssistantTest {
 			.contains("⚠ 1 bloqueada: Fix invoice totals.")
 			.contains("1 nota vinculada pode ajudar.");
 		assertThat(answer.references()).first()
-			.isEqualTo(new Reference("Projeto", "Billing Revamp", "/projects/" + PROJECT));
+			.isEqualTo(new Reference("Projeto", "Billing Revamp", "/projects/view?id=" + PROJECT));
 		assertThat(answer.references()).contains(new Reference("Nota", "Billing decisions", "/knowledge?note=" + NOTE),
 				new Reference("Tarefa", "Fix invoice totals", "/tasks?q=Fix%20invoice%20totals"));
 	}
@@ -98,7 +98,7 @@ class RuleBasedAssistantTest {
 			.isEqualTo("- **Laptop**: R$ 6.000 faltando, dá para comprar em 3 meses (depois do que você queria).");
 		Answer goals = RuleBasedAssistant.answer("minhas metas", workspace());
 		assertThat(goals.text()).isEqualTo("Metas ativas:\n- **Senior role**: 50% (1/2 marcos)");
-		assertThat(goals.references()).extracting(Reference::href).containsExactly("/goals/" + GOAL);
+		assertThat(goals.references()).extracting(Reference::href).containsExactly("/goals/view?id=" + GOAL);
 		assertThat(RuleBasedAssistant.answer("who should I contact?", workspace()).text())
 			.isEqualTo("Follow-ups desta semana:\n- **Ana** (CTO), vence em 3d");
 		assertThat(RuleBasedAssistant.answer("o que estudar?", workspace()).text())

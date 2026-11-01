@@ -34,6 +34,7 @@ O Next.js desta versão tem mudanças em relação ao que você conhece: o bloco
 - Formulários: schema Zod em `features/<f>/schemas/`, mensagens de validação em pt-BR; formulários simples usam `EntityFormDialog` com configuração de campos.
 - Cores só por tokens (`bg-card`, `text-muted-foreground`, `text-success`…). Nada de hex solto em componente.
 - Nova rota: página em `src/app/(dashboard)/…`, item em `navigation.ts` dentro do grupo da área, entrada na busca (`features/search/search-index.ts`) se fizer sentido.
+- O app também sai como estático para o desktop (`npm run build:desktop`, ver [desktop.md](../docs/desktop.md)). Nada de rota dinâmica (`[id]`), Server Actions, route handlers ou `next/headers`: detalhe usa `?id=` com os links de `lib/routes.ts` e `useQueryId()` sob `Suspense`. A URL da API vem de `env.apiUrl` (getter), nunca de uma constante.
 - Toda tela precisa funcionar no celular (sidebar vira `mobile-nav`, quadro aceita arrastar por toque).
 - Mudou um tipo que existe na API? Atualize o backend junto ou rode `npm run api:types` com a API no ar.
 
@@ -42,5 +43,6 @@ O Next.js desta versão tem mudanças em relação ao que você conhece: o bloco
 ```bash
 npm run lint
 npm run build
+npm run build:desktop   # o export estático (out/) do app desktop precisa continuar passando
 npm run dev   # conferir a tela em claro/escuro e em ~390px de largura
 ```

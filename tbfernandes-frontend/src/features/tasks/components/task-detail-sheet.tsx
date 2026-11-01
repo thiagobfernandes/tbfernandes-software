@@ -10,6 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { projectHref } from "@/lib/routes";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -104,7 +105,7 @@ export function TaskDetailSheet({
                   />
                   {project ? (
                     <Link
-                      href={`/projects/${project.id}`}
+                      href={projectHref(project.id)}
                       className="hover:text-foreground"
                       onClick={() => onOpenChange(false)}
                     >

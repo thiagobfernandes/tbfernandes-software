@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { goalHref } from "@/lib/routes";
 
 import { ProgressBar } from "@/components/shared/progress-bar";
 import { Button } from "@/components/ui/button";
@@ -60,7 +61,7 @@ export function LifeOverview({ data }: { data: AppData }) {
               return (
                 <li key={goal.id} className="flex flex-col gap-1.5">
                   <Link
-                    href={`/goals/${goal.id}`}
+                    href={goalHref(goal.id)}
                     className="flex justify-between gap-2 text-sm hover:text-primary"
                   >
                     <span className="truncate">{goal.name}</span>

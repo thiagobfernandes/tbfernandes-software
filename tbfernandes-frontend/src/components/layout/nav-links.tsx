@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import { projectHref } from "@/lib/routes";
 
 import {
   Collapsible,
@@ -115,7 +116,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
         {pinnedProjects.map((project) => (
           <Link
             key={project.id}
-            href={`/projects/${project.id}`}
+            href={projectHref(project.id)}
             onClick={onNavigate}
             className={cn(itemClass, "h-8 font-normal")}
           >

@@ -32,15 +32,15 @@ public record KnowledgeGraph(List<Node> nodes, List<Edge> edges) {
 		List<Edge> edges = new ArrayList<>();
 
 		for (GoalView goal : data.goals()) {
-			nodes.add(new Node(key("goal", goal.id()), "goal", goal.name(), "/goals/" + goal.id()));
+			nodes.add(new Node(key("goal", goal.id()), "goal", goal.name(), "/goals/view?id=" + goal.id()));
 			link(edges, key("goal", goal.id()), "goal", goal.parentId());
 		}
 		for (CompanyView company : data.companies()) {
-			nodes.add(new Node(key("company", company.id()), "company", company.name(), "/companies/" + company.id()));
+			nodes.add(new Node(key("company", company.id()), "company", company.name(), "/companies/view?id=" + company.id()));
 		}
 		for (ProjectView project : data.projects()) {
 			String id = key("project", project.id());
-			nodes.add(new Node(id, "project", project.name(), "/projects/" + project.id()));
+			nodes.add(new Node(id, "project", project.name(), "/projects/view?id=" + project.id()));
 			link(edges, id, "company", project.companyId());
 			link(edges, id, "goal", project.goalId());
 		}

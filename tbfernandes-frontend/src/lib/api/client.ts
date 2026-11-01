@@ -38,6 +38,7 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const method = (init.method ?? "GET").toUpperCase();
   const token = method === "GET" ? undefined : csrfToken();
+  const desktopToken = env.desktopToken;
   const response = await fetch(`${env.apiUrl}${path}`, {
     ...init,
     credentials: "include",
@@ -46,6 +47,7 @@ export async function apiFetch<T>(
       ...(body !== undefined && { "Content-Type": "application/json" }),
       ...(token && { "X-XSRF-TOKEN": token }),
       ...(clientId && { "X-Client-Id": clientId }),
+      ...(desktopToken && { "X-TBF-Desktop-Token": desktopToken }),
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,

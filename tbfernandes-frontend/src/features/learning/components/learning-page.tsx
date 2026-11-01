@@ -11,6 +11,7 @@ import {
   Target,
 } from "lucide-react";
 import { toast } from "sonner";
+import { goalHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { ConfirmDelete } from "@/components/shared/confirm-delete";
@@ -258,7 +259,7 @@ export function LearningPage() {
                     <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
                       {goal && (
                         <Link
-                          href={`/goals/${goal.id}`}
+                          href={goalHref(goal.id)}
                           className="flex items-center gap-1 hover:text-primary"
                         >
                           <Target className="size-3.5" aria-hidden />

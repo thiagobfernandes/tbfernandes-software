@@ -1,5 +1,6 @@
 import type { RelationNode } from "@/components/shared/relation-tree";
 import type { AppData } from "@/lib/sample-data/store";
+import { companyHref, goalHref, projectHref } from "@/lib/routes";
 
 export const graphKinds = [
   "goal",
@@ -44,7 +45,7 @@ export function buildGraph(data: AppData) {
       id: key("goal", goal.id),
       kind: "goal",
       label: goal.name,
-      href: `/goals/${goal.id}`,
+      href: goalHref(goal.id),
     });
     if (goal.parentId) link(key("goal", goal.id), key("goal", goal.parentId));
   }
@@ -53,7 +54,7 @@ export function buildGraph(data: AppData) {
       id: key("company", company.id),
       kind: "company",
       label: company.name,
-      href: `/companies/${company.id}`,
+      href: companyHref(company.id),
     });
   }
   for (const project of data.projects) {
@@ -62,7 +63,7 @@ export function buildGraph(data: AppData) {
       id,
       kind: "project",
       label: project.name,
-      href: `/projects/${project.id}`,
+      href: projectHref(project.id),
     });
     if (project.companyId) link(id, key("company", project.companyId));
     if (project.goalId) link(id, key("goal", project.goalId));
@@ -208,14 +209,14 @@ export function buildContextTree(
     id: goal.id,
     kind: "Meta",
     label: goal.name,
-    href: `/goals/${goal.id}`,
+    href: goalHref(goal.id),
     children: data.projects
       .filter((project) => project.goalId === goal.id)
       .map((project) => ({
         id: project.id,
         kind: "Projeto",
         label: project.name,
-        href: `/projects/${project.id}`,
+        href: projectHref(project.id),
         children: data.tasks
           .filter(
             (task) => task.projectId === project.id && openTask(task.status),

@@ -30,7 +30,7 @@ class AssistantApiIntegrationTests extends ApiTestSupport {
 			.hasPathSatisfying("$.source", source -> assertThat(source).isEqualTo("rules"))
 			.hasPathSatisfying("$.text", text -> assertThat(text).asString().contains("0 de 1 tarefas concluídas"));
 		List<String> hrefs = read(answer, "$.references[*].href");
-		assertThat(hrefs).contains("/projects/" + projectId, "/knowledge?note=" + noteId);
+		assertThat(hrefs).contains("/projects/view?id=" + projectId, "/knowledge?note=" + noteId);
 
 		var graph = get("/api/v1/graph");
 		assertThat(graph).hasStatusOk();

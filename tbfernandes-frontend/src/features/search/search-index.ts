@@ -4,6 +4,7 @@ import {
   secondaryNavigation,
 } from "@/lib/constants/navigation";
 import type { AppData } from "@/lib/sample-data/store";
+import { companyHref, goalHref, methodHref, projectHref } from "@/lib/routes";
 
 export type SearchResult = {
   id: string;
@@ -47,14 +48,14 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
       group: "Projetos",
       title: project.name,
       subtitle: project.description,
-      href: `/projects/${project.id}`,
+      href: projectHref(project.id),
     })),
     ...data.companies.map((company) => ({
       id: `company:${company.id}`,
       group: "Empresas",
       title: company.name,
       subtitle: company.tradeName,
-      href: `/companies/${company.id}`,
+      href: companyHref(company.id),
       keywords: company.description,
     })),
     ...data.goals.map((goal) => ({
@@ -62,7 +63,7 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
       group: "Metas",
       title: goal.name,
       subtitle: goal.desiredResult,
-      href: `/goals/${goal.id}`,
+      href: goalHref(goal.id),
     })),
     ...data.notes.map((note) => ({
       id: `note:${note.id}`,
@@ -85,7 +86,7 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
       group: "Métodos",
       title: method.title,
       subtitle: method.summary,
-      href: `/methods/${method.id}`,
+      href: methodHref(method.id),
     })),
     ...data.contacts.map((contact) => ({
       id: `contact:${contact.id}`,

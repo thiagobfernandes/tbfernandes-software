@@ -45,12 +45,14 @@ A sidebar tem grupos recolhíveis por área, cada um com subitens (`lib/constant
 | Área | Rotas | Feature |
 |---|---|---|
 | — | `/` Visão geral, `/calendar` Calendário, `/assistant` Assistente | dashboard, calendar, assistant |
-| Trabalho | `/companies`, `/companies/[id]`, `/projects`, `/projects/[id]`, `/tasks` | companies, projects, tasks |
-| Conhecimento | `/knowledge` Notas, `/knowledge/snippets`, `/knowledge/graph`, `/methods`, `/methods/[id]` | knowledge, methods |
-| Crescimento | `/goals`, `/goals/[id]`, `/learning`, `/certifications` | goals, learning |
+| Trabalho | `/companies`, `/companies/view?id=`, `/projects`, `/projects/view?id=`, `/tasks` | companies, projects, tasks |
+| Conhecimento | `/knowledge` Notas, `/knowledge/snippets`, `/knowledge/graph`, `/methods`, `/methods/view?id=` | knowledge, methods |
+| Crescimento | `/goals`, `/goals/view?id=`, `/learning`, `/certifications` | goals, learning |
 | Finanças | `/finance` Fluxo de caixa, `/finance/purchases` Compras planejadas | finance |
 | Rede | `/contacts` | contacts |
 | — | `/settings` Configurações (aparência, dados, exportar/importar) | settings |
+
+Páginas de detalhe recebem o id na query string (`/projects/view?id=…`), não no caminho, para o app poder ser exportado como arquivos estáticos no build desktop. Monte os links com `lib/routes.ts` (`projectHref`, `companyHref`, `goalHref`, `methodHref`) e leia o id com `useQueryId()` dentro de um `Suspense`.
 
 Busca global: `Ctrl/⌘ K` (`features/search`), cobrindo todos os módulos. Ao criar uma rota nova, adicione-a em `navigation.ts` e, se tiver registros, em `search-index.ts`.
 
@@ -89,6 +91,6 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 
 - Lista com filtros + alternância Lista/Quadro quando o recurso tem status (tarefas); datas no `/calendar`; timeline nos projetos.
 - Quadro kanban com arrastar e soltar, inclusive por toque (`features/tasks/hooks/use-touch-drag.ts`).
-- Detalhe em página própria (`/projects/[id]`) ou em `Sheet` lateral (tarefa).
+- Detalhe em página própria (`/projects/view?id=`) ou em `Sheet` lateral (tarefa).
 - Criar/editar em `Dialog`; excluir sempre com confirmação; feedback por toast (sonner).
 - Visual: veja [design/referencias.md](../design/referencias.md).

@@ -21,7 +21,7 @@ class KnowledgeGraphTest {
 		// 2 goals, 1 company, 1 project, 4 tasks, 1 note, 1 snippet, 1 contact
 		assertThat(graph.nodes()).hasSize(11);
 		assertThat(graph.nodes()).contains(new Node("project:" + PROJECT, "project", "Billing Revamp",
-				"/projects/" + PROJECT));
+				"/projects/view?id=" + PROJECT));
 		assertThat(graph.edges()).contains(new Edge("project:" + PROJECT, "company:" + COMPANY),
 				new Edge("project:" + PROJECT, "goal:" + GOAL), new Edge("note:" + NOTE, "project:" + PROJECT));
 		// 2 project edges + 4 task→project + 1 note + 1 contact

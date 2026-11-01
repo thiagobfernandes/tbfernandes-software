@@ -1,6 +1,6 @@
 # Estado atual
 
-Atualizado em 2026-10-30. Atualize esta página ao terminar uma etapa.
+Atualizado em 2026-11-01. Atualize esta página ao terminar uma etapa.
 
 ## O que existe
 
@@ -9,6 +9,7 @@ Atualizado em 2026-10-30. Atualize esta página ao terminar uma etapa.
 - **Backend** com as etapas 1 a 10 do [backlog](backend/backlog.md#sequência-sugerida): todos os módulos com API, Flyway, testes (89), CI, OpenAPI, login por sessão, perfil `prod`, assistente por regras, grafo, Open Finance pela Pluggy e assistente com IA por consultas estruturadas (os dois últimos desligados por padrão).
 - **Frontend ligado à API** com `NEXT_PUBLIC_DATA_SOURCE=api` (etapa 9). O modo local continua o padrão fora do Docker.
 - **Docker Compose na raiz**: banco, backend, frontend e nginx em um comando, com `/` no frontend e `/api` no backend ([como rodar](como-rodar.md)). As pastas agora são `tbfernandes-backend/`, `tbfernandes-frontend/` e `tbfernandes-nginx/`.
+- **App desktop para Windows** em andamento (Tauri + PostgreSQL embutido, [desktop.md](desktop.md)). Etapa 1 feita: o frontend exporta como estático com `npm run build:desktop` e as páginas de detalhe usam `?id=`.
 
 Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md).
 
