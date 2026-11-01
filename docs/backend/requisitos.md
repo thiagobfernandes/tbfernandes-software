@@ -17,7 +17,7 @@ Plataforma pessoal e profissional de gestão de um único usuário (por enquanto
 | Usuário (dono) | Thiago. Único usuário na v1; todas as tabelas já têm `owner_id` para permitir multiusuário. |
 | Frontend web | Next.js em `tbfernandes-frontend/`, cliente HTTP da API. |
 | Provedor Open Finance | Pluggy. Fornece contas e transações bancárias. |
-| Provedor de IA | Planejado para o assistente; atrás de uma porta de saída. |
+| Provedor de IA | Planejado para o assistente; atrás de uma interface em `application`. |
 
 ### 1.2 Escopo da v1 (MVP)
 
@@ -161,8 +161,8 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | ID | Requisito |
 |---|---|
 | RNF-ARQ-01 | Monólito modular com Spring Modulith: um módulo por domínio; módulos só usam a API pública (pacote raiz) ou eventos uns dos outros. Verificado por teste (`ArchitectureTests`). |
-| RNF-ARQ-02 | Clean architecture dentro de cada módulo: `domain` em Java puro, `application` com casos de uso e portas, `adapter` com web e persistência. Regra de dependência verificada com ArchUnit. |
-| RNF-ARQ-03 | Integrações externas (Pluggy, IA) sempre atrás de uma porta de saída, com um adaptador desligável por configuração. |
+| RNF-ARQ-02 | Clean architecture dentro de cada módulo: `domain` em Java puro, `application` com casos de uso, `infrastructure` com persistência e integrações, `protocols` com DTOs e `web` com controllers. Regra de dependência verificada com ArchUnit. |
+| RNF-ARQ-03 | Integrações externas (Pluggy, IA) sempre atrás de uma interface em `application`, com uma implementação desligável por configuração. |
 | RNF-ARQ-04 | Esquema do banco versionado só por Flyway; Hibernate apenas valida (`ddl-auto=validate`). |
 | RNF-ARQ-05 | Contrato da API em OpenAPI (springdoc), usado para gerar os tipos TypeScript do frontend. |
 

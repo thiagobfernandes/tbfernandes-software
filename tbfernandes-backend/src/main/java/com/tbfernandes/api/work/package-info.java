@@ -2,8 +2,8 @@
  * Work: companies, projects and tasks (frontend: Work group of the sidebar).
  * <p>
  * Reference module for the clean architecture layout used by every other module:
- * {@code domain} (pure Java), {@code application} (use cases and ports),
- * {@code adapter.in.web} (REST) and {@code adapter.out.persistence} (JPA).
+ * {@code domain} (pure Java), {@code application} (use cases), {@code infrastructure.persistence}
+ * (JPA), {@code protocols} (request/response DTOs) and {@code web} (REST controllers).
  * Other modules may only use the types in this package, such as {@link com.tbfernandes.api.work.TaskCompleted}.
  */
 @ApplicationModule(displayName = "Work")

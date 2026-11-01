@@ -84,7 +84,7 @@ src/main/java/com/tbfernandes/api
 ├── contacts/     contatos, interações, follow-up
 └── assistant/    perguntas e grafo, só leitura; porta LanguageModel (IA em aberto)
 
-Cada módulo: domain · application · adapter/in/web · adapter/out/persistence
+Cada módulo: domain · application · infrastructure · protocols · web
 ```
 
 ## Origem do projeto

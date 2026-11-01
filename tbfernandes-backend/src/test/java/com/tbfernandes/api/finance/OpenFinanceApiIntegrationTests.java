@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.tbfernandes.api.ApiTestSupport;
-import com.tbfernandes.api.finance.application.port.out.OpenFinanceGateway;
+import com.tbfernandes.api.finance.application.OpenFinanceGateway;
 import com.tbfernandes.api.finance.domain.AccountType;
 import com.tbfernandes.api.finance.domain.ConnectionStatus;
 import com.tbfernandes.api.shared.domain.ExternalServiceFailure;
