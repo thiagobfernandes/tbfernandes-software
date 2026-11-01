@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { goalHref, projectHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { ConfirmDelete } from "@/components/shared/confirm-delete";
@@ -118,7 +119,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
           <div className="flex flex-col gap-1.5">
             {parent && (
               <Link
-                href={`/goals/${parent.id}`}
+                href={goalHref(parent.id)}
                 className="text-xs text-muted-foreground hover:text-primary"
               >
                 Parte de {parent.name}
@@ -401,7 +402,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                 return (
                   <Link
                     key={project.id}
-                    href={`/projects/${project.id}`}
+                    href={projectHref(project.id)}
                     className="flex flex-col gap-1.5 rounded-lg hover:text-primary"
                   >
                     <span className="flex items-center justify-between gap-2 text-sm font-medium">
@@ -433,7 +434,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                   {children.map((child) => (
                     <RelatedLink
                       key={child.id}
-                      href={`/goals/${child.id}`}
+                      href={goalHref(child.id)}
                       kind="Submeta"
                       label={child.name}
                     />

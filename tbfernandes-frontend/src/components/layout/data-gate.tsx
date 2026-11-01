@@ -45,8 +45,16 @@ function ApiGate({ children }: { children: React.ReactNode }) {
             <CloudOff className="size-6 text-muted-foreground" aria-hidden />
             <CardTitle>A API não está respondendo</CardTitle>
             <CardDescription>
-              Inicie-a com <code>cd api && ./mvnw spring-boot:run</code> e tente
-              de novo. ({status.message})
+              {env.desktopBuild ? (
+                "O serviço local do aplicativo não respondeu. Feche e abra o TBFernandes de novo."
+              ) : (
+                <>
+                  Inicie-a com{" "}
+                  <code>cd tbfernandes-backend && ./mvnw spring-boot:run</code>{" "}
+                  e tente de novo.
+                </>
+              )}{" "}
+              ({status.message})
             </CardDescription>
           </CardHeader>
           <CardContent>

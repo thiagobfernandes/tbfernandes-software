@@ -5,6 +5,7 @@ import { formatBRL } from "@/lib/money";
 import type { AppData } from "@/lib/sample-data/store";
 import { isOpenTask } from "@/lib/sample-data/work";
 import { currentDay } from "@/lib/today";
+import { goalHref, projectHref } from "@/lib/routes";
 
 export type Reference = { kind: string; label: string; href: string };
 export type Answer = { text: string; references: Reference[] };
@@ -101,7 +102,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
         {
           kind: "Projeto",
           label: project.name,
-          href: `/projects/${project.id}`,
+          href: projectHref(project.id),
         },
         ...open.slice(0, 4).map((t) => taskRef(t.title)),
         ...notes.map((n) => ({
@@ -201,7 +202,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
       references: active.map((g) => ({
         kind: "Meta",
         label: g.name,
-        href: `/goals/${g.id}`,
+        href: goalHref(g.id),
       })),
     };
   }

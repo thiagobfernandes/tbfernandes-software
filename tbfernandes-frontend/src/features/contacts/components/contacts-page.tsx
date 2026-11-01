@@ -21,6 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { companyHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { ConfirmDelete } from "@/components/shared/confirm-delete";
@@ -287,7 +288,7 @@ function ContactDetail({
                 <Building2 className="size-3.5" aria-hidden />
                 {company ? (
                   <Link
-                    href={`/companies/${company.id}`}
+                    href={companyHref(company.id)}
                     className="hover:text-primary"
                   >
                     {company.name}

@@ -17,6 +17,7 @@ import {
   Tag,
   Trash2,
 } from "lucide-react";
+import { companyHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { ConfirmDelete } from "@/components/shared/confirm-delete";
@@ -102,7 +103,7 @@ export function ProjectDetailPage({ projectId }: { projectId: string }) {
               <Building2 className="size-3.5" aria-hidden />
               {company ? (
                 <Link
-                  href={`/companies/${company.id}`}
+                  href={companyHref(company.id)}
                   className="hover:text-foreground"
                 >
                   {company.name}

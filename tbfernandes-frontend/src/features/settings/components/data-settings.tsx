@@ -57,7 +57,7 @@ export function DataSettings() {
     <div className="flex flex-col gap-5">
       {api ? (
         <p className="text-sm text-muted-foreground">
-          Conectado à API em <code>{env.apiUrl}</code>
+          Conectado à API em <code suppressHydrationWarning>{env.apiUrl}</code>
           {status.state === "ready" &&
             (status.mode === "session"
               ? ", com login."

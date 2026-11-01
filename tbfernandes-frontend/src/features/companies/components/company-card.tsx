@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Building2, CalendarDays } from "lucide-react";
+import { companyHref } from "@/lib/routes";
 
 import {
   CompanyStatusLabel,
@@ -25,7 +26,7 @@ export function CompanyCard({
 
   return (
     <Link
-      href={`/companies/${company.id}`}
+      href={companyHref(company.id)}
       className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition-colors outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <div className="flex items-start gap-3">

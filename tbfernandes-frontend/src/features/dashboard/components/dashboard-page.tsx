@@ -11,6 +11,7 @@ import {
   ListChecks,
 } from "lucide-react";
 import { toast } from "sonner";
+import { projectHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -254,7 +255,7 @@ export function DashboardPage() {
                       <li key={project.id} className="flex flex-col gap-2">
                         <div className="flex items-baseline justify-between gap-3">
                           <Link
-                            href={`/projects/${project.id}`}
+                            href={projectHref(project.id)}
                             className="truncate text-sm font-medium hover:text-primary"
                           >
                             {project.name}

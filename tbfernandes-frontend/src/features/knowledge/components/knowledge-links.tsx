@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FolderKanban, ListChecks } from "lucide-react";
+import { projectHref } from "@/lib/routes";
 
 import type { KnowledgeLinks } from "@/features/knowledge/types/knowledge";
 import { projectColorClasses } from "@/lib/project-colors";
@@ -36,7 +37,7 @@ export function KnowledgeLinkChips({
       {projects.map((project) => (
         <li key={project.id}>
           <Link
-            href={`/projects/${project.id}`}
+            href={projectHref(project.id)}
             className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-0.5 text-xs hover:border-primary hover:text-primary"
           >
             <span

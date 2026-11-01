@@ -1,10 +1,13 @@
+"use client";
+
 import { Suspense } from "react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryId } from "@/components/shared/query-id";
 import { MethodDetailPage } from "@/features/methods/components/method-detail-page";
 
-export default function Page({ params }: PageProps<"/methods/[methodId]">) {
+export default function Page() {
   return (
     <Suspense
       fallback={
@@ -14,9 +17,11 @@ export default function Page({ params }: PageProps<"/methods/[methodId]">) {
         </PageContainer>
       }
     >
-      {params.then(({ methodId }) => (
-        <MethodDetailPage methodId={methodId} />
-      ))}
+      <Detail />
     </Suspense>
   );
+}
+
+function Detail() {
+  return <MethodDetailPage methodId={useQueryId()} />;
 }

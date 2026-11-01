@@ -1,5 +1,6 @@
 import { isOpenTask } from "@/lib/sample-data/work";
 import type { AppData } from "@/lib/sample-data/store";
+import { goalHref, projectHref } from "@/lib/routes";
 
 export const eventKinds = [
   "task",
@@ -63,7 +64,7 @@ export function buildCalendarEvents(data: AppData): CalendarEvent[] {
         day: project.dueDate,
         kind: "project",
         title: project.name,
-        href: `/projects/${project.id}`,
+        href: projectHref(project.id),
         done: project.status === "completed",
       },
     );
@@ -75,7 +76,7 @@ export function buildCalendarEvents(data: AppData): CalendarEvent[] {
         day: milestone.dueDate,
         kind: "milestone",
         title: milestone.title,
-        href: `/goals/${milestone.goalId}`,
+        href: goalHref(milestone.goalId),
         done: milestone.done,
       },
     );
@@ -87,7 +88,7 @@ export function buildCalendarEvents(data: AppData): CalendarEvent[] {
         day: goal.dueDate,
         kind: "goal",
         title: goal.name,
-        href: `/goals/${goal.id}`,
+        href: goalHref(goal.id),
         done: goal.status === "completed",
       },
     );

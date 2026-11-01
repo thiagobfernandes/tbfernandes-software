@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ListOrdered, Plus } from "lucide-react";
+import { methodHref } from "@/lib/routes";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -35,7 +36,7 @@ export function MethodsPage() {
           return (
             <Link
               key={method.id}
-              href={`/methods/${method.id}`}
+              href={methodHref(method.id)}
               className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition-colors outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
             >
               <div className="flex items-start justify-between gap-3">

@@ -10,6 +10,7 @@ Toda a documentação do projeto fica nesta pasta, em português. O [CLAUDE.md](
 | [padroes-de-codigo.md](padroes-de-codigo.md) | Idioma, padrões de backend e frontend, testes, commits, Definition of Done |
 | [decisoes-tecnicas.md](decisoes-tecnicas.md) | Stack, monólito modular e por que cada escolha |
 | [estado-atual.md](estado-atual.md) | O que já existe, o que está em aberto e próximos passos |
+| [desktop.md](desktop.md) | App desktop para Windows (Tauri + PostgreSQL embutido): arquitetura, etapas e contrato com o backend |
 
 ## Produto e backend
 
