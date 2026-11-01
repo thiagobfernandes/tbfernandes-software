@@ -38,15 +38,25 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
         .map_err(|e| format!("Pasta do aplicativo não encontrada: {e}"))?;
     let data = data_dir(app)?;
     let logs = data.join("logs");
-    fs::create_dir_all(&logs).map_err(|e| format!("Não foi possível criar {}: {e}", logs.display()))?;
+    fs::create_dir_all(&logs)
+        .map_err(|e| format!("Não foi possível criar {}: {e}", logs.display()))?;
 
     // `tauri dev` has no bundled resources: TBF_DESKTOP_JAVA, _JAR and _PG_BIN point elsewhere.
-    let java = override_or("TBF_DESKTOP_JAVA", resources.join("runtime").join("bin").join(exe("java")));
-    let jar = override_or("TBF_DESKTOP_JAR", resources.join("backend").join("tbfernandes-api.jar"));
+    let java = override_or(
+        "TBF_DESKTOP_JAVA",
+        resources.join("runtime").join("bin").join(exe("java")),
+    );
+    let jar = override_or(
+        "TBF_DESKTOP_JAR",
+        resources.join("backend").join("tbfernandes-api.jar"),
+    );
     let pg_bin = override_or("TBF_DESKTOP_PG_BIN", resources.join("postgres").join("bin"));
     for (what, path) in [("Java", &java), ("backend", &jar), ("PostgreSQL", &pg_bin)] {
         if !path.exists() {
-            return Err(format!("Arquivo do {what} não encontrado: {}. Reinstale o aplicativo.", path.display()));
+            return Err(format!(
+                "Arquivo do {what} não encontrado: {}. Reinstale o aplicativo.",
+                path.display()
+            ));
         }
     }
 
@@ -65,7 +75,10 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
             // Class data sharing archive, written on the first run: later starts are faster.
             "-XX:+AutoCreateSharedArchive",
         ])
-        .arg(format!("-XX:SharedArchiveFile={}", data.join("backend.jsa").display()))
+        .arg(format!(
+            "-XX:SharedArchiveFile={}",
+            data.join("backend.jsa").display()
+        ))
         .arg("-jar")
         .arg(&jar)
         .arg("--spring.profiles.active=desktop")
@@ -84,7 +97,11 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
     let child = command
         .spawn()
         .map_err(|e| format!("Não foi possível iniciar o backend: {e}"))?;
-    let backend = Backend { child: Mutex::new(Some(child)), port, token };
+    let backend = Backend {
+        child: Mutex::new(Some(child)),
+        port,
+        token,
+    };
     backend.wait_until_ready(&logs)?;
     Ok(backend)
 }
@@ -168,7 +185,9 @@ impl Backend {
 }
 
 fn override_or(variable: &str, default: PathBuf) -> PathBuf {
-    std::env::var_os(variable).map(PathBuf::from).unwrap_or(default)
+    std::env::var_os(variable)
+        .map(PathBuf::from)
+        .unwrap_or(default)
 }
 
 fn exe(name: &str) -> String {
