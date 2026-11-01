@@ -126,6 +126,18 @@ ANTHROPIC_API_KEY=...          # https://console.anthropic.com
 
 Com o provedor ligado, a pergunta e o texto da resposta, com os nomes e valores dos registros encontrados, são enviados à Anthropic. Como funciona: [etapa 10](backend/implementacao/etapa-10-assistente-ia.md).
 
+### RAG nas notas e snippets
+
+Perguntas abertas já buscam nas notas e snippets sem nenhuma chave (busca por palavras). Para a busca por significado, ligue os embeddings da Voyage AI:
+
+```bash
+TBF_ASSISTANT_EMBEDDING=voyage
+VOYAGE_API_KEY=...             # https://dash.voyageai.com
+# TBF_ASSISTANT_EMBEDDING_NAME=voyage-3.5-lite
+```
+
+O texto das notas e snippets vai para a Voyage na primeira pergunta e depois só o que mudar. No app desktop, defina as mesmas variáveis como variáveis de usuário do Windows. Como funciona: [etapa 11](backend/implementacao/etapa-11-rag.md).
+
 ## Testes e verificação
 
 ```bash

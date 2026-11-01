@@ -280,9 +280,25 @@ Ids: o frontend usa ids curtos (`t-1a2b3c4d`); a API usa UUID. Na migração dos
 
 Transações importadas vão para `finance.entry` com `source = 'OPEN_FINANCE'` e `external_id` (RN-16).
 
+## Assistant: índice de busca (AST-04)
+
+`assistant.knowledge_chunk` guarda os trechos das notas e snippets e os vetores de embeddings. É dado derivado do schema `knowledge`, refeito sempre que a impressão digital de um registro muda, por isso não tem colunas de auditoria nem `version`.
+
+| Coluna | Tipo | Observação |
+|---|---|---|
+| `owner_id` | uuid | dono |
+| `source_kind` | text | `NOTE` ou `SNIPPET` |
+| `source_id` | uuid | `knowledge.note` ou `knowledge.snippet`, sem FK (outro schema) |
+| `position` | int | ordem do trecho no registro |
+| `title`, `content` | text | título do registro e texto do trecho |
+| `fingerprint` | varchar(64) | SHA-256 de título, texto e modelo de embeddings |
+| `embedding_model` | varchar(80) | ex.: `voyage:voyage-3.5-lite`; `none` quando sem vetor |
+| `embedding` | real[] | vetor, ou null. Sem pgvector porque o PostgreSQL do app desktop não tem a extensão |
+
+Chave primária `(owner_id, source_kind, source_id, position)`. Detalhes em [etapa 11](implementacao/etapa-11-rag.md).
+
 ## 6. Planejado
 
 | Tabela | Épico | Motivo |
 |---|---|---|
 | `identity.session` ou Spring Session JDBC | IDN | login |
-| `assistant.embedding` (pgvector) | AST | busca semântica para a IA |

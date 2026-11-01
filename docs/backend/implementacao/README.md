@@ -14,3 +14,4 @@ Uma página por etapa do [backlog](../backlog.md#sequência-sugerida): o que foi
 | 8 | [Assistant e grafo](etapa-8-assistant.md) | AST-01, AST-02, KNW-05 | 46 |
 | 9 | [Frontend usando a API](etapa-9-frontend-api.md) | PLT-08, IDN-04, IDN-05 | — |
 | 10 | [Assistente com IA](etapa-10-assistente-ia.md) | AST-03 | 89 |
+| 11 | [RAG nas notas e snippets](etapa-11-rag.md) | AST-04 | 130 |
