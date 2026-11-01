@@ -30,6 +30,14 @@ pub fn data_dir(app: &AppHandle) -> Result<PathBuf, String> {
         .map_err(|e| format!("Pasta de dados não encontrada: {e}"))
 }
 
+/// Daily backups (zip of the database) go where the user sees them: Documents\TBFernandes\backups.
+pub fn backup_dir(app: &AppHandle, data: &Path) -> PathBuf {
+    app.path()
+        .document_dir()
+        .map(|dir| dir.join("TBFernandes").join("backups"))
+        .unwrap_or_else(|_| data.join("backups"))
+}
+
 /// Starts the backend and waits until it answers. The error is a message for the user.
 pub fn start(app: &AppHandle) -> Result<Backend, String> {
     let resources = app
@@ -87,6 +95,8 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
         .env("TBF_PG_BIN", &pg_bin)
         .env("TBF_DESKTOP_TOKEN", &token)
         .env("TBF_PARENT_PID", std::process::id().to_string())
+        .env("TBF_APP_VERSION", app.package_info().version.to_string())
+        .env("TBF_BACKUP_DIR", backup_dir(app, &data))
         .env_remove("JAVA_TOOL_OPTIONS")
         .env_remove("SPRING_PROFILES_ACTIVE")
         .stdin(Stdio::null())

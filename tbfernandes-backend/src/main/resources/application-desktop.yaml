@@ -1,6 +1,7 @@
 # The backend started by the Windows app (docs/desktop.md). The app sets the TBF_* variables:
 # TBF_PORT (free port it picked), TBF_DATA_DIR (%LOCALAPPDATA%\TBFernandes), TBF_PG_BIN
-# (bundled PostgreSQL bin), TBF_DESKTOP_TOKEN (secret for this launch), TBF_PARENT_PID.
+# (bundled PostgreSQL bin), TBF_DESKTOP_TOKEN (secret for this launch), TBF_PARENT_PID,
+# TBF_APP_VERSION and TBF_BACKUP_DIR (Documents\TBFernandes\backups).
 server:
   address: 127.0.0.1
   port: ${TBF_PORT:8080}
@@ -45,3 +46,9 @@ tbf:
     postgres-bin: ${TBF_PG_BIN:}
     token: ${TBF_DESKTOP_TOKEN:}
     parent-pid: ${TBF_PARENT_PID:}
+    app-version: ${TBF_APP_VERSION:}
+    backup:
+      # Zip of the database before it starts, at most once per interval and on every update.
+      dir: ${TBF_BACKUP_DIR:}
+      keep: 7
+      interval: 20h

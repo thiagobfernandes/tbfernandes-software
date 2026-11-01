@@ -5,6 +5,7 @@ mod backend;
 
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
+use tauri_plugin_window_state::{StateFlags, WindowExt};
 
 fn main() {
     tauri::Builder::default()
@@ -16,6 +17,12 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_dialog::init())
+        // Reopens the main window with the size and position it had.
+        .plugin(
+            tauri_plugin_window_state::Builder::new()
+                .with_denylist(&["splash"])
+                .build(),
+        )
         .setup(|app| {
             WebviewWindowBuilder::new(app, "splash", WebviewUrl::App("desktop-splash.html".into()))
                 .title("TBFernandes")
@@ -58,11 +65,15 @@ fn open_main_window(handle: AppHandle, backend: backend::Backend) {
             .inner_size(1360.0, 860.0)
             .min_inner_size(900.0, 600.0)
             .maximized(true)
+            .visible(false)
             .initialization_script(&script)
             .build();
         match built {
             // Close the splash only after the main window exists, or the app would exit.
-            Ok(_) => {
+            Ok(window) => {
+                let _ = window.restore_state(StateFlags::all());
+                let _ = window.show();
+                let _ = window.set_focus();
                 if let Some(splash) = app.get_webview_window("splash") {
                     let _ = splash.close();
                 }
