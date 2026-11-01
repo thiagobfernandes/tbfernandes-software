@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -8,14 +9,26 @@ const components: Components = {
   h2: (props) => <h3 className="mt-6 text-lg font-semibold" {...props} />,
   h3: (props) => <h4 className="mt-5 text-base font-semibold" {...props} />,
   p: (props) => <p className="mt-3 leading-relaxed" {...props} />,
-  a: (props) => (
-    <a
-      className="font-medium text-primary underline underline-offset-4"
-      target="_blank"
-      rel="noreferrer"
-      {...props}
-    />
-  ),
+  // In-app paths (e.g. resolved [[wiki links]]) stay in the app; the rest
+  // open in a new tab.
+  a: ({ href, node, ...props }) => {
+    void node;
+    return href?.startsWith("/") ? (
+      <Link
+        href={href}
+        className="font-medium text-primary underline decoration-dotted underline-offset-4"
+        {...props}
+      />
+    ) : (
+      <a
+        href={href}
+        className="font-medium text-primary underline underline-offset-4"
+        target="_blank"
+        rel="noreferrer"
+        {...props}
+      />
+    );
+  },
   ul: ({ className, ...props }) => (
     <ul
       className={cn(

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Minus, Plus, RotateCcw, Search, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowUpRight, Search, X } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -19,62 +20,105 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  GraphCanvas,
+  kindColor,
+} from "@/features/knowledge/components/graph-canvas";
+import {
   buildContextTree,
   buildGraph,
+  defaultHiddenKinds,
+  graphHref,
   graphKindLabels,
+  graphKindSingular,
   graphKinds,
   layoutGraph,
-  type GraphKind,
+  localNodeIds,
+  neighborIds,
+  subgraph,
 } from "@/features/knowledge/lib/graph";
 import { useAppData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
 
-/** Node colors per type; fill uses currentColor so classes drive both themes. */
-const kindColor: Record<GraphKind, string> = {
-  goal: "text-primary",
-  company: "text-sky-400",
-  project: "text-violet-400",
-  task: "text-muted-foreground",
-  note: "text-amber-400",
-  snippet: "text-rose-400",
-  contact: "text-emerald-400",
-};
+const depthOptions = [
+  { value: 0, label: "Tudo" },
+  { value: 1, label: "1 salto" },
+  { value: 2, label: "2 saltos" },
+] as const;
 
 export function KnowledgeGraphPage() {
   const data = useAppData();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const graph = useMemo(() => buildGraph(data), [data]);
-  const [hidden, setHidden] = useState<Set<GraphKind>>(new Set());
-  const [focusId, setFocusId] = useState<string>();
+  const [hidden, setHidden] = useState(() => {
+    const focusKind = searchParams.get("focus")?.split(":")[0];
+    return new Set(defaultHiddenKinds.filter((kind) => kind !== focusKind));
+  });
+  const [showOrphans, setShowOrphans] = useState(true);
+  const [depth, setDepth] = useState(0);
   const [query, setQuery] = useState("");
   const [treeGoalId, setTreeGoalId] = useState<string>();
 
-  // Layout runs only when the data or the visible types change, not on focus.
-  const { visibleEdges, positioned } = useMemo(() => {
-    const nodes = graph.nodes.filter((node) => !hidden.has(node.kind));
-    const ids = new Set(nodes.map((node) => node.id));
-    const edges = graph.edges.filter(
-      (edge) => ids.has(edge.source) && ids.has(edge.target),
-    );
-    return { visibleEdges: edges, positioned: layoutGraph(nodes, edges) };
-  }, [graph, hidden]);
-  const byId = new Map(positioned.map((node) => [node.id, node]));
+  const requestedFocus = searchParams.get("focus") ?? undefined;
+  const focusNode = graph.nodes.find(
+    (node) => node.id === requestedFocus && !hidden.has(node.kind),
+  );
+  const focusId = focusNode?.id;
+
+  function setFocus(id?: string) {
+    router.replace(id ? graphHref(id) : "/knowledge/graph", { scroll: false });
+  }
+
+  // Layout runs only when the data, the filters or the local center change,
+  // not on every focus change in the full view.
+  const localCenter = depth > 0 ? focusId : undefined;
+  const { visible, positioned } = useMemo(() => {
+    let next = subgraph(graph, (node) => !hidden.has(node.kind));
+    if (localCenter) {
+      const ids = localNodeIds(next.edges, localCenter, depth);
+      next = subgraph(next, (node) => ids.has(node.id));
+    }
+    if (!showOrphans) {
+      const linked = new Set(next.edges.flatMap((e) => [e.source, e.target]));
+      next = subgraph(
+        next,
+        (node) => linked.has(node.id) || node.id === localCenter,
+      );
+    }
+    return { visible: next, positioned: layoutGraph(next.nodes, next.edges) };
+  }, [graph, hidden, showOrphans, depth, localCenter]);
+  const byId = new Map(graph.nodes.map((node) => [node.id, node]));
+  const shownIds = new Set(positioned.map((node) => node.id));
+  const focus =
+    focusId && shownIds.has(focusId) ? byId.get(focusId) : undefined;
 
   const needle = query.trim().toLowerCase();
   const matches = needle
-    ? positioned.filter((node) => node.label.toLowerCase().includes(needle))
+    ? graph.nodes.filter(
+        (node) =>
+          !hidden.has(node.kind) && node.label.toLowerCase().includes(needle),
+      )
     : [];
-  const focus = focusId ? byId.get(focusId) : undefined;
-  const neighbors = new Set(
-    focus
-      ? visibleEdges.flatMap((edge) =>
-          edge.source === focus.id
-            ? [edge.target]
-            : edge.target === focus.id
-              ? [edge.source]
-              : [],
-        )
-      : [],
-  );
+  const neighbors = focus ? [...neighborIds(visible.edges, focus.id)] : [];
+  const neighborGroups = graphKinds
+    .map((kind) => ({
+      kind,
+      nodes: neighbors
+        .map((id) => byId.get(id)!)
+        .filter((node) => node.kind === kind)
+        .sort((a, b) => a.label.localeCompare(b.label, "pt-BR")),
+    }))
+    .filter((group) => group.nodes.length > 0);
+  const orphanCount = graph.nodes.filter(
+    (node) =>
+      !hidden.has(node.kind) &&
+      !graph.edges.some(
+        (edge) =>
+          (edge.source === node.id &&
+            !hidden.has(byId.get(edge.target)!.kind)) ||
+          (edge.target === node.id && !hidden.has(byId.get(edge.source)!.kind)),
+      ),
+  ).length;
 
   const tree = buildContextTree(data, treeGoalId);
   const treeGoals = data.goals.filter((goal) =>
@@ -85,7 +129,7 @@ export function KnowledgeGraphPage() {
     <PageContainer className="max-w-none">
       <PageHeading
         title="Grafo"
-        description="Explore como metas, empresas, projetos, tarefas e conhecimento se relacionam. As listas e a busca continuam sendo o caminho principal de navegação."
+        description="Explore como metas, projetos, tarefas e conhecimento se relacionam. Links [[Título]] dentro das notas também viram ligações."
         actions={<SampleDataBadge />}
       />
 
@@ -96,7 +140,7 @@ export function KnowledgeGraphPage() {
         </TabsList>
 
         <TabsContent value="network" className="mt-4 flex flex-col gap-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div
               role="group"
               aria-label="Mostrar tipos"
@@ -107,6 +151,7 @@ export function KnowledgeGraphPage() {
                 const count = graph.nodes.filter(
                   (node) => node.kind === kind,
                 ).length;
+                if (count === 0) return null;
                 return (
                   <button
                     key={kind}
@@ -117,7 +162,6 @@ export function KnowledgeGraphPage() {
                       if (shown) next.add(kind);
                       else next.delete(kind);
                       setHidden(next);
-                      if (focus?.kind === kind) setFocusId(undefined);
                     }}
                     className={cn(
                       "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
@@ -127,7 +171,8 @@ export function KnowledgeGraphPage() {
                     <span
                       aria-hidden
                       className={cn(
-                        "size-2 rounded-full bg-current",
+                        "size-2 rounded-full",
+                        shown ? "bg-current" : "border border-current",
                         kindColor[kind],
                       )}
                     />
@@ -138,8 +183,22 @@ export function KnowledgeGraphPage() {
                   </button>
                 );
               })}
+              <button
+                type="button"
+                aria-pressed={showOrphans}
+                onClick={() => setShowOrphans(!showOrphans)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border border-dashed px-2.5 py-1 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  showOrphans ? "bg-card" : "text-muted-foreground opacity-60",
+                )}
+              >
+                Sem ligação
+                <span className="text-muted-foreground tabular-nums">
+                  {orphanCount}
+                </span>
+              </button>
             </div>
-            <div className="relative lg:w-72">
+            <div className="relative shrink-0 lg:w-72">
               <label className="relative block">
                 <span className="sr-only">Encontrar um nó</span>
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -147,18 +206,29 @@ export function KnowledgeGraphPage() {
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && matches[0]) {
+                      setFocus(matches[0].id);
+                      setQuery("");
+                    }
+                  }}
                   placeholder="Encontrar e focar um nó"
                   className="pl-9"
                 />
               </label>
-              {matches.length > 0 && (
+              {needle && (
                 <ul className="absolute inset-x-0 top-full z-10 mt-1 max-h-60 overflow-y-auto rounded-xl border bg-popover p-1 shadow-lg">
+                  {matches.length === 0 && (
+                    <li className="px-2 py-1.5 text-sm text-muted-foreground">
+                      Nenhum nó encontrado.
+                    </li>
+                  )}
                   {matches.slice(0, 8).map((node) => (
                     <li key={node.id}>
                       <button
                         type="button"
                         onClick={() => {
-                          setFocusId(node.id);
+                          setFocus(node.id);
                           setQuery("");
                         }}
                         className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-accent"
@@ -166,11 +236,14 @@ export function KnowledgeGraphPage() {
                         <span
                           aria-hidden
                           className={cn(
-                            "size-2 rounded-full bg-current",
+                            "size-2 shrink-0 rounded-full bg-current",
                             kindColor[node.kind],
                           )}
                         />
                         <span className="truncate">{node.label}</span>
+                        <span className="ml-auto shrink-0 text-[11px] text-muted-foreground">
+                          {graphKindSingular[node.kind]}
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -179,13 +252,12 @@ export function KnowledgeGraphPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_19rem]">
             <GraphCanvas
               nodes={positioned}
-              edges={visibleEdges}
+              edges={visible.edges}
               focusId={focus?.id}
-              neighbors={neighbors}
-              onFocus={setFocusId}
+              onFocus={setFocus}
             />
             <aside className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
               {focus ? (
@@ -200,62 +272,107 @@ export function KnowledgeGraphPage() {
                             kindColor[focus.kind],
                           )}
                         />
-                        {graphKindLabels[focus.kind].replace(/s$/, "")}
+                        {graphKindSingular[focus.kind]}
                       </span>
-                      <h2 className="font-medium">{focus.label}</h2>
+                      <h2 className="font-medium break-words">{focus.label}</h2>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon-sm"
                       aria-label="Limpar foco"
-                      onClick={() => setFocusId(undefined)}
+                      onClick={() => setFocus(undefined)}
                     >
                       <X />
                     </Button>
                   </div>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={focus.href}>
-                      Open <ArrowUpRight />
-                    </Link>
-                  </Button>
-                  <h3 className="mt-2 text-xs font-medium text-muted-foreground">
-                    {neighbors.size} connection{neighbors.size === 1 ? "" : "s"}
+                  {focus.href && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={focus.href}>
+                        Abrir <ArrowUpRight />
+                      </Link>
+                    </Button>
+                  )}
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Grafo local
+                    </span>
+                    <div
+                      role="group"
+                      aria-label="Profundidade do grafo local"
+                      className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1"
+                    >
+                      {depthOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          aria-pressed={depth === option.value}
+                          onClick={() => setDepth(option.value)}
+                          className={cn(
+                            "rounded-md px-2 py-1 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                            depth === option.value
+                              ? "bg-background font-medium shadow-sm"
+                              : "text-muted-foreground hover:text-foreground",
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <h3 className="mt-1 text-xs font-medium text-muted-foreground">
+                    {neighbors.length}{" "}
+                    {neighbors.length === 1 ? "conexão" : "conexões"}
                   </h3>
-                  <ul className="flex flex-col gap-0.5">
-                    {[...neighbors].map((id) => {
-                      const node = byId.get(id)!;
-                      return (
-                        <li key={id}>
-                          <button
-                            type="button"
-                            onClick={() => setFocusId(id)}
-                            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-accent/60"
-                          >
-                            <span
-                              aria-hidden
-                              className={cn(
-                                "size-2 shrink-0 rounded-full bg-current",
-                                kindColor[node.kind],
-                              )}
-                            />
-                            <span className="truncate">{node.label}</span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  <div className="flex max-h-[22rem] flex-col gap-2 overflow-y-auto">
+                    {neighborGroups.map((group) => (
+                      <div key={group.kind} className="flex flex-col gap-0.5">
+                        <span className="flex items-center gap-1.5 px-2 text-[11px] text-muted-foreground">
+                          <span
+                            aria-hidden
+                            className={cn(
+                              "size-1.5 rounded-full bg-current",
+                              kindColor[group.kind],
+                            )}
+                          />
+                          {graphKindLabels[group.kind]} · {group.nodes.length}
+                        </span>
+                        <ul className="flex flex-col gap-0.5">
+                          {group.nodes.map((node) => (
+                            <li key={node.id}>
+                              <button
+                                type="button"
+                                onClick={() => setFocus(node.id)}
+                                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-accent/60"
+                              >
+                                <span className="truncate">{node.label}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </>
               ) : (
                 <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                   <p className="font-medium text-foreground">
-                    {positioned.length} nós · {visibleEdges.length} ligações
+                    {positioned.length} nós · {visible.edges.length} ligações
                   </p>
                   <p>
-                    Clique em um nó para focar nele e ver com o que ele se
-                    conecta. Arraste o fundo para mover; use os botões para dar
-                    zoom.
+                    Clique em um nó para focar e ver com o que ele se conecta;
+                    clique duas vezes para abrir o registro.
                   </p>
-                  <p>Nós maiores têm mais conexões.</p>
+                  <p>
+                    Use a roda do mouse ou a pinça para dar zoom, arraste o
+                    fundo para mover e arraste um nó para reposicioná-lo.
+                  </p>
+                  <p>
+                    Nós maiores têm mais conexões. Escreva{" "}
+                    <code className="rounded bg-muted px-1 font-mono text-xs">
+                      [[Título]]
+                    </code>{" "}
+                    numa nota para ligá-la a outra nota, snippet ou método.
+                  </p>
                 </div>
               )}
             </aside>
@@ -289,184 +406,5 @@ export function KnowledgeGraphPage() {
         </TabsContent>
       </Tabs>
     </PageContainer>
-  );
-}
-
-type CanvasProps = {
-  nodes: ReturnType<typeof layoutGraph>;
-  edges: { source: string; target: string }[];
-  focusId?: string;
-  neighbors: Set<string>;
-  onFocus: (id?: string) => void;
-};
-
-function GraphCanvas({
-  nodes,
-  edges,
-  focusId,
-  neighbors,
-  onFocus,
-}: CanvasProps) {
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const drag = useRef<{ x: number; y: number; moved: boolean }>(undefined);
-  const byId = new Map(nodes.map((node) => [node.id, node]));
-
-  const pad = 60;
-  const xs = nodes.map((node) => node.x);
-  const ys = nodes.map((node) => node.y);
-  const minX = Math.min(...xs, 0) - pad;
-  const minY = Math.min(...ys, 0) - pad;
-  const width = Math.max(...xs, 0) - minX + pad;
-  const height = Math.max(...ys, 0) - minY + pad;
-  const viewW = width / zoom;
-  const viewH = height / zoom;
-  const viewX = minX + (width - viewW) / 2 - pan.x;
-  const viewY = minY + (height - viewH) / 2 - pan.y;
-  const dimmed = (id: string) =>
-    focusId !== undefined && id !== focusId && !neighbors.has(id);
-
-  return (
-    <div className="relative overflow-hidden rounded-2xl border bg-dot-grid">
-      <svg
-        role="img"
-        aria-label="Grafo de registros relacionados"
-        viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}
-        className="h-[32rem] w-full cursor-grab touch-none active:cursor-grabbing"
-        onPointerDown={(event) => {
-          drag.current = { x: event.clientX, y: event.clientY, moved: false };
-          (event.target as Element).setPointerCapture?.(event.pointerId);
-        }}
-        onPointerMove={(event) => {
-          if (!drag.current) return;
-          const rect = event.currentTarget.getBoundingClientRect();
-          const scale = viewW / rect.width;
-          const dx = (event.clientX - drag.current.x) * scale;
-          const dy = (event.clientY - drag.current.y) * scale;
-          if (Math.abs(dx) + Math.abs(dy) > 1) drag.current.moved = true;
-          drag.current.x = event.clientX;
-          drag.current.y = event.clientY;
-          setPan((current) => ({ x: current.x + dx, y: current.y + dy }));
-        }}
-        onPointerUp={(event) => {
-          const wasClick = drag.current && !drag.current.moved;
-          drag.current = undefined;
-          if (wasClick && event.target === event.currentTarget)
-            onFocus(undefined);
-        }}
-      >
-        <g>
-          {edges.map((edge) => {
-            const a = byId.get(edge.source)!;
-            const b = byId.get(edge.target)!;
-            const active =
-              focusId && (edge.source === focusId || edge.target === focusId);
-            return (
-              <line
-                key={`${edge.source}-${edge.target}`}
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                className={cn(
-                  "stroke-muted-foreground transition-opacity",
-                  active
-                    ? "stroke-primary opacity-90"
-                    : focusId
-                      ? "opacity-10"
-                      : "opacity-30",
-                )}
-                strokeWidth={active ? 1.4 : 0.8}
-              />
-            );
-          })}
-        </g>
-        <g>
-          {nodes.map((node) => {
-            const radius = 4 + Math.min(node.degree, 8) * 1.1;
-            const isFocus = node.id === focusId;
-            const showLabel =
-              isFocus ||
-              neighbors.has(node.id) ||
-              (!focusId && node.degree >= 3);
-            return (
-              <g
-                key={node.id}
-                role="button"
-                tabIndex={0}
-                aria-label={`${node.label} (${graphKindLabels[node.kind]})`}
-                aria-pressed={isFocus}
-                transform={`translate(${node.x} ${node.y})`}
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={() => onFocus(isFocus ? undefined : node.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onFocus(isFocus ? undefined : node.id);
-                  }
-                }}
-                className={cn(
-                  "cursor-pointer transition-opacity outline-none [&:focus-visible>circle]:stroke-ring [&:focus-visible>circle]:stroke-[3]",
-                  kindColor[node.kind],
-                  dimmed(node.id) && "opacity-20",
-                )}
-              >
-                {isFocus && (
-                  <circle r={radius + 6} className="fill-current opacity-20" />
-                )}
-                <circle
-                  r={radius}
-                  className="fill-current stroke-background"
-                  strokeWidth={1.5}
-                />
-                {showLabel && (
-                  <text
-                    y={radius + 11}
-                    textAnchor="middle"
-                    className={cn(
-                      "pointer-events-none fill-foreground text-[9px]",
-                      isFocus && "font-semibold",
-                    )}
-                  >
-                    {node.label.length > 26
-                      ? `${node.label.slice(0, 25)}…`
-                      : node.label}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </g>
-      </svg>
-      <div className="absolute right-3 bottom-3 flex gap-1 rounded-lg border bg-card/90 p-1 shadow-sm backdrop-blur">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Aumentar zoom"
-          onClick={() => setZoom((z) => Math.min(z * 1.25, 4))}
-        >
-          <Plus />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Diminuir zoom"
-          onClick={() => setZoom((z) => Math.max(z / 1.25, 0.5))}
-        >
-          <Minus />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Restaurar visualização"
-          onClick={() => {
-            setZoom(1);
-            setPan({ x: 0, y: 0 });
-          }}
-        >
-          <RotateCcw />
-        </Button>
-      </div>
-    </div>
   );
 }
