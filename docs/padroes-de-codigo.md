@@ -25,11 +25,11 @@ Datas e dinheiro sempre formatados com `Intl` em `pt-BR` (dinheiro em BRL).
 
 Base: [arquitetura do backend](backend/arquitetura.md) e [tbfernandes-backend/CLAUDE.md](../tbfernandes-backend/CLAUDE.md).
 
-- **Pacote por módulo** (`com.tbfernandes.api.<modulo>`) e, dentro dele, camadas `domain`, `application`, `adapter/in/web`, `adapter/out/persistence`.
+- **Pacote por módulo** (`com.tbfernandes.api.<modulo>`) e, dentro dele, camadas `domain`, `application`, `infrastructure` (quando precisa), `protocols` e `web`. Sem `adapter/in`, `adapter/out` nem `port/out`.
 - **Domínio puro**: entidades e value objects sem anotações de Spring/JPA. Invariantes no construtor ou em métodos de comportamento (`task.changeStatus(next, clock)`), nunca em setters soltos.
 - **Um serviço de aplicação por agregado** (`TaskService`). Passou de ~300 linhas, divida.
-- **Portas**: repositórios como interfaces no domínio; integrações em `application/port/out`. Adaptadores implementam.
-- **DTOs na borda** como `record`; entidade JPA nunca sai do adaptador de persistência; mapeamento explícito JPA ⇄ domínio.
+- **Interfaces**: repositórios no domínio; integrações externas em `application`. A implementação fica em `infrastructure` (`<Agregado>RepositoryImpl`, `PluggyOpenFinanceGateway`).
+- **DTOs em `protocols`** como `record` público, um por arquivo; entidade JPA nunca sai de `infrastructure.persistence`; mapeamento explícito JPA ⇄ domínio.
 - **Validação**: Bean Validation nos DTOs de entrada; regras de negócio no domínio lançando `BusinessRuleViolation` com o id da regra (`RN-07`).
 - **Erros**: Problem Details (RFC 9457) pelo `ApiExceptionHandler`. Nunca expor stack trace ou SQL.
 - **Entre módulos**: só `*Lookup` público ou eventos (`@ApplicationModuleListener`). Nada de FK entre schemas.
