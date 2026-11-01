@@ -1,5 +1,6 @@
 package com.tbfernandes.api.shared.infrastructure.desktop;
 
+import java.time.Clock;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,9 +30,12 @@ class DesktopConfig {
 	private static final Logger log = LoggerFactory.getLogger(DesktopConfig.class);
 
 	@Bean(destroyMethod = "stop")
-	EmbeddedPostgres embeddedPostgres(DesktopProperties properties) {
+	EmbeddedPostgres embeddedPostgres(DesktopProperties properties, Clock clock) {
 		properties.validate();
-		return new EmbeddedPostgres(properties.postgresBin(), properties.dataDir()).start();
+		DataBackup backup = new DataBackup(properties.backupDir(), properties.backup().keep(),
+				properties.backup().interval(), properties.appVersion(), properties.dataDir().resolve("app-version"),
+				clock);
+		return new EmbeddedPostgres(properties.postgresBin(), properties.dataDir()).start(backup::runIfDue);
 	}
 
 	/** Replaces Spring Boot's DataSource: the URL is only known once PostgreSQL is up. */

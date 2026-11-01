@@ -1,6 +1,7 @@
 package com.tbfernandes.api.shared.infrastructure.desktop;
 
 import java.nio.file.Path;
+import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -12,10 +13,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * <li>token: secret created for each launch; every request must send it in
  * X-TBF-Desktop-Token (TBF_DESKTOP_TOKEN).</li>
  * <li>parent-pid: the app's process; the backend exits when it is gone (TBF_PARENT_PID).</li>
+ * <li>app-version: the app's version; a change triggers a backup (TBF_APP_VERSION).</li>
+ * <li>backup: where backups go (TBF_BACKUP_DIR, default {@code <data-dir>/backups}), how many to
+ * keep and how often (see {@link DataBackup}).</li>
  * </ul>
  */
 @ConfigurationProperties("tbf.desktop")
-public record DesktopProperties(Path dataDir, Path postgresBin, String token, Long parentPid) {
+public record DesktopProperties(Path dataDir, Path postgresBin, String token, Long parentPid, String appVersion,
+		Backup backup) {
+
+	public DesktopProperties {
+		backup = backup == null ? new Backup(null, 0, null) : backup;
+	}
+
+	public record Backup(Path dir, int keep, Duration interval) {
+
+		public Backup {
+			keep = keep <= 0 ? 7 : keep;
+			interval = interval == null ? Duration.ofHours(20) : interval;
+		}
+
+	}
+
+	Path backupDir() {
+		return blank(backup.dir()) ? dataDir.resolve("backups") : backup.dir();
+	}
 
 	void validate() {
 		if (blank(dataDir) || blank(postgresBin)) {

@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,17 +66,30 @@ public final class EmbeddedPostgres implements AutoCloseable {
 		this.passwordFile = dataDir.resolve("db-password");
 	}
 
-	public synchronized EmbeddedPostgres start() {
+	public EmbeddedPostgres start() {
+		return start(dataDirectory -> {
+		});
+	}
+
+	/**
+	 * Starts the server. {@code whileStopped} runs first, on a data directory that already existed, with no
+	 * server running, which is when its files can be copied safely (see {@link DataBackup}).
+	 */
+	public synchronized EmbeddedPostgres start(Consumer<Path> whileStopped) {
 		if (running) {
 			return this;
 		}
 		try {
 			Files.createDirectories(logs);
-			if (!Files.exists(pgData.resolve("PG_VERSION"))) {
+			boolean created = !Files.exists(pgData.resolve("PG_VERSION"));
+			if (created) {
 				initialize();
 			}
 			password = Files.readString(passwordFile, StandardCharsets.UTF_8).strip();
 			stopLeftover();
+			if (!created) {
+				whileStopped.accept(pgData);
+			}
 			port = freePort();
 			run(List.of(tool("pg_ctl"), "start", "-D", pgData.toString(), "-w", "-t", timeoutSeconds(), "-l",
 					logs.resolve("postgres.log").toString(), "-o", "-p " + port), "pg_ctl-start.log");

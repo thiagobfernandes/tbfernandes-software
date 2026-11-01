@@ -55,7 +55,15 @@ export function DataSettings() {
 
   return (
     <div className="flex flex-col gap-5">
-      {api ? (
+      {env.desktopBuild ? (
+        <p className="text-sm text-muted-foreground">
+          Seus dados ficam neste computador, em{" "}
+          <code>%LOCALAPPDATA%\TBFernandes</code>. Uma cópia do banco é salva ao
+          abrir o aplicativo, no máximo uma vez por dia e sempre depois de uma
+          atualização, em <code>Documentos\TBFernandes\backups</code> (as 7 mais
+          recentes).
+        </p>
+      ) : api ? (
         <p className="text-sm text-muted-foreground">
           Conectado à API em <code suppressHydrationWarning>{env.apiUrl}</code>
           {status.state === "ready" &&

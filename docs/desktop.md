@@ -19,7 +19,7 @@ TBFernandes.exe (Tauri, WebView2)
 | 1 | Frontend exportável como estático (`npm run build:desktop`), rotas de detalhe com `?id=`, URL da API e token em tempo de execução | Feito |
 | 2 | Perfil `desktop` no backend: PostgreSQL embutido, só `127.0.0.1`, single-user, filtro do token, CORS para a janela, desligamento limpo | Feito |
 | 3 | Projeto Tauri em `tbfernandes-desktop/`: inicia o backend, splash, espera o health, fecha tudo ao sair, instância única; instalador NSIS gerado no CI | Feito |
-| 4 | Instalador NSIS por usuário, ícones, pasta de dados, backup com `pg_dump` | A fazer |
+| 4 | Backup automático do banco, CSP na janela, janela lembra tamanho e posição | Feito |
 | 5 | Atualização automática (GitHub Releases) e workflow de release em `windows-latest` | A fazer |
 
 ## Como gerar o instalador
@@ -48,8 +48,16 @@ O mesmo funciona no Linux para testar (`npx tauri build --debug --no-bundle`, de
 - **Dados:** ficam em `%LOCALAPPDATA%\TBFernandes` (banco em `pg\`, logs em `logs\`). A desinstalação não apaga essa pasta.
 - **Abertura mais rápida:** a JVM grava um arquivo de class data sharing (`backend.jsa`) na primeira abertura e o reaproveita nas seguintes.
 - **Desenvolvimento:** `TBF_DESKTOP_JAVA`, `TBF_DESKTOP_JAR` e `TBF_DESKTOP_PG_BIN` trocam os caminhos dos recursos, por exemplo no `tauri dev`.
-- **CSP desligada por enquanto** (`"csp": null`): a janela só carrega arquivos do próprio app, mas o widget da Pluggy carrega scripts de fora. Vale definir uma CSP junto com a etapa 4.
-- **Os binários do zonky não trazem `pg_dump`.** O backup da etapa 4 vai usar a exportação JSON que já existe em Configurações, ou baixar o `pg_dump` à parte.
+
+## Etapa 4: backup, segurança e janela
+
+- **Backup automático** (`DataBackup`, no backend): antes de subir o PostgreSQL, com o servidor parado, o backend compacta a pasta `pg\` num zip em `Documentos\TBFernandes\backups` (`TBF_BACKUP_DIR`). Roda no máximo uma vez a cada 20 h, sempre que a versão do app muda (antes das migrations de uma atualização) e nunca na primeira abertura. Guarda os 7 mais recentes. Se o backup falhar, o app abre mesmo assim e o erro vai para o log.
+  - Os binários do PostgreSQL que vão no app não trazem `pg_dump`, por isso a cópia é dos arquivos. Ela é consistente porque o servidor está parado.
+  - **Restaurar:** feche o app, renomeie `%LOCALAPPDATA%\TBFernandes\pg` e extraia o zip numa nova pasta `pg` no mesmo lugar.
+  - A exportação JSON de Configurações → Dados continua valendo.
+- **CSP** em `tauri.conf.json`: scripts só do app (o Tauri adiciona os hashes dos scripts inline do export), `connect-src` só para `http://127.0.0.1:*` e IPC, e scripts e frames de `*.pluggy.ai` para o widget de contas.
+- **Janela:** `tauri-plugin-window-state` guarda tamanho, posição e se estava maximizada. A janela principal só aparece depois de restaurar esse estado.
+- **Configurações → Dados** mostra no desktop onde ficam os dados e os backups.
 
 ## Etapa 1: frontend
 
