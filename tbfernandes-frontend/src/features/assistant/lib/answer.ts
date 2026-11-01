@@ -85,9 +85,7 @@ export function answer(rawQuestion: string, data: AppData): Answer {
   const question = rawQuestion.toLowerCase();
   const openTasks = data.tasks.filter(isOpenTask);
 
-  const project = data.projects.find((p) =>
-    question.includes(p.name.toLowerCase()),
-  );
+  const project = data.projects.find((p) => mentions(question, p.name));
   if (project) {
     const tasks = data.tasks.filter((t) => t.projectId === project.id);
     const done = tasks.filter((t) => t.status === "done").length;
@@ -308,4 +306,15 @@ function excerpt(text: string, max = 280) {
   if (line.length <= max) return line;
   const space = line.lastIndexOf(" ", max);
   return `${line.slice(0, space > max / 2 ? space : max)}…`;
+}
+
+/** The question names the project as whole words, like RuleBasedAssistant.mentions in the API. */
+function mentions(question: string, name: string) {
+  const lower = name.toLowerCase().trim();
+  if (!lower) return false;
+  const escaped = lower.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
+    "u",
+  ).test(question);
 }
