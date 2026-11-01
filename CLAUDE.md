@@ -11,6 +11,7 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | `tbfernandes-frontend/` | Frontend Next.js 16, React 19, TypeScript, Tailwind 4, shadcn/ui | [tbfernandes-frontend/CLAUDE.md](tbfernandes-frontend/CLAUDE.md) |
 | `tbfernandes-backend/` | Backend Spring Boot 4.1, Java 25, Spring Modulith, PostgreSQL 17, Flyway | [tbfernandes-backend/CLAUDE.md](tbfernandes-backend/CLAUDE.md) |
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend | — |
+| `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
 | `.github/workflows/ci.yml` | CI: `./mvnw verify` no backend; `npm ci && npm run lint && npm run build` no frontend | — |

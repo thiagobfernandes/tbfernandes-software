@@ -7,6 +7,7 @@ Plataforma de gestão pessoal e profissional: empresas, projetos, tarefas, conhe
 | `tbfernandes-frontend/` | Frontend Next.js 16 (App Router, TypeScript, Tailwind CSS 4, shadcn/ui) |
 | `tbfernandes-backend/` | Backend Spring Boot 4.1 (Java 25, Spring Modulith, PostgreSQL 17, Flyway) |
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend |
+| `tbfernandes-desktop/` | App para Windows (Tauri 2) com backend e PostgreSQL embutidos ([docs/desktop.md](docs/desktop.md)) |
 | `docs/` | Requisitos, arquitetura, padrões de código, design e backlog ([índice](docs/README.md)) |
 
 ## Rodar

@@ -1,0 +1,5 @@
+node_modules/
+src-tauri/target/
+# Filled by scripts/prepare-resources.sh: Java runtime, backend jar, PostgreSQL.
+src-tauri/resources/
+src-tauri/gen/
