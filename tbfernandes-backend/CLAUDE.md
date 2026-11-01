@@ -39,6 +39,7 @@ Direção permitida entre módulos: `goals → work, learning, finance`; `knowle
 - Erros em Problem Details: `NotFound` 404, `Conflict` 409, `BusinessRuleViolation` 422 (com `rule`), validação 400 (com `errors`). Mensagens para o usuário em **pt-BR**.
 - Integrações externas (Pluggy, IA) atrás de porta, com adaptador desligado como padrão (ADR-005).
 - Dados de exemplo do perfil `dev` em `db/dev/R__dev_seed.sql`, iguais aos de `tbfernandes-frontend/src/lib/sample-data` (ADR-006).
+- Perfil `desktop` (app Windows, [desktop.md](../docs/desktop.md)): PostgreSQL embutido em `shared/infrastructure/desktop`, token `X-TBF-Desktop-Token` em toda requisição, `db/desktop` cria a conta única. Mudou algo que a abertura do banco ou a segurança usa? Rode `EmbeddedPostgresTest` e `DesktopTokenFilterTest`.
 - Mudou contrato, modelo ou regra: atualize `docs/backend/*.md` no mesmo commit e registre a etapa em `docs/backend/implementacao/`.
 
 ## Verificar
