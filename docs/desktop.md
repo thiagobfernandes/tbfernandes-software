@@ -42,7 +42,7 @@ O mesmo funciona no Linux para testar (`npx tauri build --debug --no-bundle`, de
 |---|---|
 | `src-tauri/src/main.rs` | Abre a splash (`tbfernandes-frontend/public/desktop-splash.html`), inicia o backend numa thread, depois abre a janela principal com `window.__TBF_DESKTOP__` injetado e fecha a splash. Se algo falha, mostra um diálogo com a pasta de logs. Uma segunda abertura só foca a janela que já está aberta |
 | `src-tauri/src/backend.rs` | Escolhe porta e token, roda `runtime/bin/java -jar backend/tbfernandes-api.jar --spring.profiles.active=desktop` sem janela de console, espera `/actuator/health` (até 180 s) e, ao sair, chama `/api/v1/desktop/shutdown` e espera até 20 s antes de matar o processo |
-| `src-tauri/tauri.conf.json` | Nome, ícones, recursos (`runtime/`, `backend/`, `postgres/`) e NSIS por usuário em pt-BR |
+| `src-tauri/tauri.conf.json` | Nome, ícones (como trocar em [design/referencias.md](design/referencias.md#marca)), recursos (`runtime/`, `backend/`, `postgres/`) e NSIS por usuário em pt-BR |
 | `scripts/prepare-resources.sh` | Gera `src-tauri/resources/`: jar do backend, Java com `jlink` (~70 MB) e PostgreSQL 17 dos binários `io.zonky.test.postgres` no Maven Central (~60 MB) |
 
 - **Dados:** ficam em `%LOCALAPPDATA%\TBFernandes` (banco em `pg\`, logs em `logs\`). A desinstalação não apaga essa pasta.
