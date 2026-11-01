@@ -10,14 +10,14 @@
         --bg: #ffffff;
         --fg: #0f172a;
         --muted: #64748b;
-        --brand: #0f766e;
+        --brand: #b07a1f;
       }
       @media (prefers-color-scheme: dark) {
         :root {
           --bg: #0b1120;
           --fg: #e2e8f0;
           --muted: #94a3b8;
-          --brand: #2dd4bf;
+          --brand: #d4a03a;
         }
       }
       html,
@@ -36,16 +36,9 @@
         font-family: "Segoe UI", system-ui, sans-serif;
         user-select: none;
       }
-      .mark {
-        display: grid;
-        place-items: center;
-        width: 56px;
-        height: 56px;
-        border-radius: 14px;
-        background: var(--brand);
-        color: var(--bg);
-        font-weight: 700;
-        font-size: 22px;
+      .logo {
+        width: 300px;
+        height: auto;
       }
       p {
         margin: 0;
@@ -78,8 +71,7 @@
     </style>
   </head>
   <body>
-    <div class="mark">TB</div>
-    <strong>TBFernandes</strong>
+    <img class="logo" src="brand/logo-tbfernandes.png" alt="TBFernandes" />
     <div class="bar"></div>
     <p>Preparando seus dados…</p>
   </body>

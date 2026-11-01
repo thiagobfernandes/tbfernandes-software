@@ -103,8 +103,8 @@ export function AgendaPanel({
           </div>
         </div>
         <div className="grid grid-cols-7 gap-y-1 text-center text-xs">
-          {weekdays.map((day) => (
-            <span key={day} className="pb-1 text-muted-foreground">
+          {weekdays.map((day, index) => (
+            <span key={index} className="pb-1 text-muted-foreground">
               {day}
             </span>
           ))}
