@@ -1,0 +1,47 @@
+# The backend started by the Windows app (docs/desktop.md). The app sets the TBF_* variables:
+# TBF_PORT (free port it picked), TBF_DATA_DIR (%LOCALAPPDATA%\TBFernandes), TBF_PG_BIN
+# (bundled PostgreSQL bin), TBF_DESKTOP_TOKEN (secret for this launch), TBF_PARENT_PID.
+server:
+  address: 127.0.0.1
+  port: ${TBF_PORT:8080}
+
+spring:
+  docker:
+    compose:
+      enabled: false
+  flyway:
+    # db/desktop creates the single owner account; no sample data.
+    locations: classpath:db/migration,classpath:db/desktop
+
+logging:
+  file:
+    name: ${TBF_DATA_DIR}/logs/backend.log
+  logback:
+    rollingpolicy:
+      max-file-size: 5MB
+      max-history: 5
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+tbf:
+  auth:
+    # One person, one PC: no login. The launch token protects the API (DesktopTokenFilter).
+    mode: single-user
+  cors:
+    # Origin of the Tauri window on Windows (WebView2) and on other platforms.
+    allowed-origins: http://tauri.localhost,https://tauri.localhost,tauri://localhost
+  desktop:
+    data-dir: ${TBF_DATA_DIR:}
+    postgres-bin: ${TBF_PG_BIN:}
+    token: ${TBF_DESKTOP_TOKEN:}
+    parent-pid: ${TBF_PARENT_PID:}
