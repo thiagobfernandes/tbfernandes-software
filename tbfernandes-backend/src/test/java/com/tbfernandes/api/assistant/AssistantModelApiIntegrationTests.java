@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.tbfernandes.api.ApiTestSupport;
 import com.tbfernandes.api.assistant.application.port.out.LanguageModel;
 import com.tbfernandes.api.assistant.domain.Answer;
+import com.tbfernandes.api.assistant.domain.Passage;
 import com.tbfernandes.api.assistant.domain.StructuredQuery;
 import com.tbfernandes.api.assistant.domain.StructuredQuery.Subject;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,43 @@ class AssistantModelApiIntegrationTests extends ApiTestSupport {
 		fake.query = Optional.empty();
 		fake.rewrite = Optional.empty();
 		fake.failing = false;
+		fake.fromPassages = Optional.empty();
+		fake.passages = List.of();
+	}
+
+	@Test
+	void answersAnOpenQuestionFromTheNotesAndCitesThem() {
+		String word = "zq" + UUID.randomUUID().toString().substring(0, 8);
+		String noteId = create("/api/v1/notes", """
+				{"title": "Deploy %s", "body": "Rode o script deploy-%s.sh depois do build."}""".formatted(word, word));
+		fake.fromPassages = Optional.of("Rode o script depois do build [1].");
+
+		var answer = post("/api/v1/assistant/questions", "{\"question\": \"Explique o deploy %s\"}".formatted(word));
+
+		assertThat(answer).hasStatusOk();
+		assertThat(answer).bodyJson()
+			.hasPathSatisfying("$.source", source -> assertThat(source).isEqualTo("rag"))
+			.hasPathSatisfying("$.text", text -> assertThat(text).isEqualTo("Rode o script depois do build [1]."));
+		List<String> hrefs = read(answer, "$.references[*].href");
+		assertThat(hrefs).containsExactly("/knowledge?note=" + noteId);
+		List<String> excerpts = read(answer, "$.references[*].excerpt");
+		assertThat(excerpts.getFirst()).contains("deploy-" + word + ".sh");
+		assertThat(fake.passages).extracting(Passage::title).containsExactly("Deploy " + word);
+	}
+
+	@Test
+	void aFailingModelAnswersWithThePassages() {
+		String word = "zq" + UUID.randomUUID().toString().substring(0, 8);
+		create("/api/v1/notes", """
+				{"title": "Backup %s", "body": "Copie a pasta pg."}""".formatted(word));
+		fake.failing = true;
+
+		var answer = post("/api/v1/assistant/questions", "{\"question\": \"Explique o backup %s\"}".formatted(word));
+
+		assertThat(answer).hasStatusOk();
+		assertThat(answer).bodyJson()
+			.hasPathSatisfying("$.source", source -> assertThat(source).isEqualTo("search"))
+			.hasPathSatisfying("$.references[0].excerpt", excerpt -> assertThat(excerpt).isEqualTo("Copie a pasta pg."));
 	}
 
 	@Test
@@ -98,6 +136,10 @@ class AssistantModelApiIntegrationTests extends ApiTestSupport {
 
 		Optional<String> rewrite = Optional.empty();
 
+		Optional<String> fromPassages = Optional.empty();
+
+		List<Passage> passages = List.of();
+
 		boolean failing;
 
 		@Override
@@ -114,6 +156,15 @@ class AssistantModelApiIntegrationTests extends ApiTestSupport {
 				throw new IllegalStateException("Provider down");
 			}
 			return rewrite;
+		}
+
+		@Override
+		public Optional<String> answerFromPassages(String question, List<Passage> found) {
+			if (failing) {
+				throw new IllegalStateException("Provider down");
+			}
+			passages = found;
+			return fromPassages;
 		}
 
 	}

@@ -112,6 +112,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 |---|---|---|
 | RF-AST-01 | Responder perguntas sobre os dados (projetos, tarefas atrasadas, metas, finanças) com links para os registros usados, igual à versão por regras do frontend. Perguntas em português ou inglês. | S |
 | RF-AST-02 | Responder com um modelo de IA, transformando a pergunta em uma consulta estruturada sobre os dados, usando só leitura (RN-20). | W |
+| RF-AST-03 | Responder perguntas abertas com o conteúdo das notas e snippets (RAG), mostrando o trecho de cada fonte usada. Funciona sem chave (busca por palavras) e melhora com embeddings e modelo de IA. | S |
 
 ### 2.10 Transversais
 

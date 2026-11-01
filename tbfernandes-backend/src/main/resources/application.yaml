@@ -76,6 +76,11 @@ tbf:
       provider: ${TBF_ASSISTANT_MODEL:none}
       name: ${TBF_ASSISTANT_MODEL_NAME:claude-opus-5-5}
       api-key: ${ANTHROPIC_API_KEY:}
+    embedding:
+      # none: retrieval over notes and snippets by words only (default). voyage: Voyage AI, with VOYAGE_API_KEY (AST-04).
+      provider: ${TBF_ASSISTANT_EMBEDDING:none}
+      name: ${TBF_ASSISTANT_EMBEDDING_NAME:voyage-3.5-lite}
+      api-key: ${VOYAGE_API_KEY:}
   pluggy:
     enabled: ${PLUGGY_ENABLED:false}
     base-url: https://api.pluggy.ai

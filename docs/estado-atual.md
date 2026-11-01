@@ -20,7 +20,8 @@ Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md)
 | FIN-OF: validação real | Código pronto ([etapa 7](backend/implementacao/etapa-7-open-finance.md)), testado contra o contrato documentado. Falta rodar com credenciais da Pluggy e registrar o webhook. Categorias vêm em inglês |
 | AST-03: validação real | Código pronto ([etapa 10](backend/implementacao/etapa-10-assistente-ia.md)), testado contra o contrato da API em um servidor local. Falta rodar com uma chave da Anthropic |
 | Deploy com HTTPS | O compose está pronto para deploy, mas o nginx escuta só na porta 80. O certificado ainda não foi definido |
-| AST-04 | pgvector e embeddings de notas e snippets |
+| AST-04: validação real | RAG pronto ([etapa 11](backend/implementacao/etapa-11-rag.md)), testado com servidores locais no lugar da Voyage e da Anthropic. Falta rodar com `VOYAGE_API_KEY` e `ANTHROPIC_API_KEY` |
+| Chaves no app desktop | As chaves de IA só entram por variável de ambiente do Windows. Falta uma tela de configurações para elas |
 | PLT-07 | Job de verificação de referências órfãs entre módulos |
 | IDN-06 | Limitar tentativas de login |
 | Datas de exemplo | No modo local o "hoje" é `SAMPLE_TODAY` (2026-10-23); dados de exemplo ainda usam datas fixas |

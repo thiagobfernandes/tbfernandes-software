@@ -1112,6 +1112,7 @@ export interface components {
             kind?: string;
             label?: string;
             href?: string;
+            excerpt?: string;
         };
         StatusRequest: {
             /** @enum {string} */

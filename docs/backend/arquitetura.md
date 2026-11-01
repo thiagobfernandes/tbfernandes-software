@@ -103,6 +103,12 @@ O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`),
 - Adaptadores: `DisabledLanguageModel` (padrão, `tbf.assistant.model.provider=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
 - Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
 
+### RAG do assistente (etapa 11)
+
+- Perguntas abertas são respondidas com trechos das notas e snippets. `KnowledgeRetrieval` mantém o índice `assistant.knowledge_chunk` em dia (só reprocessa o que mudou) e `PassageRanker` faz a busca híbrida (BM25 + cosseno) em Java puro.
+- Portas: `EmbeddingModel` (adaptadores `DisabledEmbeddingModel`, padrão, e `VoyageEmbeddingModel`, com `TBF_ASSISTANT_EMBEDDING=voyage`) e `KnowledgeIndex` (`KnowledgeIndexJdbcAdapter`). O `LanguageModel` ganhou `answerFromPassages`.
+- Sem pgvector: os vetores ficam em `real[]` porque o PostgreSQL embutido do app desktop não tem a extensão. Detalhes em [etapa 11](implementacao/etapa-11-rag.md).
+
 ### Leitura entre módulos do assistant
 
 O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `WorkLookup`, `KnowledgeLookup`, `GoalsLookup`, `LearningLookup`, `FinanceLookup` e `ContactsLookup`. As respostas (`RuleBasedAssistant`) e o grafo (`KnowledgeGraph`) são funções puras desse retrato, testadas sem Spring.

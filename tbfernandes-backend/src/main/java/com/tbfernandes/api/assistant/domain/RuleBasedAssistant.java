@@ -90,6 +90,16 @@ public final class RuleBasedAssistant {
 		return search(question, data);
 	}
 
+	/**
+	 * Whether one of the fixed intents or a project name matches, so {@link #answer} would not fall
+	 * back to the keyword search. Open questions go to retrieval over notes and snippets (AST-04).
+	 */
+	public static boolean understands(String rawQuestion, Workspace data) {
+		String question = rawQuestion.toLowerCase(Locale.ROOT);
+		return data.projects().stream().anyMatch(p -> question.contains(p.name().toLowerCase(Locale.ROOT)))
+				|| INTENTS.keySet().stream().anyMatch(intent -> has(question, intent));
+	}
+
 	private static boolean has(String question, String intent) {
 		return INTENTS.get(intent).stream().anyMatch(question::contains);
 	}

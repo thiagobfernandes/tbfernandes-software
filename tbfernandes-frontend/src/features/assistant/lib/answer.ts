@@ -7,8 +7,18 @@ import { isOpenTask } from "@/lib/sample-data/work";
 import { currentDay } from "@/lib/today";
 import { goalHref, projectHref } from "@/lib/routes";
 
-export type Reference = { kind: string; label: string; href: string };
-export type Answer = { text: string; references: Reference[] };
+/** excerpt: the passage of the record the answer used, when it came from retrieval (AST-04). */
+export type Reference = {
+  kind: string;
+  label: string;
+  href: string;
+  excerpt?: string | null;
+};
+/**
+ * source (API only): "rules", "query", "model", "rag" (the AI answered from passages of notes
+ * and snippets, citing them as [n]) or "search" (the passages themselves, without AI).
+ */
+export type Answer = { text: string; references: Reference[]; source?: string };
 
 const taskRef = (title: string): Reference => ({
   kind: "Tarefa",
@@ -249,26 +259,53 @@ export function answer(rawQuestion: string, data: AppData): Answer {
   const snippets = data.snippets.filter((s) =>
     matches(`${s.title} ${s.explanation ?? ""} ${s.tags.join(" ")}`),
   );
+  if (notes.length + snippets.length > 0) {
+    // Like the API's retrieval without AI (AST-04): the passages that were found.
+    const found: Reference[] = [
+      ...notes.map((n) => ({
+        kind: "Nota",
+        label: n.title,
+        href: `/knowledge?note=${n.id}`,
+        excerpt: excerpt(n.body),
+      })),
+      ...snippets.map((s) => ({
+        kind: "Snippet",
+        label: s.title,
+        href: "/knowledge/snippets",
+        excerpt: excerpt(s.explanation ?? ""),
+      })),
+    ].slice(0, 6);
+    return {
+      text:
+        found.length === 1
+          ? "Encontrei um trecho nas suas notas e snippets que pode responder. Veja abaixo."
+          : `Encontrei ${found.length} trechos nas suas notas e snippets que podem responder. Veja abaixo.`,
+      references: found,
+      source: "search",
+    };
+  }
   const tasks = data.tasks.filter((t) =>
     matches(`${t.title} ${t.description ?? ""}`),
   );
-  const references: Reference[] = [
-    ...notes.map((n) => ({
-      kind: "Nota",
-      label: n.title,
-      href: `/knowledge?note=${n.id}`,
-    })),
-    ...snippets.map((s) => ({
-      kind: "Snippet",
-      label: s.title,
-      href: "/knowledge/snippets",
-    })),
-    ...tasks.slice(0, 5).map((t) => taskRef(t.title)),
-  ];
+  const references: Reference[] = tasks
+    .slice(0, 5)
+    .map((t) => taskRef(t.title));
   return {
     text: references.length
       ? `Encontrei ${references.length} ${references.length > 1 ? "itens relacionados" : "item relacionado"} nos seus dados. Abra abaixo.`
       : "Ainda não encontrei nada sobre isso. Pergunte sobre o foco de hoje, tarefas atrasadas, um projeto pelo nome, metas, dinheiro, compras, contatos ou estudos.",
     references,
   };
+}
+
+/** The start of a passage as plain text, cut at a word and on one line (GroundedAnswer.excerpt in the API). */
+function excerpt(text: string, max = 280) {
+  const line = text
+    .replace(/^\s{0,3}(#{1,6}|>|[-*+])\s+/gm, "")
+    .replace(/\*\*|__|`/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (line.length <= max) return line;
+  const space = line.lastIndexOf(" ", max);
+  return `${line.slice(0, space > max / 2 ? space : max)}…`;
 }
