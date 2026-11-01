@@ -64,6 +64,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-KNW-04 | Buscar notas e snippets por texto e por tag. | S |
 | RF-KNW-05 | Grafo de conhecimento: nós (metas, empresas, projetos, tarefas, notas, snippets, contatos) e arestas, para a tela de grafo. A posição dos nós continua sendo calculada no navegador. | S |
 | RF-KNW-06 | CRUD de métodos de trabalho com categoria, passos ordenados, exemplos e data da última revisão. | M |
+| RF-KNW-07 | Links `[[Título]]` no texto das notas apontam para outra nota, snippet ou método pelo título (sem diferenciar maiúsculas). Viram links na leitura, arestas no grafo e "Mencionada em" na nota de destino. Hoje são resolvidos só no navegador. | S |
 
 ### 2.5 Goals (`/goals`)
 

@@ -84,10 +84,18 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 | `EmptyState`, `MissingRecord`, `PageSkeleton`, `DetailSkeleton` | Estados vazio, não encontrado e carregando |
 | `PriorityBadge`, `ProgressBar`, `TagInput`, `MultiSelectList` | Peças de formulário e listas |
 | `RelationTree` | Árvore de vínculos estilo grafo |
+| `GraphCanvas` (`features/knowledge`) | Grafo de rede estilo Obsidian: zoom na roda e na pinça, arrastar nós, destaque ao passar o mouse, duplo clique abre o registro |
 | `Markdown`, `CodeBlock` | Notas e snippets |
 | `SampleDataBadge` | Selo "dados de exemplo" (some no modo API) |
 
-## 6. Padrões de tela
+## 6. Grafo de conhecimento
+
+- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) e calcula o layout por forças, determinístico, no navegador.
+- Arestas têm `relation`: `link` (vínculo salvo), `wiki` (`[[Título]]` numa nota, ver `lib/wiki-links.ts`) e `tag` (tracejada; tags ficam desligadas por padrão).
+- `/knowledge/graph?focus=<tipo>:<id>` abre o grafo focado num nó. Com foco, o painel agrupa as conexões por tipo e o grafo local mostra 1 ou 2 saltos.
+- A leitura de uma nota mostra o grafo local dela (`NoteConnections`) e as notas que a mencionam.
+
+## 7. Padrões de tela
 
 - Lista com filtros + alternância Lista/Quadro quando o recurso tem status (tarefas); datas no `/calendar`; timeline nos projetos.
 - Quadro kanban com arrastar e soltar, inclusive por toque (`features/tasks/hooks/use-touch-drag.ts`).
