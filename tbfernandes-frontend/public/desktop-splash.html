@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- Shown by the Windows app (tbfernandes-desktop) while the backend starts. -->
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>TBFernandes</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #0f172a;
+        --muted: #64748b;
+        --brand: #0f766e;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1120;
+          --fg: #e2e8f0;
+          --muted: #94a3b8;
+          --brand: #2dd4bf;
+        }
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        user-select: none;
+      }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: var(--brand);
+        color: var(--bg);
+        font-weight: 700;
+        font-size: 22px;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .bar {
+        width: 160px;
+        height: 3px;
+        border-radius: 3px;
+        background: color-mix(in srgb, var(--brand) 20%, transparent);
+        overflow: hidden;
+      }
+      .bar::after {
+        content: "";
+        display: block;
+        width: 40%;
+        height: 100%;
+        background: var(--brand);
+        animation: slide 1.2s ease-in-out infinite;
+      }
+      @keyframes slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(250%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mark">TB</div>
+    <strong>TBFernandes</strong>
+    <div class="bar"></div>
+    <p>Preparando seus dados…</p>
+  </body>
+</html>

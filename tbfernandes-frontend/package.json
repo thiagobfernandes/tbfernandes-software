@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:desktop": "TBF_TARGET=desktop next build",
+    "build:desktop": "node scripts/build-desktop.mjs",
     "start": "next start",
     "lint": "eslint",
     "api:types": "npx --yes openapi-typescript@7.13.0 ${API_DOCS_URL:-http://localhost:8080/v3/api-docs} -o src/lib/api/schema.d.ts"

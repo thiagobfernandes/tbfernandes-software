@@ -6,7 +6,7 @@ Plano completo e comparação de opções: [TBFernandes como app desktop Windows
 
 ```
 TBFernandes.exe (Tauri, WebView2)
- ├─ carrega o frontend exportado (tbfernandes-frontend/out)
+ ├─ mostra a splash e carrega o frontend exportado (tbfernandes-frontend/out)
  ├─ inicia o backend em segundo plano (java -jar, perfil desktop, porta livre em 127.0.0.1)
  │   └─ o backend inicia o PostgreSQL embutido (%LOCALAPPDATA%\TBFernandes\data)
  └─ injeta window.__TBF_DESKTOP__ = { apiUrl, token } antes da página carregar
@@ -18,9 +18,38 @@ TBFernandes.exe (Tauri, WebView2)
 |---|---|---|
 | 1 | Frontend exportável como estático (`npm run build:desktop`), rotas de detalhe com `?id=`, URL da API e token em tempo de execução | Feito |
 | 2 | Perfil `desktop` no backend: PostgreSQL embutido, só `127.0.0.1`, single-user, filtro do token, CORS para a janela, desligamento limpo | Feito |
-| 3 | Projeto Tauri em `tbfernandes-desktop/`: inicia o backend, splash, espera o health, fecha tudo ao sair, instância única | A fazer |
+| 3 | Projeto Tauri em `tbfernandes-desktop/`: inicia o backend, splash, espera o health, fecha tudo ao sair, instância única; instalador NSIS gerado no CI | Feito |
 | 4 | Instalador NSIS por usuário, ícones, pasta de dados, backup com `pg_dump` | A fazer |
 | 5 | Atualização automática (GitHub Releases) e workflow de release em `windows-latest` | A fazer |
+
+## Como gerar o instalador
+
+O caminho normal é o CI: o workflow **desktop** (`.github/workflows/desktop.yml`) roda em `windows-latest` a cada PR que mexe no app, em todo push na `main` e sob demanda (Actions → desktop → Run workflow). O instalador fica no artefato **TBFernandes-setup** da execução. Ainda não é assinado, então o Windows mostra o aviso do SmartScreen ("Mais informações" → "Executar assim mesmo").
+
+Para gerar no próprio Windows, com Node 22, JDK 25, Rust (rustup) e Git Bash:
+
+```bash
+cd tbfernandes-frontend && npm ci && npm run build:desktop && cd ..
+tbfernandes-desktop/scripts/prepare-resources.sh   # jar, Java (jlink) e PostgreSQL 17
+cd tbfernandes-desktop && npm ci && npm run build   # src-tauri/target/release/bundle/nsis/*.exe
+```
+
+O mesmo funciona no Linux para testar (`npx tauri build --debug --no-bundle`, depois `src-tauri/target/debug/tbfernandes-desktop`). Precisa de `libwebkit2gtk-4.1-dev` e de um usuário que não seja root, por causa do `initdb`.
+
+## Etapa 3: janela (`tbfernandes-desktop/`)
+
+| Arquivo | O que faz |
+|---|---|
+| `src-tauri/src/main.rs` | Abre a splash (`tbfernandes-frontend/public/desktop-splash.html`), inicia o backend numa thread, depois abre a janela principal com `window.__TBF_DESKTOP__` injetado e fecha a splash. Se algo falha, mostra um diálogo com a pasta de logs. Uma segunda abertura só foca a janela que já está aberta |
+| `src-tauri/src/backend.rs` | Escolhe porta e token, roda `runtime/bin/java -jar backend/tbfernandes-api.jar --spring.profiles.active=desktop` sem janela de console, espera `/actuator/health` (até 180 s) e, ao sair, chama `/api/v1/desktop/shutdown` e espera até 20 s antes de matar o processo |
+| `src-tauri/tauri.conf.json` | Nome, ícones, recursos (`runtime/`, `backend/`, `postgres/`) e NSIS por usuário em pt-BR |
+| `scripts/prepare-resources.sh` | Gera `src-tauri/resources/`: jar do backend, Java com `jlink` (~70 MB) e PostgreSQL 17 dos binários `io.zonky.test.postgres` no Maven Central (~60 MB) |
+
+- **Dados:** ficam em `%LOCALAPPDATA%\TBFernandes` (banco em `pg\`, logs em `logs\`). A desinstalação não apaga essa pasta.
+- **Abertura mais rápida:** a JVM grava um arquivo de class data sharing (`backend.jsa`) na primeira abertura e o reaproveita nas seguintes.
+- **Desenvolvimento:** `TBF_DESKTOP_JAVA`, `TBF_DESKTOP_JAR` e `TBF_DESKTOP_PG_BIN` trocam os caminhos dos recursos, por exemplo no `tauri dev`.
+- **CSP desligada por enquanto** (`"csp": null`): a janela só carrega arquivos do próprio app, mas o widget da Pluggy carrega scripts de fora. Vale definir uma CSP junto com a etapa 4.
+- **Os binários do zonky não trazem `pg_dump`.** O backup da etapa 4 vai usar a exportação JSON que já existe em Configurações, ou baixar o `pg_dump` à parte.
 
 ## Etapa 1: frontend
 
