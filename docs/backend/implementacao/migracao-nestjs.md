@@ -6,7 +6,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 |---|---|---|
 | 1 | Base (ambiente, banco, migrações, logger, erros, paginação, `X-Client-Id`, transações, eventos), `identity` e `work` | feita |
 | 2 | `knowledge` e `contacts` | feita |
-| 3 | `learning`, `goals` e `finance` (com Open Finance) | a fazer |
+| 3 | `learning`, `finance` (com Open Finance) e `goals`, um PR cada | em andamento (`finance` feita) |
 | 4 | `assistant` (regras, grafo, RAG; modelo de IA atrás de uma interface sem fornecedor fixo) | a fazer |
 | 5 | Desktop com Node no lugar do Java (PostgreSQL embutido, backup, token), compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | a fazer |
 
@@ -56,3 +56,26 @@ Java (porta 8081) e NestJS (porta 8080) com o seed de desenvolvimento: as listas
 
 - 49 unitários: mais `Tags`, `Note`, `Snippet`, `Method`, `Contact`, `Interaction` e `IsoDates`.
 - 27 e2e: portes de `KnowledgeApiIntegrationTests` e `ContactsApiIntegrationTests` (busca por texto, trecho do título e tag; vínculo removido ao excluir o projeto; 404 de tarefa desconhecida; código literal; ordem dos passos; RN-23; empresa removida do contato; follow-up único sem tarefa sobrando; `dueWithinDays`; interações excluídas com o contato).
+
+## Etapa 3b — finance
+
+### O que foi feito
+
+- **Dinheiro em centavos.** `Money` converte os números do JSON e o texto do `numeric` do PostgreSQL em centavos inteiros, com arredondamento meio-para-par como o `BigDecimal` do Java, e volta para número (JSON) ou texto `"1500.00"` (banco). O número do JSON é lido como foi escrito (`12.345` vira 1234 centavos, não o binário 12,3449…). Somas e projeções são exatas.
+- **Lançamentos e fluxo de caixa** (RF-FIN-01, FIN-02): `FinanceEntry` com escopo pessoal ou empresa (RN-12), valor sempre positivo. `CashFlows` (domínio) monta a série do mês escolhido e dos anteriores (`months` padrão 6, de 1 a 24), os totais do mês e as despesas por categoria, da maior para a menor. Sem `scope`, soma os dois e devolve `"scope": "all"`.
+- **Compras** (RF-FIN-03, FIN-04): `PurchaseGoal` com RN-17 (compra feita precisa do valor pago) e RN-18 (reserva não negativa) e a projeção (`missing`, `ready`, `months`, `month`, `onTime`), a mesma regra do frontend.
+- **Open Finance** (épico FIN-OF): `OpenFinanceGateway` (application) esconde o fornecedor. `PluggyOpenFinanceGateway` usa `fetch`: reaproveita a chave de API por 110 minutos, pede outra uma vez quando a Pluggy responde 401, segue o cursor `next` de `/v2/transactions`, ignora transações pendentes, trata o sinal do cartão de crédito e usa `amountInAccountCurrency` em compras no exterior. Qualquer falha vira `ExternalServiceError` (502) sem dados sensíveis na mensagem. Com `PLUGGY_ENABLED` diferente de `true`, entra o `DisabledOpenFinanceGateway`, que responde 422 RN-15.
+- **Sincronização**: cadastro (`POST /finance/connections`) e webhooks publicam `finance.connection-sync-requested`; o `ConnectionSyncListener` sincroniza depois do commit, fora da requisição. A conexão é travada com `SELECT … FOR UPDATE`, o cadastro concorrente usa `INSERT … ON CONFLICT (external_id) DO NOTHING` e a importação é idempotente pelo id da transação (RN-16). Falha no fornecedor fica registrada na conexão (`status: error`, `lastError`) sem perder as contas da última sincronização boa. Conexão de outra conta dá 409 RN-21.
+- **Webhook** `POST /webhooks/pluggy`: rota pública, comparação do `X-Webhook-Secret` em tempo constante; sem segredo configurado, tudo é recusado com 401. Trata `item/updated`, `item/error` (inclusive conexão ainda não cadastrada, pelo `clientUserId` `"<owner>:<SCOPE>"`), `item/deleted` e `transactions/deleted`.
+- **API pública**: `FinanceLookup` (compras com projeção e totais do mês por escopo, em reais) para goals e assistente. `ALLOWED_MODULE_DEPENDENCIES` ganhou `finance: []`.
+- **Configuração**: `PLUGGY_ENABLED`, `PLUGGY_BASE_URL`, `PLUGGY_CLIENT_ID`, `PLUGGY_CLIENT_SECRET` e `PLUGGY_WEBHOOK_SECRET`, validadas no início (id e segredo obrigatórios quando ligado). Ver `.env.example`.
+
+### Conferência com o Java
+
+Java (porta 8081) e NestJS (porta 8080) recebendo as mesmas requisições: lançamentos, lista por mês, fluxo de caixa com e sem escopo, compra, projeção, 400 de valor negativo, 422 RN-17, 404, lista de conexões, 422 RN-15 com o Open Finance desligado, 400 do token sem escopo e 401 do webhook sem segredo deram o mesmo JSON. A única diferença é de escrita: o Java manda `10000.00` e o NestJS `10000`, o mesmo número para o frontend.
+
+### Testes
+
+- Unitários: `Money`, `CashFlows`, `PurchaseGoal`, `BankConnection`, `ConnectionClaims` e o porte de `PluggyOpenFinanceGatewayTest` com um `fetch` falso.
+- e2e: portes de `FinanceApiIntegrationTests` e `OpenFinanceApiIntegrationTests` com um gateway falso (`startApp` agora aceita trocar providers). O vínculo compra ↔ meta fica para o módulo goals.
+

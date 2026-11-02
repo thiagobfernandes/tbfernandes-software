@@ -101,7 +101,7 @@ Desligado por padrão: a tela "Contas conectadas" avisa e os lançamentos manuai
 export PLUGGY_ENABLED=true
 export PLUGGY_CLIENT_ID=...
 export PLUGGY_CLIENT_SECRET=...
-cd tbfernandes-backend && ./mvnw spring-boot:run
+cd tbfernandes-backend && ./mvnw spring-boot:run   # ou: cd tbfernandes-backend-nest && npm run dev
 
 # Bancos de teste no widget, em tbfernandes-frontend/.env.local
 NEXT_PUBLIC_PLUGGY_SANDBOX=true

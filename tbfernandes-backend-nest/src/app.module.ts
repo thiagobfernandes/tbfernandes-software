@@ -16,6 +16,7 @@ import {
   desktopConfig,
 } from './infrastructure/environments/registers';
 import { ContactsModule } from './modules/contacts/contacts.module';
+import { FinanceModule } from './modules/finance';
 import { IdentityModule } from './modules/identity/identity.module';
 import { CsrfMiddleware } from './modules/identity/infrastructure/security/csrf.middleware';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
@@ -31,6 +32,7 @@ import { WorkModule } from './modules/work/work.module';
     WorkModule,
     KnowledgeModule,
     ContactsModule,
+    FinanceModule,
   ],
 })
 export class AppModule implements NestModule {
