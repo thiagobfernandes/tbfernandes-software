@@ -16,18 +16,20 @@ Cada módulo:
 <modulo>/
 ├── package-info.java        @ApplicationModule
 ├── <Modulo>Lookup.java      API pública para outros módulos (+ eventos como TaskCompleted)
-├── domain/                  Java puro: entidades, value objects, regras, portas de repositório
-├── application/             um serviço por agregado; portas de saída em application/port/out
-└── adapter/
-    ├── in/web/              controllers e DTOs (records)
-    └── out/persistence/     entidades JPA, Spring Data, mapeamento JPA ⇄ domínio
+├── domain/                  Java puro: entidades, value objects, regras, interfaces de repositório
+├── application/             um serviço por agregado; interfaces de integração externa (ex.: LanguageModel)
+├── infrastructure/          só se precisar: persistence/ (JPA, Spring Data, <Agregado>RepositoryImpl), clientes externos
+├── protocols/               DTOs de request/response (records públicos, um por arquivo)
+└── web/                     controllers REST
 ```
+
+Não use o padrão de portas e adaptadores: nada de `adapter/in`, `adapter/out` ou `application/port/out` (ADR-008).
 
 Direção permitida entre módulos: `goals → work, learning, finance`; `knowledge, contacts → work`; `assistant → todos` (só leitura).
 
 ## Regras
 
-- `domain` não importa Spring, JPA nem nada de `application`/`adapter`. `application` não importa `adapter`, JPA nem Spring Web. `ArchitectureTests` falha se isso quebrar.
+- `domain` não importa Spring, JPA nem `application`/`infrastructure`/`protocols`/`web`. `application` não importa `infrastructure`, `protocols`, `web`, JPA nem Spring Web. `protocols` não importa Spring, JPA, `infrastructure` nem `web`. `ArchitectureTests` falha se isso quebrar.
 - Regra de negócio (RN-xx de `requisitos.md`) mora no domínio e tem teste unitário `*Test` sem Spring.
 - Cada módulo tem um `*ApiIntegrationTests` (HTTP → caso de uso → PostgreSQL real via Testcontainers). Nada de H2.
 - Schema: nova migração em `src/main/resources/db/migration/V<n>__<descricao>.sql` (próximo número = maior existente + 1). Nunca editar migração aplicada. Hibernate só valida (`ddl-auto=validate`).
@@ -37,7 +39,7 @@ Direção permitida entre módulos: `goals → work, learning, finance`; `knowle
 - Enums: MAIÚSCULAS no Java e no banco (`text` + `CHECK`), minúsculas no JSON.
 - Rotas: `/api/v1/<recurso-no-plural>`, recurso plano por coleção do frontend; status em `PATCH /{id}/status`. Listas aceitam `?page=&size=` e devolvem `X-Total-Count`.
 - Erros em Problem Details: `NotFound` 404, `Conflict` 409, `BusinessRuleViolation` 422 (com `rule`), validação 400 (com `errors`). Mensagens para o usuário em **pt-BR**.
-- Integrações externas (Pluggy, IA) atrás de porta, com adaptador desligado como padrão (ADR-005).
+- Integrações externas (Pluggy, IA) atrás de uma interface em `application`, com implementação desligada como padrão (ADR-005).
 - Dados de exemplo do perfil `dev` em `db/dev/R__dev_seed.sql`, iguais aos de `tbfernandes-frontend/src/lib/sample-data` (ADR-006).
 - Perfil `desktop` (app Windows, [desktop.md](../docs/desktop.md)): PostgreSQL embutido em `shared/infrastructure/desktop`, token `X-TBF-Desktop-Token` em toda requisição, `db/desktop` cria a conta única. Mudou algo que a abertura do banco ou a segurança usa? Rode `EmbeddedPostgresTest` e `DesktopTokenFilterTest`.
 - Mudou contrato, modelo ou regra: atualize `docs/backend/*.md` no mesmo commit e registre a etapa em `docs/backend/implementacao/`.

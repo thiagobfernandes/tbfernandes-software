@@ -18,6 +18,8 @@ O alerta de ingestão dispara quando o **lag** do consumer group \`telemetry-eve
 
 > A maioria dos incidentes até agora foi uma query lenta na busca de dispositivos.
 
+O tratamento de erro da API segue o [[Handler de exceções com Problem Details]].
+
 - [x] Documentar os links dos dashboards
 - [ ] Pedir acesso de leitura aos logs de produção`,
     tags: ["telemetry", "incident", "kafka"],
@@ -37,7 +39,9 @@ O alerta de ingestão dispara quando o **lag** do consumer group \`telemetry-eve
 | knowledge | notas, snippets, vínculos |
 | finance | lançamentos, metas de compra |
 
-Leituras entre módulos passam por **serviços de aplicação**, nunca pelos repositórios de outro módulo.`,
+Leituras entre módulos passam por **serviços de aplicação**, nunca pelos repositórios de outro módulo.
+
+Os alertas de [[Ingestão de telemetria: de onde vêm os alertas|telemetria]] mostram por que cada módulo precisa de métricas próprias. Antes de abrir um PR, siga o [[Método de commit]].`,
     tags: ["architecture", "spring"],
     projectIds: ["p2"],
     taskIds: ["t2"],

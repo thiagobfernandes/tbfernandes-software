@@ -96,8 +96,10 @@ Todos os módulos dependem de `shared`; essas setas foram omitidas.
 
 ```mermaid
 flowchart LR
-    subgraph adapter_in["adapter.in.web"]
+    subgraph web["web"]
         ctrl[TaskController]
+    end
+    subgraph protocols["protocols"]
         dto[TaskRequest / TaskResponse]
     end
     subgraph application
@@ -105,10 +107,10 @@ flowchart LR
     end
     subgraph domain
         task[Task]
-        repo{{"TaskRepository (porta)"}}
+        repo{{"TaskRepository (interface)"}}
     end
-    subgraph adapter_out["adapter.out.persistence"]
-        adp[TaskPersistenceAdapter]
+    subgraph infrastructure["infrastructure.persistence"]
+        adp[TaskRepositoryImpl]
         jpa[TaskJpaEntity + TaskJpaRepository]
     end
 

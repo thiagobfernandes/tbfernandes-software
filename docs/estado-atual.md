@@ -5,6 +5,7 @@ Atualizado em 2026-11-01. Atualize esta página ao terminar uma etapa.
 ## O que existe
 
 - **Frontend** completo para todos os módulos: Trabalho (empresas, projetos com timeline, tarefas com lista e quadro), Conhecimento (notas, snippets, grafo, métodos), Crescimento (metas, aprendizado, certificações), Finanças (fluxo de caixa, compras planejadas), Rede (contatos), Assistente, Calendário, busca global `Ctrl K`, visão geral com cards de vida, arrastar no quadro (mouse e toque), configurações com exportar/importar.
+- **Grafo estilo Obsidian**: links `[[Título]]` entre notas, snippets e métodos, nós de métodos, estudos, habilidades e tags, zoom na roda e na pinça, arrastar nós, grafo local de 1 ou 2 saltos e grafo local na leitura da nota.
 - **Interface em pt-BR** (patch 0016) e mensagens da API e respostas do assistente em pt-BR (0017).
 - **Backend** com as etapas 1 a 10 do [backlog](backend/backlog.md#sequência-sugerida): todos os módulos com API, Flyway, testes (89), CI, OpenAPI, login por sessão, perfil `prod`, assistente por regras, grafo, Open Finance pela Pluggy e assistente com IA por consultas estruturadas (os dois últimos desligados por padrão).
 - **Frontend ligado à API** com `NEXT_PUBLIC_DATA_SOURCE=api` (etapa 9). O modo local continua o padrão fora do Docker.

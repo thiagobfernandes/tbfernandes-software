@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BookOpen, Pencil, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +20,10 @@ import {
   TagList,
   uniqueTags,
 } from "@/features/knowledge/components/knowledge-links";
+import { NoteConnections } from "@/features/knowledge/components/note-connections";
+import { wikiTargets } from "@/features/knowledge/lib/graph";
 import { matchesQuery } from "@/features/knowledge/lib/link-options";
+import { resolveWikiLinks } from "@/features/knowledge/lib/wiki-links";
 import { formatShort } from "@/lib/dates";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
@@ -35,11 +38,12 @@ function excerpt(markdown: string) {
 }
 
 export function KnowledgePage() {
-  const { notes } = useAppData();
+  const data = useAppData();
+  const { notes } = data;
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
-  const [tag, setTag] = useState<string>();
+  const [tag, setTag] = useState(searchParams.get("tag") ?? undefined);
   const [editing, setEditing] = useState(false);
 
   const visible = notes
@@ -48,6 +52,7 @@ export function KnowledgePage() {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const selectedId = searchParams.get("note") ?? visible[0]?.id;
   const selected = notes.find((note) => note.id === selectedId);
+  const targets = useMemo(() => wikiTargets(data), [data]);
 
   function select(id?: string) {
     router.replace(id ? `/knowledge?note=${id}` : "/knowledge", {
@@ -169,12 +174,13 @@ export function KnowledgePage() {
                 <KnowledgeLinkChips links={selected} />
               </header>
               {selected.body ? (
-                <Markdown>{selected.body}</Markdown>
+                <Markdown>{resolveWikiLinks(selected.body, targets)}</Markdown>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   Esta nota está vazia.
                 </p>
               )}
+              <NoteConnections note={selected} />
               <NoteFormDialog
                 item={selected}
                 open={editing}

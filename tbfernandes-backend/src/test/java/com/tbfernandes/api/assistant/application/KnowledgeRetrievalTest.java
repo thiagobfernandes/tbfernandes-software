@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.tbfernandes.api.assistant.application.port.out.EmbeddingModel;
-import com.tbfernandes.api.assistant.application.port.out.KnowledgeIndex;
+import com.tbfernandes.api.assistant.application.EmbeddingModel;
+import com.tbfernandes.api.assistant.application.KnowledgeIndex;
 import com.tbfernandes.api.assistant.domain.IndexedChunk;
 import com.tbfernandes.api.assistant.domain.KnowledgeDocument;
 import com.tbfernandes.api.assistant.domain.KnowledgeDocument.Key;

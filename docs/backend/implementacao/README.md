@@ -15,3 +15,5 @@ Uma página por etapa do [backlog](../backlog.md#sequência-sugerida): o que foi
 | 9 | [Frontend usando a API](etapa-9-frontend-api.md) | PLT-08, IDN-04, IDN-05 | — |
 | 10 | [Assistente com IA](etapa-10-assistente-ia.md) | AST-03 | 89 |
 | 11 | [RAG nas notas e snippets](etapa-11-rag.md) | AST-04 | 130 |
+
+Mudanças de estrutura sem item de backlog: [reorganização dos pacotes](reorganizacao-pacotes.md) (sem `adapter/in`/`adapter/out`, ADR-008).

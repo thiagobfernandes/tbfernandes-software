@@ -26,6 +26,11 @@ class ArchitectureTests {
 		MODULES.verify();
 	}
 
+	/** Module layers: {@code <module>.web} (controllers), {@code <module>.protocols} (DTOs). */
+	private static final String WEB = "com.tbfernandes.api.*.web..";
+
+	private static final String PROTOCOLS = "com.tbfernandes.api.*.protocols..";
+
 	@Test
 	void domainIsPlainJava() {
 		noClasses().that()
@@ -33,17 +38,35 @@ class ArchitectureTests {
 			.should()
 			.dependOnClassesThat()
 			.resideInAnyPackage("org.springframework..", "jakarta.persistence..", "org.hibernate..", "..application..",
-					"..adapter..")
+					"..infrastructure..", WEB, PROTOCOLS)
 			.check(CLASSES);
 	}
 
 	@Test
-	void applicationDoesNotKnowAdapters() {
+	void applicationDoesNotKnowInfrastructureOrWeb() {
 		noClasses().that()
 			.resideInAPackage("..application..")
 			.should()
 			.dependOnClassesThat()
-			.resideInAnyPackage("..adapter..", "jakarta.persistence..", "org.springframework.web..")
+			.resideInAnyPackage("..infrastructure..", WEB, PROTOCOLS, "jakarta.persistence..", "org.springframework.web..")
+			.check(CLASSES);
+	}
+
+	@Test
+	void protocolsAreOnlyDataShapes() {
+		noClasses().that()
+			.resideInAPackage(PROTOCOLS)
+			.should()
+			.dependOnClassesThat()
+			.resideInAnyPackage("..infrastructure..", WEB, "jakarta.persistence..", "org.springframework..")
+			.check(CLASSES);
+	}
+
+	@Test
+	void noInOutAdapterPackages() {
+		noClasses().should()
+			.resideInAnyPackage("..adapter..", "..port..")
+			.because("layout is domain, application, infrastructure, protocols and web (docs/backend/arquitetura.md)")
 			.check(CLASSES);
 	}
 

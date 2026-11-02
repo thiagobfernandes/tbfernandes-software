@@ -27,15 +27,15 @@ Responder perguntas abertas ("como configurei o Docker no WSL?", "o que anotei s
 | Resposta com citações renumeradas, ou com os trechos quando não há modelo | `domain/GroundedAnswer` |
 | `Reference` ganha `excerpt` (o trecho usado) | `domain/Answer` |
 | `RuleBasedAssistant.understands` diz se as regras têm uma resposta específica | `domain/RuleBasedAssistant` |
-| Portas `EmbeddingModel` e `KnowledgeIndex`; `LanguageModel.answerFromPassages` | `application/port/out` |
+| Interfaces `EmbeddingModel` e `KnowledgeIndex`; `LanguageModel.answerFromPassages` | `application` |
 | Sincronização do índice e busca | `application/KnowledgeRetrieval` |
-| Adaptadores de embeddings: desligado (padrão) e Voyage AI | `adapter/out/embedding` |
-| Índice em `assistant.knowledge_chunk` com JDBC | `adapter/out/persistence/KnowledgeIndexJdbcAdapter`, `V12__assistant_knowledge_index.sql` |
+| Adaptadores de embeddings: desligado (padrão) e Voyage AI | `infrastructure/embedding` |
+| Índice em `assistant.knowledge_chunk` com JDBC | `infrastructure/persistence/JdbcKnowledgeIndex`, `V12__assistant_knowledge_index.sql` |
 | Tela do assistente: fontes numeradas com o trecho, e de onde veio a resposta | `tbfernandes-frontend/src/features/assistant` |
 
 ## Decisões
 
-- **Sem pgvector por enquanto.** O PostgreSQL que vai no instalador do app desktop (binários `io.zonky.test.postgres`) não traz a extensão, e o pgvector não tem build oficial para Windows. O vetor fica numa coluna `real[]` e o cosseno é calculado em Java, sobre os trechos do dono. Para um usuário com milhares de notas isso leva milissegundos. Se um dia precisar de índice (HNSW), a migração é `embedding::vector` e só o `KnowledgeIndexJdbcAdapter` muda.
+- **Sem pgvector por enquanto.** O PostgreSQL que vai no instalador do app desktop (binários `io.zonky.test.postgres`) não traz a extensão, e o pgvector não tem build oficial para Windows. O vetor fica numa coluna `real[]` e o cosseno é calculado em Java, sobre os trechos do dono. Para um usuário com milhares de notas isso leva milissegundos. Se um dia precisar de índice (HNSW), a migração é `embedding::vector` e só o `JdbcKnowledgeIndex` muda.
 - **Voyage AI para embeddings.** A Anthropic não tem modelo de embeddings e indica a Voyage. Padrão `voyage-3.5-lite` (multilíngue, bom em português), trocável por `TBF_ASSISTANT_EMBEDDING_NAME`. A requisição usa `input_type` `document` para os trechos e `query` para a pergunta.
 - **Funciona sem chave.** Sem provedor de embeddings, a busca é só por palavras (BM25). Sem modelo de IA, a resposta mostra os trechos. Nenhuma das duas peças é obrigatória.
 - **Índice atualizado na pergunta.** Antes de cada busca, as impressões digitais são comparadas com as notas atuais. Só o que mudou é processado de novo, em lotes de 64 documentos, com as chamadas ao provedor fora de transação. Não depende de eventos do módulo knowledge, então não cria acoplamento novo. Um registro apagado continua no índice até a próxima pergunta.

@@ -15,8 +15,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Columns every aggregate-root table has: id, owner_id, created_at, updated_at and version
- * (optimistic lock). Fields are public so each module's persistence adapter can map them
- * directly; only adapters ever see these entities.
+ * (optimistic lock). Fields are public so each module's infrastructure.persistence can map them
+ * directly; only infrastructure code ever sees these entities.
  */
 @MappedSuperclass
 public abstract class AuditedEntity {

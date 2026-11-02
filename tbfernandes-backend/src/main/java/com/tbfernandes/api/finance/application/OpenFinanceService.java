@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.tbfernandes.api.finance.application.port.out.OpenFinanceGateway;
-import com.tbfernandes.api.finance.application.port.out.OpenFinanceGateway.ConnectToken;
-import com.tbfernandes.api.finance.application.port.out.OpenFinanceGateway.ExternalAccount;
-import com.tbfernandes.api.finance.application.port.out.OpenFinanceGateway.ExternalConnection;
-import com.tbfernandes.api.finance.application.port.out.OpenFinanceGateway.ExternalTransaction;
+import com.tbfernandes.api.finance.application.OpenFinanceGateway;
+import com.tbfernandes.api.finance.application.OpenFinanceGateway.ConnectToken;
+import com.tbfernandes.api.finance.application.OpenFinanceGateway.ExternalAccount;
+import com.tbfernandes.api.finance.application.OpenFinanceGateway.ExternalConnection;
+import com.tbfernandes.api.finance.application.OpenFinanceGateway.ExternalTransaction;
 import com.tbfernandes.api.finance.domain.BankConnection;
 import com.tbfernandes.api.finance.domain.BankConnectionRepository;
 import com.tbfernandes.api.finance.domain.EntryScope;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.tbfernandes.api.assistant.application.port.out.LanguageModel;
+import com.tbfernandes.api.assistant.application.LanguageModel;
 import com.tbfernandes.api.assistant.domain.Answer;
 import com.tbfernandes.api.assistant.domain.GroundedAnswer;
 import com.tbfernandes.api.assistant.domain.KnowledgeDocument;

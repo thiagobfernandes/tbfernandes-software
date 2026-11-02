@@ -17,7 +17,7 @@ Plataforma pessoal e profissional de gestão de um único usuário (por enquanto
 | Usuário (dono) | Thiago. Único usuário na v1; todas as tabelas já têm `owner_id` para permitir multiusuário. |
 | Frontend web | Next.js em `tbfernandes-frontend/`, cliente HTTP da API. |
 | Provedor Open Finance | Pluggy. Fornece contas e transações bancárias. |
-| Provedor de IA | Planejado para o assistente; atrás de uma porta de saída. |
+| Provedor de IA | Planejado para o assistente; atrás de uma interface em `application`. |
 
 ### 1.2 Escopo da v1 (MVP)
 
@@ -64,6 +64,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-KNW-04 | Buscar notas e snippets por texto e por tag. | S |
 | RF-KNW-05 | Grafo de conhecimento: nós (metas, empresas, projetos, tarefas, notas, snippets, contatos) e arestas, para a tela de grafo. A posição dos nós continua sendo calculada no navegador. | S |
 | RF-KNW-06 | CRUD de métodos de trabalho com categoria, passos ordenados, exemplos e data da última revisão. | M |
+| RF-KNW-07 | Links `[[Título]]` no texto das notas apontam para outra nota, snippet ou método pelo título (sem diferenciar maiúsculas). Viram links na leitura, arestas no grafo e "Mencionada em" na nota de destino. Hoje são resolvidos só no navegador. | S |
 
 ### 2.5 Goals (`/goals`)
 
@@ -162,8 +163,8 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | ID | Requisito |
 |---|---|
 | RNF-ARQ-01 | Monólito modular com Spring Modulith: um módulo por domínio; módulos só usam a API pública (pacote raiz) ou eventos uns dos outros. Verificado por teste (`ArchitectureTests`). |
-| RNF-ARQ-02 | Clean architecture dentro de cada módulo: `domain` em Java puro, `application` com casos de uso e portas, `adapter` com web e persistência. Regra de dependência verificada com ArchUnit. |
-| RNF-ARQ-03 | Integrações externas (Pluggy, IA) sempre atrás de uma porta de saída, com um adaptador desligável por configuração. |
+| RNF-ARQ-02 | Clean architecture dentro de cada módulo: `domain` em Java puro, `application` com casos de uso, `infrastructure` com persistência e integrações, `protocols` com DTOs e `web` com controllers. Regra de dependência verificada com ArchUnit. |
+| RNF-ARQ-03 | Integrações externas (Pluggy, IA) sempre atrás de uma interface em `application`, com uma implementação desligável por configuração. |
 | RNF-ARQ-04 | Esquema do banco versionado só por Flyway; Hibernate apenas valida (`ddl-auto=validate`). |
 | RNF-ARQ-05 | Contrato da API em OpenAPI (springdoc), usado para gerar os tipos TypeScript do frontend. |
 

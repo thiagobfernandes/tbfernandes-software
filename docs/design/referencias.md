@@ -10,7 +10,7 @@ A linguagem visual atual foi aprovada em 2026-10-23 ("gostei dessa estilização
 |---|---|---|
 | **Luma** (SaaS no Behance) — grafo | Árvore com conectores ortogonais e pontos, nó raiz com brilho, canvas escuro pontilhado | "Como seu trabalho se conecta" na visão geral, árvore de metas, `RelationTree` |
 | **Luma** — cards de métrica | Rótulo pequeno, número grande e leve + unidade, um visual pequeno (barras, pontos, anel, linha) | `MetricCard` + `metric-visuals` (visão geral) |
-| **Obsidian** — grafo | Grafo de rede com nós coloridos por tipo, filtros por tipo, painel do nó selecionado | `/knowledge/graph` |
+| **Obsidian** — grafo | Grafo de rede com nós coloridos por tipo, filtros por tipo, painel do nó selecionado, grafo local, links `[[…]]` | `/knowledge/graph`, conexões na leitura da nota |
 | **Cindr** (Dribbble) | Timeline escura por dia, pílula "hoje" com marcador vertical, barras com faixa colorida à esquerda e %, trilho direito com calendário do mês e to-do Hoje / Próximos 7 dias / Depois | Timeline de projetos, `agenda-panel` da visão geral, `/calendar` |
 | **AturnDeck** (Dribbble) | Trilho de ícones + painel de projetos com Recentes/Categorias e contadores, cards kanban com prioridade, chip de data e progresso | Sidebar com contadores, quadro de tarefas |
 | **Ronas IT** (Dribbble) | Alternância Lista/Quadro/Calendário, barra de filtros, kanban com tag e prazo, trilho de atividade | `/tasks` (Lista/Quadro com busca) |
@@ -41,6 +41,12 @@ Os sites Dribbble, Behance e obsidian.md não abrem a partir do ambiente do Clau
 - **Canvas pontilhado** para grafos e árvores.
 - **Ícones** lucide-react, tamanho padrão do shadcn.
 - **Cores só por tokens** de `tbfernandes-frontend/src/app/globals.css` (`--success`, `--warning`, `--destructive`, cores de projeto em `lib/project-colors.ts`). Nada de hex no componente.
+
+## Marca
+
+- **Logo:** notebook com "t" + palavra "tbfernandes", em dourado degradê. Arquivos em `tbfernandes-frontend/public/brand/`: `logo-tbfernandes.png` (completa) e `logo-symbol.png` (só o notebook). O dourado funciona nos dois temas, então não há versão clara e escura.
+- **Onde aparece:** `components/layout/brand-mark.tsx` (barra lateral, menu do celular e tela de carregamento; com a barra recolhida, só o símbolo), splash do desktop (`public/desktop-splash.html`) e `src/app/favicon.ico`.
+- **Ícone do Windows:** o símbolo dourado num quadrado navy arredondado. Para trocar, gere um PNG quadrado de 1024 px e rode `npx tauri icon <arquivo>.png` em `tbfernandes-desktop/`. Depois apague o que não usamos (`android/`, `ios/`, `Square*`, `StoreLogo.png`, `64x64.png`).
 
 ## Estrutura de navegação
 
