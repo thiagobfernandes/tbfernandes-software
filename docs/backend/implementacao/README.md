@@ -17,3 +17,5 @@ Uma página por etapa do [backlog](../backlog.md#sequência-sugerida): o que foi
 | 11 | [RAG nas notas e snippets](etapa-11-rag.md) | AST-04 | 130 |
 
 Mudanças de estrutura sem item de backlog: [reorganização dos pacotes](reorganizacao-pacotes.md) (sem `adapter/in`/`adapter/out`, ADR-008).
+
+Migração para NestJS (ADR-009): [migracao-nestjs.md](migracao-nestjs.md).

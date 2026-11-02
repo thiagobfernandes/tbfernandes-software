@@ -171,6 +171,11 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 **Decisão:** cada módulo tem `domain`, `application`, `infrastructure` (persistência e clientes externos, só quando necessário), `protocols` (DTOs) e `web` (controllers). Interfaces de integração ficam em `application`; implementações de repositório se chamam `<Agregado>RepositoryImpl`.
 **Consequências:** a regra de dependência continua igual e verificada pelo `ArchitectureTests`; um teste novo impede que pacotes `adapter` ou `port` voltem.
 
+### ADR-009 — Backend em NestJS
+**Contexto:** o Thiago decidiu sair do Java por enquanto e ficar em NestJS (2026-11-02), seguindo a estrutura do projeto my-self.so (variáveis de ambiente com `registerAs` e Joi, `DatabaseModule.forRoot/forFeature`, `BaseRepository`) e o logger e o `ParseJsonPipe` do projeto INFRA.
+**Decisão:** o backend é reescrito em `tbfernandes-backend-nest/` (NestJS 11, TypeORM, Joi), módulo a módulo, com as mesmas camadas (`domain`, `application`, `infrastructure`, `protocols`, `web`), o mesmo banco e o mesmo contrato JSON. As migrações SQL continuam as mesmas e são aplicadas por um executor próprio (`SqlMigrator`) na tabela `flyway_schema_history`, com o checksum do Flyway: um banco que o Java migrou é reconhecido como atualizado. Repositórios e integrações são classes abstratas no domínio ou em `application`; mappers explícitos separam linha, domínio e JSON. Fronteiras de módulo e de camada são verificadas por `src/architecture.spec.ts` e pelo ESLint. O Java continua funcionando até o NestJS cobrir todos os módulos; na última etapa ele sai, a pasta vira `tbfernandes-backend/` e o app desktop passa a levar Node no lugar do Java.
+**Consequências:** uma linguagem só no frontend e no backend; sessões em memória como antes (uma instância); Spring Modulith dá lugar a `@nestjs/event-emitter` com eventos depois do commit (sem o registro persistente de eventos). Registro das etapas em [implementacao/migracao-nestjs.md](implementacao/migracao-nestjs.md).
+
 ## 8. Ambiente local
 
 ```

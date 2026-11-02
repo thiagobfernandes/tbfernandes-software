@@ -1,0 +1,16 @@
+import { Project } from './project';
+
+/** Implemented in infrastructure/persistence. */
+export abstract class ProjectRepository {
+  abstract create(project: Project): Promise<Project>;
+  abstract save(project: Project): Promise<Project>;
+  abstract findById(ownerId: string, id: string): Promise<Project | null>;
+  /** Newest start first; companyId filters when given. */
+  abstract findAll(
+    ownerId: string,
+    companyId?: string | null,
+  ): Promise<Project[]>;
+  abstract exists(ownerId: string, id: string): Promise<boolean>;
+  abstract anyForCompany(ownerId: string, companyId: string): Promise<boolean>;
+  abstract delete(project: Project): Promise<void>;
+}
