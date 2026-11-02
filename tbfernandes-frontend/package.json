@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.9.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "d3-force": "^3.0.0",
     "highlight.js": "^11.12.0",
     "lucide-react": "^1.61.0",
     "next": "16.4.2",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/d3-force": "^3.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

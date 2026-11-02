@@ -11,7 +11,6 @@ import {
   buildGraph,
   graphHref,
   graphNodeId,
-  layoutGraph,
   localNodeIds,
   subgraph,
 } from "@/features/knowledge/lib/graph";
@@ -35,7 +34,7 @@ export function NoteConnections({ note }: { note: Note }) {
     const graph = subgraph(buildGraph(data), (node) => node.kind !== "tag");
     const ids = localNodeIds(graph.edges, centerId, 1);
     const near = subgraph(graph, (node) => ids.has(node.id));
-    return { edges: near.edges, nodes: layoutGraph(near.nodes, near.edges) };
+    return near;
   }, [data, centerId]);
 
   const title = normalizeTitle(note.title);

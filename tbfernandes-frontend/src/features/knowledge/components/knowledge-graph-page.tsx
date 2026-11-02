@@ -31,7 +31,6 @@ import {
   graphKindLabels,
   graphKindSingular,
   graphKinds,
-  layoutGraph,
   localNodeIds,
   neighborIds,
   subgraph,
@@ -72,7 +71,7 @@ export function KnowledgeGraphPage() {
   // Layout runs only when the data, the filters or the local center change,
   // not on every focus change in the full view.
   const localCenter = depth > 0 ? focusId : undefined;
-  const { visible, positioned } = useMemo(() => {
+  const visible = useMemo(() => {
     let next = subgraph(graph, (node) => !hidden.has(node.kind));
     if (localCenter) {
       const ids = localNodeIds(next.edges, localCenter, depth);
@@ -85,10 +84,10 @@ export function KnowledgeGraphPage() {
         (node) => linked.has(node.id) || node.id === localCenter,
       );
     }
-    return { visible: next, positioned: layoutGraph(next.nodes, next.edges) };
+    return next;
   }, [graph, hidden, showOrphans, depth, localCenter]);
   const byId = new Map(graph.nodes.map((node) => [node.id, node]));
-  const shownIds = new Set(positioned.map((node) => node.id));
+  const shownIds = new Set(visible.nodes.map((node) => node.id));
   const focus =
     focusId && shownIds.has(focusId) ? byId.get(focusId) : undefined;
 
@@ -254,7 +253,7 @@ export function KnowledgeGraphPage() {
 
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_19rem]">
             <GraphCanvas
-              nodes={positioned}
+              nodes={visible.nodes}
               edges={visible.edges}
               focusId={focus?.id}
               onFocus={setFocus}
@@ -356,7 +355,7 @@ export function KnowledgeGraphPage() {
               ) : (
                 <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                   <p className="font-medium text-foreground">
-                    {positioned.length} nós · {visible.edges.length} ligações
+                    {visible.nodes.length} nós · {visible.edges.length} ligações
                   </p>
                   <p>
                     Clique em um nó para focar e ver com o que ele se conecta;
