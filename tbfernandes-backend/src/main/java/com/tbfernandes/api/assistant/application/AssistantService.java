@@ -6,7 +6,7 @@ import java.time.YearMonth;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.tbfernandes.api.assistant.application.port.out.LanguageModel;
+import com.tbfernandes.api.assistant.application.LanguageModel;
 import com.tbfernandes.api.assistant.domain.Answer;
 import com.tbfernandes.api.assistant.domain.KnowledgeGraph;
 import com.tbfernandes.api.assistant.domain.QueryEngine;

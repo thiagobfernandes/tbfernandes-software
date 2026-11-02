@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Output port: implemented by the persistence adapter. */
+/** Implemented in the module's infrastructure.persistence package. */
 public interface SnippetRepository {
 
 	Snippet save(Snippet snippet);

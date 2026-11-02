@@ -34,41 +34,47 @@ O módulo `work` é a referência; os outros seguem o mesmo desenho.
 com.tbfernandes.api.work
 ├── package-info.java            @ApplicationModule: nome e documentação do módulo
 ├── TaskCompleted.java           API pública: eventos e consultas que outros módulos podem usar
-├── domain/                      Java puro: entidades, value objects, regras, portas de repositório
-│   ├── company/  Company, CompanyDetails, CompanyRepository (porta)
-│   ├── project/  Project, ProjectDetails, ProjectRepository (porta)
-│   └── task/     Task, ChecklistItem, TaskDetails, TaskRepository (porta)
+├── domain/                      Java puro: entidades, value objects, regras, interfaces de repositório
+│   ├── company/  Company, CompanyDetails, CompanyRepository
+│   ├── project/  Project, ProjectDetails, ProjectRepository
+│   └── task/     Task, ChecklistItem, TaskDetails, TaskRepository
 ├── application/                 casos de uso: orquestram domínio, transação e eventos
 │   ├── company/CompanyService
 │   ├── project/ProjectService
 │   └── task/TaskService
-└── adapter/
-    ├── in/web/                  controllers REST e DTOs de request/response
-    └── out/persistence/         entidades JPA, Spring Data, adaptadores que implementam as portas
+├── infrastructure/              só quando o módulo precisa
+│   └── persistence/             entidades JPA, Spring Data, *RepositoryImpl (implementa o repositório do domínio)
+├── protocols/                   DTOs de request/response (records públicos), ex.: TaskRequest, TaskResponse
+└── web/                         controllers REST
 ```
+
+Sem o padrão de portas e adaptadores (`adapter/in`, `adapter/out`, `application/port/out`), por decisão do Thiago (ADR-008). O que era `adapter/out/*` agora fica em `infrastructure/*` (`persistence`, `pluggy`, `model`, `security`), e as interfaces de integração externa (`OpenFinanceGateway`, `LanguageModel`) ficam direto em `application/`.
 
 ### Regra de dependência
 
 ```
-adapter.in.web ─▶ application ─▶ domain ◀─ adapter.out.persistence
+web ─▶ protocols ─▶ domain
+web ─▶ application ─▶ domain ◀─ infrastructure
 ```
 
 | Camada | Pode depender de | Não pode depender de |
 |---|---|---|
-| `domain` | `shared.domain`, JDK | Spring, JPA, Hibernate, `application`, `adapter` |
-| `application` | `domain`, `shared.application`, `@Transactional`, `ApplicationEventPublisher` | `adapter`, JPA, Spring Web |
-| `adapter` | tudo acima, Spring, JPA, HTTP | adaptadores de outro módulo |
+| `domain` | `shared.domain`, JDK | Spring, JPA, Hibernate, `application`, `infrastructure`, `protocols`, `web` |
+| `application` | `domain`, `shared.application`, `@Transactional`, `ApplicationEventPublisher` | `infrastructure`, `protocols`, `web`, JPA, Spring Web |
+| `protocols` | `domain`, `shared.protocols`, Bean Validation, Jackson | `infrastructure`, `web`, Spring, JPA |
+| `infrastructure` | `domain`, `application`, Spring, JPA, HTTP | classes internas de outro módulo |
+| `web` | `application`, `domain`, `protocols`, Spring Web | `infrastructure` de outro módulo |
 
-O `ArchitectureTests` verifica as duas primeiras linhas com ArchUnit.
+O `ArchitectureTests` verifica as três primeiras linhas com ArchUnit e falha se aparecer algum pacote `adapter` ou `port`.
 
 ### Por que este nível e não mais
 
 Clean architecture "completa" teria uma interface de caso de uso por operação, objetos de entrada e saída por caso de uso e presenters. Para um time de uma pessoa, isso multiplica arquivos sem proteger mais as regras. A versão adotada mantém o que importa:
 
 - **Regras no domínio**, testáveis sem Spring nem banco (`TaskTest` roda em milissegundos).
-- **Portas de saída** como interfaces no domínio (repositórios) ou em `application.port.out` (integrações).
+- **Interfaces onde a regra mora**: repositórios no domínio, integrações externas em `application`. A implementação fica em `infrastructure`.
 - **Um serviço de aplicação por agregado** em vez de uma classe por caso de uso. Se um serviço passar de ~300 linhas, ele se divide.
-- **Mapeamento explícito** entre entidade JPA e domínio no adaptador de persistência. Custa algumas linhas, mas mantém o domínio sem anotações e deixa o schema evoluir sem mexer nas regras.
+- **Mapeamento explícito** entre entidade JPA e domínio em `infrastructure.persistence`. Custa algumas linhas, mas mantém o domínio sem anotações e deixa o schema evoluir sem mexer nas regras.
 
 ## 4. Comunicação entre módulos
 
@@ -80,8 +86,8 @@ Clean architecture "completa" teria uma interface de caso de uso por operação,
 
 ### Open Finance (Pluggy)
 
-- Porta: `finance.application.port.out.OpenFinanceGateway` (token de conexão, contas, transações).
-- Adaptadores em `finance.adapter.out.pluggy`:
+- Interface: `finance.application.OpenFinanceGateway` (token de conexão, contas, transações).
+- Implementações em `finance.infrastructure.pluggy`:
   - `DisabledOpenFinanceGateway`: padrão; responde com a regra RN-15.
   - `PluggyOpenFinanceGateway`: ativo com `tbf.pluggy.enabled=true`. Detalhes na [etapa 7](implementacao/etapa-7-open-finance.md).
 - Credenciais por `PLUGGY_CLIENT_ID` e `PLUGGY_CLIENT_SECRET`; webhook por `PLUGGY_WEBHOOK_SECRET`.
@@ -99,8 +105,8 @@ O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`),
 
 ### IA do assistente (etapa 8)
 
-- Porta: `assistant.application.port.out.LanguageModel`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
-- Adaptadores: `DisabledLanguageModel` (padrão, `tbf.assistant.model.provider=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
+- Interface: `assistant.application.LanguageModel`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
+- Implementações (em `assistant.infrastructure.model`): `DisabledLanguageModel` (padrão, `tbf.assistant.model.provider=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
 - Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
 
 ### Leitura entre módulos do assistant
@@ -125,7 +131,7 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 ### ADR-001 — Clean architecture leve dentro do monólito modular
 **Contexto:** o usuário quer separar regras de negócio sem aumentar demais a complexidade.
 **Decisão:** domínio puro, casos de uso por agregado, portas e adaptadores; Spring Modulith para as fronteiras entre módulos.
-**Consequências:** regras testáveis sem infraestrutura; um pouco de código de mapeamento por agregado.
+**Consequências:** regras testáveis sem infraestrutura; um pouco de código de mapeamento por agregado. Os nomes de pacote de portas e adaptadores foram trocados no ADR-008.
 
 ### ADR-002 — Work agrupa empresas, projetos e tarefas
 **Contexto:** a proposta inicial tinha `company`, `project` e `task` como módulos separados, mas eles mudam juntos e têm FKs fortes (tarefa → projeto → empresa).
@@ -153,6 +159,11 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 **Contexto:** o store do frontend aplica cada mudança na hora e envia para a API depois. Se o id só existisse depois da resposta, a tela teria que trocar ids já usados (seleção, vínculos, uma interação que aponta para a tarefa de follow-up criada no mesmo clique).
 **Decisão:** `POST` aceita o cabeçalho opcional `X-Client-Id` com um UUID; o primeiro agregado criado na requisição usa esse id (`Ids.forNewAggregate()`). Se uma linha com esse id já existir, de qualquer dono, a API responde 409 em vez de sobrescrever (`AuditedEntity` recusa no `@PostLoad`). Itens filhos, como os do checklist, continuam com ids do servidor.
 **Consequências:** criação otimista com id estável, e importação idempotente: importar duas vezes os mesmos dados não duplica nada. O frontend gera UUIDv7, como a API.
+
+### ADR-008 — Pacotes `infrastructure`, `protocols` e `web` no lugar de `adapter/in` e `adapter/out`
+**Contexto:** o padrão de portas e adaptadores (`adapter/in/web`, `adapter/out/persistence`, `application/port/out`) espalhava cada módulo em pastas profundas e misturava DTOs dentro dos controllers.
+**Decisão:** cada módulo tem `domain`, `application`, `infrastructure` (persistência e clientes externos, só quando necessário), `protocols` (DTOs) e `web` (controllers). Interfaces de integração ficam em `application`; implementações de repositório se chamam `<Agregado>RepositoryImpl`.
+**Consequências:** a regra de dependência continua igual e verificada pelo `ArchitectureTests`; um teste novo impede que pacotes `adapter` ou `port` voltem.
 
 ## 8. Ambiente local
 
