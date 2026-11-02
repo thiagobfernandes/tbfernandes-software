@@ -11,6 +11,8 @@ const SRC = __dirname;
 const ALLOWED_MODULE_DEPENDENCIES: Record<string, string[]> = {
   identity: [],
   work: [],
+  knowledge: ['work'],
+  contacts: ['work'],
 };
 
 interface SourceImport {

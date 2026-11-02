@@ -1,3 +1,4 @@
+export * from './dates';
 export * from './domain-event';
 export * from './errors';
 export * from './ids';
