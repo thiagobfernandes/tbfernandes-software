@@ -10,11 +10,12 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 |---|---|---|
 | `tbfernandes-frontend/` | Frontend Next.js 16, React 19, TypeScript, Tailwind 4, shadcn/ui | [tbfernandes-frontend/CLAUDE.md](tbfernandes-frontend/CLAUDE.md) |
 | `tbfernandes-backend/` | Backend Spring Boot 4.1, Java 25, Spring Modulith, PostgreSQL 17, Flyway | [tbfernandes-backend/CLAUDE.md](tbfernandes-backend/CLAUDE.md) |
+| `tbfernandes-backend-nest/` | Backend NestJS 11, TypeScript, TypeORM, PostgreSQL 17, migrações SQL do Flyway. Substitui o Java módulo a módulo (ADR-009) | [tbfernandes-backend-nest/CLAUDE.md](tbfernandes-backend-nest/CLAUDE.md) |
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend | — |
 | `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
-| `.github/workflows/ci.yml` | CI: `./mvnw verify` no backend; `npm ci && npm run lint && npm run build` no frontend | — |
+| `.github/workflows/ci.yml` | CI: `./mvnw verify` no backend Java; lint, testes, e2e e build no backend NestJS; `npm ci && npm run lint && npm run build` no frontend | — |
 
 ## Onde está cada regra
 
@@ -52,6 +53,10 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 cd tbfernandes-backend && ./mvnw spring-boot:run      # http://localhost:8080, Swagger em /swagger-ui.html
 cd tbfernandes-backend && ./mvnw verify               # testes (Testcontainers + ArchitectureTests)
 
+# Backend NestJS (PostgreSQL do compose em localhost:5434)
+cd tbfernandes-backend-nest && npm install && npm run dev  # http://localhost:8080, Swagger em /swagger-ui
+cd tbfernandes-backend-nest && npm run lint && npm run typecheck && npm test && npm run test:e2e
+
 # Frontend
 cd tbfernandes-frontend && npm install && npm run dev  # http://localhost:3000
 cd tbfernandes-frontend && npm run lint && npm run build
@@ -62,6 +67,6 @@ cd tbfernandes-frontend && npm run api:types           # regenera src/lib/api/sc
 
 ## Antes de terminar uma tarefa
 
-- Backend: `./mvnw verify` verde (inclui `ArchitectureTests`).
+- Backend: `./mvnw verify` verde (inclui `ArchitectureTests`); no NestJS, `npm run lint`, `npm run typecheck`, `npm test` e `npm run test:e2e` verdes.
 - Frontend: `npm run lint` e `npm run build` sem erros; conferir a tela em claro e escuro e em largura de celular.
 - Docs atualizados e commit no padrão Conventional Commits (ver [padrões](docs/padroes-de-codigo.md#commits-e-entregas)).

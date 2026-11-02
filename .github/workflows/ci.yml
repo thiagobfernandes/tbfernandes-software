@@ -22,6 +22,26 @@ jobs:
       # Testcontainers uses the Docker engine that GitHub-hosted runners already have.
       - run: ./mvnw -B verify
 
+  api-nest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tbfernandes-backend-nest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tbfernandes-backend-nest/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # Testcontainers uses the Docker engine that GitHub-hosted runners already have.
+      - run: npm run test:e2e
+      - run: npm run build
+
   web:
     runs-on: ubuntu-latest
     defaults:
