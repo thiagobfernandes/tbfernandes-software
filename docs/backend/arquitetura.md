@@ -48,7 +48,7 @@ com.tbfernandes.api.work
 └── web/                         controllers REST
 ```
 
-Sem o padrão de portas e adaptadores (`adapter/in`, `adapter/out`, `application/port/out`), por decisão do Thiago (ADR-008). O que era `adapter/out/*` agora fica em `infrastructure/*` (`persistence`, `pluggy`, `model`, `security`), e as interfaces de integração externa (`OpenFinanceGateway`, `LanguageModel`) ficam direto em `application/`.
+Sem o padrão de portas e adaptadores (`adapter/in`, `adapter/out`, `application/port/out`), por decisão do Thiago (ADR-008). O que era `adapter/out/*` agora fica em `infrastructure/*` (`persistence`, `pluggy`, `model`, `security`), e as interfaces de integração externa (`OpenFinanceGateway`, `LanguageModel`, `EmbeddingModel`, `KnowledgeIndex`) ficam direto em `application/`.
 
 ### Regra de dependência
 
@@ -108,6 +108,12 @@ O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`),
 - Interface: `assistant.application.LanguageModel`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
 - Implementações (em `assistant.infrastructure.model`): `DisabledLanguageModel` (padrão, `tbf.assistant.model.provider=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
 - Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
+
+### RAG do assistente (etapa 11)
+
+- Perguntas abertas são respondidas com trechos das notas e snippets. `KnowledgeRetrieval` mantém o índice `assistant.knowledge_chunk` em dia (só reprocessa o que mudou) e `PassageRanker` faz a busca híbrida (BM25 + cosseno) em Java puro.
+- Portas: `EmbeddingModel` (adaptadores `DisabledEmbeddingModel`, padrão, e `VoyageEmbeddingModel`, com `TBF_ASSISTANT_EMBEDDING=voyage`) e `KnowledgeIndex` (`JdbcKnowledgeIndex`). O `LanguageModel` ganhou `answerFromPassages`.
+- Sem pgvector: os vetores ficam em `real[]` porque o PostgreSQL embutido do app desktop não tem a extensão. Detalhes em [etapa 11](implementacao/etapa-11-rag.md).
 
 ### Leitura entre módulos do assistant
 

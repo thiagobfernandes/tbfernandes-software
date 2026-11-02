@@ -57,6 +57,23 @@ class AssistantApiIntegrationTests extends ApiTestSupport {
 	}
 
 	@Test
+	void withoutAModelAnOpenQuestionShowsThePassagesOfTheNotes() {
+		String word = "zq" + UUID.randomUUID().toString().substring(0, 8);
+		String noteId = create("/api/v1/notes", """
+				{"title": "Servidor %s", "body": "O nginx encaminha /api para o backend."}""".formatted(word));
+
+		var answer = post("/api/v1/assistant/questions", "{\"question\": \"Explique o servidor %s\"}".formatted(word));
+
+		assertThat(answer).hasStatusOk();
+		assertThat(answer).bodyJson()
+			.hasPathSatisfying("$.source", source -> assertThat(source).isEqualTo("search"))
+			.hasPathSatisfying("$.references[0].excerpt",
+					excerpt -> assertThat(excerpt).asString().contains("O nginx encaminha /api"));
+		List<String> hrefs = read(answer, "$.references[*].href");
+		assertThat(hrefs).containsExactly("/knowledge?note=" + noteId);
+	}
+
+	@Test
 	void questionIsRequired() {
 		assertThat(post("/api/v1/assistant/questions", "{\"question\": \"  \"}")).hasStatus(400);
 	}

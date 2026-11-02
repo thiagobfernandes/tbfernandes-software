@@ -61,7 +61,7 @@ public final class RuleBasedAssistant {
 
 		Optional<ProjectView> project = data.projects()
 			.stream()
-			.filter(p -> question.contains(p.name().toLowerCase(Locale.ROOT)))
+			.filter(p -> mentions(question, p.name()))
 			.findFirst();
 		if (project.isPresent()) {
 			return aboutProject(project.get(), data);
@@ -88,6 +88,28 @@ public final class RuleBasedAssistant {
 			return learning(data.studies());
 		}
 		return search(question, data);
+	}
+
+	/**
+	 * Whether one of the fixed intents or a project name matches, so {@link #answer} would not fall
+	 * back to the keyword search. Open questions go to retrieval over notes and snippets (AST-04).
+	 */
+	public static boolean understands(String rawQuestion, Workspace data) {
+		String question = rawQuestion.toLowerCase(Locale.ROOT);
+		return data.projects().stream().anyMatch(p -> mentions(question, p.name()))
+				|| INTENTS.keySet().stream().anyMatch(intent -> has(question, intent));
+	}
+
+	/**
+	 * Whether the question names the project as whole words, so a project called "P" or "API" is
+	 * not found inside every other word.
+	 */
+	static boolean mentions(String question, String name) {
+		String lower = name.toLowerCase(Locale.ROOT).strip();
+		return !lower.isEmpty() && java.util.regex.Pattern
+			.compile("(?<![\\p{L}\\p{N}])" + java.util.regex.Pattern.quote(lower) + "(?![\\p{L}\\p{N}])")
+			.matcher(question)
+			.find();
 	}
 
 	private static boolean has(String question, String intent) {

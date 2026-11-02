@@ -132,7 +132,7 @@ Falha ao falar com a Pluggy responde 502.
 
 | Método | Rota | Uso | Item |
 |---|---|---|---|
-| POST | `/assistant/questions` | `{ question }` (até 500 caracteres) → resposta com referências | AST-01, AST-02, AST-03 |
+| POST | `/assistant/questions` | `{ question }` (até 500 caracteres) → resposta com referências | AST-01 a AST-04 |
 | GET | `/graph` | `{ nodes: [{ id, kind, label, href }], edges: [{ source, target }] }` | KNW-05 |
 
 Exemplo de resposta do assistente. O formato é o de `tbfernandes-frontend/src/features/assistant/lib/answer.ts`, mais o campo `source`:
@@ -146,6 +146,20 @@ Exemplo de resposta do assistente. O formato é o de `tbfernandes-frontend/src/f
 ```
 
 `source` vale `rules` enquanto nenhum modelo de IA estiver configurado (`TBF_ASSISTANT_MODEL=none`) ou quando as regras responderam. Com um modelo, vale `query` quando o texto veio da execução da consulta e `model` quando o modelo o reescreveu. Nos dois casos, o campo `query` traz a consulta usada (`subject`, `aggregate`, `text`, `statuses`, `priorities`, `openOnly`, `project`, `company`, `dueFrom`, `dueTo`, `month`, `sort`, `limit`) e as referências vêm da execução. Com as regras, `query` é `null`.
+
+Perguntas abertas que nem a consulta nem as regras respondem buscam nas notas e snippets (AST-04, [etapa 11](implementacao/etapa-11-rag.md)). Nesse caso `source` vale `rag` quando o modelo escreveu a resposta a partir dos trechos, citando as fontes como `[1]`, `[2]` na ordem de `references`, e `search` quando não há modelo e a resposta só aponta os trechos. As referências trazem `excerpt`, o trecho usado (texto simples, até 280 caracteres); nas outras respostas `excerpt` é `null`.
+
+```json
+{
+  "text": "Instale o Docker Engine dentro do Ubuntu e ative o systemd [1]. Para subir tudo, use `docker compose up -d` [2].",
+  "references": [
+    { "kind": "Nota", "label": "Docker no WSL", "href": "/knowledge?note=0192...", "excerpt": "Instale o Docker Engine dentro do Ubuntu..." },
+    { "kind": "Snippet", "label": "compose up", "href": "/knowledge/snippets", "excerpt": "Sobe banco, backend e frontend em segundo plano." }
+  ],
+  "source": "rag",
+  "query": null
+}
+```
 
 ## Exemplo de tarefa
 

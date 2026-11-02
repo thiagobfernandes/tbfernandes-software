@@ -119,4 +119,11 @@ class RuleBasedAssistantTest {
 		assertThat(RuleBasedAssistant.encodeUriComponent("Fix (a) & b's ~ok!")).isEqualTo("Fix%20(a)%20%26%20b's%20~ok!");
 	}
 
+	@Test
+	void projectNamesMatchOnlyAsWholeWords() {
+		assertThat(RuleBasedAssistant.mentions("como está o tbfernandes software?", "TBFernandes Software")).isTrue();
+		assertThat(RuleBasedAssistant.mentions("explique o servidor", "P")).isFalse();
+		assertThat(RuleBasedAssistant.mentions("status do p?", "P")).isTrue();
+	}
+
 }

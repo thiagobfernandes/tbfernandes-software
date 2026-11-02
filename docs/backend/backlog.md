@@ -138,7 +138,7 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | AST-01 | Portar o assistente por regras (`tbfernandes-frontend/src/features/assistant/lib/answer.ts`) para a API (RF-AST-01) | M | ✅ etapa 8 |
 | AST-02 | Porta `LanguageModel` e adaptador desligado | P | ✅ etapa 8 |
 | AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ✅ etapa 10 |
-| AST-04 | pgvector e embeddings de notas e snippets | G | ⬜ |
+| AST-04 | Embeddings de notas e snippets e respostas com RAG (RF-AST-03). Vetores em `real[]`, sem pgvector, por causa do app desktop | G | ✅ etapa 11 |
 
 ## Épico IDN — Identity e segurança
 
@@ -167,3 +167,4 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | 8 | AST-01, AST-02, KNW-05 | assistente por regras e grafo na API; AST-04 em aberto |
 | 9 | PLT-08, IDN-04, IDN-05 | todas as telas lendo e gravando pela API (`NEXT_PUBLIC_DATA_SOURCE=api`), login, exportar e importar |
 | 10 | AST-03 | assistente com IA: saída estruturada e consultas |
+| 11 | AST-04 | RAG: respostas a partir das notas e snippets, com as fontes |

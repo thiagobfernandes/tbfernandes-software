@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUp, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowUp, BookOpenText, RotateCcw, Sparkles } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { Markdown } from "@/components/shared/markdown";
 import { PageHeading } from "@/components/shared/page-heading";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { answer, type Answer } from "@/features/assistant/lib/answer";
+import {
+  answer,
+  type Answer,
+  type Reference,
+} from "@/features/assistant/lib/answer";
 import { apiFetch } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { env } from "@/lib/env";
@@ -30,6 +34,16 @@ const suggestions = [
   "Com quem devo fazer follow-up?",
   "Tem algo sobre Kafka?",
 ];
+
+/** Answers built from passages of notes and snippets (AST-04) cite them by number. */
+const fromPassages = (source?: string) =>
+  source === "rag" || source === "search";
+
+const sourceLabel: Record<string, string> = {
+  rag: "Resposta com IA a partir das suas notas",
+  search: "Trechos encontrados nas suas notas",
+  model: "Texto escrito com IA",
+};
 
 export function AssistantPage() {
   const data = useAppData();
@@ -94,7 +108,7 @@ export function AssistantPage() {
       />
       <p className="rounded-xl border border-dashed px-4 py-2.5 text-xs text-muted-foreground">
         {env.dataSource === "api"
-          ? "As respostas vêm dos seus dados na API por meio de regras fixas. Quando um modelo de IA for conectado, ele escreve o texto, e os links continuam apontando para os registros usados."
+          ? "Perguntas sobre tarefas, metas e dinheiro são respondidas com os seus dados. Perguntas abertas buscam nas suas notas e snippets e mostram os trechos usados. Com um modelo de IA conectado, ele escreve a resposta citando cada trecho."
           : "Simulado: as respostas vêm dos seus dados por meio de regras fixas. O assistente com IA substitui isto quando o backend estiver ligado, e sempre vai mostrar de onde veio cada resposta."}
       </p>
 
@@ -140,27 +154,16 @@ export function AssistantPage() {
               </span>
               <div className="flex min-w-0 flex-col gap-3 rounded-2xl rounded-tl-md border bg-card px-4 py-3">
                 <Markdown>{message.text}</Markdown>
-                {message.references.length > 0 && (
-                  <div className="flex flex-col gap-1.5 border-t pt-3">
-                    <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-                      Fontes
-                    </span>
-                    <ul className="flex flex-wrap gap-1.5">
-                      {message.references.map((reference) => (
-                        <li key={`${reference.kind}-${reference.label}`}>
-                          <Link
-                            href={reference.href}
-                            className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-0.5 text-xs hover:border-primary hover:text-primary"
-                          >
-                            <span className="text-muted-foreground">
-                              {reference.kind}
-                            </span>
-                            {reference.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                {message.references.length > 0 &&
+                  (fromPassages(message.source) ? (
+                    <PassageSources references={message.references} />
+                  ) : (
+                    <RecordSources references={message.references} />
+                  ))}
+                {message.source && sourceLabel[message.source] && (
+                  <span className="text-[11px] text-muted-foreground">
+                    {sourceLabel[message.source]}
+                  </span>
                 )}
               </div>
             </div>
@@ -212,5 +215,77 @@ export function AssistantPage() {
         </Button>
       </form>
     </PageContainer>
+  );
+}
+
+function SourcesHeading() {
+  return (
+    <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+      Fontes
+    </span>
+  );
+}
+
+/** Links to the records an answer was built from. */
+function RecordSources({ references }: { references: Reference[] }) {
+  return (
+    <div className="flex flex-col gap-1.5 border-t pt-3">
+      <SourcesHeading />
+      <ul className="flex flex-wrap gap-1.5">
+        {references.map((reference) => (
+          <li key={`${reference.kind}-${reference.label}`}>
+            <Link
+              href={reference.href}
+              className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-0.5 text-xs hover:border-primary hover:text-primary"
+            >
+              <span className="text-muted-foreground">{reference.kind}</span>
+              {reference.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Numbered sources, matching the [n] citations in the text, with the passage each one gave. */
+function PassageSources({ references }: { references: Reference[] }) {
+  return (
+    <div className="flex flex-col gap-2 border-t pt-3">
+      <SourcesHeading />
+      <ol className="flex flex-col gap-2">
+        {references.map((reference, index) => (
+          <li key={`${reference.href}-${reference.label}`}>
+            <Link
+              href={reference.href}
+              className="group flex gap-2.5 rounded-xl border bg-background px-3 py-2 outline-none hover:border-primary/60 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            >
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary/15 text-[11px] font-semibold text-primary tabular-nums">
+                {index + 1}
+              </span>
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="flex items-center gap-1.5 text-xs">
+                  <BookOpenText
+                    className="size-3.5 shrink-0 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <span className="text-muted-foreground">
+                    {reference.kind}
+                  </span>
+                  <span className="truncate font-medium group-hover:text-primary">
+                    {reference.label}
+                  </span>
+                </span>
+                {reference.excerpt && (
+                  <span className="line-clamp-2 text-xs text-muted-foreground">
+                    {reference.excerpt}
+                  </span>
+                )}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

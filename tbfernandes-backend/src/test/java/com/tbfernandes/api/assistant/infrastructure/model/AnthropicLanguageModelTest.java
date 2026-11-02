@@ -9,11 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.UUID;
 
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.jayway.jsonpath.JsonPath;
 import com.sun.net.httpserver.HttpServer;
 import com.tbfernandes.api.assistant.domain.Answer;
+import com.tbfernandes.api.assistant.domain.KnowledgeDocument;
+import com.tbfernandes.api.assistant.domain.Passage;
 import com.tbfernandes.api.assistant.domain.StructuredQuery;
 import com.tbfernandes.api.assistant.domain.StructuredQuery.Subject;
 import org.junit.jupiter.api.AfterEach;
@@ -119,6 +122,20 @@ class AnthropicLanguageModelTest {
 		assertThat(text).contains("Você tem 2 tarefas.");
 		assertThat((String) JsonPath.read(requests.getFirst(), "$.messages[0].content")).isEqualTo(
 				"Question: Quantas?\n\nAnswer to rewrite:\n2 tarefas");
+	}
+
+	@Test
+	void sendsTheNumberedPassagesForARetrievalAnswer() {
+		responses.add(message("{\"text\": \"Use o compose [1].\"}", "end_turn"));
+		Passage passage = new Passage(new KnowledgeDocument.Key(KnowledgeDocument.Kind.NOTE, UUID.randomUUID()),
+				"Docker", "docker compose up -d", 0.9);
+
+		Optional<String> text = model.answerFromPassages("Como subo?", List.of(passage));
+
+		assertThat(text).contains("Use o compose [1].");
+		assertThat((String) JsonPath.read(requests.getFirst(), "$.messages[0].content"))
+			.isEqualTo("Question: Como subo?\n\nPassages:\n\n[1] Nota: Docker\ndocker compose up -d");
+		assertThat((String) JsonPath.read(requests.getFirst(), "$.system")).contains("only the");
 	}
 
 	private static String message(String text, String stopReason) {
