@@ -90,7 +90,7 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 
 ## 6. Grafo de conhecimento
 
-- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) e calcula o layout por forças, determinístico, no navegador.
+- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) . O layout é uma simulação de forças ao vivo com `d3-force` (`lib/force-layout.ts`): arrastar um nó puxa os vizinhos, nós que continuam no grafo mantêm a posição quando os filtros mudam, e os rótulos que se sobrepõem são omitidos. O `GraphCanvas` move os nós escrevendo os atributos do SVG direto, sem render do React a cada quadro.
 - Arestas têm `relation`: `link` (vínculo salvo), `wiki` (`[[Título]]` numa nota, ver `lib/wiki-links.ts`) e `tag` (tracejada; tags ficam desligadas por padrão).
 - `/knowledge/graph?focus=<tipo>:<id>` abre o grafo focado num nó. Com foco, o painel agrupa as conexões por tipo e o grafo local mostra 1 ou 2 saltos.
 - A leitura de uma nota mostra o grafo local dela (`NoteConnections`) e as notas que a mencionam.
