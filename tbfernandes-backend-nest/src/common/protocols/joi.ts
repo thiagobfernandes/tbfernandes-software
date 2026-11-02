@@ -42,8 +42,9 @@ export const J = {
       });
   },
 
+  /** Blank means "no value", as before. */
   optionalIsoDate() {
-    return J.isoDate().allow(null).default(null);
+    return J.isoDate().allow(null, '').empty('').default(null);
   },
 
   /** YYYY-MM, used by finance. */
@@ -55,8 +56,9 @@ export const J = {
     return Joi.string().guid().lowercase();
   },
 
+  /** Blank means "no value", as before. */
   optionalUuid() {
-    return J.uuid().allow(null).default(null);
+    return J.uuid().allow(null, '').empty('').default(null);
   },
 
   /** Lists of uuids, e.g. note links. Absent means empty. */

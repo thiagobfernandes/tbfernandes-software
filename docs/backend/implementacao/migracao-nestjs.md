@@ -5,7 +5,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 | Etapa | Conteúdo | Situação |
 |---|---|---|
 | 1 | Base (ambiente, banco, migrações, logger, erros, paginação, `X-Client-Id`, transações, eventos), `identity` e `work` | feita |
-| 2 | `knowledge` e `contacts` | a fazer |
+| 2 | `knowledge` e `contacts` | feita |
 | 3 | `learning`, `goals` e `finance` (com Open Finance) | a fazer |
 | 4 | `assistant` (regras, grafo, RAG; modelo de IA atrás de uma interface sem fornecedor fixo) | a fazer |
 | 5 | Desktop com Node no lugar do Java (PostgreSQL embutido, backup, token), compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | a fazer |
@@ -37,3 +37,22 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 
 - 31 unitários (`npm test`): regras de `Task`, `Company`, `Project`, `AppUser` e senha, UUID v7, checksum do Flyway, schemas Joi, `ParseJsonPipe`, filtro de erros e as regras de arquitetura (`src/architecture.spec.ts`: fronteiras de módulo, camadas e nada de `adapter`/`port`).
 - 20 e2e (`npm run test:e2e`, PostgreSQL real): ciclo empresa → projeto → tarefa com evento `TaskCompleted`, paginação, 400 com campos, RN-01, RN-03, RN-07, projeto excluído mantendo as tarefas, atrasadas e painel, PUT com checklist e campos desconhecidos, `X-Client-Id`, sessão com CSRF e donos separados, RN-25, token do desktop, health, OpenAPI e migrações idempotentes.
+
+## Etapa 2 — knowledge e contacts
+
+### O que foi feito
+
+- **Knowledge**: notas, snippets e métodos de trabalho com o mesmo JSON do Java. Tags normalizadas no domínio (`Tags`: sem espaços, minúsculas, sem repetição, até 40 caracteres), vínculos com projetos e tarefas em `KnowledgeLinks` e checados pelo `LinkValidator` através do `WorkLookup` (RN-05). Busca com o mesmo SQL: `tsvector` gerado (`search @@ plainto_tsquery('simple', …)`) ou trecho do título com `ILIKE`, tag exata e, nos snippets, linguagem exata em minúsculas. O código do snippet é gravado sem nenhuma alteração (RN-11). Passos e exemplos do método são regravados em ordem a cada edição; o método precisa de pelo menos um passo.
+- **Contacts**: contatos e interações em dois repositórios (`ContactRepository` e `InteractionRepository`), empresa cadastrada ou nome de empresa, nunca os dois (RN-23), e-mail em minúsculas, especialidades sem repetição, filtro `dueWithinDays` (CTC-04) e follow-up (CTC-03) que cria a tarefa pelo `FollowUpTasks` do work. O follow-up roda numa transação só, então o segundo pedido (RN-24) não deixa tarefa sobrando.
+- **Eventos**: `WorkItemDeletedListener` (KNW-06) tira o vínculo de notas e snippets quando um projeto ou tarefa é excluído; `WorkEventsListener` tira a empresa dos contatos e o follow-up das interações. Cada listener roda depois do commit, na sua própria transação.
+- **APIs públicas**: `KnowledgeLookup` (notas e snippets) e `ContactsLookup` (contatos), que o assistente vai usar na etapa 4. `ALLOWED_MODULE_DEPENDENCIES` passou a ter `knowledge → work` e `contacts → work`.
+- **Requisições**: `companyId`, `followUpTaskId` e datas opcionais em branco (`""`) valem como vazio, como o Jackson fazia.
+
+### Conferência com o Java
+
+Java (porta 8081) e NestJS (porta 8080) com o seed de desenvolvimento: as listas de notas, snippets, métodos, contatos e interações e as buscas (`?q=`, `?language=`, `?dueWithinDays=`) devolveram o mesmo JSON. Criação de contato e interação, follow-up e o 422 do RN-24 também saíram iguais; só as mensagens de erro mudaram para pt-BR.
+
+### Testes
+
+- 49 unitários: mais `Tags`, `Note`, `Snippet`, `Method`, `Contact`, `Interaction` e `IsoDates`.
+- 27 e2e: portes de `KnowledgeApiIntegrationTests` e `ContactsApiIntegrationTests` (busca por texto, trecho do título e tag; vínculo removido ao excluir o projeto; 404 de tarefa desconhecida; código literal; ordem dos passos; RN-23; empresa removida do contato; follow-up único sem tarefa sobrando; `dueWithinDays`; interações excluídas com o contato).

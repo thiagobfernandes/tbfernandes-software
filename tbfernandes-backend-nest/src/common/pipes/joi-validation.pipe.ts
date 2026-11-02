@@ -23,6 +23,7 @@ const MESSAGES = {
   'number.max': 'deve ser no máximo {{#limit}}',
   'boolean.base': 'deve ser verdadeiro ou falso',
   'array.base': 'deve ser uma lista',
+  'array.min': 'deve ter pelo menos {{#limit}} item(ns)',
   'object.base': 'deve ser um objeto',
   'date.invalid': 'não é uma data válida',
 };

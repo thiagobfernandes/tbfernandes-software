@@ -50,3 +50,15 @@ export async function create(
   }
   return (response.body as { id: string }).id;
 }
+
+/** Waits for work done by event listeners after the request answered. */
+export async function eventually(
+  check: () => Promise<boolean>,
+  timeoutMs = 5000,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!(await check())) {
+    if (Date.now() > deadline) throw new Error('Condition not met in time');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+}
