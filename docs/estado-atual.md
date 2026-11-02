@@ -11,7 +11,7 @@ Atualizado em 2026-11-02. Atualize esta página ao terminar uma etapa.
 - **Frontend ligado à API** com `NEXT_PUBLIC_DATA_SOURCE=api` (etapa 9). O modo local continua o padrão fora do Docker.
 - **Docker Compose na raiz**: banco, backend, frontend e nginx em um comando, com `/` no frontend e `/api` no backend ([como rodar](como-rodar.md)). As pastas agora são `tbfernandes-backend/`, `tbfernandes-frontend/` e `tbfernandes-nginx/`.
 - **App desktop para Windows** em andamento (Tauri + PostgreSQL embutido, [desktop.md](desktop.md)). Etapas 1 a 4 feitas: janela Tauri em `tbfernandes-desktop/` com instalador gerado pelo workflow `desktop`, backup diário do banco em `Documentos\TBFernandes\backups`; o frontend exporta como estático com `npm run build:desktop` (páginas de detalhe com `?id=`), e o backend tem o perfil `desktop` com PostgreSQL embutido, token por abertura e desligamento junto com o app.
-- **Backend em NestJS** em andamento (ADR-009, [migração](backend/implementacao/migracao-nestjs.md)): `tbfernandes-backend-nest/` já tem a base, `identity`, `work`, `knowledge` e `contacts`, com o mesmo banco e o mesmo JSON do Java. O Java segue no ar até a última etapa.
+- **Backend em NestJS** em andamento (ADR-009, [migração](backend/implementacao/migracao-nestjs.md)): `tbfernandes-backend-nest/` já tem a base, `identity`, `work`, `knowledge`, `contacts` e `learning`, com o mesmo banco e o mesmo JSON do Java. O Java segue no ar até a última etapa.
 
 Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md).
 

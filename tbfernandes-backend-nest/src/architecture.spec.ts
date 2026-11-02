@@ -13,6 +13,7 @@ const ALLOWED_MODULE_DEPENDENCIES: Record<string, string[]> = {
   work: [],
   knowledge: ['work'],
   contacts: ['work'],
+  learning: [],
 };
 
 interface SourceImport {
