@@ -19,6 +19,7 @@ import { ContactsModule } from './modules/contacts/contacts.module';
 import { FinanceModule } from './modules/finance';
 import { IdentityModule } from './modules/identity/identity.module';
 import { CsrfMiddleware } from './modules/identity/infrastructure/security/csrf.middleware';
+import { LearningModule } from './modules/learning/learning.module';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 import { WorkModule } from './modules/work/work.module';
 
@@ -32,6 +33,7 @@ import { WorkModule } from './modules/work/work.module';
     WorkModule,
     KnowledgeModule,
     ContactsModule,
+    LearningModule,
     FinanceModule,
   ],
 })

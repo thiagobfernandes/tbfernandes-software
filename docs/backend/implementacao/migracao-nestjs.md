@@ -6,7 +6,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 |---|---|---|
 | 1 | Base (ambiente, banco, migrações, logger, erros, paginação, `X-Client-Id`, transações, eventos), `identity` e `work` | feita |
 | 2 | `knowledge` e `contacts` | feita |
-| 3 | `learning`, `finance` (com Open Finance) e `goals`, um PR cada | em andamento (`finance` feita) |
+| 3 | `learning` (feita), `finance` (com Open Finance, feita) e `goals`, um PR cada | em andamento |
 | 4 | `assistant` (regras, grafo, RAG; modelo de IA atrás de uma interface sem fornecedor fixo) | a fazer |
 | 5 | Desktop com Node no lugar do Java (PostgreSQL embutido, backup, token), compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | a fazer |
 
@@ -56,6 +56,16 @@ Java (porta 8081) e NestJS (porta 8080) com o seed de desenvolvimento: as listas
 
 - 49 unitários: mais `Tags`, `Note`, `Snippet`, `Method`, `Contact`, `Interaction` e `IsoDates`.
 - 27 e2e: portes de `KnowledgeApiIntegrationTests` e `ContactsApiIntegrationTests` (busca por texto, trecho do título e tag; vínculo removido ao excluir o projeto; 404 de tarefa desconhecida; código literal; ordem dos passos; RN-23; empresa removida do contato; follow-up único sem tarefa sobrando; `dueWithinDays`; interações excluídas com o contato).
+
+## Etapa 3a — learning
+
+- Estudos, materiais, habilidades, certificações e formação, com um repositório e um serviço por agregado (no Java era um repositório só para os cinco).
+- Regras no domínio: estudo começa `planned` e o prazo não vem antes do início (RN-02); material começa `to_consume` e precisa de tipo; nível da habilidade de 1 a 5 (RN-13, 422); certificação obtida precisa da data e vence depois dela (RN-14); formação com início antes do fim.
+- Referências dentro do módulo: habilidades do estudo e estudos da certificação precisam ser do mesmo dono (404). Excluir um estudo deixa os materiais sem estudo (`ON DELETE SET NULL`); nome de habilidade repetido dá 409.
+- `expiringWithinDays` (LRN-06) devolve só certificações obtidas que vencem entre hoje e o fim da janela.
+- `LearningLookup` (estudos e certificações) para `goals` e o assistente.
+- Conferido com o Java lado a lado: mesmo JSON em `/studies`, `/materials`, `/skills`, `/certifications` e `/educations` (listas de ids em ordem estável).
+- Testes: 57 unitários e 31 e2e (porte de `LearningApiIntegrationTests` mais estudo excluído, 409 de habilidade repetida e ordem das formações).
 
 ## Etapa 3b — finance
 
