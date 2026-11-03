@@ -14,7 +14,7 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
-| `.github/workflows/ci.yml` | CI: lint, typecheck, testes, e2e e build no backend; `npm ci && npm run lint && npm run build` no frontend | — |
+| `.github/workflows/ci.yml` | CI: lint, typecheck, testes, e2e e build no backend; `npm ci && npm run lint && npm run build` no frontend; imagens do compose construídas e testadas pelo nginx | — |
 
 ## Onde está cada regra
 

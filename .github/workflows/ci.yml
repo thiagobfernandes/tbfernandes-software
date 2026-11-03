@@ -43,3 +43,21 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm run build:desktop
+
+  # The images of compose.yaml, started together: catches a broken Dockerfile or compose setting.
+  images:
+    runs-on: ubuntu-latest
+    env:
+      TBF_PGDATA_VOLUME: tbf-ci-pgdata
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+      - run: docker compose up -d --wait --wait-timeout 180
+      - name: Smoke test through nginx
+        run: |
+          curl -fsS http://localhost/api/v1/tasks | head -c 300; echo
+          curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost/
+      - if: failure()
+        run: docker compose logs --no-color
+      - if: always()
+        run: docker compose down -v
