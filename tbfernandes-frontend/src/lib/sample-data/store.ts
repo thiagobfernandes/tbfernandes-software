@@ -3,7 +3,7 @@
 // Client-side store behind every screen. With NEXT_PUBLIC_DATA_SOURCE=local
 // (default) it simulates the API: starts from the sample data and keeps
 // changes in this browser (localStorage). With "api" it starts empty, loads
-// from the Spring Boot API and sends each change there (lib/api/remote-store).
+// from the backend API and sends each change there (lib/api/remote-store).
 
 import { useSyncExternalStore } from "react";
 

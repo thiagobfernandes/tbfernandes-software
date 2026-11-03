@@ -5,9 +5,9 @@ on:
   pull_request:
     paths:
       - "tbfernandes-desktop/**"
-      - "tbfernandes-backend-nest/src/**"
-      - "tbfernandes-backend-nest/db/**"
-      - "tbfernandes-backend-nest/package*.json"
+      - "tbfernandes-backend/src/**"
+      - "tbfernandes-backend/db/**"
+      - "tbfernandes-backend/package*.json"
       - "tbfernandes-frontend/src/**"
       - "tbfernandes-frontend/public/**"
       - "tbfernandes-frontend/package*.json"
@@ -35,7 +35,7 @@ jobs:
           cache: npm
           cache-dependency-path: |
             tbfernandes-frontend/package-lock.json
-            tbfernandes-backend-nest/package-lock.json
+            tbfernandes-backend/package-lock.json
             tbfernandes-desktop/package-lock.json
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2

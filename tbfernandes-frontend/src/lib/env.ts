@@ -31,7 +31,7 @@ export const env = {
   },
   /**
    * "local": simulated store in this browser (default).
-   * "api": every screen reads and writes through the Spring Boot API.
+   * "api": every screen reads and writes through the backend API.
    * The desktop build always uses the API.
    */
   dataSource:

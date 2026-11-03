@@ -1,6 +1,6 @@
 "use client";
 
-// Keeps the client store in sync with the Spring Boot API when
+// Keeps the client store in sync with the backend API when
 // NEXT_PUBLIC_DATA_SOURCE=api. The store stays the source of truth for the
 // screens: changes are applied locally first, then sent here one at a time.
 // When the API refuses a change, the data is reloaded from the API, so the

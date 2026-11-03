@@ -3,6 +3,8 @@
 Status: proposta inicial (2026-10-23), revisada em 2026-10-27. Cada decisão pode ser revista quando um problema real justificar.
 
 > **Atualizações desde a proposta:** os módulos do backend ficaram `shared`, `identity`, `work` (empresas, projetos e tarefas, ADR-002), `knowledge`, `goals`, `learning`, `finance`, `contacts` e `assistant`; as camadas de cada módulo são `domain`, `application`, `adapter/in/web` e `adapter/out/persistence` (veja [backend/arquitetura.md](backend/arquitetura.md)). Desde 2026-10-27 os **textos de interface são em português (pt-BR)**; código continua em inglês.
+>
+> **2026-11-03:** o backend foi reescrito em **NestJS 11 + TypeScript + TypeORM** (ADR-009 em [backend/arquitetura.md](backend/arquitetura.md#adr-009--backend-em-nestjs)). As seções abaixo que citam Spring, Java, JUnit ou springdoc descrevem a proposta original; as equivalentes hoje são módulos Nest com `src/architecture.spec.ts`, `@nestjs/event-emitter`, Joi, Jest e `@nestjs/swagger`. As migrações continuam em SQL no formato do Flyway.
 
 ## 1. Arquitetura: monólito modular
 
@@ -42,10 +44,10 @@ Por quê: um usuário, um time de uma pessoa e domínio ainda em descoberta. O m
 
 | Camada | Escolha |
 |---|---|
-| Backend | Java 25 (LTS) + Spring Boot 4, Maven Wrapper |
+| Backend | TypeScript + NestJS 11 + TypeORM (até 2026-11-03: Java 25 + Spring Boot 4) |
 | Banco | PostgreSQL 17 + Flyway (pgvector depois) |
 | Frontend | TypeScript + Next.js 16 + React 19 + Tailwind CSS 4 + shadcn/ui |
-| Testes | JUnit 5, Testcontainers; no frontend, Vitest + Playwright quando houver fluxo real |
+| Testes | Jest, supertest, Testcontainers; no frontend, Vitest + Playwright quando houver fluxo real |
 | Ambiente local | Docker Compose para o PostgreSQL |
 
 ## 4. Suposições assumidas (confirmar)

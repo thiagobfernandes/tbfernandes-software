@@ -1,4 +1,5 @@
-target
-scripts
-compose.yaml
-*.md
+node_modules
+dist
+coverage
+.env*
+test

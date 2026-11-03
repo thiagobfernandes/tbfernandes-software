@@ -1,5 +1,5 @@
 //! The NestJS backend, started in the background with the bundled Node.js runtime.
-//! It runs the `desktop` profile (tbfernandes-backend-nest, docs/desktop.md): its own
+//! It runs the `desktop` profile (tbfernandes-backend, docs/desktop.md): its own
 //! PostgreSQL, 127.0.0.1 only, and every request must carry the launch token.
 
 use std::fs::{self, File};

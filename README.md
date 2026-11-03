@@ -5,7 +5,7 @@ Plataforma de gestão pessoal e profissional: empresas, projetos, tarefas, conhe
 | Pasta | Conteúdo |
 |---|---|
 | `tbfernandes-frontend/` | Frontend Next.js 16 (App Router, TypeScript, Tailwind CSS 4, shadcn/ui) |
-| `tbfernandes-backend/` | Backend Spring Boot 4.1 (Java 25, Spring Modulith, PostgreSQL 17, Flyway) |
+| `tbfernandes-backend/` | Backend NestJS 11 (TypeScript, TypeORM, PostgreSQL 17) |
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend |
 | `tbfernandes-desktop/` | App para Windows (Tauri 2) com backend e PostgreSQL embutidos ([docs/desktop.md](docs/desktop.md)) |
 | `docs/` | Requisitos, arquitetura, padrões de código, design e backlog ([índice](docs/README.md)) |
@@ -14,7 +14,8 @@ Plataforma de gestão pessoal e profissional: empresas, projetos, tarefas, conhe
 
 ```bash
 # backend (precisa do Docker)
-cd tbfernandes-backend && ./mvnw spring-boot:run
+docker compose up -d postgres
+cd tbfernandes-backend && npm install && npm run dev
 
 # frontend
 cd tbfernandes-frontend && cp .env.example .env.local && npm install && npm run dev

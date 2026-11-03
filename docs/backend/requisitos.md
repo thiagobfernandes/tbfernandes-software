@@ -2,7 +2,7 @@
 
 Versão 0.1 · 2026-10-26 · Status: proposta para revisão
 
-Este documento descreve o que a API Spring Boot precisa fazer para substituir o armazenamento simulado do frontend (`tbfernandes-frontend/src/lib/sample-data/store.ts`). Os requisitos foram levantados a partir das telas e dos tipos do frontend (`tbfernandes-frontend/src/features/*/types`). Cada requisito tem um identificador usado no código, nos testes e no [backlog](backlog.md).
+Este documento descreve o que a API do backend precisa fazer para substituir o armazenamento simulado do frontend (`tbfernandes-frontend/src/lib/sample-data/store.ts`). Os requisitos foram levantados a partir das telas e dos tipos do frontend (`tbfernandes-frontend/src/features/*/types`). Cada requisito tem um identificador usado no código, nos testes e no [backlog](backlog.md).
 
 Prioridade (MoSCoW): **M** = obrigatório no MVP, **S** = deveria ter, **C** = pode ter, **W** = fora do escopo agora.
 
@@ -162,8 +162,8 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 
 | ID | Requisito |
 |---|---|
-| RNF-ARQ-01 | Monólito modular com Spring Modulith: um módulo por domínio; módulos só usam a API pública (pacote raiz) ou eventos uns dos outros. Verificado por teste (`ArchitectureTests`). |
-| RNF-ARQ-02 | Clean architecture dentro de cada módulo: `domain` em Java puro, `application` com casos de uso, `infrastructure` com persistência e integrações, `protocols` com DTOs e `web` com controllers. Regra de dependência verificada com ArchUnit. |
+| RNF-ARQ-01 | Monólito modular: um módulo Nest por domínio; módulos só usam a API pública (`index.ts`) ou eventos uns dos outros. Verificado por teste (`src/architecture.spec.ts`). |
+| RNF-ARQ-02 | Clean architecture dentro de cada módulo: `domain` em TypeScript puro, `application` com casos de uso, `infrastructure` com persistência e integrações, `protocols` com DTOs e `web` com controllers. Regra de dependência verificada por `src/architecture.spec.ts` e pelo ESLint. |
 | RNF-ARQ-03 | Integrações externas (Pluggy, IA) sempre atrás de uma interface em `application`, com uma implementação desligável por configuração. |
 | RNF-ARQ-04 | Esquema do banco versionado só por Flyway; Hibernate apenas valida (`ddl-auto=validate`). |
 | RNF-ARQ-05 | Contrato da API em OpenAPI (springdoc), usado para gerar os tipos TypeScript do frontend. |
@@ -186,7 +186,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RNF-DES-01 | p95 abaixo de 300 ms nas listagens com até 5 000 registros por coleção, medido localmente. |
 | RNF-DES-02 | Listagens com mais de 100 itens possíveis são paginadas (`page`, `size`). |
 | RNF-CONF-01 | Concorrência otimista com coluna `version`; conflito retorna 409. |
-| RNF-CONF-02 | Eventos entre módulos persistidos no registro do Spring Modulith (`event_publication`) e republicados após reinício. |
+| RNF-CONF-02 | Eventos entre módulos entregues só depois do commit da transação que os publicou. Desde o NestJS (ADR-009) não há registro persistente: um evento perdido num reinício não é reenviado. |
 | RNF-CONF-04 | O assistente responde mesmo se o provedor de IA falhar ou estiver desligado: cai para as respostas por regras. |
 | RNF-CONF-03 | Backup diário do PostgreSQL quando houver ambiente fora da máquina local. |
 
@@ -199,7 +199,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RNF-QLD-03 | Build e testes no CI (GitHub Actions) a cada PR. |
 | RNF-OPS-01 | Health check em `/actuator/health`; mapa dos módulos em `/actuator/modulith`. |
 | RNF-OPS-02 | Logs estruturados (JSON) fora do perfil `dev`. |
-| RNF-OPS-03 | Ambiente local sobe com um comando (`./mvnw spring-boot:run`, que inicia o `compose.yaml`). |
+| RNF-OPS-03 | Ambiente local sobe com um comando (`docker compose up -d --build`; para desenvolver, `docker compose up -d postgres` e `npm run dev`). |
 
 ### 4.5 Interoperabilidade e usabilidade da API
 
