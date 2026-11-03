@@ -27,7 +27,6 @@ Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md)
 | PLT-07 | Job de verificação de referências órfãs entre módulos |
 | IDN-06 | Limitar tentativas de login |
 | Datas de exemplo | No modo local o "hoje" é `SAMPLE_TODAY` (2026-10-23); dados de exemplo ainda usam datas fixas |
-| Mensagens restantes em inglês | Algumas `BusinessRuleViolation` ainda têm texto em inglês (ex.: RN-02, RN-03, RN-17, RN-19 em `Require`, `ProjectService`, `PurchaseGoal`, `Goal`, `GoalService`) |
 
 ## Como o código chega ao repositório
 

@@ -147,7 +147,7 @@ cd tbfernandes-frontend && npm run lint && npm run build
 cd tbfernandes-frontend && npm run api:types            # com a API no ar: regenera os tipos TypeScript do OpenAPI
 ```
 
-O CI (`.github/workflows/ci.yml`) roda os mesmos comandos a cada push na `main` e em cada PR.
+O CI (`.github/workflows/ci.yml`) roda os mesmos comandos a cada push na `main` e em cada PR. O job `images` também constrói as imagens do `compose.yaml`, sobe tudo e chama `/api/v1/tasks` e `/` pelo nginx.
 
 ## Problemas comuns
 
