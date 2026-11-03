@@ -17,6 +17,7 @@ import {
 } from './infrastructure/environments/registers';
 import { ContactsModule } from './modules/contacts/contacts.module';
 import { FinanceModule } from './modules/finance';
+import { GoalsModule } from './modules/goals';
 import { IdentityModule } from './modules/identity/identity.module';
 import { CsrfMiddleware } from './modules/identity/infrastructure/security/csrf.middleware';
 import { LearningModule } from './modules/learning/learning.module';
@@ -35,6 +36,7 @@ import { WorkModule } from './modules/work/work.module';
     ContactsModule,
     LearningModule,
     FinanceModule,
+    GoalsModule,
   ],
 })
 export class AppModule implements NestModule {

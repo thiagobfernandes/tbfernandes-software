@@ -6,7 +6,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 |---|---|---|
 | 1 | Base (ambiente, banco, migrações, logger, erros, paginação, `X-Client-Id`, transações, eventos), `identity` e `work` | feita |
 | 2 | `knowledge` e `contacts` | feita |
-| 3 | `learning` (feita), `finance` (com Open Finance, feita) e `goals`, um PR cada | em andamento |
+| 3 | `learning`, `finance` (com Open Finance) e `goals`, um PR cada | feita |
 | 4 | `assistant` (regras, grafo, RAG; modelo de IA atrás de uma interface sem fornecedor fixo) | a fazer |
 | 5 | Desktop com Node no lugar do Java (PostgreSQL embutido, backup, token), compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | a fazer |
 
@@ -88,4 +88,15 @@ Java (porta 8081) e NestJS (porta 8080) recebendo as mesmas requisições: lanç
 
 - Unitários: `Money`, `CashFlows`, `PurchaseGoal`, `BankConnection`, `ConnectionClaims` e o porte de `PluggyOpenFinanceGatewayTest` com um `fetch` falso.
 - e2e: portes de `FinanceApiIntegrationTests` e `OpenFinanceApiIntegrationTests` com um gateway falso (`startApp` agora aceita trocar providers). O vínculo compra ↔ meta fica para o módulo goals.
+
+## Etapa 3c — goals
+
+- Metas, submetas, marcos e indicador com o mesmo JSON do Java. `GoalRepository` e `MilestoneRepository` separados (no Java era um só).
+- Regras no domínio: meta começa `planned` com prioridade `normal`; não pode ser submeta dela mesma nem das suas submetas (RN-19, conferido subindo a cadeia de pais, e a meta pai precisa existir); indicador com rótulo, unidade e alvo maior que zero; `PATCH /goals/{id}/indicator` só com indicador (RN-21). Excluir a meta leva submetas e marcos (RN-09, `ON DELETE CASCADE`).
+- Valores do indicador em centésimos inteiros, arredondados como o PostgreSQL grava `numeric(14,2)` (meio para longe do zero). A resposta já sai com o valor gravado: o Java devolvia `7.255` no PATCH e `7.26` na leitura seguinte; o NestJS devolve `7.26` nas duas.
+- `GoalProgresses` (RF-GOL-05): indicador primeiro, depois marcos, depois tarefas ligadas direto ou pelos projetos (sem as canceladas); mesmo texto de `basis` do Java.
+- `TaskCompletedListener` (GOL-05): tarefa concluída ativa a meta planejada e soma 1 no indicador em `tasks`, depois do commit.
+- `GET /goals/{id}/links` (GOL-04) lê projetos, tarefas, estudos e compras pelas APIs públicas de work, learning e finance. `GoalsLookup` (metas com progresso) fica para o assistente. `ALLOWED_MODULE_DEPENDENCIES` ganhou `goals → work, learning, finance`.
+- Conferido com o Java lado a lado: criação com indicador, submeta, PATCH do indicador, marcos, vínculos e os erros (400 de alvo zero e de `current` ausente, 404 de meta desconhecida) deram o mesmo JSON, fora a diferença de arredondamento acima e `10.00` contra `10`.
+- Testes: unitários de `Goal`, `Decimals`, `Indicators` e `GoalProgresses`; e2e com o porte de `GoalsApiIntegrationTests`, RN-21, 404 do pai desconhecido e o vínculo compra ↔ meta que faltava do `FinanceApiIntegrationTests`.
 
