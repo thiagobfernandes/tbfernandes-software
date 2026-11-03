@@ -7,6 +7,12 @@ export const IsoDates = {
     date.setUTCDate(date.getUTCDate() + days);
     return date.toISOString().slice(0, 10);
   },
+
+  /** Whole days from one day to another (negative when `to` is earlier). */
+  daysBetween(from: IsoDate, to: IsoDate): number {
+    const ms = Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`);
+    return Math.round(ms / 86_400_000);
+  },
 };
 
 /** A calendar month as the API writes it: YYYY-MM. Compares as text. */

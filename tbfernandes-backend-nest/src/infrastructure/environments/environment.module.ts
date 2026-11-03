@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import {
   appConfig,
+  assistantConfig,
   authConfig,
   databaseConfig,
   desktopConfig,
@@ -27,6 +28,7 @@ import { ValidationSchema } from './schemas';
         authConfig,
         desktopConfig,
         pluggyConfig,
+        assistantConfig,
       ],
     }),
   ],

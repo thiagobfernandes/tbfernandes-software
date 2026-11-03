@@ -15,6 +15,7 @@ import {
   authConfig,
   desktopConfig,
 } from './infrastructure/environments/registers';
+import { AssistantModule } from './modules/assistant';
 import { ContactsModule } from './modules/contacts/contacts.module';
 import { FinanceModule } from './modules/finance';
 import { GoalsModule } from './modules/goals';
@@ -37,6 +38,7 @@ import { WorkModule } from './modules/work/work.module';
     LearningModule,
     FinanceModule,
     GoalsModule,
+    AssistantModule,
   ],
 })
 export class AppModule implements NestModule {
