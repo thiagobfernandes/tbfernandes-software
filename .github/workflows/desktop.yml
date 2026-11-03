@@ -5,8 +5,9 @@ on:
   pull_request:
     paths:
       - "tbfernandes-desktop/**"
-      - "tbfernandes-backend/src/main/**"
-      - "tbfernandes-backend/pom.xml"
+      - "tbfernandes-backend-nest/src/**"
+      - "tbfernandes-backend-nest/db/**"
+      - "tbfernandes-backend-nest/package*.json"
       - "tbfernandes-frontend/src/**"
       - "tbfernandes-frontend/public/**"
       - "tbfernandes-frontend/package*.json"
@@ -28,17 +29,13 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "25"
-          cache: maven
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: |
             tbfernandes-frontend/package-lock.json
+            tbfernandes-backend-nest/package-lock.json
             tbfernandes-desktop/package-lock.json
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
@@ -49,7 +46,7 @@ jobs:
         working-directory: tbfernandes-frontend
         run: npm ci && npm run build:desktop
 
-      - name: Java runtime, backend and PostgreSQL
+      - name: Node.js runtime, backend and PostgreSQL
         run: tbfernandes-desktop/scripts/prepare-resources.sh
 
       - name: Installer

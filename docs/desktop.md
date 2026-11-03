@@ -7,7 +7,7 @@ Plano completo e comparação de opções: [TBFernandes como app desktop Windows
 ```
 TBFernandes.exe (Tauri, WebView2)
  ├─ mostra a splash e carrega o frontend exportado (tbfernandes-frontend/out)
- ├─ inicia o backend em segundo plano (java -jar, perfil desktop, porta livre em 127.0.0.1)
+ ├─ inicia o backend em segundo plano (Node.js, perfil desktop, porta livre em 127.0.0.1)
  │   └─ o backend inicia o PostgreSQL embutido (%LOCALAPPDATA%\TBFernandes\data)
  └─ injeta window.__TBF_DESKTOP__ = { apiUrl, token } antes da página carregar
 ```
@@ -26,11 +26,11 @@ TBFernandes.exe (Tauri, WebView2)
 
 O caminho normal é o CI: o workflow **desktop** (`.github/workflows/desktop.yml`) roda em `windows-latest` a cada PR que mexe no app, em todo push na `main` e sob demanda (Actions → desktop → Run workflow). O instalador fica no artefato **TBFernandes-setup** da execução. Ainda não é assinado, então o Windows mostra o aviso do SmartScreen ("Mais informações" → "Executar assim mesmo").
 
-Para gerar no próprio Windows, com Node 22, JDK 25, Rust (rustup) e Git Bash:
+Para gerar no próprio Windows, com Node 22, Rust (rustup) e Git Bash:
 
 ```bash
 cd tbfernandes-frontend && npm ci && npm run build:desktop && cd ..
-tbfernandes-desktop/scripts/prepare-resources.sh   # jar, Java (jlink) e PostgreSQL 17
+tbfernandes-desktop/scripts/prepare-resources.sh   # backend NestJS, Node.js e PostgreSQL 17
 cd tbfernandes-desktop && npm ci && npm run build   # src-tauri/target/release/bundle/nsis/*.exe
 ```
 
@@ -41,17 +41,16 @@ O mesmo funciona no Linux para testar (`npx tauri build --debug --no-bundle`, de
 | Arquivo | O que faz |
 |---|---|
 | `src-tauri/src/main.rs` | Abre a splash (`tbfernandes-frontend/public/desktop-splash.html`), inicia o backend numa thread, depois abre a janela principal com `window.__TBF_DESKTOP__` injetado e fecha a splash. Se algo falha, mostra um diálogo com a pasta de logs. Uma segunda abertura só foca a janela que já está aberta |
-| `src-tauri/src/backend.rs` | Escolhe porta e token, roda `runtime/bin/java -jar backend/tbfernandes-api.jar --spring.profiles.active=desktop` sem janela de console, espera `/actuator/health` (até 180 s) e, ao sair, chama `/api/v1/desktop/shutdown` e espera até 20 s antes de matar o processo |
+| `src-tauri/src/backend.rs` | Escolhe porta e token, roda `runtime/node.exe backend/dist/main.js` com `TBF_PROFILE=desktop` sem janela de console (saída em `logs\backend.log`), espera `/actuator/health` (até 180 s) e, ao sair, chama `/api/v1/desktop/shutdown` e espera até 20 s antes de matar o processo |
 | `src-tauri/tauri.conf.json` | Nome, ícones (como trocar em [design/referencias.md](design/referencias.md#marca)), recursos (`runtime/`, `backend/`, `postgres/`) e NSIS por usuário em pt-BR |
-| `scripts/prepare-resources.sh` | Gera `src-tauri/resources/`: jar do backend, Java com `jlink` (~70 MB) e PostgreSQL 17 dos binários `io.zonky.test.postgres` no Maven Central (~60 MB) |
+| `scripts/prepare-resources.sh` | Gera `src-tauri/resources/`: o backend NestJS compilado com só as dependências de produção (`dist/`, `node_modules/`, `db/`, ~120 MB), o `node.exe` oficial de nodejs.org (`NODE_VERSION`, ~80 MB) e o PostgreSQL 17 dos binários `io.zonky.test.postgres` no Maven Central (~60 MB) |
 
 - **Dados:** ficam em `%LOCALAPPDATA%\TBFernandes` (banco em `pg\`, logs em `logs\`). A desinstalação não apaga essa pasta.
-- **Abertura mais rápida:** a JVM grava um arquivo de class data sharing (`backend.jsa`) na primeira abertura e o reaproveita nas seguintes.
-- **Desenvolvimento:** `TBF_DESKTOP_JAVA`, `TBF_DESKTOP_JAR` e `TBF_DESKTOP_PG_BIN` trocam os caminhos dos recursos, por exemplo no `tauri dev`.
+- **Desenvolvimento:** `TBF_DESKTOP_NODE`, `TBF_DESKTOP_BACKEND` (pasta com `dist/`) e `TBF_DESKTOP_PG_BIN` trocam os caminhos dos recursos, por exemplo no `tauri dev`.
 
 ## Etapa 4: backup, segurança e janela
 
-- **Backup automático** (`DataBackup`, no backend): antes de subir o PostgreSQL, com o servidor parado, o backend compacta a pasta `pg\` num zip em `Documentos\TBFernandes\backups` (`TBF_BACKUP_DIR`). Roda no máximo uma vez a cada 20 h, sempre que a versão do app muda (antes das migrations de uma atualização) e nunca na primeira abertura. Guarda os 7 mais recentes. Se o backup falhar, o app abre mesmo assim e o erro vai para o log.
+- **Backup automático** (`DataBackup`, no backend, com um gravador de zip próprio em `zip-writer.ts`): antes de subir o PostgreSQL, com o servidor parado, o backend compacta a pasta `pg\` num zip em `Documentos\TBFernandes\backups` (`TBF_BACKUP_DIR`). Roda no máximo uma vez a cada 20 h, sempre que a versão do app muda (antes das migrations de uma atualização) e nunca na primeira abertura. Guarda os 7 mais recentes. Se o backup falhar, o app abre mesmo assim e o erro vai para o log.
   - Os binários do PostgreSQL que vão no app não trazem `pg_dump`, por isso a cópia é dos arquivos. Ela é consistente porque o servidor está parado.
   - **Restaurar:** feche o app, renomeie `%LOCALAPPDATA%\TBFernandes\pg` e extraia o zip numa nova pasta `pg` no mesmo lugar.
   - A exportação JSON de Configurações → Dados continua valendo.
@@ -69,7 +68,7 @@ O mesmo funciona no Linux para testar (`npx tauri build --debug --no-bundle`, de
 
 ## Etapa 2: backend (perfil `desktop`)
 
-Código em `tbfernandes-backend/src/main/java/com/tbfernandes/api/shared/infrastructure/desktop/` e `application-desktop.yaml`.
+Código em `tbfernandes-backend-nest/src/infrastructure/desktop/` e em `src/main.ts`, que sobe o PostgreSQL antes do Nest. Até a etapa 5 da [migração para NestJS](backend/implementacao/migracao-nestjs.md) o app usava o backend Java; a pasta de dados e o banco são os mesmos, então uma instalação antiga abre com os dados que já tinha.
 
 ### Variáveis que o app passa ao backend
 
@@ -81,26 +80,25 @@ Código em `tbfernandes-backend/src/main/java/com/tbfernandes/api/shared/infrast
 | `TBF_DESKTOP_TOKEN` | Segredo criado a cada abertura, com 32 caracteres ou mais. Toda requisição precisa mandar `X-TBF-Desktop-Token` com ele, senão recebe 401 |
 | `TBF_PARENT_PID` | Processo do app. Se ele sumir, o backend desliga sozinho em até 2 s e para o PostgreSQL |
 
-E `--spring.profiles.active=desktop`.
+E `TBF_PROFILE=desktop`, `TBF_APP_VERSION` (uma versão nova dispara backup) e `TBF_BACKUP_DIR`.
 
 ### O que acontece na abertura
 
 1. `EmbeddedPostgres`: na primeira vez roda `initdb` (usuário `tbf`, senha aleatória, `scram-sha-256`, locale `C`, só TCP em `127.0.0.1`). Se um PostgreSQL ficou rodando de uma abertura que travou, ele é parado antes. Depois sobe numa porta livre e cria o banco `tbfernandes`.
-2. O `DataSource` (Hikari) aponta para esse banco e o Flyway roda `db/migration` + `db/desktop` (cria a conta única, sem dados de exemplo).
-3. `DesktopTokenFilter` barra quem não manda o token. Preflights de CORS passam. A origem `http://tauri.localhost` é liberada no CORS.
-4. Para fechar: `POST /api/v1/desktop/shutdown` (com o token) responde 202, fecha o Spring e para o PostgreSQL (`pg_ctl stop -m fast`).
+2. `DesktopRuntime` grava a conexão em `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` e `DB_NAME`; o Nest conecta nesse banco e roda as migrações `db/migration` + `db/desktop` (cria a conta única, sem dados de exemplo).
+3. `DesktopTokenMiddleware` barra quem não manda o token. Preflights de CORS passam. A origem `http://tauri.localhost` é liberada no CORS.
+4. Para fechar: `POST /api/v1/desktop/shutdown` (com o token) responde 202, fecha o Nest e para o PostgreSQL (`pg_ctl stop -m fast`). O mesmo acontece quando o processo do app some (`TBF_PARENT_PID`, conferido a cada 2 s).
 
-Abertura medida no Linux: ~11 s na primeira vez (com `initdb` e migrations), ~11 s depois (o Spring é a maior parte).
+Abertura medida no Linux com o Node e o PostgreSQL do instalador: ~1 s do início do backend até ele responder, já com `initdb` e migrations na primeira vez (o Java levava ~11 s).
 
 ### Rodar o perfil desktop na mão (WSL/Linux)
 
 O `initdb` não roda como root. Com um PostgreSQL instalado (ex.: `/usr/lib/postgresql/16/bin`):
 
 ```bash
-cd tbfernandes-backend && ./mvnw -DskipTests package
-TBF_PORT=18080 TBF_DATA_DIR=$HOME/.tbf-desktop TBF_PG_BIN=/usr/lib/postgresql/16/bin \
-TBF_DESKTOP_TOKEN=$(openssl rand -hex 16) \
-java -jar target/tbfernandes-api-0.0.1-SNAPSHOT.jar --spring.profiles.active=desktop
+cd tbfernandes-backend-nest && npm run build
+TBF_PROFILE=desktop TBF_PORT=18080 TBF_DATA_DIR=$HOME/.tbf-desktop TBF_PG_BIN=/usr/lib/postgresql/16/bin \
+TBF_DESKTOP_TOKEN=$(openssl rand -hex 16) node dist/main.js
 ```
 
-O `EmbeddedPostgresTest` usa o PostgreSQL da máquina (`TBF_TEST_PG_BIN` ou o mais novo em `/usr/lib/postgresql`) e é pulado quando não há um ou quando roda como root.
+O teste `embedded-postgres.spec.ts` usa o PostgreSQL da máquina (`TBF_TEST_PG_BIN` ou o mais novo em `/usr/lib/postgresql`) e é pulado quando não há um ou quando roda como root.

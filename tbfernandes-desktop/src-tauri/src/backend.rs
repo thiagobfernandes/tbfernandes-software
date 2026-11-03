@@ -1,6 +1,6 @@
-//! The Spring Boot backend, started in the background with the bundled Java runtime.
-//! It runs the `desktop` profile (tbfernandes-backend, docs/desktop.md): its own PostgreSQL,
-//! 127.0.0.1 only, and every request must carry the launch token.
+//! The NestJS backend, started in the background with the bundled Node.js runtime.
+//! It runs the `desktop` profile (tbfernandes-backend-nest, docs/desktop.md): its own
+//! PostgreSQL, 127.0.0.1 only, and every request must carry the launch token.
 
 use std::fs::{self, File};
 use std::net::TcpListener;
@@ -49,17 +49,15 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
     fs::create_dir_all(&logs)
         .map_err(|e| format!("Não foi possível criar {}: {e}", logs.display()))?;
 
-    // `tauri dev` has no bundled resources: TBF_DESKTOP_JAVA, _JAR and _PG_BIN point elsewhere.
-    let java = override_or(
-        "TBF_DESKTOP_JAVA",
-        resources.join("runtime").join("bin").join(exe("java")),
+    // `tauri dev` has no bundled resources: TBF_DESKTOP_NODE, _BACKEND and _PG_BIN point elsewhere.
+    let node = override_or(
+        "TBF_DESKTOP_NODE",
+        resources.join("runtime").join(exe("node")),
     );
-    let jar = override_or(
-        "TBF_DESKTOP_JAR",
-        resources.join("backend").join("tbfernandes-api.jar"),
-    );
+    let backend_dir = override_or("TBF_DESKTOP_BACKEND", resources.join("backend"));
+    let main = backend_dir.join("dist").join("main.js");
     let pg_bin = override_or("TBF_DESKTOP_PG_BIN", resources.join("postgres").join("bin"));
-    for (what, path) in [("Java", &java), ("backend", &jar), ("PostgreSQL", &pg_bin)] {
+    for (what, path) in [("Node.js", &node), ("backend", &main), ("PostgreSQL", &pg_bin)] {
         if !path.exists() {
             return Err(format!(
                 "Arquivo do {what} não encontrado: {}. Reinstale o aplicativo.",
@@ -70,26 +68,16 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
 
     let port = free_port().map_err(|e| format!("Nenhuma porta livre: {e}"))?;
     let token = new_token()?;
-    let console = File::create(logs.join("backend-console.log"))
+    let console = File::create(logs.join("backend.log"))
         .map_err(|e| format!("Não foi possível criar o log: {e}"))?;
     let console_err = console.try_clone().map_err(|e| e.to_string())?;
 
-    let mut command = Command::new(&java);
+    let mut command = Command::new(&node);
     command
-        .args([
-            "-Xms64m",
-            "-Xmx512m",
-            "-XX:TieredStopAtLevel=1",
-            // Class data sharing archive, written on the first run: later starts are faster.
-            "-XX:+AutoCreateSharedArchive",
-        ])
-        .arg(format!(
-            "-XX:SharedArchiveFile={}",
-            data.join("backend.jsa").display()
-        ))
-        .arg("-jar")
-        .arg(&jar)
-        .arg("--spring.profiles.active=desktop")
+        .arg(&main)
+        .current_dir(&backend_dir)
+        .env("TBF_PROFILE", "desktop")
+        .env("NODE_ENV", "production")
         .env("TBF_PORT", port.to_string())
         .env("TBF_DATA_DIR", &data)
         .env("TBF_PG_BIN", &pg_bin)
@@ -97,8 +85,14 @@ pub fn start(app: &AppHandle) -> Result<Backend, String> {
         .env("TBF_PARENT_PID", std::process::id().to_string())
         .env("TBF_APP_VERSION", app.package_info().version.to_string())
         .env("TBF_BACKUP_DIR", backup_dir(app, &data))
-        .env_remove("JAVA_TOOL_OPTIONS")
-        .env_remove("SPRING_PROFILES_ACTIVE")
+        // Settings from the user's environment must not change how the bundled backend runs.
+        .env_remove("NODE_OPTIONS")
+        .env_remove("DB_HOST")
+        .env_remove("DB_PORT")
+        .env_remove("DB_USERNAME")
+        .env_remove("DB_PASSWORD")
+        .env_remove("DB_NAME")
+        .env_remove("TBF_DB_SCRIPTS")
         .stdin(Stdio::null())
         .stdout(console)
         .stderr(console_err);
