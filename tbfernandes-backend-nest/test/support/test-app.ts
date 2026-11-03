@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 
@@ -10,6 +10,8 @@ import type { App } from 'supertest/types';
  */
 export async function startApp(
   env: Record<string, string> = {},
+  /** Replaces providers, e.g. a fake bank provider. */
+  override: (builder: TestingModuleBuilder) => TestingModuleBuilder = (b) => b,
 ): Promise<INestApplication<App>> {
   Object.assign(process.env, {
     TBF_PROFILE: 'test',
@@ -25,9 +27,9 @@ export async function startApp(
   const { configureApp } =
     require('../../src/bootstrap/configure-app') as typeof import('../../src/bootstrap/configure-app');
   /* eslint-enable @typescript-eslint/no-require-imports */
-  const moduleRef = await Test.createTestingModule({
-    imports: [AppModule],
-  }).compile();
+  const moduleRef = await override(
+    Test.createTestingModule({ imports: [AppModule] }),
+  ).compile();
   const app = moduleRef.createNestApplication<INestApplication<App>>({
     logger: false,
   });

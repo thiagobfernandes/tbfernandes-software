@@ -5,6 +5,7 @@ import {
   authConfig,
   databaseConfig,
   desktopConfig,
+  pluggyConfig,
 } from './registers';
 import { ValidationSchema } from './schemas';
 
@@ -20,7 +21,13 @@ import { ValidationSchema } from './schemas';
       envFilePath: ['.env.local', '.env'],
       validationSchema: ValidationSchema,
       validationOptions: { abortEarly: false, allowUnknown: true },
-      load: [appConfig, databaseConfig, authConfig, desktopConfig],
+      load: [
+        appConfig,
+        databaseConfig,
+        authConfig,
+        desktopConfig,
+        pluggyConfig,
+      ],
     }),
   ],
 })
