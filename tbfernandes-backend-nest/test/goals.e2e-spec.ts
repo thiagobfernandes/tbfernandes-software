@@ -68,14 +68,12 @@ describe('Goals API', () => {
     const parent = await goal('Parent', null, null);
     const child = await goal('Child', parent, null);
 
-    const cycle = await http()
-      .put(`/api/v1/goals/${parent}`)
-      .send({
-        name: 'Parent',
-        area: 'career',
-        desiredResult: 'Done',
-        parentId: child,
-      });
+    const cycle = await http().put(`/api/v1/goals/${parent}`).send({
+      name: 'Parent',
+      area: 'career',
+      desiredResult: 'Done',
+      parentId: child,
+    });
     expect(cycle.status).toBe(422);
     expect(cycle.body.rule).toBe('RN-19');
 
