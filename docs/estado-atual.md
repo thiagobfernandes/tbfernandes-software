@@ -1,17 +1,17 @@
 # Estado atual
 
-Atualizado em 2026-11-02. Atualize esta página ao terminar uma etapa.
+Atualizado em 2026-11-03. Atualize esta página ao terminar uma etapa.
 
 ## O que existe
 
 - **Frontend** completo para todos os módulos: Trabalho (empresas, projetos com timeline, tarefas com lista e quadro), Conhecimento (notas, snippets, grafo, métodos), Crescimento (metas, aprendizado, certificações), Finanças (fluxo de caixa, compras planejadas), Rede (contatos), Assistente, Calendário, busca global `Ctrl K`, visão geral com cards de vida, arrastar no quadro (mouse e toque), configurações com exportar/importar.
 - **Grafo estilo Obsidian**: links `[[Título]]` entre notas, snippets e métodos, nós de métodos, estudos, habilidades e tags, zoom na roda e na pinça, arrastar nós, grafo local de 1 ou 2 saltos e grafo local na leitura da nota.
 - **Interface em pt-BR** (patch 0016) e mensagens da API e respostas do assistente em pt-BR (0017).
-- **Backend** com as etapas 1 a 10 do [backlog](backend/backlog.md#sequência-sugerida): todos os módulos com API, Flyway, testes (89), CI, OpenAPI, login por sessão, perfil `prod`, assistente por regras, grafo, Open Finance pela Pluggy e assistente com IA por consultas estruturadas (os dois últimos desligados por padrão).
+- **Backend** (escrito em Java e reescrito em NestJS, abaixo) com as etapas 1 a 11 do [backlog](backend/backlog.md#sequência-sugerida): todos os módulos com API, Flyway, testes (89), CI, OpenAPI, login por sessão, perfil `prod`, assistente por regras, grafo, Open Finance pela Pluggy e assistente com IA por consultas estruturadas (os dois últimos desligados por padrão).
 - **Frontend ligado à API** com `NEXT_PUBLIC_DATA_SOURCE=api` (etapa 9). O modo local continua o padrão fora do Docker.
 - **Docker Compose na raiz**: banco, backend, frontend e nginx em um comando, com `/` no frontend e `/api` no backend ([como rodar](como-rodar.md)). As pastas agora são `tbfernandes-backend/`, `tbfernandes-frontend/` e `tbfernandes-nginx/`.
 - **App desktop para Windows** em andamento (Tauri + PostgreSQL embutido, [desktop.md](desktop.md)). Etapas 1 a 4 feitas: janela Tauri em `tbfernandes-desktop/` com instalador gerado pelo workflow `desktop`, backup diário do banco em `Documentos\TBFernandes\backups`; o frontend exporta como estático com `npm run build:desktop` (páginas de detalhe com `?id=`), e o backend tem o perfil `desktop` com PostgreSQL embutido, token por abertura e desligamento junto com o app.
-- **Backend em NestJS** em andamento (ADR-009, [migração](backend/implementacao/migracao-nestjs.md)): `tbfernandes-backend-nest/` já tem a base, `identity`, `work`, `knowledge`, `contacts`, `learning`, `finance` (com Open Finance), `goals` e `assistant`, com o mesmo banco e o mesmo JSON do Java. O Java segue no ar até a última etapa.
+- **Backend em NestJS** (ADR-009, [migração](backend/implementacao/migracao-nestjs.md)): `tbfernandes-backend/` tem todos os módulos com o mesmo banco e o mesmo JSON do antigo backend Java, que foi removido. O compose, o CI e o app desktop (com Node embutido) usam o NestJS.
 
 Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md).
 

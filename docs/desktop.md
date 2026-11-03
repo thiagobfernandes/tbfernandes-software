@@ -68,7 +68,7 @@ O mesmo funciona no Linux para testar (`npx tauri build --debug --no-bundle`, de
 
 ## Etapa 2: backend (perfil `desktop`)
 
-Código em `tbfernandes-backend-nest/src/infrastructure/desktop/` e em `src/main.ts`, que sobe o PostgreSQL antes do Nest. Até a etapa 5 da [migração para NestJS](backend/implementacao/migracao-nestjs.md) o app usava o backend Java; a pasta de dados e o banco são os mesmos, então uma instalação antiga abre com os dados que já tinha.
+Código em `tbfernandes-backend/src/infrastructure/desktop/` e em `src/main.ts`, que sobe o PostgreSQL antes do Nest. Até a etapa 5 da [migração para NestJS](backend/implementacao/migracao-nestjs.md) o app usava o backend Java; a pasta de dados e o banco são os mesmos, então uma instalação antiga abre com os dados que já tinha.
 
 ### Variáveis que o app passa ao backend
 
@@ -96,7 +96,7 @@ Abertura medida no Linux com o Node e o PostgreSQL do instalador: ~1 s do iníci
 O `initdb` não roda como root. Com um PostgreSQL instalado (ex.: `/usr/lib/postgresql/16/bin`):
 
 ```bash
-cd tbfernandes-backend-nest && npm run build
+cd tbfernandes-backend && npm run build
 TBF_PROFILE=desktop TBF_PORT=18080 TBF_DATA_DIR=$HOME/.tbf-desktop TBF_PG_BIN=/usr/lib/postgresql/16/bin \
 TBF_DESKTOP_TOKEN=$(openssl rand -hex 16) node dist/main.js
 ```

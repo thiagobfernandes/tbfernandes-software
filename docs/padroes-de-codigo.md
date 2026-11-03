@@ -25,17 +25,18 @@ Datas e dinheiro sempre formatados com `Intl` em `pt-BR` (dinheiro em BRL).
 
 Base: [arquitetura do backend](backend/arquitetura.md) e [tbfernandes-backend/CLAUDE.md](../tbfernandes-backend/CLAUDE.md).
 
-- **Pacote por módulo** (`com.tbfernandes.api.<modulo>`) e, dentro dele, camadas `domain`, `application`, `infrastructure` (quando precisa), `protocols` e `web`. Sem `adapter/in`, `adapter/out` nem `port/out`.
-- **Domínio puro**: entidades e value objects sem anotações de Spring/JPA. Invariantes no construtor ou em métodos de comportamento (`task.changeStatus(next, clock)`), nunca em setters soltos.
+- **Pasta por módulo** (`src/modules/<modulo>`) e, dentro dela, camadas `domain`, `application`, `infrastructure` (quando precisa), `protocols` e `web`. API pública só no `index.ts`. Sem `adapter/in`, `adapter/out` nem `port/out`.
+- **SOLID**: casos de uso dependem de classes abstratas (`TaskRepository`, `OwnerContext`, `Clock`), ligadas no módulo com `{ provide: Abstração, useClass: Implementação }`.
+- **Domínio puro**: TypeScript sem decorators nem pacotes npm (só `node:*`). Invariantes no construtor ou em métodos de comportamento (`task.changeStatus(next, today)`), nunca em propriedades soltas.
 - **Um serviço de aplicação por agregado** (`TaskService`). Passou de ~300 linhas, divida.
-- **Interfaces**: repositórios no domínio; integrações externas em `application`. A implementação fica em `infrastructure` (`<Agregado>RepositoryImpl`, `PluggyOpenFinanceGateway`).
-- **DTOs em `protocols`** como `record` público, um por arquivo; entidade JPA nunca sai de `infrastructure.persistence`; mapeamento explícito JPA ⇄ domínio.
-- **Validação**: Bean Validation nos DTOs de entrada; regras de negócio no domínio lançando `BusinessRuleViolation` com o id da regra (`RN-07`).
-- **Erros**: Problem Details (RFC 9457) pelo `ApiExceptionHandler`. Nunca expor stack trace ou SQL.
-- **Entre módulos**: só `*Lookup` público ou eventos (`@ApplicationModuleListener`). Nada de FK entre schemas.
-- **Banco**: Flyway, uma migração nova por mudança, `snake_case`, enums como `text` + `CHECK`, `numeric(14,2)` para dinheiro, `owner_id` e colunas de auditoria em toda raiz de agregado.
-- **Datas**: `LocalDate` para dias, `Instant` (UTC) para momentos.
-- **Nomes de teste**: `*Test` (unidade, sem Spring), `*Tests` (com Spring). Integração sempre com PostgreSQL real (Testcontainers).
+- **Abstrações**: repositórios no domínio; integrações externas em `application`. A implementação fica em `infrastructure` (`TypeOrm<Agregado>Repository`, `PluggyOpenFinanceGateway`).
+- **DTOs em `protocols`**: `*.request.ts` (classe + schema Joi) e `*.response.ts`; entidade TypeORM nunca sai de `infrastructure/persistence`; mappers explícitos linha ⇄ domínio e domínio ⇄ JSON.
+- **Validação**: Joi nos DTOs de entrada; regras de negócio no domínio lançando `BusinessRuleViolationError` com o id da regra (`RN-07`).
+- **Erros**: Problem Details (RFC 9457) pelo `ProblemDetailsFilter`. Nunca expor stack trace ou SQL.
+- **Entre módulos**: só `*Lookup` exportado no `index.ts` ou eventos (`@OnEvent`), na direção de `ALLOWED_MODULE_DEPENDENCIES`. Nada de FK entre schemas.
+- **Banco**: migração SQL nova em `db/migration` por mudança, `snake_case`, enums como `text` + `CHECK`, `numeric(14,2)` para dinheiro, `owner_id` e colunas de auditoria em toda raiz de agregado.
+- **Datas**: texto `YYYY-MM-DD` (`IsoDate`) para dias, `Date` (UTC) para momentos.
+- **Testes**: `*.spec.ts` ao lado do código (unidade, sem Nest quando for domínio); `test/*.e2e-spec.ts` com PostgreSQL real (Testcontainers).
 
 ## Frontend
 
@@ -57,9 +58,9 @@ Base: [arquitetura do frontend](frontend/arquitetura.md) e [tbfernandes-frontend
 
 | Camada | O que testar | Ferramenta |
 |---|---|---|
-| Domínio (backend) | Cada regra RN-xx | JUnit 5, sem Spring |
-| Módulo (backend) | HTTP → caso de uso → banco | `*ApiIntegrationTests`, Testcontainers |
-| Arquitetura | Fronteiras de módulo e regra de dependência | `ArchitectureTests` (Modulith + ArchUnit) |
+| Domínio (backend) | Cada regra RN-xx | Jest, sem Nest |
+| Módulo (backend) | HTTP → caso de uso → banco | `test/*.e2e-spec.ts`, supertest, Testcontainers |
+| Arquitetura | Fronteiras de módulo e regra de dependência | `src/architecture.spec.ts` e ESLint |
 | Frontend | Lint, tipos e build; fluxos críticos com Playwright quando fizer sentido | ESLint, `next build`, Playwright |
 
 Nunca desligar ou pular um teste para o CI passar.
@@ -75,8 +76,8 @@ Nunca desligar ou pular um teste para o CI passar.
 
 - Requisito (RF/RN) identificado em [requisitos](backend/requisitos.md) e atendido.
 - Regras no domínio com teste unitário; integração do módulo com PostgreSQL real.
-- `./mvnw verify` verde (inclui `ArchitectureTests`).
+- No backend, `npm run lint`, `npm run typecheck`, `npm test` e `npm run test:e2e` verdes.
 - `npm run lint` e `npm run build` sem erros; tela conferida em claro, escuro e celular.
 - Endpoint no OpenAPI; erros em Problem Details; textos em pt-BR.
-- Migração Flyway nova (nunca editar uma aplicada).
+- Migração SQL nova em `db/migration` (nunca editar uma aplicada).
 - Docs e backlog atualizados.

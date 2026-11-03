@@ -9,13 +9,12 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | Pasta | Conteúdo | Regras locais |
 |---|---|---|
 | `tbfernandes-frontend/` | Frontend Next.js 16, React 19, TypeScript, Tailwind 4, shadcn/ui | [tbfernandes-frontend/CLAUDE.md](tbfernandes-frontend/CLAUDE.md) |
-| `tbfernandes-backend/` | Backend Spring Boot 4.1, Java 25, Spring Modulith, PostgreSQL 17, Flyway | [tbfernandes-backend/CLAUDE.md](tbfernandes-backend/CLAUDE.md) |
-| `tbfernandes-backend-nest/` | Backend NestJS 11, TypeScript, TypeORM, PostgreSQL 17, migrações SQL do Flyway. Substitui o Java módulo a módulo (ADR-009) | [tbfernandes-backend-nest/CLAUDE.md](tbfernandes-backend-nest/CLAUDE.md) |
+| `tbfernandes-backend/` | Backend NestJS 11, TypeScript, TypeORM, PostgreSQL 17, migrações SQL no formato do Flyway (ADR-009) | [tbfernandes-backend/CLAUDE.md](tbfernandes-backend/CLAUDE.md) |
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend | — |
 | `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
-| `.github/workflows/ci.yml` | CI: `./mvnw verify` no backend Java; lint, testes, e2e e build no backend NestJS; `npm ci && npm run lint && npm run build` no frontend | — |
+| `.github/workflows/ci.yml` | CI: lint, typecheck, testes, e2e e build no backend; `npm ci && npm run lint && npm run build` no frontend | — |
 
 ## Onde está cada regra
 
@@ -37,8 +36,8 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 
 1. **Idioma.** Textos de interface, toasts, mensagens de erro para o usuário, respostas do assistente e documentação: **português (pt-BR)**. Código (nomes de classes, funções, variáveis, rotas, colunas, enums): **inglês**. Comentários de código seguem o idioma do arquivo em volta (hoje inglês no código).
 2. **Monólito modular.** Um backend (`tbfernandes-backend/`), um frontend (`tbfernandes-frontend/`), um banco. Sem microserviços, filas ou cache distribuído sem necessidade medida.
-3. **Fronteiras de módulo.** No backend, um módulo só usa a API pública de outro (`*Lookup` no pacote raiz) ou eventos. Nunca o repositório nem as classes internas de outro módulo. `ArchitectureTests` verifica.
-4. **Clean architecture leve.** `domain` em Java puro → `application` (casos de uso) → `infrastructure` (persistência, integrações), `protocols` (DTOs) e `web` (controllers). Sem pacotes `adapter/in`, `adapter/out` ou `port`. Regras de negócio sempre no domínio, com teste unitário.
+3. **Fronteiras de módulo.** No backend, um módulo só usa a API pública de outro (`*Lookup` exportado no `index.ts`) ou eventos. Nunca o repositório nem as classes internas de outro módulo. `src/architecture.spec.ts` verifica.
+4. **Clean architecture leve.** `domain` em TypeScript puro → `application` (casos de uso) → `infrastructure` (persistência, integrações), `protocols` (DTOs) e `web` (controllers). Sem pacotes `adapter/in`, `adapter/out` ou `port`. Regras de negócio sempre no domínio, com teste unitário.
 5. **Banco só por Flyway.** Nova migração `V<n>__<descricao>.sql`; nunca editar uma já aplicada. Um schema por módulo, sem FK entre schemas.
 6. **Frontend por feature.** Páginas finas em `tbfernandes-frontend/src/app`, código em `tbfernandes-frontend/src/features/<feature>`. Toda tela lê e grava pelo store (`tbfernandes-frontend/src/lib/sample-data/store.ts`), que funciona em modo local (simulado) ou API.
 7. **Design.** Toda tela nova segue as referências e a linguagem visual aprovada (paleta navy escura, cards de métrica estilo Luma, timeline estilo Cindr, quadro estilo AturnDeck/Ronas). Antes de inventar um layout, procure uma tela existente parecida e reutilize os componentes de `components/shared`. Detalhes em [docs/design/referencias.md](docs/design/referencias.md).
@@ -49,13 +48,10 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 ## Comandos rápidos
 
 ```bash
-# Backend (precisa de Docker rodando; sobe o PostgreSQL do compose automaticamente)
-cd tbfernandes-backend && ./mvnw spring-boot:run      # http://localhost:8080, Swagger em /swagger-ui.html
-cd tbfernandes-backend && ./mvnw verify               # testes (Testcontainers + ArchitectureTests)
-
-# Backend NestJS (PostgreSQL do compose em localhost:5434)
-cd tbfernandes-backend-nest && npm install && npm run dev  # http://localhost:8080, Swagger em /swagger-ui
-cd tbfernandes-backend-nest && npm run lint && npm run typecheck && npm test && npm run test:e2e
+# Backend (precisa do Docker para o PostgreSQL e para os testes e2e)
+docker compose up -d postgres                         # PostgreSQL em localhost:5434
+cd tbfernandes-backend && npm install && npm run dev  # http://localhost:8080, Swagger em /swagger-ui
+cd tbfernandes-backend && npm run lint && npm run typecheck && npm test && npm run test:e2e
 
 # Frontend
 cd tbfernandes-frontend && npm install && npm run dev  # http://localhost:3000
@@ -67,6 +63,6 @@ cd tbfernandes-frontend && npm run api:types           # regenera src/lib/api/sc
 
 ## Antes de terminar uma tarefa
 
-- Backend: `./mvnw verify` verde (inclui `ArchitectureTests`); no NestJS, `npm run lint`, `npm run typecheck`, `npm test` e `npm run test:e2e` verdes.
+- Backend: `npm run lint`, `npm run typecheck`, `npm test` e `npm run test:e2e` verdes.
 - Frontend: `npm run lint` e `npm run build` sem erros; conferir a tela em claro e escuro e em largura de celular.
 - Docs atualizados e commit no padrão Conventional Commits (ver [padrões](docs/padroes-de-codigo.md#commits-e-entregas)).

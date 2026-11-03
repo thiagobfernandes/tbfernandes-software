@@ -4,7 +4,7 @@ Versão 0.1 · 2026-10-26 · Fonte da verdade: `tbfernandes-backend/src/main/res
 
 ## 1. Convenções
 
-- Um **schema por módulo**: `identity`, `work`, `knowledge`, `goals`, `learning`, `finance`, `contacts`. O registro de eventos do Spring Modulith (`event_publication`) fica em `public`.
+- Um **schema por módulo**: `identity`, `work`, `knowledge`, `goals`, `learning`, `finance`, `contacts`. A tabela `public.event_publication` é do antigo backend Java (Spring Modulith) e ficou sem uso no NestJS.
 - **Chave primária** `id uuid` (v7, gerada pela aplicação).
 - **Raiz de agregado** tem `owner_id`, `created_at`, `updated_at` e `version` (concorrência otimista). Tabelas filhas (itens de checklist, passos, marcos, interações) herdam o dono da raiz.
 - **Enums** em `text` com `CHECK`, valores em maiúsculas (ADR-004).

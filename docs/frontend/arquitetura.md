@@ -8,7 +8,7 @@ Versão 0.1 · 2026-10-27 · Complementa [decisoes-tecnicas.md](../decisoes-tecn
 - **Organização por feature**: páginas finas em `src/app`, código em `src/features/<feature>`.
 - **Um store no cliente** (`src/lib/sample-data/store.ts`) é a fonte de dados de todas as telas. Ele funciona em dois modos:
   - `local` (padrão): simula a API com dados de exemplo salvos no localStorage;
-  - `api`: carrega as 17 coleções da API Spring Boot e envia cada mudança para ela.
+  - `api`: carrega as 17 coleções da API do backend e envia cada mudança para ela.
 - **Interface em pt-BR**, código em inglês.
 
 ## 2. Pastas

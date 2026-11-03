@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # Fills src-tauri/resources/ with what the app ships next to the window (docs/desktop.md):
 #   runtime/   Node.js (node.exe on Windows) from nodejs.org
-#   backend/   tbfernandes-backend-nest built for production: dist/, node_modules/, db/
+#   backend/   tbfernandes-backend built for production: dist/, node_modules/, db/
 #   postgres/  PostgreSQL binaries (bin, lib, share) for this platform
 # Runs on Windows (Git Bash, as in CI) and on Linux. Run it before `npm run build`.
-#   SKIP_BACKEND_BUILD=1  reuse tbfernandes-backend-nest/dist
+#   SKIP_BACKEND_BUILD=1  reuse tbfernandes-backend/dist
 #   NODE_VERSION=22.23.4  Node.js release bundled with the app
 #   PG_VERSION=17.11.0    PostgreSQL build from io.zonky.test.postgres on Maven Central
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="$ROOT/tbfernandes-desktop/src-tauri/resources"
-BACKEND="$ROOT/tbfernandes-backend-nest"
+BACKEND="$ROOT/tbfernandes-backend"
 NODE_VERSION="${NODE_VERSION:-22.23.4}"
 PG_VERSION="${PG_VERSION:-17.11.0}"
 

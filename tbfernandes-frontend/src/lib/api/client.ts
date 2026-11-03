@@ -1,6 +1,6 @@
 import { env } from "@/lib/env";
 
-/** Error body returned by the Spring Boot API (RFC 9457 Problem Details). */
+/** Error body returned by the backend API (RFC 9457 Problem Details). */
 export type ProblemDetail = {
   type?: string;
   title?: string;

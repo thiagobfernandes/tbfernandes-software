@@ -1,20 +1,20 @@
 # Arquitetura do backend
 
-Versão 0.1 · 2026-10-26 · Complementa [decisoes-tecnicas.md](../decisoes-tecnicas.md)
+Versão 0.2 · 2026-11-03 (NestJS, ADR-009) · Complementa [decisoes-tecnicas.md](../decisoes-tecnicas.md)
 
 ## 1. Resumo
 
-- **Um único deploy**: Spring Boot 4.1 com Java 25, em `tbfernandes-backend/`.
-- **Monólito modular** com Spring Modulith: cada domínio é um módulo, e o teste `ArchitectureTests` falha se um módulo usar internals de outro.
-- **Clean architecture dentro de cada módulo**: as regras de negócio ficam em classes Java puras; Spring, JPA e HTTP ficam nas bordas.
-- **PostgreSQL 17**, um schema por módulo, migrações Flyway.
+- **Um único deploy**: NestJS 11 com TypeScript, em `tbfernandes-backend/` (até a etapa 11 era Spring Boot com Java; reescrito pelo ADR-009).
+- **Monólito modular**: cada domínio é um módulo Nest com a API pública no `index.ts`, e o teste `src/architecture.spec.ts` falha se um módulo usar internals de outro ou depender fora de `ALLOWED_MODULE_DEPENDENCIES`.
+- **Clean architecture dentro de cada módulo**: as regras de negócio ficam em TypeScript puro; Nest, TypeORM e HTTP ficam nas bordas.
+- **PostgreSQL 17**, um schema por módulo, migrações SQL no formato do Flyway aplicadas pelo `SqlMigrator`.
 - **Integrações externas atrás de portas**: Pluggy (Open Finance) e o futuro provedor de IA.
 
 ## 2. Módulos
 
 | Módulo | Pacote | Schema | Conteúdo | Telas |
 |---|---|---|---|---|
-| Shared kernel | `shared` | `public` | ids, erros base, dono da requisição, CORS, Problem Details | todas |
+| Kernel comum | `common` + `infrastructure` | `public` | ids, erros base, dono da requisição, CORS, Problem Details | todas |
 | Identity | `identity` | `identity` | usuário dono; login depois | Settings |
 | Work | `work` | `work` | empresas, projetos, tarefas, checklist | Dashboard, Companies, Projects, Tasks |
 | Knowledge | `knowledge` | `knowledge` | notas, snippets, vínculos, métodos | Knowledge, Snippets, Graph, Methods |
@@ -31,20 +31,18 @@ A lista de módulos agrupa `company`, `project` e `task` da proposta inicial em 
 O módulo `work` é a referência; os outros seguem o mesmo desenho.
 
 ```
-com.tbfernandes.api.work
-├── package-info.java            @ApplicationModule: nome e documentação do módulo
-├── TaskCompleted.java           API pública: eventos e consultas que outros módulos podem usar
-├── domain/                      Java puro: entidades, value objects, regras, interfaces de repositório
-│   ├── company/  Company, CompanyDetails, CompanyRepository
-│   ├── project/  Project, ProjectDetails, ProjectRepository
-│   └── task/     Task, ChecklistItem, TaskDetails, TaskRepository
-├── application/                 casos de uso: orquestram domínio, transação e eventos
-│   ├── company/CompanyService
-│   ├── project/ProjectService
-│   └── task/TaskService
-├── infrastructure/              só quando o módulo precisa
-│   └── persistence/             entidades JPA, Spring Data, *RepositoryImpl (implementa o repositório do domínio)
-├── protocols/                   DTOs de request/response (records públicos), ex.: TaskRequest, TaskResponse
+src/modules/work
+├── index.ts                     API pública: WorkModule, WorkLookup e WorkEvents (ex.: taskCompleted)
+├── work.module.ts, work.lookup.ts, work.events.ts
+├── domain/                      TypeScript puro: entidades, regras, repositórios como classes abstratas
+│   ├── company/  company.ts, company.repository.ts, company.spec.ts
+│   ├── project/  project.ts, project.repository.ts, project.spec.ts
+│   └── task/     task.ts, task.repository.ts, task.spec.ts
+├── application/                 casos de uso: orquestram domínio, transação (UnitOfWork) e eventos
+│   └── company.service.ts, project.service.ts, task.service.ts, work-lookup.service.ts
+├── infrastructure/
+│   └── persistence/             entidades TypeORM, TypeOrm*Repository (implementa o repositório do domínio), mappers/
+├── protocols/                   DTOs: *.request.ts (classe + schema Joi), *.response.ts, mappers/ (domínio ↔ JSON)
 └── web/                         controllers REST
 ```
 
@@ -59,27 +57,27 @@ web ─▶ application ─▶ domain ◀─ infrastructure
 
 | Camada | Pode depender de | Não pode depender de |
 |---|---|---|
-| `domain` | `shared.domain`, JDK | Spring, JPA, Hibernate, `application`, `infrastructure`, `protocols`, `web` |
-| `application` | `domain`, `shared.application`, `@Transactional`, `ApplicationEventPublisher` | `infrastructure`, `protocols`, `web`, JPA, Spring Web |
-| `protocols` | `domain`, `shared.protocols`, Bean Validation, Jackson | `infrastructure`, `web`, Spring, JPA |
-| `infrastructure` | `domain`, `application`, Spring, JPA, HTTP | classes internas de outro módulo |
-| `web` | `application`, `domain`, `protocols`, Spring Web | `infrastructure` de outro módulo |
+| `domain` | `common/domain`, módulos `node:*` | qualquer pacote npm, `application`, `infrastructure`, `protocols`, `web` |
+| `application` | `domain`, `common/application` (`UnitOfWork`, `EventPublisher`, `OwnerContext`, `Clock`), `@nestjs/common` | `infrastructure`, `protocols`, `web`, TypeORM, Express |
+| `protocols` | `domain`, `common/protocols`, Joi | `infrastructure`, `web`, TypeORM |
+| `infrastructure` | `domain`, `application`, Nest, TypeORM, HTTP | classes internas de outro módulo |
+| `web` | `application`, `domain`, `protocols`, Nest | `infrastructure` de outro módulo |
 
-O `ArchitectureTests` verifica as três primeiras linhas com ArchUnit e falha se aparecer algum pacote `adapter` ou `port`.
+O `src/architecture.spec.ts` e o ESLint verificam as três primeiras linhas e falham se aparecer alguma pasta `adapter` ou `port`.
 
 ### Por que este nível e não mais
 
 Clean architecture "completa" teria uma interface de caso de uso por operação, objetos de entrada e saída por caso de uso e presenters. Para um time de uma pessoa, isso multiplica arquivos sem proteger mais as regras. A versão adotada mantém o que importa:
 
-- **Regras no domínio**, testáveis sem Spring nem banco (`TaskTest` roda em milissegundos).
+- **Regras no domínio**, testáveis sem Nest nem banco (`task.spec.ts` roda em milissegundos).
 - **Interfaces onde a regra mora**: repositórios no domínio, integrações externas em `application`. A implementação fica em `infrastructure`.
 - **Um serviço de aplicação por agregado** em vez de uma classe por caso de uso. Se um serviço passar de ~300 linhas, ele se divide.
-- **Mapeamento explícito** entre entidade JPA e domínio em `infrastructure.persistence`. Custa algumas linhas, mas mantém o domínio sem anotações e deixa o schema evoluir sem mexer nas regras.
+- **Mapeamento explícito** entre entidade TypeORM e domínio em `infrastructure/persistence/mappers`, e entre domínio e JSON em `protocols/mappers`. Custa algumas linhas, mas mantém o domínio sem anotações e deixa o schema evoluir sem mexer nas regras.
 
 ## 4. Comunicação entre módulos
 
-1. **Eventos de domínio** (preferido): o módulo publica um record da sua API pública, como `work.TaskCompleted`; quem se interessa escuta com `@ApplicationModuleListener`. O Spring Modulith grava a publicação em `event_publication` na mesma transação e entrega depois do commit, com nova tentativa após reinício.
-2. **Consulta síncrona**: quando um módulo precisa validar uma referência (ex.: `contacts` verificar se uma empresa existe), o módulo dono expõe uma interface no pacote raiz (ex.: `work.WorkLookup`). Nunca se acessa repositório de outro módulo.
+1. **Eventos de domínio** (preferido): o módulo publica um evento da sua API pública, como `WorkEvents.taskCompleted`; quem se interessa escuta com `@OnEvent` (`@nestjs/event-emitter`). Eventos publicados dentro de `UnitOfWork.run` saem só depois do commit. Não há registro persistente: um evento perdido num reinício não é reenviado (a tabela `event_publication`, do Java, ficou sem uso).
+2. **Consulta síncrona**: quando um módulo precisa validar uma referência (ex.: `contacts` verificar se uma empresa existe), o módulo dono exporta uma classe abstrata no `index.ts` (ex.: `WorkLookup`). Nunca se acessa repositório de outro módulo.
 3. **Sem FK entre schemas** (ADR-003): `task.goal_id` é só um `uuid`. A aplicação valida na escrita e os eventos de exclusão limpam vínculos.
 
 ## 5. Integrações externas
@@ -96,41 +94,41 @@ Clean architecture "completa" teria uma interface de caso de uso por operação,
 
 ### Autenticação (etapa 6)
 
-| Modo (`tbf.auth.mode`) | Uso | Comportamento |
+| Modo (`TBF_AUTH_MODE`) | Uso | Comportamento |
 |---|---|---|
-| `single-user` | desenvolvimento local (padrão do perfil `dev`) | sem login; toda requisição age como `tbf.auth.owner-id` |
+| `single-user` | desenvolvimento local (padrão do perfil `dev`) | sem login; toda requisição age como `TBF_AUTH_OWNER_ID` |
 | `session` | qualquer ambiente compartilhado (forçado no perfil `prod`) | login por `POST /api/v1/auth/login`, sessão em cookie HttpOnly/SameSite=Lax, CSRF no cookie `XSRF-TOKEN` devolvido no cabeçalho `X-XSRF-TOKEN` |
 
-O `OwnerContext` é implementado pelo módulo identity (`SecurityOwnerContext`), então nenhum outro módulo muda ao trocar de modo. Não há cadastro público: a conta é criada no início pela configuração `tbf.auth.bootstrap.*`.
+O `OwnerContext` é implementado pelo módulo identity (`SessionOwnerContext`), então nenhum outro módulo muda ao trocar de modo. Não há cadastro público: a conta é criada no início pelas variáveis `TBF_AUTH_BOOTSTRAP_*`.
 
 ### IA do assistente (etapa 8)
 
-- Interface: `assistant.application.LanguageModel`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
-- Implementações (em `assistant.infrastructure.model`): `DisabledLanguageModel` (padrão, `tbf.assistant.model.provider=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
+- Classe abstrata: `LanguageModel`, em `modules/assistant/application`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
+- Implementações (em `modules/assistant/infrastructure/model`): `DisabledLanguageModel` (padrão, `TBF_ASSISTANT_MODEL=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
 - Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
 
 ### RAG do assistente (etapa 11)
 
-- Perguntas abertas são respondidas com trechos das notas e snippets. `KnowledgeRetrieval` mantém o índice `assistant.knowledge_chunk` em dia (só reprocessa o que mudou) e `PassageRanker` faz a busca híbrida (BM25 + cosseno) em Java puro.
-- Portas: `EmbeddingModel` (adaptadores `DisabledEmbeddingModel`, padrão, e `VoyageEmbeddingModel`, com `TBF_ASSISTANT_EMBEDDING=voyage`) e `KnowledgeIndex` (`JdbcKnowledgeIndex`). O `LanguageModel` ganhou `answerFromPassages`.
+- Perguntas abertas são respondidas com trechos das notas e snippets. `KnowledgeRetrievalService` mantém o índice `assistant.knowledge_chunk` em dia (só reprocessa o que mudou) e `PassageRanker` faz a busca híbrida (BM25 + cosseno) em TypeScript puro.
+- Portas: `EmbeddingModel` (adaptadores `DisabledEmbeddingModel`, padrão, e `VoyageEmbeddingModel`, com `TBF_ASSISTANT_EMBEDDING=voyage`) e `KnowledgeIndex` (`SqlKnowledgeIndex`). O `LanguageModel` ganhou `answerFromPassages`.
 - Sem pgvector: os vetores ficam em `real[]` porque o PostgreSQL embutido do app desktop não tem a extensão. Detalhes em [etapa 11](implementacao/etapa-11-rag.md).
 
 ### Leitura entre módulos do assistant
 
-O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `WorkLookup`, `KnowledgeLookup`, `GoalsLookup`, `LearningLookup`, `FinanceLookup` e `ContactsLookup`. As respostas (`RuleBasedAssistant`) e o grafo (`KnowledgeGraph`) são funções puras desse retrato, testadas sem Spring.
+O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `WorkLookup`, `KnowledgeLookup`, `GoalsLookup`, `LearningLookup`, `FinanceLookup` e `ContactsLookup`. As respostas (`RuleBasedAssistant`) e o grafo (`KnowledgeGraphs`) são funções puras desse retrato, testadas sem Nest.
 
 ## 6. Convenções
 
 | Tema | Convenção |
 |---|---|
-| Ids | UUID v7 gerado na aplicação (`shared.domain.Ids`): ordenado no tempo, bom para índice. |
-| Dono | `OwnerContext.currentOwnerId()`: no modo `single-user` vem de `tbf.auth.owner-id`; no modo `session`, do usuário logado. |
+| Ids | UUID v7 gerado na aplicação (`IdGenerator`), ou o `X-Client-Id` do frontend (ADR-007): ordenado no tempo, bom para índice. |
+| Dono | `OwnerContext.currentOwnerId()`: no modo `single-user` vem de `TBF_AUTH_OWNER_ID`; no modo `session`, do usuário logado. |
 | Erros | `NotFound` → 404, `Conflict` → 409, `BusinessRuleViolation` → 422 com `rule`, validação → 400 com `errors`. |
-| Enums | Maiúsculas no Java e no banco (CHECK); minúsculas no JSON e nos parâmetros de URL. |
-| Datas | `LocalDate` para dias, `Instant` (UTC) para momentos. |
+| Enums | Maiúsculas no domínio e no banco (CHECK); minúsculas no JSON e nos parâmetros de URL. |
+| Datas | Texto `YYYY-MM-DD` (`IsoDate`) para dias, `Date` (UTC) para momentos. |
 | Auditoria | `created_at`, `updated_at`, `version` em toda tabela de agregado. |
 | Rotas | `/api/v1/<recurso-no-plural>`, um recurso plano por coleção do frontend; mudança de status em `PATCH /{id}/status`. |
-| Testes | `*Test` para unidade, `*Tests` com Spring; integração sempre com PostgreSQL do Testcontainers. |
+| Testes | `*.spec.ts` ao lado do código (unidade); `test/*.e2e-spec.ts` da requisição HTTP ao PostgreSQL real (Testcontainers). |
 
 ## 7. Decisões de arquitetura (ADR)
 
@@ -173,14 +171,14 @@ O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `Wo
 
 ### ADR-009 — Backend em NestJS
 **Contexto:** o Thiago decidiu sair do Java por enquanto e ficar em NestJS (2026-11-02), seguindo a estrutura do projeto my-self.so (variáveis de ambiente com `registerAs` e Joi, `DatabaseModule.forRoot/forFeature`, `BaseRepository`) e o logger e o `ParseJsonPipe` do projeto INFRA.
-**Decisão:** o backend é reescrito em `tbfernandes-backend-nest/` (NestJS 11, TypeORM, Joi), módulo a módulo, com as mesmas camadas (`domain`, `application`, `infrastructure`, `protocols`, `web`), o mesmo banco e o mesmo contrato JSON. As migrações SQL continuam as mesmas e são aplicadas por um executor próprio (`SqlMigrator`) na tabela `flyway_schema_history`, com o checksum do Flyway: um banco que o Java migrou é reconhecido como atualizado. Repositórios e integrações são classes abstratas no domínio ou em `application`; mappers explícitos separam linha, domínio e JSON. Fronteiras de módulo e de camada são verificadas por `src/architecture.spec.ts` e pelo ESLint. O Java continua funcionando até o NestJS cobrir todos os módulos; na última etapa ele sai, a pasta vira `tbfernandes-backend/` e o app desktop passa a levar Node no lugar do Java.
+**Decisão:** o backend é reescrito em NestJS (primeiro em `tbfernandes-backend-nest/`) (NestJS 11, TypeORM, Joi), módulo a módulo, com as mesmas camadas (`domain`, `application`, `infrastructure`, `protocols`, `web`), o mesmo banco e o mesmo contrato JSON. As migrações SQL continuam as mesmas e são aplicadas por um executor próprio (`SqlMigrator`) na tabela `flyway_schema_history`, com o checksum do Flyway: um banco que o Java migrou é reconhecido como atualizado. Repositórios e integrações são classes abstratas no domínio ou em `application`; mappers explícitos separam linha, domínio e JSON. Fronteiras de módulo e de camada são verificadas por `src/architecture.spec.ts` e pelo ESLint. O Java continuou funcionando até o NestJS cobrir todos os módulos. **Concluído em 2026-11-03:** o Java saiu, a pasta virou `tbfernandes-backend/` e o app desktop leva Node no lugar do Java.
 **Consequências:** uma linguagem só no frontend e no backend; sessões em memória como antes (uma instância); Spring Modulith dá lugar a `@nestjs/event-emitter` com eventos depois do commit (sem o registro persistente de eventos). Registro das etapas em [implementacao/migracao-nestjs.md](implementacao/migracao-nestjs.md).
 
 ## 8. Ambiente local
 
 ```
 WSL (Ubuntu)
-├── tbfernandes-frontend/  Next.js :3000  ──HTTP──▶  tbfernandes-backend/  Spring Boot :8080  ──JDBC──▶  PostgreSQL 17 :5432 (Docker, compose.yaml)
+├── tbfernandes-frontend/  Next.js :3000  ──HTTP──▶  tbfernandes-backend/  NestJS :8080  ──TCP──▶  PostgreSQL 17 :5434 (Docker, serviço postgres do compose.yaml)
 ```
 
 Veja [README do backend](../../tbfernandes-backend/README.md) para os comandos.

@@ -1,12 +1,27 @@
 # The whole platform behind nginx: `docker compose up -d --build`, then http://localhost.
+# Only the database, for `npm run dev` in tbfernandes-backend/: `docker compose up -d postgres`.
 # Settings come from .env (see .env.example). How to run and deploy: docs/como-rodar.md.
 name: tbfernandes
 
-include:
-  # The database lives in its own file because `./mvnw spring-boot:run` also uses it.
-  - tbfernandes-backend/compose.yaml
-
 services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tbfernandes
+      POSTGRES_USER: tbf
+      POSTGRES_PASSWORD: ${TBF_DB_PASSWORD:-tbf}
+    ports:
+      # Local only. 5432 is often taken by other projects on this machine.
+      - "127.0.0.1:${TBF_DB_PORT:-5434}:5432"
+    volumes:
+      - tbf-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tbf -d tbfernandes"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build: ./tbfernandes-backend
     restart: unless-stopped
@@ -14,15 +29,20 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: ${TBF_PROFILE:-dev}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tbfernandes
-      SPRING_DATASOURCE_USERNAME: tbf
-      SPRING_DATASOURCE_PASSWORD: ${TBF_DB_PASSWORD:-tbf}
-      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      TBF_PROFILE: ${TBF_PROFILE:-dev}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: tbf
+      DB_PASSWORD: ${TBF_DB_PASSWORD:-tbf}
+      DB_NAME: tbfernandes
+      # Behind nginx: trust X-Forwarded-* for the client address and HTTPS cookies.
+      TBF_TRUST_PROXY: "true"
       TBF_AUTH_MODE: ${TBF_AUTH_MODE:-single-user}
       TBF_AUTH_BOOTSTRAP_EMAIL: ${TBF_AUTH_BOOTSTRAP_EMAIL:-}
       TBF_AUTH_BOOTSTRAP_PASSWORD: ${TBF_AUTH_BOOTSTRAP_PASSWORD:-}
       TBF_AUTH_BOOTSTRAP_NAME: ${TBF_AUTH_BOOTSTRAP_NAME:-}
+      # Empty: a new secret on each start, which signs everyone out on restart.
+      TBF_SESSION_SECRET: ${TBF_SESSION_SECRET:-}
       TBF_COOKIE_SECURE: ${TBF_COOKIE_SECURE:-false}
       TBF_ASSISTANT_MODEL: ${TBF_ASSISTANT_MODEL:-none}
       TBF_ASSISTANT_MODEL_NAME: ${TBF_ASSISTANT_MODEL_NAME:-claude-opus-5-5}
@@ -35,16 +55,11 @@ services:
       PLUGGY_CLIENT_SECRET: ${PLUGGY_CLIENT_SECRET:-}
       PLUGGY_WEBHOOK_SECRET: ${PLUGGY_WEBHOOK_SECRET:-}
     healthcheck:
-      # The JRE image has no curl or wget.
-      test:
-        - CMD
-        - bash
-        - -c
-        - exec 3<>/dev/tcp/localhost/8080 && printf 'GET /actuator/health HTTP/1.0\r\n\r\n' >&3 && grep -q UP <&3
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
       interval: 10s
       timeout: 3s
       retries: 12
-      start_period: 40s
+      start_period: 20s
 
   frontend:
     build:
@@ -66,3 +81,8 @@ services:
         condition: service_started
     ports:
       - "${TBF_HTTP_PORT:-80}:80"
+
+volumes:
+  tbf-pgdata:
+    # The name it got when the database lived in api/compose.yaml. It holds real data: keep it.
+    name: ${TBF_PGDATA_VOLUME:-api_tbf-pgdata}

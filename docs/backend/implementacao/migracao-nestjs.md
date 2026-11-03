@@ -1,6 +1,6 @@
 # Migração do backend para NestJS
 
-Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cresce em `tbfernandes-backend-nest/`; o Java em `tbfernandes-backend/` segue no ar até a última etapa, então o modo API do frontend e o app desktop funcionam o tempo todo.
+Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cresceu em `tbfernandes-backend-nest/` enquanto o Java seguia no ar em `tbfernandes-backend/`, então o modo API do frontend e o app desktop funcionaram o tempo todo. Na etapa 5b o Java saiu e a pasta do NestJS passou a ser `tbfernandes-backend/`.
 
 | Etapa | Conteúdo | Situação |
 |---|---|---|
@@ -8,7 +8,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 | 2 | `knowledge` e `contacts` | feita |
 | 3 | `learning`, `finance` (com Open Finance) e `goals`, um PR cada | feita |
 | 4 | `assistant` (regras, consultas estruturadas, grafo, RAG; modelo de IA atrás de `LanguageModel`) | feita |
-| 5 | 5a: desktop com Node no lugar do Java (PostgreSQL embutido, backup, token, desligamento). 5b: compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | 5a feita, 5b a fazer |
+| 5 | 5a: desktop com Node no lugar do Java (PostgreSQL embutido, backup, token, desligamento). 5b: compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | feita |
 
 ## Etapa 1 — base, identity e work
 
@@ -118,3 +118,11 @@ Java (porta 8081) e NestJS (porta 8080) recebendo as mesmas requisições: lanç
 - Mesma pasta de dados do Java: um banco criado pelo app em Java é reaproveitado, já que o schema é o mesmo.
 - Inicialização do backend em cerca de 1 s, contra cerca de 11 s da JVM.
 - Testes: `data-backup.spec.ts` (zip válido, intervalo, rotação, versão) e `embedded-postgres.spec.ts` (sobe e para um PostgreSQL real; pulado como root, porque o `initdb` recusa).
+
+## Etapa 5b — só NestJS
+
+- O backend Java saiu do repositório; `tbfernandes-backend-nest/` virou `tbfernandes-backend/`. O histórico do Java continua no git e nos documentos das etapas anteriores em `implementacao/`.
+- `compose.yaml` da raiz: o serviço `postgres` (antes em `tbfernandes-backend/compose.yaml`, mesmo volume `api_tbf-pgdata`) e o `backend` com a imagem Node, variáveis `DB_*`, `TBF_TRUST_PROXY=true` atrás do nginx e `TBF_SESSION_SECRET`; healthcheck com `wget`. Para desenvolver, `docker compose up -d postgres` e `npm run dev`.
+- CI: o job `api` agora roda lint, typecheck, testes, e2e e build do NestJS; o job do Java saiu.
+- `scripts/pluggy-register-webhook.sh` e `scripts/dev-seed/` vieram para a pasta nova; o gerador de seed escreve em `db/dev/R__dev_seed.sql`.
+- Frontend: a tela "A API não está respondendo" mostra `npm run dev`; comentários deixam de citar Spring Boot.

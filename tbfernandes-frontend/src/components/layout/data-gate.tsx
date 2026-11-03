@@ -50,7 +50,7 @@ function ApiGate({ children }: { children: React.ReactNode }) {
               ) : (
                 <>
                   Inicie-a com{" "}
-                  <code>cd tbfernandes-backend && ./mvnw spring-boot:run</code>{" "}
+                  <code>cd tbfernandes-backend && npm run dev</code>{" "}
                   e tente de novo.
                 </>
               )}{" "}
