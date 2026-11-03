@@ -9,6 +9,7 @@ import {
   RequestContextMiddleware,
 } from './common/middlewares';
 import { DatabaseModule } from './infrastructure/database/database.module';
+import { DesktopModule } from './infrastructure/desktop/desktop.module';
 import { DesktopTokenMiddleware } from './infrastructure/desktop/desktop-token.middleware';
 import { EnvironmentModule } from './infrastructure/environments/environment.module';
 import {
@@ -39,6 +40,7 @@ import { WorkModule } from './modules/work/work.module';
     FinanceModule,
     GoalsModule,
     AssistantModule,
+    DesktopModule.forProfile(process.env.TBF_PROFILE),
   ],
 })
 export class AppModule implements NestModule {

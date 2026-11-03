@@ -8,7 +8,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 | 2 | `knowledge` e `contacts` | feita |
 | 3 | `learning`, `finance` (com Open Finance) e `goals`, um PR cada | feita |
 | 4 | `assistant` (regras, consultas estruturadas, grafo, RAG; modelo de IA atrás de `LanguageModel`) | feita |
-| 5 | Desktop com Node no lugar do Java (PostgreSQL embutido, backup, token), compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | a fazer |
+| 5 | 5a: desktop com Node no lugar do Java (PostgreSQL embutido, backup, token, desligamento). 5b: compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | 5a feita, 5b a fazer |
 
 ## Etapa 1 — base, identity e work
 
@@ -109,3 +109,12 @@ Java (porta 8081) e NestJS (porta 8080) recebendo as mesmas requisições: lanç
 - `POST /assistant/questions` e `GET /graph` com o mesmo JSON do Java; os enums da consulta saem em minúsculas como no Java.
 - Conferido com o Java lado a lado em bancos novos com os mesmos dados: projeto, atrasadas, foco, dinheiro, metas, contatos, estudos, busca, pergunta aberta (trechos) e grafo deram o mesmo JSON. Única diferença: a mensagem de pergunta vazia sai em português (`question é obrigatório`), como as outras mensagens do NestJS.
 - Testes: unitários do domínio (porte de `RuleBasedAssistantTest`, `QueryEngineTest`, `KnowledgeGraphTest`, `KnowledgeDocumentTest`, `TextChunkerTest`, `PassageRankerTest`, `GroundedAnswerTest`), da recuperação (`KnowledgeRetrievalTest`) e dos adaptadores Voyage e Anthropic com `fetch` falso; e2e com o porte de `AssistantApiIntegrationTests` e `AssistantModelApiIntegrationTests` (modelo falso).
+
+## Etapa 5a — desktop com Node
+
+- O app Tauri roda `runtime/node(.exe) backend/dist/main.js` com `TBF_PROFILE=desktop`; a JVM saiu do instalador. `prepare-resources.sh` compila o NestJS, instala só as dependências de produção (sem TypeScript, mapas e tipos) e baixa o Node oficial de nodejs.org.
+- `DesktopRuntime` (em `src/infrastructure/desktop/`) roda antes do `NestFactory`: valida `TBF_DATA_DIR`, `TBF_PG_BIN` e o token, faz o backup diário em zip (guarda 7) com o banco parado, sobe o PostgreSQL embutido (`initdb` com scram-sha-256 na primeira vez, porta livre, só `127.0.0.1`) e preenche `DB_*` para a configuração do Nest.
+- `POST /api/v1/desktop/shutdown` (só no perfil desktop, protegido pelo token) responde 202, fecha o app e para o PostgreSQL. O processo também encerra quando o processo do app some (`watchParent`) e em SIGINT/SIGTERM.
+- Mesma pasta de dados do Java: um banco criado pelo app em Java é reaproveitado, já que o schema é o mesmo.
+- Inicialização do backend em cerca de 1 s, contra cerca de 11 s da JVM.
+- Testes: `data-backup.spec.ts` (zip válido, intervalo, rotação, versão) e `embedded-postgres.spec.ts` (sobe e para um PostgreSQL real; pulado como root, porque o `initdb` recusa).
