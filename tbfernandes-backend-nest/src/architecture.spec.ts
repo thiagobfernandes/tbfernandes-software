@@ -16,6 +16,7 @@ const ALLOWED_MODULE_DEPENDENCIES: Record<string, string[]> = {
   finance: [],
   goals: ['work', 'learning', 'finance'],
   learning: [],
+  assistant: ['work', 'knowledge', 'goals', 'learning', 'finance', 'contacts'],
 };
 
 interface SourceImport {

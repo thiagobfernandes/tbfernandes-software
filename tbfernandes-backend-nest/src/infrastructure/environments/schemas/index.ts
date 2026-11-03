@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { appEnvironmentSchema } from './app.schema';
+import { assistantEnvironmentSchema } from './assistant.schema';
 import { authEnvironmentSchema } from './auth.schema';
 import { databaseEnvironmentSchema } from './database.schema';
 import { desktopEnvironmentSchema } from './desktop.schema';
@@ -12,4 +13,5 @@ export const ValidationSchema = [
   authEnvironmentSchema,
   desktopEnvironmentSchema,
   pluggyEnvironmentSchema,
+  assistantEnvironmentSchema,
 ].reduce((acc, schema) => acc.concat(schema), Joi.object());

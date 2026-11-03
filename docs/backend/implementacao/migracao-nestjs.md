@@ -7,7 +7,7 @@ Decisão em [ADR-009](../arquitetura.md#adr-009--backend-em-nestjs). O NestJS cr
 | 1 | Base (ambiente, banco, migrações, logger, erros, paginação, `X-Client-Id`, transações, eventos), `identity` e `work` | feita |
 | 2 | `knowledge` e `contacts` | feita |
 | 3 | `learning`, `finance` (com Open Finance) e `goals`, um PR cada | feita |
-| 4 | `assistant` (regras, grafo, RAG; modelo de IA atrás de uma interface sem fornecedor fixo) | a fazer |
+| 4 | `assistant` (regras, consultas estruturadas, grafo, RAG; modelo de IA atrás de `LanguageModel`) | feita |
 | 5 | Desktop com Node no lugar do Java (PostgreSQL embutido, backup, token), compose, CI e remoção do Java; a pasta vira `tbfernandes-backend/` | a fazer |
 
 ## Etapa 1 — base, identity e work
@@ -100,3 +100,12 @@ Java (porta 8081) e NestJS (porta 8080) recebendo as mesmas requisições: lanç
 - Conferido com o Java lado a lado: criação com indicador, submeta, PATCH do indicador, marcos, vínculos e os erros (400 de alvo zero e de `current` ausente, 404 de meta desconhecida) deram o mesmo JSON, fora a diferença de arredondamento acima e `10.00` contra `10`.
 - Testes: unitários de `Goal`, `Decimals`, `Indicators` e `GoalProgresses`; e2e com o porte de `GoalsApiIntegrationTests`, RN-21, 404 do pai desconhecido e o vínculo compra ↔ meta que faltava do `FinanceApiIntegrationTests`.
 
+## Etapa 4 — assistant
+
+- Mesmo roteamento do Java (AST-01 a AST-04): o modelo transforma a pergunta numa `StructuredQuery`, que o `QueryEngine` roda sobre os dados; o que as regras entendem recebe a resposta das regras; o resto é respondido com trechos das notas e snippets (RAG) e, sem trecho relevante, pela busca por palavras das regras. Toda falha do modelo cai na resposta montada pelos dados. Pergunta obrigatória, até 500 caracteres.
+- O domínio (`RuleBasedAssistant`, `QueryEngine`, `KnowledgeGraphs`, `TextChunker`, `PassageRanker` com BM25 e cosseno, `GroundedAnswer`) é TypeScript puro e declara os próprios tipos de registro (`workspace.ts`), já que o domínio não importa outros módulos. A aplicação monta o `Workspace` pelas APIs públicas de work, knowledge, goals, learning, finance e contacts; `ALLOWED_MODULE_DEPENDENCIES` ganhou `assistant` com esses seis.
+- `LanguageModel` e `EmbeddingModel` são classes abstratas da aplicação. Adaptadores: `AnthropicLanguageModel` (SDK oficial, saída estruturada por JSON schema, esforço baixo, fallback no servidor fora do Haiku, 25 s e uma nova tentativa por chamada), `VoyageEmbeddingModel` (`fetch`) e os dois desligados, que são o padrão. Mesmas variáveis do Java (`TBF_ASSISTANT_MODEL`, `TBF_ASSISTANT_MODEL_NAME`, `ANTHROPIC_API_KEY`, `TBF_ASSISTANT_EMBEDDING`, `TBF_ASSISTANT_EMBEDDING_NAME`, `VOYAGE_API_KEY`), validadas pelo Joi.
+- Índice em `assistant.knowledge_chunk` por SQL (`SqlKnowledgeIndex`), com o mesmo fingerprint SHA-256 do Java, então um índice criado pelo Java é reaproveitado. A sincronização roda uma de cada vez por dono; os embeddings são pedidos fora de transação.
+- `POST /assistant/questions` e `GET /graph` com o mesmo JSON do Java; os enums da consulta saem em minúsculas como no Java.
+- Conferido com o Java lado a lado em bancos novos com os mesmos dados: projeto, atrasadas, foco, dinheiro, metas, contatos, estudos, busca, pergunta aberta (trechos) e grafo deram o mesmo JSON. Única diferença: a mensagem de pergunta vazia sai em português (`question é obrigatório`), como as outras mensagens do NestJS.
+- Testes: unitários do domínio (porte de `RuleBasedAssistantTest`, `QueryEngineTest`, `KnowledgeGraphTest`, `KnowledgeDocumentTest`, `TextChunkerTest`, `PassageRankerTest`, `GroundedAnswerTest`), da recuperação (`KnowledgeRetrievalTest`) e dos adaptadores Voyage e Anthropic com `fetch` falso; e2e com o porte de `AssistantApiIntegrationTests` e `AssistantModelApiIntegrationTests` (modelo falso).
