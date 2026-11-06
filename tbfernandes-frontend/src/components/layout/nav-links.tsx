@@ -24,6 +24,10 @@ import {
   type NavGroup,
   type NavItem,
 } from "@/lib/constants/navigation";
+import {
+  setNavGroupOpen,
+  useNavGroupOverrides,
+} from "@/components/layout/sidebar-state";
 import { projectColorClasses } from "@/lib/project-colors";
 import { useWorkData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
@@ -34,7 +38,7 @@ type NavLinksProps = {
 };
 
 const itemClass =
-  "flex h-9 w-full items-center gap-3 rounded-md px-3 text-sm font-medium text-sidebar-foreground transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring";
+  "flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium text-sidebar-foreground transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring";
 
 export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
   const pathname = usePathname();
@@ -90,7 +94,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
   }
 
   return (
-    <nav className="flex flex-1 flex-col gap-1" aria-label="Principal">
+    <nav className="flex flex-1 flex-col gap-0.5" aria-label="Principal">
       {mainNavigation.map((entry) =>
         isNavGroup(entry) ? (
           <NavGroupSection
@@ -109,8 +113,8 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
           />
         ),
       )}
-      <div className="mt-5 flex flex-col gap-0.5">
-        <span className="px-3 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+      <div className="mt-4 flex flex-col gap-0.5">
+        <span className="px-2.5 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
           Projetos ativos
         </span>
         {pinnedProjects.map((project) => (
@@ -118,7 +122,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
             key={project.id}
             href={projectHref(project.id)}
             onClick={onNavigate}
-            className={cn(itemClass, "h-8 font-normal")}
+            className={cn(itemClass, "h-7 font-normal")}
           >
             <span
               aria-hidden
@@ -130,7 +134,7 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
           </Link>
         ))}
       </div>
-      <div className="mt-auto flex flex-col gap-1 pt-4">
+      <div className="mt-auto flex flex-col gap-0.5 pt-4">
         {secondaryNavigation.map((item) => (
           <TopLink
             key={item.href}
@@ -206,13 +210,16 @@ function NavGroupSection({
   const Icon = group.icon;
   const containsActive = group.items.some((item) => item.href === activeHref);
   const isPlanned = group.items.every((item) => item.soon);
+  const overrides = useNavGroupOverrides();
+  const open = overrides[group.title] ?? containsActive;
 
   return (
     <Collapsible
-      defaultOpen={!isPlanned || containsActive}
+      open={open}
+      onOpenChange={(next) => setNavGroupOpen(group.title, next)}
       className="group/nav"
     >
-      <CollapsibleTrigger className={cn(itemClass, "mt-3")}>
+      <CollapsibleTrigger className={cn(itemClass, "mt-2")}>
         <Icon
           className={cn(
             "size-4 shrink-0",
@@ -232,7 +239,7 @@ function NavGroupSection({
       </CollapsibleTrigger>
       <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         {/* Tree guide: a vertical rail with a node dot per item, echoing the relationship graph. */}
-        <ul className="relative mt-1 ml-5 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
+        <ul className="relative mt-0.5 ml-[18px] flex flex-col gap-px border-l border-sidebar-border pl-2.5">
           {group.items.map((item) => {
             const active = item.href === activeHref;
             return (
@@ -240,7 +247,7 @@ function NavGroupSection({
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute top-1/2 -left-[15.5px] size-1.5 -translate-y-1/2 rounded-full bg-sidebar-border",
+                    "absolute top-1/2 -left-[13.5px] size-1.5 -translate-y-1/2 rounded-full bg-sidebar-border",
                     active &&
                       "bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)]",
                   )}
@@ -249,7 +256,7 @@ function NavGroupSection({
                   <span
                     className={cn(
                       itemClass,
-                      "pointer-events-none h-8 px-2 font-normal opacity-60",
+                      "pointer-events-none h-7 px-2 font-normal opacity-60",
                     )}
                   >
                     <span className="truncate">{item.title}</span>
@@ -261,7 +268,7 @@ function NavGroupSection({
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       itemClass,
-                      "h-8 px-2 font-normal",
+                      "h-7 px-2 font-normal",
                       active &&
                         "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
                     )}
