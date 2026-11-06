@@ -4,7 +4,7 @@ import Joi from 'joi';
  * Building blocks for request schemas, written the way the frontend sends values:
  * enums in lower case, days as YYYY-MM-DD, optional fields as null or absent.
  */
-export const J = {
+export const RequestFields = {
   /** Optional text: null, absent or blank all mean "no value". */
   optionalText(max: number) {
     return Joi.string().trim().max(max).allow(null, '').empty('').default(null);
@@ -17,7 +17,7 @@ export const J = {
   /** A lower-case enum value in JSON, upper case in the domain and the database. */
   enumOf<E extends string>(values: readonly E[]) {
     // Not .valid(): Joi returns allowed values as they are, skipping the conversion.
-    const lower = values.map((v) => v.toLowerCase());
+    const lower = values.map((value) => value.toLowerCase());
     return Joi.string().custom((value: string, helpers) => {
       const upper = value.trim().toUpperCase() as E;
       return values.includes(upper)
@@ -27,7 +27,7 @@ export const J = {
   },
 
   optionalEnumOf<E extends string>(values: readonly E[]) {
-    return J.enumOf(values).allow(null).default(null);
+    return RequestFields.enumOf(values).allow(null).default(null);
   },
 
   isoDate() {
@@ -44,10 +44,9 @@ export const J = {
 
   /** Blank means "no value", as before. */
   optionalIsoDate() {
-    return J.isoDate().allow(null, '').empty('').default(null);
+    return RequestFields.isoDate().allow(null, '').empty('').default(null);
   },
 
-  /** YYYY-MM, used by finance. */
   yearMonth() {
     return Joi.string().pattern(/^\d{4}-(0[1-9]|1[0-2])$/, 'AAAA-MM');
   },
@@ -58,15 +57,14 @@ export const J = {
 
   /** Blank means "no value", as before. */
   optionalUuid() {
-    return J.uuid().allow(null, '').empty('').default(null);
+    return RequestFields.uuid().allow(null, '').empty('').default(null);
   },
 
   /** Lists of uuids, e.g. note links. Absent means empty. */
   uuidList() {
-    return Joi.array().items(J.uuid()).default([]);
+    return Joi.array().items(RequestFields.uuid()).default([]);
   },
 
-  /** Paging parameters accepted by every list (PLT-09); read by PagingInterceptor. */
   paging() {
     return {
       page: Joi.number().integer().min(0),

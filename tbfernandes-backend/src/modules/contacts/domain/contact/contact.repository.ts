@@ -1,6 +1,5 @@
 import { Contact } from './contact';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class ContactRepository {
   abstract create(contact: Contact): Promise<Contact>;
   abstract save(contact: Contact): Promise<Contact>;

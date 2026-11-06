@@ -13,7 +13,6 @@ import {
   PurchaseGoalRepository,
 } from '../domain';
 
-/** Purchase goals and their projection (RF-FIN-03, FIN-04). */
 @Injectable()
 export class PurchaseService {
   constructor(

@@ -1,17 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Clock, OwnerContext } from '../../../common/application';
-import {
-  IsoDate,
-  Require,
-  YearMonth,
-  YearMonths,
-} from '../../../common/domain';
-import { ContactsLookup } from '../../contacts';
-import { FinanceLookup } from '../../finance';
-import { GoalsLookup } from '../../goals';
-import { KnowledgeLookup } from '../../knowledge';
-import { LearningLookup } from '../../learning';
-import { WorkLookup } from '../../work';
+import { IsoDate, Require, YearMonths } from '../../../common/domain';
 import {
   Answer,
   GroundedAnswer,
@@ -23,150 +12,152 @@ import {
   StructuredQuery,
   Workspace,
 } from '../domain';
+import { AssistantTracer } from './assistant-tracer';
 import { KnowledgeRetrievalService } from './knowledge-retrieval.service';
 import { LanguageModel } from './language.model';
+import { WorkspaceReader } from './workspace-reader';
 
 export const QUESTION_MAX_LENGTH = 500;
 
-/**
- * Questions over the owner's data (AST-01 to AST-04) and the knowledge graph (KNW-05). Reads
- * only through the other modules' public lookups and never writes to them (RN-20); the only
- * table it writes is its own retrieval index.
- *
- * Routing: a question the model turns into a query runs over the data; one the rules
- * understand gets the rule's answer; any other question is answered from passages of notes
- * and snippets (RAG), and when nothing relevant is found the rules' keyword search answers.
- * The assistant never fails because of the model: every model error falls back to the
- * grounded answer.
- */
+const groundedOutput = (answer: Answer) => ({
+  text: answer.text,
+  references: answer.references,
+});
+
 @Injectable()
 export class AssistantService {
   private readonly logger = new Logger('Assistant');
 
   constructor(
-    private readonly work: WorkLookup,
-    private readonly knowledge: KnowledgeLookup,
-    private readonly goals: GoalsLookup,
-    private readonly learning: LearningLookup,
-    private readonly finance: FinanceLookup,
-    private readonly contacts: ContactsLookup,
+    private readonly workspaces: WorkspaceReader,
     private readonly model: LanguageModel,
     private readonly retrieval: KnowledgeRetrievalService,
     private readonly owner: OwnerContext,
     private readonly clock: Clock,
+    private readonly tracer: AssistantTracer,
   ) {}
 
-  async ask(question: string | null | undefined): Promise<Answer> {
+  ask(question: string | null | undefined): Promise<Answer> {
     const text = Require.text(question, 'question', QUESTION_MAX_LENGTH);
+    return this.tracer.trace(
+      'answer-question',
+      { userId: this.owner.currentOwnerId(), input: text },
+      async (trace) => {
+        const answer = await this.route(text);
+        trace.update({
+          output: answer.text,
+          metadata: {
+            source: answer.source,
+            references: answer.references.length,
+          },
+        });
+        return answer;
+      },
+    );
+  }
+
+  private async route(text: string): Promise<Answer> {
     const today = this.clock.today();
-    const ownerId = this.owner.currentOwnerId();
-    const query = await this.toQuery(text, today);
-    const workspace = await this.workspace(
-      ownerId,
+    const query = await this.queryFor(text, today);
+    const workspace = await this.workspaces.read(
+      this.owner.currentOwnerId(),
       today,
       query?.month ?? YearMonths.of(today),
     );
-    if (query) return this.rewrite(text, QueryEngine.run(query, workspace));
-    if (RuleBasedAssistant.understands(text, workspace)) {
-      return this.rewrite(text, RuleBasedAssistant.answer(text, workspace));
-    }
-    const passages = await this.retrieval.search(
-      ownerId,
-      text,
-      KnowledgeDocuments.ofWorkspace(workspace),
-    );
-    if (!passages.length) {
-      return this.rewrite(text, RuleBasedAssistant.answer(text, workspace));
-    }
-    try {
-      const written = await this.model.answerFromPassages(text, passages);
-      if (written) return GroundedAnswer.fromModel(written, passages);
-    } catch (error) {
-      this.logger.warn(
-        `Language model failed, answering with the passages: ${String(error)}`,
-      );
-    }
-    return GroundedAnswer.excerpts(passages);
+    if (query) return this.answerFromData(text, query, workspace);
+    if (RuleBasedAssistant.understands(text, workspace))
+      return this.answerByRules(text, workspace);
+    return this.answerFromKnowledge(text, workspace);
   }
 
   async graph(): Promise<KnowledgeGraph> {
     const today = this.clock.today();
-    return KnowledgeGraphs.of(
-      await this.workspace(
-        this.owner.currentOwnerId(),
-        today,
-        YearMonths.of(today),
-      ),
+    const workspace = await this.workspaces.read(
+      this.owner.currentOwnerId(),
+      today,
+      YearMonths.of(today),
     );
+    return KnowledgeGraphs.of(workspace);
   }
 
-  private async rewrite(question: string, grounded: Answer): Promise<Answer> {
-    try {
-      const text = await this.model.answer(question, grounded);
-      return text ? { ...grounded, text, source: 'model' } : grounded;
-    } catch (error) {
-      // The grounded answer is always good enough to show.
-      this.logger.warn(
-        `Language model failed, answering without it: ${String(error)}`,
-      );
-      return grounded;
-    }
-  }
-
-  private async toQuery(
+  private queryFor(
     question: string,
     today: IsoDate,
   ): Promise<StructuredQuery | null> {
-    try {
-      return await this.model.toQuery(question, today);
-    } catch (error) {
-      this.logger.warn(
-        `Language model could not build a query, answering with rules: ${String(error)}`,
-      );
-      return null;
-    }
+    return this.withoutModelOnFailure(
+      () => this.model.toQuery(question, today),
+      null,
+      'Language model could not build a query, answering with rules',
+    );
   }
 
-  private async workspace(
-    ownerId: string,
-    today: IsoDate,
-    month: YearMonth,
-  ): Promise<Workspace> {
-    const [
-      companies,
-      projects,
-      tasks,
-      notes,
-      snippets,
-      goals,
-      studies,
-      purchases,
-      cashFlow,
-      contacts,
-    ] = await Promise.all([
-      this.work.companies(ownerId),
-      this.work.projects(ownerId),
-      this.work.tasks(ownerId),
-      this.knowledge.notes(ownerId),
-      this.knowledge.snippets(ownerId),
-      this.goals.goals(ownerId),
-      this.learning.studies(ownerId),
-      this.finance.purchases(ownerId),
-      this.finance.month(ownerId, month),
-      this.contacts.contacts(ownerId),
-    ]);
-    return {
-      today,
-      companies,
-      projects,
-      tasks,
-      notes,
-      snippets,
-      goals,
-      studies,
-      purchases,
-      month: cashFlow,
-      contacts,
-    };
+  private async answerFromData(
+    question: string,
+    query: StructuredQuery,
+    workspace: Workspace,
+  ): Promise<Answer> {
+    const grounded = await this.tracer.step('run-query', 'span', (step) => {
+      const answer = QueryEngine.run(query, workspace);
+      step.update({ input: query, output: groundedOutput(answer) });
+      return Promise.resolve(answer);
+    });
+    return this.rewrite(question, grounded);
+  }
+
+  private async answerByRules(
+    question: string,
+    workspace: Workspace,
+  ): Promise<Answer> {
+    const grounded = await this.tracer.step(
+      'answer-by-rules',
+      'span',
+      (step) => {
+        const answer = RuleBasedAssistant.answer(question, workspace);
+        step.update({ input: question, output: groundedOutput(answer) });
+        return Promise.resolve(answer);
+      },
+    );
+    return this.rewrite(question, grounded);
+  }
+
+  private async answerFromKnowledge(
+    question: string,
+    workspace: Workspace,
+  ): Promise<Answer> {
+    const passages = await this.retrieval.search(
+      this.owner.currentOwnerId(),
+      question,
+      KnowledgeDocuments.ofWorkspace(workspace),
+    );
+    if (!passages.length) return this.answerByRules(question, workspace);
+    const written = await this.withoutModelOnFailure(
+      () => this.model.answerFromPassages(question, passages),
+      null,
+      'Language model failed, answering with the passages',
+    );
+    if (written) return GroundedAnswer.fromModel(written, passages);
+    return GroundedAnswer.excerpts(passages);
+  }
+
+  private async rewrite(question: string, grounded: Answer): Promise<Answer> {
+    const text = await this.withoutModelOnFailure(
+      () => this.model.answer(question, grounded),
+      null,
+      'Language model failed, answering without it',
+    );
+    return text ? { ...grounded, text, source: 'model' } : grounded;
+  }
+
+  private async withoutModelOnFailure<T>(
+    call: () => Promise<T>,
+    fallback: T,
+    warning: string,
+  ): Promise<T> {
+    try {
+      return await call();
+    } catch (error) {
+      this.logger.warn(`${warning}: ${String(error)}`);
+      return fallback;
+    }
   }
 }

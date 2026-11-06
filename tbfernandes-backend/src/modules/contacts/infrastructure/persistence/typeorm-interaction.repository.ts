@@ -5,7 +5,6 @@ import { Interaction, InteractionRepository } from '../../domain';
 import { InteractionEntity } from './interaction.entity';
 import { InteractionPersistenceMapper as Mapper } from './mappers/interaction.persistence-mapper';
 
-/** InteractionRepository on TypeORM. */
 @Injectable()
 export class TypeOrmInteractionRepository extends InteractionRepository {
   private readonly rows: BaseRepository<InteractionEntity>;

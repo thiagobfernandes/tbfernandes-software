@@ -17,7 +17,6 @@ import {
 } from '../protocols';
 import type { ValidRegisterRequest, ValidTokenRequest } from '../protocols';
 
-/** Bank connections (epic FIN-OF). Bodies match the frontend's finance/types/connections.ts. */
 @ApiTags('finance')
 @Controller('finance/connections')
 export class ConnectionController {

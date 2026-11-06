@@ -2,29 +2,28 @@ import { Note } from '../../../domain';
 import { NoteEntity, NoteLinkEntity } from '../note.entity';
 import { LinkPersistenceMapper } from './link.persistence-mapper';
 
-/** Note ↔ knowledge.note row and its knowledge.note_link rows. */
 export const NotePersistenceMapper = {
-  toDomain(e: NoteEntity): Note {
+  toDomain(entity: NoteEntity): Note {
     return Note.restore(
-      e.id,
-      e.ownerId,
-      { title: e.title, body: e.body, tags: e.tags ?? [] },
-      LinkPersistenceMapper.toLinks(e.links),
-      e.createdAt,
-      e.updatedAt,
+      entity.id,
+      entity.ownerId,
+      { title: entity.title, body: entity.body, tags: entity.tags ?? [] },
+      LinkPersistenceMapper.toLinks(entity.links),
+      entity.createdAt,
+      entity.updatedAt,
     );
   },
 
   /** The note row only; links come from toLinkEntities. */
-  toEntity(note: Note, e: NoteEntity = new NoteEntity()): NoteEntity {
-    const d = note.details;
-    e.id = note.id;
-    e.ownerId = note.ownerId;
-    e.title = d.title;
-    e.body = d.body;
-    e.tags = d.tags;
-    delete e.links;
-    return e;
+  toEntity(note: Note, entity: NoteEntity = new NoteEntity()): NoteEntity {
+    const details = note.details;
+    entity.id = note.id;
+    entity.ownerId = note.ownerId;
+    entity.title = details.title;
+    entity.body = details.body;
+    entity.tags = details.tags;
+    delete entity.links;
+    return entity;
   },
 
   toLinkEntities(note: Note): NoteLinkEntity[] {

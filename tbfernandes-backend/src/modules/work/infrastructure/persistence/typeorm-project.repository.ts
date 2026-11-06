@@ -5,7 +5,6 @@ import { Project, ProjectRepository } from '../../domain';
 import { ProjectPersistenceMapper as Mapper } from './mappers/project.persistence-mapper';
 import { ProjectEntity } from './project.entity';
 
-/** ProjectRepository on TypeORM. */
 @Injectable()
 export class TypeOrmProjectRepository extends ProjectRepository {
   private readonly rows: BaseRepository<ProjectEntity>;

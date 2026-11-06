@@ -7,7 +7,6 @@ import { HealthController } from './web/health.controller';
 import { RequestIdGenerator } from '../infrastructure/ids/request-id-generator';
 import { SystemClock } from '../infrastructure/time/system-clock';
 
-/** Kernel shared by every module: clock, ids, error format and paging. */
 @Global()
 @Module({
   controllers: [HealthController],

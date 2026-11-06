@@ -4,7 +4,6 @@ import type { InteractionKind } from '../../domain';
 
 @Entity({ schema: 'contacts', name: 'interaction' })
 export class InteractionEntity extends AuditedEntity {
-  /** FK to contacts.contact, ON DELETE CASCADE. */
   @Column('uuid')
   contactId: string;
 

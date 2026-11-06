@@ -9,7 +9,6 @@ export class ChecklistItemResponse {
   done: boolean;
 }
 
-/** Same shape as the frontend's Task type (features/tasks/types/task.ts). */
 export class TaskResponse {
   id: string;
   title: string;

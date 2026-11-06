@@ -12,7 +12,6 @@ import { SESSION_COOKIE } from '../modules/identity/infrastructure/security/sess
 
 const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
-/** HTTP settings shared by main.ts and the e2e tests. */
 export function configureApp(app: INestApplication): INestApplication {
   const config = app.get(ConfigService);
   const appCfg = config.getOrThrow<AppConfig>('app');

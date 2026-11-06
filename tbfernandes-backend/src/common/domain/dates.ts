@@ -24,10 +24,10 @@ export const YearMonths = {
   },
 
   plusMonths(month: YearMonth, months: number): YearMonth {
-    const [year, m] = month.split('-').map(Number);
-    const index = year * 12 + (m - 1) + months;
-    const y = Math.floor(index / 12);
-    return `${String(y).padStart(4, '0')}-${String((index % 12) + 1).padStart(2, '0')}`;
+    const [year, monthNumber] = month.split('-').map(Number);
+    const index = year * 12 + (monthNumber - 1) + months;
+    const resultYear = Math.floor(index / 12);
+    return `${String(resultYear).padStart(4, '0')}-${String((index % 12) + 1).padStart(2, '0')}`;
   },
 
   firstDay(month: YearMonth): IsoDate {

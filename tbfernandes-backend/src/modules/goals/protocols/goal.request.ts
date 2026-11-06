@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { GOAL_AREAS, GOAL_PRIORITIES, GOAL_STATUSES } from '../domain';
 import type { GoalArea, GoalPriority, GoalStatus } from '../domain';
 
@@ -9,7 +9,6 @@ export class IndicatorBody {
   unit: string;
 }
 
-/** Body of POST and PUT /goals. Enums in lower case. */
 export class GoalRequest {
   name: string;
   description?: string | null;
@@ -22,7 +21,6 @@ export class GoalRequest {
   currentState?: string | null;
   desiredResult: string;
   doneCriteria?: string | null;
-  /** YYYY-MM-DD */
   dueDate?: string | null;
   indicator?: IndicatorBody | null;
   parentId?: string | null;
@@ -50,15 +48,15 @@ export interface ValidGoalRequest {
 }
 
 export const goalRequestSchema = Joi.object<ValidGoalRequest>({
-  name: J.requiredText(200),
-  description: J.optionalText(2000),
-  area: J.enumOf(GOAL_AREAS).required(),
-  status: J.optionalEnumOf(GOAL_STATUSES),
-  priority: J.optionalEnumOf(GOAL_PRIORITIES),
-  currentState: J.optionalText(2000),
-  desiredResult: J.requiredText(2000),
-  doneCriteria: J.optionalText(1000),
-  dueDate: J.optionalIsoDate(),
+  name: RequestFields.requiredText(200),
+  description: RequestFields.optionalText(2000),
+  area: RequestFields.enumOf(GOAL_AREAS).required(),
+  status: RequestFields.optionalEnumOf(GOAL_STATUSES),
+  priority: RequestFields.optionalEnumOf(GOAL_PRIORITIES),
+  currentState: RequestFields.optionalText(2000),
+  desiredResult: RequestFields.requiredText(2000),
+  doneCriteria: RequestFields.optionalText(1000),
+  dueDate: RequestFields.optionalIsoDate(),
   indicator: Joi.object<ValidIndicator>({
     label: Joi.string().allow(null, '').default(null),
     current: Joi.number().allow(null).default(null),
@@ -67,10 +65,9 @@ export const goalRequestSchema = Joi.object<ValidGoalRequest>({
   })
     .allow(null)
     .default(null),
-  parentId: J.optionalUuid(),
+  parentId: RequestFields.optionalUuid(),
 });
 
-/** Body of PATCH /goals/{id}/indicator (RF-GOL-04). */
 export class ProgressRequest {
   current: number;
 }
@@ -86,7 +83,6 @@ export class IndicatorResponse {
   unit: string;
 }
 
-/** Same shape as the frontend's Goal type. */
 export class GoalResponse {
   id: string;
   name: string;
@@ -102,7 +98,6 @@ export class GoalResponse {
   parentId: string | null;
 }
 
-/** GOL-04: projects, tasks, studies and purchases that point to the goal. */
 export class GoalLinksResponse {
   projects: object[];
   tasks: object[];

@@ -2,17 +2,20 @@ import { InvalidArgumentError } from '../../../common/domain';
 
 export const DEFAULT_MAX_LENGTH = 1200;
 
-const isWhitespace = (c: string | undefined) => c != null && /\s/.test(c);
+const isWhitespace = (character: string | undefined) =>
+  character != null && /\s/.test(character);
 
-/** Where to cut: after the last sentence end, else at the last space, else at the limit. */
 function lastBreak(text: string, maxLength: number): number {
-  for (let i = maxLength - 1; i > Math.floor(maxLength / 2); i--) {
-    const c = text[i];
+  for (let index = maxLength - 1; index > Math.floor(maxLength / 2); index--) {
+    const character = text[index];
     if (
-      (c === '.' || c === '!' || c === '?' || c === '\n') &&
-      isWhitespace(text[i + 1])
+      (character === '.' ||
+        character === '!' ||
+        character === '?' ||
+        character === '\n') &&
+      isWhitespace(text[index + 1])
     )
-      return i + 1;
+      return index + 1;
   }
   const space = text.lastIndexOf(' ', maxLength);
   return space > Math.floor(maxLength / 2) ? space : maxLength;
@@ -42,9 +45,9 @@ export const TextChunker = {
     const pieces = text
       .trim()
       .split(/\n\s*\n/)
-      .map((p) => p.trim())
-      .filter((p) => p !== '')
-      .flatMap((p) => cut(p, maxLength));
+      .map((paragraph) => paragraph.trim())
+      .filter((paragraph) => paragraph !== '')
+      .flatMap((paragraph) => cut(paragraph, maxLength));
     const chunks: string[] = [];
     let current = '';
     for (const piece of pieces) {

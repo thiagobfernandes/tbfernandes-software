@@ -75,20 +75,28 @@ export class Project {
     this._details = Project.validated(details);
   }
 
-  private static validated(d: ProjectDetails): ProjectDetails {
-    Require.present(d.startDate, 'startDate');
-    Require.dateOrder(d.startDate, d.dueDate, 'dueDate');
+  private static validated(details: ProjectDetails): ProjectDetails {
+    Require.present(details.startDate, 'startDate');
+    Require.dateOrder(details.startDate, details.dueDate, 'dueDate');
     return {
-      name: Require.text(d.name, 'name', 120),
-      description: Require.optionalText(d.description, 'description', 2000),
-      companyId: d.companyId ?? null,
-      category: Require.present(d.category, 'category'),
-      status: d.status ?? 'PLANNED',
-      color: d.color ?? 'TEAL',
-      startDate: d.startDate,
-      dueDate: d.dueDate ?? null,
-      nextDelivery: Require.optionalText(d.nextDelivery, 'nextDelivery', 200),
-      goalId: d.goalId ?? null,
+      name: Require.text(details.name, 'name', 120),
+      description: Require.optionalText(
+        details.description,
+        'description',
+        2000,
+      ),
+      companyId: details.companyId ?? null,
+      category: Require.present(details.category, 'category'),
+      status: details.status ?? 'PLANNED',
+      color: details.color ?? 'TEAL',
+      startDate: details.startDate,
+      dueDate: details.dueDate ?? null,
+      nextDelivery: Require.optionalText(
+        details.nextDelivery,
+        'nextDelivery',
+        200,
+      ),
+      goalId: details.goalId ?? null,
     };
   }
 }

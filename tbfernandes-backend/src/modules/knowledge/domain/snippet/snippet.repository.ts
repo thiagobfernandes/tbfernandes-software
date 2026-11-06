@@ -5,11 +5,9 @@ export interface SnippetSearch {
   text: string | null;
   /** Exact, lower case. */
   language: string | null;
-  /** Exact. */
   tag: string | null;
 }
 
-/** Implemented in infrastructure/persistence. */
 export abstract class SnippetRepository {
   abstract create(snippet: Snippet): Promise<Snippet>;
   abstract save(snippet: Snippet): Promise<Snippet>;

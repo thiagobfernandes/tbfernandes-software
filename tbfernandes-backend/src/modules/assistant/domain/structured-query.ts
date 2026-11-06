@@ -24,11 +24,6 @@ export type QueryAggregate = (typeof QUERY_AGGREGATES)[number];
 export const QUERY_SORTS = ['DUE_DATE', 'PRIORITY', 'NAME'] as const;
 export type QuerySort = (typeof QUERY_SORTS)[number];
 
-/**
- * A question turned into filters over the owner's data (AST-03). It only describes what to
- * read: QueryEngine runs it over a Workspace, so nothing a language model returns can reach
- * the database or write anything (RN-20). Empty filters do not filter.
- */
 export interface StructuredQuery {
   subject: QuerySubject;
   aggregate: QueryAggregate;
@@ -50,10 +45,10 @@ export const MAX_LIMIT = 50;
 
 const clean = (value: string | null | undefined) => (value ?? '').trim();
 const lower = (values: string[] | null | undefined) =>
-  (values ?? []).map((v) => v.trim().toLowerCase());
+  (values ?? []).map((value) => value.trim().toLowerCase());
 
 export const StructuredQueries = {
-  of(q: {
+  of(input: {
     subject: QuerySubject | null;
     aggregate?: QueryAggregate | null;
     text?: string | null;
@@ -68,22 +63,22 @@ export const StructuredQueries = {
     sort?: QuerySort | null;
     limit?: number | null;
   }): StructuredQuery {
-    if (q.subject == null)
+    if (input.subject == null)
       throw new InvalidArgumentError('A query needs a subject');
-    const limit = q.limit ?? 0;
+    const limit = input.limit ?? 0;
     return {
-      subject: q.subject,
-      aggregate: q.aggregate ?? 'LIST',
-      text: clean(q.text),
-      statuses: lower(q.statuses),
-      priorities: lower(q.priorities),
-      openOnly: q.openOnly ?? false,
-      project: clean(q.project),
-      company: clean(q.company),
-      dueFrom: q.dueFrom ?? null,
-      dueTo: q.dueTo ?? null,
-      month: q.month ?? null,
-      sort: q.sort ?? 'DUE_DATE',
+      subject: input.subject,
+      aggregate: input.aggregate ?? 'LIST',
+      text: clean(input.text),
+      statuses: lower(input.statuses),
+      priorities: lower(input.priorities),
+      openOnly: input.openOnly ?? false,
+      project: clean(input.project),
+      company: clean(input.company),
+      dueFrom: input.dueFrom ?? null,
+      dueTo: input.dueTo ?? null,
+      month: input.month ?? null,
+      sort: input.sort ?? 'DUE_DATE',
       limit: limit <= 0 ? DEFAULT_LIMIT : Math.min(limit, MAX_LIMIT),
     };
   },

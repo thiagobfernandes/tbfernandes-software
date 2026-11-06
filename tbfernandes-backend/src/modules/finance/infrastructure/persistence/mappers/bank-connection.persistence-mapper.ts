@@ -4,51 +4,55 @@ import {
   BankConnectionEntity,
 } from '../bank-connection.entity';
 
-/** BankConnection ↔ finance.bank_connection and finance.bank_account rows. */
 export const BankConnectionPersistenceMapper = {
-  toDomain(e: BankConnectionEntity): BankConnection {
-    return BankConnection.restore(e.id, e.ownerId, e.externalId, {
-      institution: e.institution,
-      scope: e.scope,
-      status: e.status,
-      lastSyncedAt: e.lastSyncedAt,
-      lastError: e.lastError,
-      accounts: (e.accounts ?? []).map((a) => ({
-        externalId: a.externalId,
-        name: a.name,
-        type: a.type,
-        balance: a.balance,
-        currency: a.currency,
-      })),
-    });
+  toDomain(entity: BankConnectionEntity): BankConnection {
+    return BankConnection.restore(
+      entity.id,
+      entity.ownerId,
+      entity.externalId,
+      {
+        institution: entity.institution,
+        scope: entity.scope,
+        status: entity.status,
+        lastSyncedAt: entity.lastSyncedAt,
+        lastError: entity.lastError,
+        accounts: (entity.accounts ?? []).map((accountEntity) => ({
+          externalId: accountEntity.externalId,
+          name: accountEntity.name,
+          type: accountEntity.type,
+          balance: accountEntity.balance,
+          currency: accountEntity.currency,
+        })),
+      },
+    );
   },
 
   toEntity(
     connection: BankConnection,
-    e: BankConnectionEntity = new BankConnectionEntity(),
+    entity: BankConnectionEntity = new BankConnectionEntity(),
   ): BankConnectionEntity {
-    const d = connection.details;
-    e.id = connection.id;
-    e.ownerId = connection.ownerId;
-    e.externalId = connection.externalId;
-    e.institution = d.institution;
-    e.scope = d.scope;
-    e.status = d.status;
-    e.lastSyncedAt = d.lastSyncedAt;
-    e.lastError = d.lastError;
-    delete e.accounts;
-    return e;
+    const details = connection.details;
+    entity.id = connection.id;
+    entity.ownerId = connection.ownerId;
+    entity.externalId = connection.externalId;
+    entity.institution = details.institution;
+    entity.scope = details.scope;
+    entity.status = details.status;
+    entity.lastSyncedAt = details.lastSyncedAt;
+    entity.lastError = details.lastError;
+    delete entity.accounts;
+    return entity;
   },
 
   toAccountEntities(connection: BankConnection): BankAccountEntity[] {
-    return connection.details.accounts.map((a) =>
+    return connection.details.accounts.map((account) =>
       Object.assign(new BankAccountEntity(), {
         connectionId: connection.id,
-        externalId: a.externalId,
-        name: a.name,
-        type: a.type,
-        balance: a.balance,
-        currency: a.currency,
+        externalId: account.externalId,
+        name: account.name,
+        type: account.type,
+        balance: account.balance,
+        currency: account.currency,
       }),
     );
   },

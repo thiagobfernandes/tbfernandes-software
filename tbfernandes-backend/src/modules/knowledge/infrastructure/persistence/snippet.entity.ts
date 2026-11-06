@@ -30,7 +30,6 @@ export class SnippetEntity extends AuditedEntity {
   @Column('text', { array: true })
   tags: string[];
 
-  /** Read through the relation; written by the repository. */
   @OneToMany(() => SnippetLinkEntity, (link) => link.snippet)
   links?: SnippetLinkEntity[];
 }

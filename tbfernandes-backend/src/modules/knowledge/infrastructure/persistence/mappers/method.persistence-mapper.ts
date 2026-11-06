@@ -5,40 +5,42 @@ import {
   MethodStepEntity,
 } from '../method.entity';
 
-const byPosition = (a: { position: number }, b: { position: number }) =>
-  a.position - b.position;
+const byPosition = (left: { position: number }, right: { position: number }) =>
+  left.position - right.position;
 
-/** Method ↔ knowledge.method row and its method_step / method_example rows. */
 export const MethodPersistenceMapper = {
-  toDomain(e: MethodEntity): Method {
-    return Method.restore(e.id, e.ownerId, {
-      title: e.title,
-      summary: e.summary,
-      category: e.category,
-      steps: [...(e.steps ?? [])]
+  toDomain(entity: MethodEntity): Method {
+    return Method.restore(entity.id, entity.ownerId, {
+      title: entity.title,
+      summary: entity.summary,
+      category: entity.category,
+      steps: [...(entity.steps ?? [])]
         .sort(byPosition)
         .map((step) => ({ title: step.title, detail: step.detail })),
-      examples: [...(e.examples ?? [])]
+      examples: [...(entity.examples ?? [])]
         .sort(byPosition)
         .map((example) => ({ title: example.title, content: example.content })),
-      tags: e.tags ?? [],
-      lastReviewed: e.lastReviewed,
+      tags: entity.tags ?? [],
+      lastReviewed: entity.lastReviewed,
     });
   },
 
   /** The method row only; steps and examples come from their own functions. */
-  toEntity(method: Method, e: MethodEntity = new MethodEntity()): MethodEntity {
-    const d = method.details;
-    e.id = method.id;
-    e.ownerId = method.ownerId;
-    e.title = d.title;
-    e.summary = d.summary;
-    e.category = d.category;
-    e.tags = d.tags;
-    e.lastReviewed = d.lastReviewed;
-    delete e.steps;
-    delete e.examples;
-    return e;
+  toEntity(
+    method: Method,
+    entity: MethodEntity = new MethodEntity(),
+  ): MethodEntity {
+    const details = method.details;
+    entity.id = method.id;
+    entity.ownerId = method.ownerId;
+    entity.title = details.title;
+    entity.summary = details.summary;
+    entity.category = details.category;
+    entity.tags = details.tags;
+    entity.lastReviewed = details.lastReviewed;
+    delete entity.steps;
+    delete entity.examples;
+    return entity;
   },
 
   toStepEntities(method: Method): MethodStepEntity[] {

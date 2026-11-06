@@ -5,7 +5,6 @@ import { WorkEvents } from '../../work';
 import type { CompanyDeleted, TaskDeleted } from '../../work';
 import { ContactRepository, InteractionRepository } from '../domain';
 
-/** Keeps contacts consistent when work items they point to are deleted (RN-01). */
 @Injectable()
 export class WorkEventsListener {
   constructor(

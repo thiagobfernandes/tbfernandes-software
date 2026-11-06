@@ -10,7 +10,6 @@ import {
 } from '../domain';
 import { FinanceLookup, MonthView, PurchaseView } from '../finance.lookup';
 
-/** FinanceLookup on the repositories. */
 @Injectable()
 export class FinanceLookupService extends FinanceLookup {
   constructor(
@@ -23,16 +22,16 @@ export class FinanceLookupService extends FinanceLookup {
 
   async purchases(ownerId: string): Promise<PurchaseView[]> {
     const today = this.clock.today();
-    return (await this.purchaseGoals.findAll(ownerId)).map((p) => {
-      const projection = p.project(today);
-      const d = p.details;
+    return (await this.purchaseGoals.findAll(ownerId)).map((purchaseGoal) => {
+      const projection = purchaseGoal.project(today);
+      const details = purchaseGoal.details;
       return {
-        id: p.id,
-        name: d.name,
-        status: p.status.toLowerCase(),
-        goalId: d.goalId,
-        estimated: Money.toNumber(d.estimated),
-        reserved: Money.toNumber(p.reserved),
+        id: purchaseGoal.id,
+        name: details.name,
+        status: purchaseGoal.status.toLowerCase(),
+        goalId: details.goalId,
+        estimated: Money.toNumber(details.estimated),
+        reserved: Money.toNumber(purchaseGoal.reserved),
         missing: Money.toNumber(projection.missing),
         ready: projection.ready,
         months: projection.months,

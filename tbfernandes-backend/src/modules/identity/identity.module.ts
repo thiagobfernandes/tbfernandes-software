@@ -18,10 +18,6 @@ import { SessionOwnerContext } from './infrastructure/security/session-owner-con
 import { AuthController } from './web/auth.controller';
 import { MeController } from './web/me.controller';
 
-/**
- * Identity: the account that owns the data, login (session mode) and the OwnerContext every
- * other module reads the current owner from.
- */
 @Global()
 @Module({
   imports: [DatabaseModule.forFeature([AppUserEntity])],

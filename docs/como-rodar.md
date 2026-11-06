@@ -116,27 +116,53 @@ tbfernandes-backend/scripts/pluggy-register-webhook.sh https://seu-host/api/v1/w
 
 ## Assistente com IA
 
-Desligado por padrão: o assistente responde por regras. Para ligar, no `.env` da raiz (ou exportado, fora do Docker):
+Desligado por padrão: o assistente responde por regras. Para ligar, configure no `.env` da raiz (compose) ou no `tbfernandes-backend/.env.local` (`npm run dev`).
+
+### Configuração gratuita: Groq + Ollama
+
+O modelo de linguagem roda na Groq, que tem plano gratuito sem cartão (com limite de requisições por minuto e por dia). Os embeddings rodam no Ollama, na sua máquina.
+
+```bash
+COMPOSE_PROFILES=ai                       # sobe o ollama e baixa o modelo de embedding
+TBF_ASSISTANT_MODEL=openai-compatible
+TBF_ASSISTANT_MODEL_API_KEY=gsk_...       # https://console.groq.com/keys
+# TBF_ASSISTANT_MODEL_NAME=openai/gpt-oss-120b
+# TBF_ASSISTANT_MODEL_BASE_URL=https://api.groq.com/openai/v1
+TBF_ASSISTANT_EMBEDDING=ollama
+# TBF_ASSISTANT_EMBEDDING_NAME=bge-m3
+```
+
+`docker compose up -d --build` sobe também o serviço `ollama` (porta `127.0.0.1:11434`, mude com `TBF_OLLAMA_PORT` se o Ollama já estiver instalado no host), e o `ollama-models` baixa o `bge-m3` uma vez para o volume `tbf-ollama`. Com `npm run dev`, suba só o Ollama com `docker compose --profile ai up -d ollama ollama-models`; o backend usa `OLLAMA_BASE_URL=http://localhost:11434`. Para ver os modelos que a Groq oferece hoje: `curl -H "Authorization: Bearer $KEY" https://api.groq.com/openai/v1/models`.
+
+`openai-compatible` serve para qualquer API no formato da OpenAI, trocando a URL: xAI (`https://api.x.ai/v1`, pago) ou o próprio Ollama (`http://ollama:11434/v1` no compose, para rodar tudo offline com, por exemplo, `qwen3:8b`).
+
+### Anthropic e Voyage (pagos)
 
 ```bash
 TBF_ASSISTANT_MODEL=anthropic
 ANTHROPIC_API_KEY=...          # https://console.anthropic.com
 # TBF_ASSISTANT_MODEL_NAME=claude-opus-5-5
-```
-
-Com o provedor ligado, a pergunta e o texto da resposta, com os nomes e valores dos registros encontrados, são enviados à Anthropic. Como funciona: [etapa 10](backend/implementacao/etapa-10-assistente-ia.md).
-
-### RAG nas notas e snippets
-
-Perguntas abertas já buscam nas notas e snippets sem nenhuma chave (busca por palavras). Para a busca por significado, ligue os embeddings da Voyage AI:
-
-```bash
 TBF_ASSISTANT_EMBEDDING=voyage
 VOYAGE_API_KEY=...             # https://dash.voyageai.com
 # TBF_ASSISTANT_EMBEDDING_NAME=voyage-3.5-lite
 ```
 
-O texto das notas e snippets vai para a Voyage na primeira pergunta e depois só o que mudar. No app desktop, defina as mesmas variáveis como variáveis de usuário do Windows. Como funciona: [etapa 11](backend/implementacao/etapa-11-rag.md).
+### Traces na Langfuse
+
+Cada pergunta vira um trace na Langfuse com os passos `plan-query`, `run-query` ou `answer-by-rules`, `retrieve-passages`, `embed-query`/`embed-documents`, `rewrite-answer` e `answer-from-passages`. Cada chamada ao modelo aparece como generation, com modelo, tokens e o raciocínio do modelo.
+
+```bash
+TBF_ASSISTANT_TRACING=langfuse
+LANGFUSE_PUBLIC_KEY=pk-lf-...             # projeto na Langfuse, Settings > API Keys
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_BASE_URL=https://us.cloud.langfuse.com   # EU: https://cloud.langfuse.com
+```
+
+O ambiente do trace é o `TBF_PROFILE` (`dev`, `prod`, `desktop`). E-mails e CPFs são mascarados antes do envio. Com o tracing ligado, a pergunta, os prompts, os trechos de notas usados no RAG e as respostas vão para a Langfuse.
+
+### O que sai da aplicação
+
+Com um modelo ligado, a pergunta e o texto da resposta, com os nomes e valores dos registros encontrados, vão para o provedor (a Groq na configuração gratuita). Com embeddings no Ollama, o texto das notas e snippets não sai da máquina; com a Voyage, ele vai para lá na primeira pergunta e depois só o que mudar. Perguntas abertas buscam nas notas por palavras mesmo sem embeddings. No app desktop, defina as mesmas variáveis como variáveis de usuário do Windows (o Ollama é instalado à parte). Como funciona: [etapa 10](backend/implementacao/etapa-10-assistente-ia.md) e [etapa 11](backend/implementacao/etapa-11-rag.md).
 
 ## Testes e verificação
 

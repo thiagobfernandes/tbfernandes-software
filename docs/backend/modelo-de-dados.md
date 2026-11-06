@@ -292,7 +292,7 @@ Transações importadas vão para `finance.entry` com `source = 'OPEN_FINANCE'` 
 | `position` | int | ordem do trecho no registro |
 | `title`, `content` | text | título do registro e texto do trecho |
 | `fingerprint` | varchar(64) | SHA-256 de título, texto e modelo de embeddings |
-| `embedding_model` | varchar(80) | ex.: `voyage:voyage-3.5-lite`; `none` quando sem vetor |
+| `embedding_model` | varchar(80) | ex.: `ollama:bge-m3`, `voyage:voyage-3.5-lite`; `none` quando sem vetor |
 | `embedding` | real[] | vetor, ou null. Sem pgvector porque o PostgreSQL do app desktop não tem a extensão |
 
 Chave primária `(owner_id, source_kind, source_id, position)`. Detalhes em [etapa 11](implementacao/etapa-11-rag.md).

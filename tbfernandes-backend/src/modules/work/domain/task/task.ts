@@ -148,36 +148,50 @@ export class Task {
     return isOpen(this._status);
   }
 
-  private static validated(d: TaskDetails): TaskDetails {
-    Require.dateOrder(d.startDate, d.dueDate, 'dueDate');
-    const done = d.checklistDone ?? null;
-    const total = d.checklistTotal ?? null;
-    if (
-      (done === null) !== (total === null) ||
-      (total !== null && done !== null && (done < 0 || total < done))
-    ) {
+  /** RN-08: done and total come together, with 0 <= done <= total. */
+  private static validatedChecklistProgress(details: TaskDetails) {
+    const done = details.checklistDone ?? null;
+    const total = details.checklistTotal ?? null;
+    const onlyOneSet = (done === null) !== (total === null);
+    const outOfRange =
+      done !== null && total !== null && (done < 0 || total < done);
+    if (onlyOneSet || outOfRange) {
       throw new BusinessRuleViolationError(
         'RN-08',
         'O progresso da checklist precisa de 0 <= feitos <= total',
       );
     }
+    return { done, total };
+  }
+
+  private static validated(details: TaskDetails): TaskDetails {
+    Require.dateOrder(details.startDate, details.dueDate, 'dueDate');
+    const { done, total } = Task.validatedChecklistProgress(details);
     return {
-      title: Require.text(d.title, 'title', 200),
-      description: Require.optionalText(d.description, 'description', 5000),
-      projectId: d.projectId ?? null,
-      priority: d.priority ?? 'NORMAL',
-      tag: Require.optionalText(d.tag, 'tag', 40),
-      startDate: d.startDate ?? null,
-      dueDate: d.dueDate ?? null,
-      doneCriteria: Require.optionalText(d.doneCriteria, 'doneCriteria', 1000),
+      title: Require.text(details.title, 'title', 200),
+      description: Require.optionalText(
+        details.description,
+        'description',
+        5000,
+      ),
+      projectId: details.projectId ?? null,
+      priority: details.priority ?? 'NORMAL',
+      tag: Require.optionalText(details.tag, 'tag', 40),
+      startDate: details.startDate ?? null,
+      dueDate: details.dueDate ?? null,
+      doneCriteria: Require.optionalText(
+        details.doneCriteria,
+        'doneCriteria',
+        1000,
+      ),
       checklistDone: done,
       checklistTotal: total,
-      checklistItems: (d.checklistItems ?? []).map((item) => ({
+      checklistItems: (details.checklistItems ?? []).map((item) => ({
         id: Require.present(item.id, 'checklist item id'),
         title: Require.text(item.title, 'checklist item title', 200),
         done: !!item.done,
       })),
-      goalId: d.goalId ?? null,
+      goalId: details.goalId ?? null,
     };
   }
 }

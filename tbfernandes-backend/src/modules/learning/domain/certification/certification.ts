@@ -12,7 +12,6 @@ export const CERTIFICATION_STATUSES = [
 ] as const;
 export type CertificationStatus = (typeof CERTIFICATION_STATUSES)[number];
 
-/** The editable fields of a certification. */
 export interface CertificationDetails {
   name: string;
   issuer: string;
@@ -23,7 +22,6 @@ export interface CertificationDetails {
   studyIds: string[];
 }
 
-/** A certification, planned or obtained (RF-LRN-04, RN-14). */
 export class Certification {
   private constructor(
     readonly id: string,
@@ -39,7 +37,6 @@ export class Certification {
     );
   }
 
-  /** Rebuilds a certification already stored; no rules run. */
   static restore(id: string, ownerId: string, details: CertificationDetails) {
     return new Certification(id, ownerId, details);
   }
@@ -67,32 +64,38 @@ export class Certification {
     );
   }
 
-  private static validated(d: CertificationDetails): CertificationDetails {
-    const status = d.status ?? 'PLANNED';
-    if (status === 'OBTAINED' && d.obtainedAt == null) {
+  private static validated(
+    details: CertificationDetails,
+  ): CertificationDetails {
+    const status = details.status ?? 'PLANNED';
+    if (status === 'OBTAINED' && details.obtainedAt == null) {
       throw new BusinessRuleViolationError(
         'RN-14',
         'Uma certificação obtida precisa da data de obtenção',
       );
     }
-    if (d.obtainedAt && d.expiresAt && d.expiresAt <= d.obtainedAt) {
+    if (
+      details.obtainedAt &&
+      details.expiresAt &&
+      details.expiresAt <= details.obtainedAt
+    ) {
       throw new BusinessRuleViolationError(
         'RN-14',
         'O vencimento precisa ser depois da data de obtenção',
       );
     }
     return {
-      name: Require.text(d.name, 'name', 200),
-      issuer: Require.text(d.issuer, 'issuer', 120),
+      name: Require.text(details.name, 'name', 200),
+      issuer: Require.text(details.issuer, 'issuer', 120),
       status,
-      obtainedAt: d.obtainedAt ?? null,
-      expiresAt: d.expiresAt ?? null,
+      obtainedAt: details.obtainedAt ?? null,
+      expiresAt: details.expiresAt ?? null,
       validationUrl: Require.optionalText(
-        d.validationUrl,
+        details.validationUrl,
         'validationUrl',
         2000,
       ),
-      studyIds: [...new Set(d.studyIds ?? [])],
+      studyIds: [...new Set(details.studyIds ?? [])],
     };
   }
 }

@@ -79,7 +79,6 @@ export class TaskController {
     );
   }
 
-  /** Board drag and drop and the status menu (RN-06, RN-07). */
   @Patch(':id/status')
   @ApiBody({ type: StatusRequest })
   async changeStatus(

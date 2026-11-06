@@ -21,7 +21,6 @@ export class NoteEntity extends AuditedEntity {
   @Column('text', { array: true })
   tags: string[];
 
-  /** Read through the relation; written by the repository. */
   @OneToMany(() => NoteLinkEntity, (link) => link.note)
   links?: NoteLinkEntity[];
 }

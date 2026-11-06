@@ -22,7 +22,6 @@ export class AccountBootstrapService {
     private readonly uow: UnitOfWork,
   ) {}
 
-  /** Returns what it did, for the startup log. */
   bootstrap(
     account: BootstrapAccount,
     ownerId: string,

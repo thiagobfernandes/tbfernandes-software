@@ -1,6 +1,5 @@
 import { Certification } from './certification';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class CertificationRepository {
   abstract create(certification: Certification): Promise<Certification>;
   abstract save(certification: Certification): Promise<Certification>;

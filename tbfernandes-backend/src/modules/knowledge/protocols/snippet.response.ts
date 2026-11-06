@@ -1,4 +1,3 @@
-/** Same shape as the frontend's Snippet type. */
 export class SnippetResponse {
   id: string;
   title: string;

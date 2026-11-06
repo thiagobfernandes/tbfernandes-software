@@ -1,10 +1,8 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 
-/** Body of POST and PUT /milestones. */
 export class MilestoneRequest {
   goalId: string;
   title: string;
-  /** YYYY-MM-DD */
   dueDate?: string | null;
   done?: boolean | null;
 }
@@ -17,9 +15,9 @@ export interface ValidMilestoneRequest {
 }
 
 export const milestoneRequestSchema = Joi.object<ValidMilestoneRequest>({
-  goalId: J.uuid().required(),
-  title: J.requiredText(200),
-  dueDate: J.optionalIsoDate(),
+  goalId: RequestFields.uuid().required(),
+  title: RequestFields.requiredText(200),
+  dueDate: RequestFields.optionalIsoDate(),
   done: Joi.boolean().allow(null).empty(null).default(false),
 });
 
@@ -28,11 +26,10 @@ export interface MilestoneListQuery {
 }
 
 export const milestoneListQuerySchema = Joi.object<MilestoneListQuery>({
-  goalId: J.optionalUuid(),
-  ...J.paging(),
+  goalId: RequestFields.optionalUuid(),
+  ...RequestFields.paging(),
 });
 
-/** Same shape as the frontend's Milestone type. */
 export class MilestoneResponse {
   id: string;
   goalId: string;

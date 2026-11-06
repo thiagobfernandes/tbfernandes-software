@@ -26,7 +26,6 @@ import {
 } from '../protocols';
 import type { ValidGoalRequest } from '../protocols';
 
-/** Goals and sub-goals. Bodies match the frontend's goals/types/goal.ts. */
 @ApiTags('goals')
 @Controller('goals')
 export class GoalController {
@@ -45,7 +44,6 @@ export class GoalController {
     return GoalMapper.toResponse(await this.goals.get(id));
   }
 
-  /** GOL-04: what points to the goal in work, learning and finance. */
   @Get(':id/links')
   linksOf(@IdParam() id: string): Promise<GoalLinksResponse> {
     return this.links.linksOf(id);

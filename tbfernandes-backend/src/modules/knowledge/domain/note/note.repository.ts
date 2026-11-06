@@ -1,6 +1,5 @@
 import { Note } from './note';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class NoteRepository {
   abstract create(note: Note): Promise<Note>;
   abstract save(note: Note): Promise<Note>;

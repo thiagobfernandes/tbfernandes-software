@@ -13,7 +13,6 @@ import {
   SessionResponse,
 } from '../protocols';
 
-/** Login and logout for session mode (IDN-01). */
 @ApiTags('identity')
 @Public()
 @Controller('auth')

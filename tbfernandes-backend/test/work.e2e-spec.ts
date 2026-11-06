@@ -4,7 +4,6 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { create, startApp } from './support/test-app';
 
-/** End to end through HTTP, use cases and PostgreSQL, with the JSON shape the frontend expects. */
 describe('Work API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());

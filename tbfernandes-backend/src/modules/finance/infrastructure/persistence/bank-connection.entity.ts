@@ -56,7 +56,7 @@ export class BankAccountEntity {
   @Column('varchar', { nullable: true })
   currency: string | null;
 
-  @ManyToOne(() => BankConnectionEntity, (c) => c.accounts, {
+  @ManyToOne(() => BankConnectionEntity, (connection) => connection.accounts, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'connection_id' })

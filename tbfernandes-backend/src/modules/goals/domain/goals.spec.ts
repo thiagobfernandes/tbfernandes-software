@@ -88,8 +88,8 @@ describe('Decimals', () => {
 });
 
 describe('GoalProgresses', () => {
-  const goal = (d: Partial<GoalDetails> = {}) =>
-    Goal.create('g', 'o1', { ...details, ...d });
+  const goal = (overrides: Partial<GoalDetails> = {}) =>
+    Goal.create('g', 'o1', { ...details, ...overrides });
 
   it('uses the indicator first, rounding half up and capping at 100', () => {
     expect(

@@ -7,7 +7,6 @@ import {
 import { AppUser, AppUserRepository, checkPassword, Profile } from '../domain';
 import { PasswordHasher } from './password-hasher';
 
-/** The signed-in user's own account (IDN-03). */
 @Injectable()
 export class ProfileService {
   constructor(

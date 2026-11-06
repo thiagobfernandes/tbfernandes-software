@@ -1,10 +1,8 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { INTERACTION_KINDS, InteractionKind } from '../domain';
 
-/** Body of POST and PUT /interactions. */
 export class InteractionRequest {
   contactId: string;
-  /** YYYY-MM-DD */
   date: string;
   /** meeting, call, message, event or referral */
   kind: string;
@@ -21,11 +19,11 @@ export interface ValidInteractionRequest {
 }
 
 export const interactionRequestSchema = Joi.object<ValidInteractionRequest>({
-  contactId: J.uuid().required(),
-  date: J.isoDate().required(),
-  kind: J.enumOf(INTERACTION_KINDS).required(),
-  summary: J.requiredText(2000),
-  followUpTaskId: J.optionalUuid(),
+  contactId: RequestFields.uuid().required(),
+  date: RequestFields.isoDate().required(),
+  kind: RequestFields.enumOf(INTERACTION_KINDS).required(),
+  summary: RequestFields.requiredText(2000),
+  followUpTaskId: RequestFields.optionalUuid(),
 });
 
 export interface InteractionListQuery {
@@ -33,14 +31,13 @@ export interface InteractionListQuery {
 }
 
 export const interactionListQuerySchema = Joi.object<InteractionListQuery>({
-  contactId: J.optionalUuid(),
-  ...J.paging(),
+  contactId: RequestFields.optionalUuid(),
+  ...RequestFields.paging(),
 });
 
 /** Body of POST /interactions/{id}/follow-up. Without a title: "Follow-up com <nome>". */
 export class FollowUpRequest {
   title?: string | null;
-  /** YYYY-MM-DD */
   dueDate?: string | null;
 }
 
@@ -50,6 +47,6 @@ export interface ValidFollowUpRequest {
 }
 
 export const followUpRequestSchema = Joi.object<ValidFollowUpRequest>({
-  title: J.optionalText(200),
-  dueDate: J.optionalIsoDate(),
+  title: RequestFields.optionalText(200),
+  dueDate: RequestFields.optionalIsoDate(),
 });

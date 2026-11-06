@@ -27,94 +27,112 @@ const key = (kind: string, id: string) => `${kind}:${id}`;
 // Ids are lowercase UUIDs, so text order is the order the Java backend used.
 const sorted = (ids: string[]) => [...ids].sort();
 
+class GraphBuilder {
+  private readonly nodes: GraphNode[] = [];
+  private readonly edges: GraphEdge[] = [];
+
+  addNode(kind: string, id: string, label: string, href: string): string {
+    const nodeId = key(kind, id);
+    this.nodes.push({ id: nodeId, kind, label, href });
+    return nodeId;
+  }
+
+  link(source: string, kind: string, target: string | null): void {
+    if (target) this.edges.push({ source, target: key(kind, target) });
+  }
+
+  linkAll(source: string, kind: string, targets: string[]): void {
+    sorted(targets).forEach((target) => this.link(source, kind, target));
+  }
+
+  build(): KnowledgeGraph {
+    // Drop edges whose other end was deleted (references across modules have no FK, ADR-003).
+    const ids = new Set(this.nodes.map((node) => node.id));
+    return {
+      nodes: this.nodes,
+      edges: this.edges.filter(
+        (edge) => ids.has(edge.source) && ids.has(edge.target),
+      ),
+    };
+  }
+}
+
+function addWork(graph: GraphBuilder, data: Workspace): void {
+  for (const company of data.companies)
+    graph.addNode(
+      'company',
+      company.id,
+      company.name,
+      `/companies/view?id=${company.id}`,
+    );
+  for (const project of data.projects) {
+    const id = graph.addNode(
+      'project',
+      project.id,
+      project.name,
+      `/projects/view?id=${project.id}`,
+    );
+    graph.link(id, 'company', project.companyId);
+    graph.link(id, 'goal', project.goalId);
+  }
+  for (const task of data.tasks) {
+    const id = graph.addNode(
+      'task',
+      task.id,
+      task.title,
+      `/tasks?q=${encodeURIComponent(task.title)}`,
+    );
+    graph.link(id, 'project', task.projectId);
+    graph.link(id, 'goal', task.goalId);
+  }
+}
+
+function addKnowledge(graph: GraphBuilder, data: Workspace): void {
+  for (const note of data.notes) {
+    const id = graph.addNode(
+      'note',
+      note.id,
+      note.title,
+      `/knowledge?note=${note.id}`,
+    );
+    graph.linkAll(id, 'project', note.projectIds);
+    graph.linkAll(id, 'task', note.taskIds);
+  }
+  for (const snippet of data.snippets) {
+    const id = graph.addNode(
+      'snippet',
+      snippet.id,
+      snippet.title,
+      '/knowledge/snippets',
+    );
+    graph.linkAll(id, 'project', snippet.projectIds);
+    graph.linkAll(id, 'task', snippet.taskIds);
+  }
+}
+
 export const KnowledgeGraphs = {
   of(data: Workspace): KnowledgeGraph {
-    const nodes: GraphNode[] = [];
-    const edges: GraphEdge[] = [];
-    const link = (source: string, kind: string, target: string | null) => {
-      if (target) edges.push({ source, target: key(kind, target) });
-    };
+    const graph = new GraphBuilder();
     for (const goal of data.goals) {
-      const id = key('goal', goal.id);
-      nodes.push({
-        id,
-        kind: 'goal',
-        label: goal.name,
-        href: `/goals/view?id=${goal.id}`,
-      });
-      link(id, 'goal', goal.parentId);
-    }
-    for (const company of data.companies) {
-      nodes.push({
-        id: key('company', company.id),
-        kind: 'company',
-        label: company.name,
-        href: `/companies/view?id=${company.id}`,
-      });
-    }
-    for (const project of data.projects) {
-      const id = key('project', project.id);
-      nodes.push({
-        id,
-        kind: 'project',
-        label: project.name,
-        href: `/projects/view?id=${project.id}`,
-      });
-      link(id, 'company', project.companyId);
-      link(id, 'goal', project.goalId);
-    }
-    for (const task of data.tasks) {
-      const id = key('task', task.id);
-      nodes.push({
-        id,
-        kind: 'task',
-        label: task.title,
-        href: `/tasks?q=${encodeURIComponent(task.title)}`,
-      });
-      link(id, 'project', task.projectId);
-      link(id, 'goal', task.goalId);
-    }
-    for (const note of data.notes) {
-      const id = key('note', note.id);
-      nodes.push({
-        id,
-        kind: 'note',
-        label: note.title,
-        href: `/knowledge?note=${note.id}`,
-      });
-      sorted(note.projectIds).forEach((projectId) =>
-        link(id, 'project', projectId),
+      const id = graph.addNode(
+        'goal',
+        goal.id,
+        goal.name,
+        `/goals/view?id=${goal.id}`,
       );
-      sorted(note.taskIds).forEach((taskId) => link(id, 'task', taskId));
+      graph.link(id, 'goal', goal.parentId);
     }
-    for (const snippet of data.snippets) {
-      const id = key('snippet', snippet.id);
-      nodes.push({
-        id,
-        kind: 'snippet',
-        label: snippet.title,
-        href: '/knowledge/snippets',
-      });
-      sorted(snippet.projectIds).forEach((projectId) =>
-        link(id, 'project', projectId),
-      );
-      sorted(snippet.taskIds).forEach((taskId) => link(id, 'task', taskId));
-    }
+    addWork(graph, data);
+    addKnowledge(graph, data);
     for (const contact of data.contacts) {
-      const id = key('contact', contact.id);
-      nodes.push({
-        id,
-        kind: 'contact',
-        label: contact.name,
-        href: `/contacts?contact=${contact.id}`,
-      });
-      link(id, 'company', contact.companyId);
+      const id = graph.addNode(
+        'contact',
+        contact.id,
+        contact.name,
+        `/contacts?contact=${contact.id}`,
+      );
+      graph.link(id, 'company', contact.companyId);
     }
-    // Drop edges whose other end was deleted (references across modules have no FK, ADR-003).
-    const ids = new Set(nodes.map((n) => n.id));
-    return {
-      nodes,
-      edges: edges.filter((e) => ids.has(e.source) && ids.has(e.target)),
-    };
+    return graph.build();
   },
 };

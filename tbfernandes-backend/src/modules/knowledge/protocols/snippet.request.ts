@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { KnowledgeJoi } from './knowledge.joi';
 
 /** Body of POST and PUT /snippets. The code is kept exactly as sent (RN-11). */
@@ -25,11 +25,11 @@ export interface ValidSnippetRequest {
 }
 
 export const snippetRequestSchema = Joi.object<ValidSnippetRequest>({
-  title: J.requiredText(200),
-  language: J.requiredText(30),
+  title: RequestFields.requiredText(200),
+  language: RequestFields.requiredText(30),
   code: Joi.string().required(),
-  explanation: J.optionalText(5000),
-  sourceUrl: J.optionalText(2000),
+  explanation: RequestFields.optionalText(5000),
+  sourceUrl: RequestFields.optionalText(2000),
   tags: KnowledgeJoi.tags(),
   projectIds: KnowledgeJoi.ids(),
   taskIds: KnowledgeJoi.ids(),
@@ -45,5 +45,5 @@ export const snippetListQuerySchema = Joi.object<SnippetListQuery>({
   q: Joi.string().allow('').default(null),
   language: Joi.string().allow('').default(null),
   tag: Joi.string().allow('').default(null),
-  ...J.paging(),
+  ...RequestFields.paging(),
 });

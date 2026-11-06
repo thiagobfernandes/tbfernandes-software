@@ -1,24 +1,23 @@
 import { Milestone } from '../../../domain';
 import { MilestoneEntity } from '../milestone.entity';
 
-/** Milestone ↔ goals.milestone row. */
 export const MilestonePersistenceMapper = {
-  toDomain(e: MilestoneEntity): Milestone {
-    return Milestone.restore(e.id, e.ownerId, {
-      goalId: e.goalId,
-      title: e.title,
-      dueDate: e.dueDate,
-      done: e.done,
+  toDomain(entity: MilestoneEntity): Milestone {
+    return Milestone.restore(entity.id, entity.ownerId, {
+      goalId: entity.goalId,
+      title: entity.title,
+      dueDate: entity.dueDate,
+      done: entity.done,
     });
   },
 
   toEntity(
     milestone: Milestone,
-    e: MilestoneEntity = new MilestoneEntity(),
+    entity: MilestoneEntity = new MilestoneEntity(),
   ): MilestoneEntity {
-    e.id = milestone.id;
-    e.ownerId = milestone.ownerId;
-    Object.assign(e, milestone.details);
-    return e;
+    entity.id = milestone.id;
+    entity.ownerId = milestone.ownerId;
+    Object.assign(entity, milestone.details);
+    return entity;
   },
 };

@@ -9,7 +9,6 @@ import { KnowledgeLinks, Note, NoteDetails, NoteRepository } from '../domain';
 import { LinkValidator } from './link-validator';
 import { blankToNull } from './search-text';
 
-/** Note use cases (RF-KNW-01, RF-KNW-03, RF-KNW-04). */
 @Injectable()
 export class NoteService {
   constructor(

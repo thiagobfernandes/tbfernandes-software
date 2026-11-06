@@ -1,4 +1,3 @@
-/** A provider answered with an HTTP status that is not a success. */
 export class ProviderHttpError extends Error {
   constructor(
     readonly provider: string,
@@ -8,7 +7,6 @@ export class ProviderHttpError extends Error {
   }
 }
 
-/** POST a JSON body and read a JSON answer, giving up after timeoutMs. */
 export async function postJson<T>(
   http: typeof fetch,
   provider: string,

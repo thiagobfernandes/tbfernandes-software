@@ -6,7 +6,6 @@ import type {
 } from 'joi';
 import { RequestValidationError } from './request-validation.error';
 
-/** Messages in pt-BR for the rules the request schemas use. */
 const MESSAGES = {
   'any.required': 'é obrigatório',
   'any.only': 'deve ser um destes valores: {{#valids}}',

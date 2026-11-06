@@ -20,7 +20,6 @@ export const MATERIAL_STATUSES = [
 ] as const;
 export type MaterialStatus = (typeof MATERIAL_STATUSES)[number];
 
-/** The editable fields of a material. */
 export interface MaterialDetails {
   studyId: string | null;
   title: string;
@@ -30,7 +29,6 @@ export interface MaterialDetails {
   notes: string | null;
 }
 
-/** Something to read, watch or practice (RF-LRN-02). Consuming it is not mastering the topic. */
 export class Material {
   private constructor(
     readonly id: string,
@@ -46,7 +44,6 @@ export class Material {
     );
   }
 
-  /** Rebuilds a material already stored; no rules run. */
   static restore(id: string, ownerId: string, details: MaterialDetails) {
     return new Material(id, ownerId, details);
   }
@@ -63,14 +60,14 @@ export class Material {
     this._details = Material.validated(details);
   }
 
-  private static validated(d: MaterialDetails): MaterialDetails {
+  private static validated(details: MaterialDetails): MaterialDetails {
     return {
-      studyId: d.studyId ?? null,
-      title: Require.text(d.title, 'title', 300),
-      type: Require.present(d.type, 'type'),
-      url: Require.optionalText(d.url, 'url', 2000),
-      status: d.status ?? 'TO_CONSUME',
-      notes: Require.optionalText(d.notes, 'notes', 5000),
+      studyId: details.studyId ?? null,
+      title: Require.text(details.title, 'title', 300),
+      type: Require.present(details.type, 'type'),
+      url: Require.optionalText(details.url, 'url', 2000),
+      status: details.status ?? 'TO_CONSUME',
+      notes: Require.optionalText(details.notes, 'notes', 5000),
     };
   }
 }

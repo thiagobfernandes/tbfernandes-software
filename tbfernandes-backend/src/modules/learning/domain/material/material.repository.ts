@@ -1,6 +1,5 @@
 import { Material } from './material';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class MaterialRepository {
   abstract create(material: Material): Promise<Material>;
   abstract save(material: Material): Promise<Material>;

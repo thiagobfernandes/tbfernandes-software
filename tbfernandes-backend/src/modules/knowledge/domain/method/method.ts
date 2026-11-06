@@ -23,7 +23,6 @@ export interface MethodExample {
   content: string;
 }
 
-/** The editable fields of a working method. */
 export interface MethodDetails {
   title: string;
   summary: string;
@@ -34,7 +33,6 @@ export interface MethodDetails {
   lastReviewed: IsoDate;
 }
 
-/** A working method: ordered steps plus verbatim examples (RF-KNW-06). */
 export class Method {
   private constructor(
     readonly id: string,
@@ -50,18 +48,17 @@ export class Method {
     );
   }
 
-  /** Rebuilds a method already stored; no rules run. */
   static restore(id: string, ownerId: string, details: MethodDetails): Method {
     return new Method(id, ownerId, details);
   }
 
   get details(): MethodDetails {
-    const d = this._details;
+    const details = this._details;
     return {
-      ...d,
-      steps: d.steps.map((step) => ({ ...step })),
-      examples: d.examples.map((example) => ({ ...example })),
-      tags: [...d.tags],
+      ...details,
+      steps: details.steps.map((step) => ({ ...step })),
+      examples: details.examples.map((example) => ({ ...example })),
+      tags: [...details.tags],
     };
   }
 
@@ -69,8 +66,8 @@ export class Method {
     this._details = Method.validated(details);
   }
 
-  private static validated(d: MethodDetails): MethodDetails {
-    const steps = (d.steps ?? []).map((step) => ({
+  private static validated(details: MethodDetails): MethodDetails {
+    const steps = (details.steps ?? []).map((step) => ({
       title: Require.text(step.title, 'step title', 200),
       detail: Require.optionalText(step.detail, 'step detail', 2000),
     }));
@@ -79,18 +76,18 @@ export class Method {
         'um método precisa de pelo menos um passo',
       );
     }
-    const examples = (d.examples ?? []).map((example) => ({
+    const examples = (details.examples ?? []).map((example) => ({
       title: Require.text(example.title, 'example title', 200),
       content: Require.present(example.content, 'example content'),
     }));
     return {
-      title: Require.text(d.title, 'title', 200),
-      summary: Require.text(d.summary, 'summary', 1000),
-      category: Require.present(d.category, 'category'),
+      title: Require.text(details.title, 'title', 200),
+      summary: Require.text(details.summary, 'summary', 1000),
+      category: Require.present(details.category, 'category'),
       steps,
       examples,
-      tags: Tags.normalize(d.tags),
-      lastReviewed: Require.present(d.lastReviewed, 'lastReviewed'),
+      tags: Tags.normalize(details.tags),
+      lastReviewed: Require.present(details.lastReviewed, 'lastReviewed'),
     };
   }
 }

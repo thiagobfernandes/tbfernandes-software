@@ -8,7 +8,6 @@ import { NotFoundError } from '../../../common/domain';
 import { Milestone, MilestoneDetails, MilestoneRepository } from '../domain';
 import { GoalService } from './goal.service';
 
-/** Milestones of a goal (RF-GOL-03). */
 @Injectable()
 export class MilestoneService {
   constructor(

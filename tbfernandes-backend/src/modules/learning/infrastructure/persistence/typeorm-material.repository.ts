@@ -5,7 +5,6 @@ import { Material, MaterialRepository } from '../../domain';
 import { MaterialEntity } from './material.entity';
 import { MaterialPersistenceMapper as Mapper } from './mappers/material.persistence-mapper';
 
-/** MaterialRepository on TypeORM. */
 @Injectable()
 export class TypeOrmMaterialRepository extends MaterialRepository {
   private readonly rows: BaseRepository<MaterialEntity>;

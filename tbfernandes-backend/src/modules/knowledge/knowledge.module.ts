@@ -29,10 +29,6 @@ import { MethodController } from './web/method.controller';
 import { NoteController } from './web/note.controller';
 import { SnippetController } from './web/snippet.controller';
 
-/**
- * Knowledge: notes, snippets and working methods, linked to work items through WorkLookup
- * only. Other modules read it through KnowledgeLookup.
- */
 @Module({
   imports: [
     WorkModule,

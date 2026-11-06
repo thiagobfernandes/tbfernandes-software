@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import {
   MATERIAL_STATUSES,
   MATERIAL_TYPES,
@@ -6,7 +6,6 @@ import {
   MaterialType,
 } from '../domain';
 
-/** Body of POST and PUT /materials. */
 export class MaterialRequest {
   studyId?: string | null;
   title: string;
@@ -28,20 +27,19 @@ export interface ValidMaterialRequest {
 }
 
 export const materialRequestSchema = Joi.object<ValidMaterialRequest>({
-  studyId: J.optionalUuid(),
-  title: J.requiredText(300),
-  type: J.enumOf(MATERIAL_TYPES).required(),
-  url: J.optionalText(2000),
-  status: J.optionalEnumOf(MATERIAL_STATUSES),
-  notes: J.optionalText(5000),
+  studyId: RequestFields.optionalUuid(),
+  title: RequestFields.requiredText(300),
+  type: RequestFields.enumOf(MATERIAL_TYPES).required(),
+  url: RequestFields.optionalText(2000),
+  status: RequestFields.optionalEnumOf(MATERIAL_STATUSES),
+  notes: RequestFields.optionalText(5000),
 });
 
 export const materialListQuerySchema = Joi.object<{ studyId: string | null }>({
-  studyId: J.optionalUuid(),
-  ...J.paging(),
+  studyId: RequestFields.optionalUuid(),
+  ...RequestFields.paging(),
 });
 
-/** Same shape as the frontend's Material type. */
 export class MaterialResponse {
   id: string;
   studyId: string | null;

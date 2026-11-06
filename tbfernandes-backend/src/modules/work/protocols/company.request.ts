@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import {
   COMPANY_RELATIONSHIPS,
   COMPANY_STATUSES,
@@ -6,7 +6,6 @@ import {
   CompanyStatus,
 } from '../domain';
 
-/** Body of POST and PUT /companies. Enums in lower case, as the frontend sends them. */
 export class CompanyRequest {
   name: string;
   tradeName?: string | null;
@@ -15,7 +14,6 @@ export class CompanyRequest {
   /** active, inactive or closed (default active) */
   status?: string | null;
   description?: string | null;
-  /** YYYY-MM-DD */
   startDate: string;
   mainContact?: string | null;
 }
@@ -32,11 +30,11 @@ export interface ValidCompanyRequest {
 }
 
 export const companyRequestSchema = Joi.object<ValidCompanyRequest>({
-  name: J.requiredText(120),
-  tradeName: J.optionalText(120),
-  relationship: J.enumOf(COMPANY_RELATIONSHIPS).required(),
-  status: J.optionalEnumOf(COMPANY_STATUSES),
-  description: J.optionalText(2000),
-  startDate: J.isoDate().required(),
-  mainContact: J.optionalText(120),
+  name: RequestFields.requiredText(120),
+  tradeName: RequestFields.optionalText(120),
+  relationship: RequestFields.enumOf(COMPANY_RELATIONSHIPS).required(),
+  status: RequestFields.optionalEnumOf(COMPANY_STATUSES),
+  description: RequestFields.optionalText(2000),
+  startDate: RequestFields.isoDate().required(),
+  mainContact: RequestFields.optionalText(120),
 });

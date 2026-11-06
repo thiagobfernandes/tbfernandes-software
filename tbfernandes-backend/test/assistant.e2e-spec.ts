@@ -16,7 +16,6 @@ interface Ref {
 
 const short = () => randomUUID().slice(0, 8);
 
-/** Port of AssistantApiIntegrationTests: no model, rules and keyword retrieval. */
 describe('Assistant API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
@@ -58,7 +57,9 @@ describe('Assistant API', () => {
     expect(answer.body.source).toBe('rules');
     expect(answer.body.text).toContain('0 de 1 tarefas concluídas');
     expect(answer.body.query).toBeNull();
-    const hrefs = (answer.body.references as Ref[]).map((r) => r.href);
+    const hrefs = (answer.body.references as Ref[]).map(
+      (reference) => reference.href,
+    );
     expect(hrefs).toEqual(
       expect.arrayContaining([
         `/projects/view?id=${projectId}`,
@@ -70,11 +71,15 @@ describe('Assistant API', () => {
     expect(graph.status).toBe(200);
     const edges = graph.body.edges as Array<{ source: string; target: string }>;
     expect(
-      edges.filter((e) => e.source === `note:${noteId}`).map((e) => e.target),
+      edges
+        .filter((edge) => edge.source === `note:${noteId}`)
+        .map((edge) => edge.target),
     ).toEqual([`project:${projectId}`]);
     const nodes = graph.body.nodes as Array<{ id: string; kind: string }>;
     expect(
-      nodes.filter((n) => n.id === `company:${companyId}`).map((n) => n.kind),
+      nodes
+        .filter((node) => node.id === `company:${companyId}`)
+        .map((node) => node.kind),
     ).toEqual(['company']);
   });
 
@@ -109,7 +114,9 @@ describe('Assistant API', () => {
     expect(answer.body.source).toBe('search');
     const refs = answer.body.references as Ref[];
     expect(refs[0].excerpt).toContain('O nginx encaminha /api');
-    expect(refs.map((r) => r.href)).toEqual([`/knowledge?note=${noteId}`]);
+    expect(refs.map((reference) => reference.href)).toEqual([
+      `/knowledge?note=${noteId}`,
+    ]);
   });
 
   it('needs a question', async () => {
@@ -146,7 +153,6 @@ class FakeModel extends LanguageModel {
   }
 }
 
-/** Port of AssistantModelApiIntegrationTests: a fake model over real data (AST-03, AST-04). */
 describe('Assistant API with a language model', () => {
   let app: INestApplication<App>;
   const fake = new FakeModel();
@@ -186,9 +192,13 @@ describe('Assistant API with a language model', () => {
     expect(answer.body.source).toBe('rag');
     expect(answer.body.text).toBe('Rode o script depois do build [1].');
     const refs = answer.body.references as Ref[];
-    expect(refs.map((r) => r.href)).toEqual([`/knowledge?note=${noteId}`]);
+    expect(refs.map((reference) => reference.href)).toEqual([
+      `/knowledge?note=${noteId}`,
+    ]);
     expect(refs[0].excerpt).toContain(`deploy-${word}.sh`);
-    expect(fake.passages.map((p) => p.title)).toEqual([`Deploy ${word}`]);
+    expect(fake.passages.map((passage) => passage.title)).toEqual([
+      `Deploy ${word}`,
+    ]);
   });
 
   it('answers with the passages when the model fails', async () => {
@@ -220,9 +230,9 @@ describe('Assistant API with a language model', () => {
     expect(answer.body.query.subject).toBe('tasks');
     expect(answer.body.query.sort).toBe('due_date');
     expect(answer.body.text).toContain(title);
-    expect((answer.body.references as Ref[]).map((r) => r.label)).toEqual([
-      title,
-    ]);
+    expect(
+      (answer.body.references as Ref[]).map((reference) => reference.label),
+    ).toEqual([title]);
   });
 
   it('keeps the references of the query in the rewritten text', async () => {
@@ -234,9 +244,9 @@ describe('Assistant API with a language model', () => {
     const answer = await ask('Quais tarefas?');
     expect(answer.body.source).toBe('model');
     expect(answer.body.text).toBe('Texto do modelo');
-    expect((answer.body.references as Ref[]).map((r) => r.label)).toEqual([
-      title,
-    ]);
+    expect(
+      (answer.body.references as Ref[]).map((reference) => reference.label),
+    ).toEqual([title]);
   });
 
   it('still answers with rules when the model fails', async () => {

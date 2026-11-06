@@ -10,7 +10,6 @@ const OWNER = {
   password: 'correct horse battery',
 };
 
-/** Session mode (IDN-01): login, CSRF and owners that never see each other's data. */
 describe('Session auth', () => {
   let app: INestApplication<App>;
 
@@ -30,7 +29,7 @@ describe('Session auth', () => {
     const session = await agent.get('/api/v1/auth/session');
     const cookie = ([] as string[])
       .concat(session.headers['set-cookie'] ?? [])
-      .find((c) => c.startsWith('XSRF-TOKEN='));
+      .find((header) => header.startsWith('XSRF-TOKEN='));
     const token = decodeURIComponent(cookie!.split(';')[0].split('=')[1]);
     return { agent, token };
   }

@@ -5,7 +5,6 @@ import {
   Require,
 } from '../../../../common/domain';
 
-/** The editable fields of a contact. */
 export interface ContactDetails {
   name: string;
   /** work.company (other module). */
@@ -43,7 +42,6 @@ export class Contact {
     );
   }
 
-  /** Rebuilds a contact already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -65,37 +63,41 @@ export class Contact {
     this._details = { ...this._details, companyId: null };
   }
 
-  private static validated(d: ContactDetails): ContactDetails {
-    const companyName = Require.optionalText(d.companyName, 'companyName', 120);
-    if (d.companyId != null && companyName != null) {
+  private static validated(details: ContactDetails): ContactDetails {
+    const companyName = Require.optionalText(
+      details.companyName,
+      'companyName',
+      120,
+    );
+    if (details.companyId != null && companyName != null) {
       throw new BusinessRuleViolationError(
         'RN-23',
         'Use uma empresa cadastrada ou um nome de empresa, não os dois',
       );
     }
-    const email = Require.optionalText(d.email, 'email', 254);
+    const email = Require.optionalText(details.email, 'email', 254);
     if (email != null && !EMAIL.test(email)) {
       throw new InvalidArgumentError('email não é válido');
     }
     const specialties = [
       ...new Set(
-        (d.specialties ?? [])
-          .filter((s) => s != null && s.trim() !== '')
-          .map((s) => s.trim()),
+        (details.specialties ?? [])
+          .filter((specialty) => specialty != null && specialty.trim() !== '')
+          .map((specialty) => specialty.trim()),
       ),
     ];
     return {
-      name: Require.text(d.name, 'name', 120),
-      companyId: d.companyId ?? null,
+      name: Require.text(details.name, 'name', 120),
+      companyId: details.companyId ?? null,
       companyName,
-      role: Require.optionalText(d.role, 'role', 120),
+      role: Require.optionalText(details.role, 'role', 120),
       email: email?.toLowerCase() ?? null,
-      phone: Require.optionalText(d.phone, 'phone', 40),
-      profileUrl: Require.optionalText(d.profileUrl, 'profileUrl', 2000),
+      phone: Require.optionalText(details.phone, 'phone', 40),
+      profileUrl: Require.optionalText(details.profileUrl, 'profileUrl', 2000),
       specialties,
-      context: Require.optionalText(d.context, 'context', 2000),
-      nextContact: d.nextContact ?? null,
-      notes: Require.optionalText(d.notes, 'notes', 5000),
+      context: Require.optionalText(details.context, 'context', 2000),
+      nextContact: details.nextContact ?? null,
+      notes: Require.optionalText(details.notes, 'notes', 5000),
     };
   }
 }

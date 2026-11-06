@@ -6,7 +6,6 @@ import {
   StudyView,
 } from '../learning.lookup';
 
-/** Implements the learning module's public API on top of its own repositories. */
 @Injectable()
 export class LearningLookupService extends LearningLookup {
   constructor(
@@ -18,28 +17,30 @@ export class LearningLookupService extends LearningLookup {
 
   async studies(ownerId: string): Promise<StudyView[]> {
     return (await this.studiesRepo.findAll(ownerId)).map((study) => {
-      const d = study.details;
+      const details = study.details;
       return {
         id: study.id,
-        name: d.name,
+        name: details.name,
         status: study.status.toLowerCase(),
-        goalId: d.goalId,
-        dueDate: d.dueDate,
-        nextActivity: d.nextActivity,
+        goalId: details.goalId,
+        dueDate: details.dueDate,
+        nextActivity: details.nextActivity,
       };
     });
   }
 
   async certifications(ownerId: string): Promise<CertificationView[]> {
-    return (await this.certificationsRepo.findAll(ownerId)).map((c) => {
-      const d = c.details;
-      return {
-        id: c.id,
-        name: d.name,
-        issuer: d.issuer,
-        status: c.status.toLowerCase(),
-        expiresAt: d.expiresAt,
-      };
-    });
+    return (await this.certificationsRepo.findAll(ownerId)).map(
+      (certification) => {
+        const details = certification.details;
+        return {
+          id: certification.id,
+          name: details.name,
+          issuer: details.issuer,
+          status: certification.status.toLowerCase(),
+          expiresAt: details.expiresAt,
+        };
+      },
+    );
   }
 }

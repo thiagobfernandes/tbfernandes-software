@@ -13,10 +13,8 @@ import {
 import type { ConnectionStatus } from '../src/modules/finance/domain';
 import { create, eventually, startApp } from './support/test-app';
 
-/** Owner of the single-user mode. */
 const OWNER = '0192f000-0000-7000-8000-000000000001';
 
-/** Stands in for Pluggy, as the FakeGateway of the old backend's tests. */
 class FakeGateway extends OpenFinanceGateway {
   transactions: ExternalTransaction[] = [];
   deleted: string[] = [];
@@ -82,7 +80,6 @@ const expense = (id: string, date: string): ExternalTransaction => ({
   category: 'Food',
 });
 
-/** Port of FinanceApiIntegrationTests (the goal link waits for the goals module). */
 describe('Finance API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
@@ -253,7 +250,6 @@ describe('Finance API', () => {
   });
 });
 
-/** Port of OpenFinanceApiIntegrationTests. */
 describe('Open finance API', () => {
   let app: INestApplication<App>;
   const gateway = new FakeGateway();
@@ -289,13 +285,15 @@ describe('Open finance API', () => {
           `/api/v1/finance/entries?month=${month}&scope=${scope}`,
         )
       ).body as { description: string }[]
-    ).map((e) => e.description);
+    ).map((entry) => entry.description);
 
   const connections = async () =>
     (await http().get('/api/v1/finance/connections')).body as Connection[];
 
   const connectionOf = async (item: string) =>
-    (await connections()).find((c) => c.id === registered.get(item));
+    (await connections()).find(
+      (connection) => connection.id === registered.get(item),
+    );
 
   const register = async (item: string, scope: string) => {
     const id = await create(app, '/api/v1/finance/connections', {
@@ -427,7 +425,9 @@ describe('Open finance API', () => {
       (await imported('2031-06', 'business')).includes('Mercado'),
     );
     const id = await register(item, 'business');
-    expect((await connections()).filter((c) => c.id === id)).toHaveLength(1);
+    expect(
+      (await connections()).filter((connection) => connection.id === id),
+    ).toHaveLength(1);
   });
 
   it('ignores webhooks for unknown connections without a valid claim', async () => {

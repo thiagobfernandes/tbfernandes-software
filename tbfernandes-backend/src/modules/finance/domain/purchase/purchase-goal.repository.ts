@@ -1,6 +1,5 @@
 import { PurchaseGoal } from './purchase-goal';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class PurchaseGoalRepository {
   abstract create(purchase: PurchaseGoal): Promise<PurchaseGoal>;
   abstract save(purchase: PurchaseGoal): Promise<PurchaseGoal>;

@@ -14,7 +14,6 @@ export interface CategoryTotal {
   amount: Cents;
 }
 
-/** FIN-02: the selected month plus the months before it, as the cash flow screen shows. */
 export interface CashFlow {
   month: YearMonth;
   /** Null sums both scopes, which the screen warns can double count transfers. */
@@ -25,12 +24,10 @@ export interface CashFlow {
 }
 
 export const CashFlows = {
-  /** The first month a cash flow of `months` months ending at `selected` covers. */
   firstMonth(selected: YearMonth, months: number): YearMonth {
     return YearMonths.plusMonths(selected, -(Math.max(1, months) - 1));
   },
 
-  /** @param entries the entries from the first month to the selected one */
   build(
     selected: YearMonth,
     months: number,
@@ -44,21 +41,24 @@ export const CashFlows = {
     }
     const series: MonthTotals[] = [];
     for (
-      let m = CashFlows.firstMonth(selected, months);
-      m <= selected;
-      m = YearMonths.plusMonths(m, 1)
+      let month = CashFlows.firstMonth(selected, months);
+      month <= selected;
+      month = YearMonths.plusMonths(month, 1)
     ) {
-      series.push(CashFlows.totals(m, byMonth.get(m) ?? []));
+      series.push(CashFlows.totals(month, byMonth.get(month) ?? []));
     }
     const byCategory = new Map<string, Cents>();
     for (const entry of byMonth.get(selected) ?? []) {
-      const d = entry.details;
-      if (d.kind !== 'EXPENSE') continue;
-      byCategory.set(d.category, (byCategory.get(d.category) ?? 0) + d.amount);
+      const details = entry.details;
+      if (details.kind !== 'EXPENSE') continue;
+      byCategory.set(
+        details.category,
+        (byCategory.get(details.category) ?? 0) + details.amount,
+      );
     }
     const expensesByCategory = [...byCategory]
       .map(([category, amount]) => ({ category, amount }))
-      .sort((a, b) => b.amount - a.amount);
+      .sort((left, right) => right.amount - left.amount);
     return {
       month: selected,
       scope,

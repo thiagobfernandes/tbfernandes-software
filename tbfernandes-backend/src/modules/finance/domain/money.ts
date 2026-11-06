@@ -3,6 +3,21 @@ import { InvalidArgumentError } from '../../../common/domain';
 /** An amount in BRL cents. Integers keep sums exact (RNF-API-03: two decimals). */
 export type Cents = number;
 
+/** @param droppedDigits the decimal digits after the cents, e.g. "500" for 1.005 */
+function roundHalfToEven(
+  truncatedCents: number,
+  droppedDigits: string,
+): number {
+  const [firstDropped = '0'] = droppedDigits;
+  const exactlyHalf =
+    firstDropped === '5' && /^0*$/.test(droppedDigits.slice(1));
+  const roundsUp =
+    firstDropped > '5' ||
+    (firstDropped === '5' && !exactlyHalf) ||
+    (exactlyHalf && truncatedCents % 2 === 1);
+  return roundsUp ? truncatedCents + 1 : truncatedCents;
+}
+
 /**
  * Decimal amounts ↔ cents, rounding half to even like the database and the old backend.
  * Accepts the numbers of the JSON and the strings of PostgreSQL numeric.
@@ -14,15 +29,8 @@ export const Money = {
     if (!match) throw new InvalidArgumentError(`valor inválido: ${text}`);
     const [, sign, whole, fraction = ''] = match;
     const digits = fraction.padEnd(3, '0');
-    let cents = Number(whole || '0') * 100 + Number(digits.slice(0, 2));
-    const rest = digits.slice(2);
-    const half = rest[0] === '5' && /^0*$/.test(rest.slice(1));
-    if (
-      rest[0] > '5' ||
-      (rest[0] === '5' && !half) ||
-      (half && cents % 2 === 1)
-    )
-      cents += 1;
+    const truncated = Number(whole || '0') * 100 + Number(digits.slice(0, 2));
+    const cents = roundHalfToEven(truncated, digits.slice(2));
     return sign && cents !== 0 ? -cents : cents;
   },
 
@@ -31,7 +39,6 @@ export const Money = {
     return cents / 100;
   },
 
-  /** For PostgreSQL numeric: "1500.00". */
   toDecimal(cents: Cents): string {
     const sign = cents < 0 ? '-' : '';
     const abs = Math.abs(cents);

@@ -1,13 +1,11 @@
 import { IsoDate } from '../../common/domain';
 
-/** Lightweight copy of a company, safe to hold outside the module. */
 export interface CompanyView {
   id: string;
   name: string;
   status: string;
 }
 
-/** Lightweight copy of a project, safe to hold outside the module. */
 export interface ProjectView {
   id: string;
   name: string;
@@ -30,10 +28,6 @@ export interface TaskView {
   dueDate: IsoDate | null;
 }
 
-/**
- * Read access to work items for other modules (WRK-08). They use this instead of the work
- * tables, so the work module keeps its internals private.
- */
 export abstract class WorkLookup {
   abstract companyExists(ownerId: string, companyId: string): Promise<boolean>;
   abstract projectExists(ownerId: string, projectId: string): Promise<boolean>;

@@ -36,7 +36,6 @@ export interface ExternalTransaction {
  * provider fails.
  */
 export abstract class OpenFinanceGateway {
-  /** False for the disabled gateway (RN-15). */
   abstract enabled(): boolean;
   /**
    * Short-lived token the frontend passes to the provider's connect widget.

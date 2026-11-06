@@ -27,21 +27,21 @@ export const TaskMapper = {
   },
 
   toResponse(task: Task): TaskResponse {
-    const d = task.details;
+    const details = task.details;
     return {
       id: task.id,
-      title: d.title,
-      description: d.description,
-      projectId: d.projectId,
+      title: details.title,
+      description: details.description,
+      projectId: details.projectId,
       status: task.status.toLowerCase(),
-      priority: (d.priority ?? 'NORMAL').toLowerCase(),
-      tag: d.tag,
-      startDate: d.startDate,
-      dueDate: d.dueDate,
-      doneCriteria: d.doneCriteria,
+      priority: (details.priority ?? 'NORMAL').toLowerCase(),
+      tag: details.tag,
+      startDate: details.startDate,
+      dueDate: details.dueDate,
+      doneCriteria: details.doneCriteria,
       checklist: task.progress(),
-      checklistItems: d.checklistItems.map((item) => ({ ...item })),
-      goalId: d.goalId,
+      checklistItems: details.checklistItems.map((item) => ({ ...item })),
+      goalId: details.goalId,
       completedAt: toInstant(task.completedAt),
     };
   },

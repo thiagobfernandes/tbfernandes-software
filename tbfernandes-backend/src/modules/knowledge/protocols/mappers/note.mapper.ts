@@ -4,7 +4,6 @@ import { ValidNoteRequest } from '../note.request';
 import { NoteResponse } from '../note.response';
 import { LinksMapper, tagList } from './links.mapper';
 
-/** JSON ↔ Note. */
 export const NoteMapper = {
   toDetails(request: ValidNoteRequest): NoteDetails {
     return {
@@ -19,12 +18,12 @@ export const NoteMapper = {
   },
 
   toResponse(note: Note): NoteResponse {
-    const d = note.details;
+    const details = note.details;
     return {
       id: note.id,
-      title: d.title,
-      body: d.body,
-      tags: d.tags,
+      title: details.title,
+      body: details.body,
+      tags: details.tags,
       projectIds: LinksMapper.sorted(note.links.projectIds),
       taskIds: LinksMapper.sorted(note.links.taskIds),
       createdAt: toInstant(note.createdAt),

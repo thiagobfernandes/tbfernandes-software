@@ -7,7 +7,6 @@ import {
 import { NotFoundError } from '../../../common/domain';
 import { Skill, SkillDetails, SkillRepository } from '../domain';
 
-/** Skill use cases (RF-LRN-03). */
 @Injectable()
 export class SkillService {
   constructor(

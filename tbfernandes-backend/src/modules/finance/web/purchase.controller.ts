@@ -38,7 +38,6 @@ export class PurchaseController {
     return PurchaseMapper.toResponse(await this.purchases.get(id));
   }
 
-  /** FIN-04: when the purchase becomes affordable at the planned monthly saving. */
   @Get(':id/projection')
   async projection(@IdParam() id: string): Promise<ProjectionResponse> {
     return PurchaseMapper.toProjection(await this.purchases.projection(id));

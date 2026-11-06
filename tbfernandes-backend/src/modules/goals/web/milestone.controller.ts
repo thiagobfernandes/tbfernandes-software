@@ -30,14 +30,13 @@ import type { MilestoneListQuery, ValidMilestoneRequest } from '../protocols';
 export class MilestoneController {
   constructor(private readonly milestones: MilestoneService) {}
 
-  /** goalId keeps the milestones of one goal. */
   @Get()
   @ApiQuery({ name: 'goalId', required: false, type: String })
   async list(
     @ValidatedQuery(milestoneListQuerySchema) query: MilestoneListQuery,
   ): Promise<MilestoneResponse[]> {
-    return (await this.milestones.list(query.goalId)).map((m) =>
-      MilestoneMapper.toResponse(m),
+    return (await this.milestones.list(query.goalId)).map((milestone) =>
+      MilestoneMapper.toResponse(milestone),
     );
   }
 

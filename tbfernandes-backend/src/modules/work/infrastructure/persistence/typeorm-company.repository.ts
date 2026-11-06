@@ -5,7 +5,6 @@ import { Company, CompanyRepository } from '../../domain';
 import { CompanyEntity } from './company.entity';
 import { CompanyPersistenceMapper as Mapper } from './mappers/company.persistence-mapper';
 
-/** CompanyRepository on TypeORM. */
 @Injectable()
 export class TypeOrmCompanyRepository extends CompanyRepository {
   private readonly rows: BaseRepository<CompanyEntity>;

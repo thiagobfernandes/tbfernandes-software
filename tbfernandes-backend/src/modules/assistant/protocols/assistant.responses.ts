@@ -1,4 +1,3 @@
-/** A link to a record, as the frontend's assistant shows it. */
 export class ReferenceResponse {
   kind: string;
   label: string;
@@ -6,7 +5,6 @@ export class ReferenceResponse {
   excerpt: string | null;
 }
 
-/** The query a question was turned into (AST-03); enums in lower case. */
 export class QueryResponse {
   subject: string;
   aggregate: string;
@@ -23,7 +21,6 @@ export class QueryResponse {
   limit: number;
 }
 
-/** Same shape as the frontend's AssistantAnswer type. */
 export class AnswerResponse {
   text: string;
   references: ReferenceResponse[];
@@ -44,7 +41,6 @@ export class GraphEdgeResponse {
   target: string;
 }
 
-/** Nodes and edges of the knowledge graph screen (KNW-05). */
 export class GraphResponse {
   nodes: GraphNodeResponse[];
   edges: GraphEdgeResponse[];

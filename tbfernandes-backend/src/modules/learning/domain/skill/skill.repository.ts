@@ -1,6 +1,5 @@
 import { Skill } from './skill';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class SkillRepository {
   abstract create(skill: Skill): Promise<Skill>;
   abstract save(skill: Skill): Promise<Skill>;

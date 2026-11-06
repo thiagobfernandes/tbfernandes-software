@@ -14,10 +14,6 @@ import { TypeOrmInteractionRepository } from './infrastructure/persistence/typeo
 import { ContactController } from './web/contact.controller';
 import { InteractionController } from './web/interaction.controller';
 
-/**
- * Contacts: professional network and interaction history. Follow-up tasks are created
- * through FollowUpTasks (work's public API), never by writing to its tables.
- */
 @Module({
   imports: [
     WorkModule,

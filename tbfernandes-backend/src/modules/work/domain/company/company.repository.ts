@@ -1,6 +1,5 @@
 import { Company } from './company';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class CompanyRepository {
   abstract create(company: Company): Promise<Company>;
   abstract save(company: Company): Promise<Company>;

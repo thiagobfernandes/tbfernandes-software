@@ -21,10 +21,6 @@ import { ProjectController } from './web/project.controller';
 import { TaskController } from './web/task.controller';
 import { FollowUpTasks, WorkLookup } from './work.lookup';
 
-/**
- * Work: companies, projects and tasks. Reference module for the layout every other module
- * follows. Other modules use only WorkLookup, FollowUpTasks and the events in work.events.
- */
 @Module({
   imports: [
     DatabaseModule.forFeature([

@@ -65,7 +65,6 @@ export class ProjectController {
     );
   }
 
-  /** The project's tasks stay, without project (RN-01). */
   @Delete(':id')
   @HttpCode(204)
   async delete(@IdParam() id: string): Promise<void> {

@@ -9,7 +9,6 @@ export interface DatabaseConfig {
   password: string;
   database: string;
   logging: boolean;
-  /** Folders of SQL migrations, applied in order (db/migration plus the profile's extras). */
   migrationLocations: string[];
 }
 

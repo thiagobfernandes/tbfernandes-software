@@ -9,11 +9,11 @@ const inDays = (days: number) => {
   return date.toISOString().slice(0, 10);
 };
 
-/** Port of LearningApiIntegrationTests. */
 describe('Learning API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
-  const ids = (body: unknown) => (body as { id: string }[]).map((i) => i.id);
+  const ids = (body: unknown) =>
+    (body as { id: string }[]).map((item) => item.id);
 
   beforeAll(async () => {
     app = await startApp();

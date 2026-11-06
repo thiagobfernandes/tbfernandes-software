@@ -26,7 +26,6 @@ export interface MonthView {
   businessExpense: number;
 }
 
-/** Read access to finance data for other modules (goals, assistant). */
 export abstract class FinanceLookup {
   abstract purchases(ownerId: string): Promise<PurchaseView[]>;
   abstract month(ownerId: string, month: YearMonth): Promise<MonthView>;

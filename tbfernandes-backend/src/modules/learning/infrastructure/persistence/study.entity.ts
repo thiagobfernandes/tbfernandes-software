@@ -33,7 +33,6 @@ export class StudyEntity extends AuditedEntity {
   @Column('varchar', { nullable: true })
   nextActivity: string | null;
 
-  /** Read through the relation; written by the repository. */
   @OneToMany(() => StudySkillEntity, (link) => link.study)
   skills?: StudySkillEntity[];
 }

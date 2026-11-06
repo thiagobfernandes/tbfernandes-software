@@ -71,7 +71,7 @@ const has = (question: string, intent: string) =>
 
 const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const plural = (n: number, suffix = 's') => (n > 1 ? suffix : '');
+const plural = (count: number, suffix = 's') => (count > 1 ? suffix : '');
 
 const rules = (text: string, references: Reference[]) =>
   answerOf(text, references, 'rules');
@@ -91,8 +91,8 @@ export const RuleBasedAssistant = {
   answer(rawQuestion: string, data: Workspace): Answer {
     const question = rawQuestion.toLowerCase();
     const openTasks = data.tasks.filter(isOpenTask);
-    const project = data.projects.find((p) =>
-      RuleBasedAssistant.mentions(question, p.name),
+    const project = data.projects.find((candidate) =>
+      RuleBasedAssistant.mentions(question, candidate.name),
     );
     if (project) return aboutProject(project, data);
     if (has(question, 'overdue')) return overdue(openTasks, data);
@@ -113,8 +113,8 @@ export const RuleBasedAssistant = {
   understands(rawQuestion: string, data: Workspace): boolean {
     const question = rawQuestion.toLowerCase();
     return (
-      data.projects.some((p) =>
-        RuleBasedAssistant.mentions(question, p.name),
+      data.projects.some((project) =>
+        RuleBasedAssistant.mentions(question, project.name),
       ) || Object.keys(INTENTS).some((intent) => has(question, intent))
     );
   },
@@ -146,11 +146,13 @@ export const RuleBasedAssistant = {
 };
 
 function aboutProject(project: ProjectRecord, data: Workspace): Answer {
-  const tasks = data.tasks.filter((t) => t.projectId === project.id);
-  const done = tasks.filter((t) => t.status === 'done').length;
+  const tasks = data.tasks.filter((task) => task.projectId === project.id);
+  const done = tasks.filter((task) => task.status === 'done').length;
   const open = tasks.filter(isOpenTask);
-  const blocked = open.filter((t) => t.status === 'blocked');
-  const notes = data.notes.filter((n) => n.projectIds.includes(project.id));
+  const blocked = open.filter((task) => task.status === 'blocked');
+  const notes = data.notes.filter((note) =>
+    note.projectIds.includes(project.id),
+  );
   const percent = tasks.length ? Math.round((done * 100) / tasks.length) : 0;
   const parts = [
     `**${project.name}** está ${PROJECT_STATUS_TEXT[project.status] ?? project.status}: ${done} de ${tasks.length} tarefas concluídas (${percent}%).`,
@@ -163,88 +165,90 @@ function aboutProject(project: ProjectRecord, data: Workspace): Answer {
       : 'Tarefas abertas:\n' +
           open
             .map(
-              (t) =>
-                `- ${t.title}${t.dueDate == null ? '' : ` (${Format.due(t.dueDate, data.today)})`}`,
+              (task) =>
+                `- ${task.title}${task.dueDate == null ? '' : ` (${Format.due(task.dueDate, data.today)})`}`,
             )
             .join('\n'),
   );
   if (blocked.length)
     parts.push(
-      `⚠ ${blocked.length} bloqueada${plural(blocked.length)}: ${blocked.map((t) => t.title).join(', ')}.`,
+      `⚠ ${blocked.length} bloqueada${plural(blocked.length)}: ${blocked.map((task) => task.title).join(', ')}.`,
     );
   if (notes.length) {
-    const s = plural(notes.length);
+    const pluralSuffix = plural(notes.length);
     parts.push(
-      `${notes.length} nota${s} vinculada${s} pode${plural(notes.length, 'm')} ajudar.`,
+      `${notes.length} nota${pluralSuffix} vinculada${pluralSuffix} pode${plural(notes.length, 'm')} ajudar.`,
     );
   }
   return rules(parts.join('\n\n'), [
     reference('Projeto', project.name, `/projects/view?id=${project.id}`),
-    ...open.slice(0, 4).map((t) => taskRef(t.title)),
+    ...open.slice(0, 4).map((task) => taskRef(task.title)),
     ...notes.map(noteRef),
   ]);
 }
 
 function overdue(openTasks: TaskRecord[], data: Workspace): Answer {
   const late = openTasks.filter(
-    (t) => t.dueDate != null && t.dueDate < data.today,
+    (task) => task.dueDate != null && task.dueDate < data.today,
   );
-  const s = plural(late.length);
+  const pluralSuffix = plural(late.length);
   const text =
     late.length === 0
       ? 'Nada atrasado. 🎉'
-      : `Você tem ${late.length} tarefa${s} atrasada${s}:\n${late
+      : `Você tem ${late.length} tarefa${pluralSuffix} atrasada${pluralSuffix}:\n${late
           .map(
-            (t) =>
-              `- **${t.title}**, ${Format.due(t.dueDate!, data.today)}${t.status === 'blocked' ? ' (bloqueada)' : ''}`,
+            (task) =>
+              `- **${task.title}**, ${Format.due(task.dueDate!, data.today)}${task.status === 'blocked' ? ' (bloqueada)' : ''}`,
           )
           .join(
             '\n',
           )}\n\nComece pelas bloqueadas: elas geralmente precisam de uma mensagem, não de trabalho.`;
   return rules(
     text,
-    late.map((t) => taskRef(t.title)),
+    late.map((task) => taskRef(task.title)),
   );
 }
 
 function focus(openTasks: TaskRecord[], data: Workspace): Answer {
   const list = openTasks
     .filter(
-      (t) =>
-        t.dueDate != null && Format.daysBetween(data.today, t.dueDate) <= 2,
+      (task) =>
+        task.dueDate != null &&
+        Format.daysBetween(data.today, task.dueDate) <= 2,
     )
     .sort(
-      (a, b) =>
-        (PRIORITY_RANK[a.priority] ?? 2) - (PRIORITY_RANK[b.priority] ?? 2) ||
-        a.dueDate!.localeCompare(b.dueDate!),
+      (left, right) =>
+        (PRIORITY_RANK[left.priority] ?? 2) -
+          (PRIORITY_RANK[right.priority] ?? 2) ||
+        left.dueDate!.localeCompare(right.dueDate!),
     );
   const text =
     list.length === 0
       ? 'Nada vence nos próximos dois dias. Bom momento para o backlog ou para estudar.'
       : `Para hoje, nesta ordem:\n${list
           .map(
-            (t, i) =>
-              `${i + 1}. **${t.title}** · prioridade ${PRIORITY_TEXT[t.priority] ?? t.priority} · ${Format.due(t.dueDate!, data.today)}`,
+            (task, index) =>
+              `${index + 1}. **${task.title}** · prioridade ${PRIORITY_TEXT[task.priority] ?? task.priority} · ${Format.due(task.dueDate!, data.today)}`,
           )
           .join('\n')}\n\nOrdenado por prioridade e depois por prazo.`;
   return rules(
     text,
-    list.map((t) => taskRef(t.title)),
+    list.map((task) => taskRef(task.title)),
   );
 }
 
 function purchases(all: PurchaseRecord[]): Answer {
-  const open = all.filter((p) => p.status !== 'bought');
+  const open = all.filter((purchase) => purchase.status !== 'bought');
   const text =
     open.length === 0
       ? 'Nenhuma compra planejada.'
       : open
-          .map((p) => {
-            if (p.ready)
-              return `- **${p.name}**: valor todo reservado, pronto para comprar.`;
-            if (p.months == null)
-              return `- **${p.name}**: ${Format.brl(p.missing)} faltando, sem economia mensal definida.`;
-            return `- **${p.name}**: ${Format.brl(p.missing)} faltando, dá para comprar em ${p.months} meses${p.onTime === false ? ' (depois do que você queria)' : ''}.`;
+          .map((purchase) => {
+            if (purchase.ready)
+              return `- **${purchase.name}**: valor todo reservado, pronto para comprar.`;
+            if (purchase.months == null)
+              return `- **${purchase.name}**: ${Format.brl(purchase.missing)} faltando, sem economia mensal definida.`;
+            return `- **${purchase.name}**: ${Format.brl(purchase.missing)} faltando, dá para comprar em ${purchase.months} meses${purchase.onTime === false ? ' (depois do que você queria)' : ''}.`;
           })
           .join('\n');
   return rules(text, [
@@ -253,81 +257,93 @@ function purchases(all: PurchaseRecord[]): Answer {
 }
 
 function goals(all: GoalRecord[]): Answer {
-  const active = all.filter((g) => g.status === 'active');
+  const active = all.filter((goal) => goal.status === 'active');
   const text =
     active.length === 0
       ? 'Nenhuma meta ativa.'
       : 'Metas ativas:\n' +
         active
           .map(
-            (g) => `- **${g.name}**: ${g.percent}% (${g.basis.toLowerCase()})`,
+            (goal) =>
+              `- **${goal.name}**: ${goal.percent}% (${goal.basis.toLowerCase()})`,
           )
           .join('\n');
   return rules(
     text,
-    active.map((g) => reference('Meta', g.name, `/goals/view?id=${g.id}`)),
+    active.map((goal) =>
+      reference('Meta', goal.name, `/goals/view?id=${goal.id}`),
+    ),
   );
 }
 
 function contacts(all: ContactRecord[], data: Workspace): Answer {
   const due = all
     .filter(
-      (c) =>
-        c.nextContact != null &&
-        Format.daysBetween(data.today, c.nextContact) <= 7,
+      (contact) =>
+        contact.nextContact != null &&
+        Format.daysBetween(data.today, contact.nextContact) <= 7,
     )
-    .sort((a, b) => a.nextContact!.localeCompare(b.nextContact!));
+    .sort((left, right) => left.nextContact!.localeCompare(right.nextContact!));
   const text =
     due.length === 0
       ? 'Nenhum follow-up nesta semana.'
       : 'Follow-ups desta semana:\n' +
         due
           .map(
-            (c) =>
-              `- **${c.name}** (${Format.present(c.role) ? c.role : 'contato'}), ${Format.due(c.nextContact!, data.today)}`,
+            (contact) =>
+              `- **${contact.name}** (${Format.present(contact.role) ? contact.role : 'contato'}), ${Format.due(contact.nextContact!, data.today)}`,
           )
           .join('\n');
   return rules(
     text,
-    due.map((c) => reference('Contato', c.name, `/contacts?contact=${c.id}`)),
+    due.map((contact) =>
+      reference('Contato', contact.name, `/contacts?contact=${contact.id}`),
+    ),
   );
 }
 
 function learning(studies: StudyRecord[]): Answer {
-  const ongoing = studies.filter((s) => s.status !== 'completed');
+  const ongoing = studies.filter((study) => study.status !== 'completed');
   const text =
     ongoing.length === 0
       ? 'Nenhum estudo em andamento.'
       : 'Estudos em andamento:\n' +
         ongoing
           .map(
-            (s) =>
-              `- **${s.name}**: ${Format.present(s.nextActivity) ? s.nextActivity : 'sem próxima atividade definida'}`,
+            (study) =>
+              `- **${study.name}**: ${Format.present(study.nextActivity) ? study.nextActivity : 'sem próxima atividade definida'}`,
           )
           .join('\n');
   return rules(text, [reference('Aprendizado', 'Aprendizado', '/learning')]);
 }
 
-/** Fallback: search knowledge and tasks for the question's words. */
 function search(question: string, data: Workspace): Answer {
-  const words = question.split(/[^\p{L}\p{N}]+/u).filter((w) => w.length > 3);
+  const words = question
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((word) => word.length > 3);
   const matches = (text: string) => {
     const lower = text.toLowerCase();
-    return words.some((w) => lower.includes(w));
+    return words.some((word) => lower.includes(word));
   };
   const references: Reference[] = [
     ...data.notes
-      .filter((n) => matches(`${n.title} ${n.body} ${n.tags.join(' ')}`))
+      .filter((note) =>
+        matches(`${note.title} ${note.body} ${note.tags.join(' ')}`),
+      )
       .map(noteRef),
     ...data.snippets
-      .filter((s) =>
-        matches(`${s.title} ${s.explanation ?? ''} ${s.tags.join(' ')}`),
+      .filter((snippet) =>
+        matches(
+          `${snippet.title} ${snippet.explanation ?? ''} ${snippet.tags.join(' ')}`,
+        ),
       )
-      .map((s) => reference('Snippet', s.title, '/knowledge/snippets')),
+      .map((snippet) =>
+        reference('Snippet', snippet.title, '/knowledge/snippets'),
+      ),
     ...data.tasks
-      .filter((t) => matches(`${t.title} ${t.description ?? ''}`))
+      .filter((task) => matches(`${task.title} ${task.description ?? ''}`))
       .slice(0, 5)
-      .map((t) => taskRef(t.title)),
+      .map((task) => taskRef(task.title)),
   ];
   const text =
     references.length === 0

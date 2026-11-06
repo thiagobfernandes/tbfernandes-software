@@ -56,7 +56,6 @@ export class DesktopRuntime {
     return runtime;
   }
 
-  /** What exit() runs before PostgreSQL stops: closing the Nest app. */
   onExit(handler: () => Promise<void>): void {
     this.exitHandler = handler;
   }
@@ -90,7 +89,6 @@ export class DesktopRuntime {
 
 let current: DesktopRuntime | null = null;
 
-/** The runtime of this process, or null outside the desktop profile. */
 export const desktopRuntime = (): DesktopRuntime | null => current;
 
 function isAlive(pid: number): boolean {

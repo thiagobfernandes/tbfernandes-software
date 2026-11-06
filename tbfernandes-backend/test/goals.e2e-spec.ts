@@ -3,7 +3,6 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { create, eventually, startApp } from './support/test-app';
 
-/** Port of GoalsApiIntegrationTests and of the goal link in FinanceApiIntegrationTests. */
 describe('Goals API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
@@ -111,7 +110,9 @@ describe('Goals API', () => {
     const remaining = (await http().get('/api/v1/milestones')).body as {
       id: string;
     }[];
-    expect(remaining.map((m) => m.id)).not.toContain(milestone);
+    expect(
+      remaining.map((remainingMilestone) => remainingMilestone.id),
+    ).not.toContain(milestone);
   });
 
   it('activates the goal and counts a completed linked task (GOL-05)', async () => {
@@ -140,9 +141,9 @@ describe('Goals API', () => {
       (await http().get(`/api/v1/goals/${goalId}`)).body.indicator.current,
     ).toBe(1);
     const links = await http().get(`/api/v1/goals/${goalId}/links`);
-    expect((links.body.tasks as { id: string }[]).map((t) => t.id)).toEqual([
-      taskId,
-    ]);
+    expect(
+      (links.body.tasks as { id: string }[]).map((task) => task.id),
+    ).toEqual([taskId]);
   });
 
   it('lists the purchases linked to a goal', async () => {

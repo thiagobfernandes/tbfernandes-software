@@ -1,7 +1,6 @@
 import { BusinessRuleViolationError, InvalidArgumentError } from './errors';
 import { IsoDate } from './types';
 
-/** Guards for domain invariants, so entities stay free of framework validation. */
 export const Require = {
   text(
     value: string | null | undefined,

@@ -9,18 +9,16 @@ const SKIPPED = new Set(['postmaster.pid', 'postmaster.opts']);
 
 export interface BackupSettings {
   backupDir: string;
-  /** How many zip files to keep, newest first. */
   keep: number;
   intervalMs: number;
   appVersion: string;
-  /** Holds the app version of the last start. */
   versionFile: string;
   now?: () => Date;
 }
 
-const pad = (n: number) => String(n).padStart(2, '0');
-const stamp = (d: Date) =>
-  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+const pad = (value: number) => String(value).padStart(2, '0');
+const stamp = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
 
 async function exists(path: string): Promise<boolean> {
   return fs.stat(path).then(
@@ -80,20 +78,19 @@ export class DataBackup {
       : null;
   }
 
-  /** Newest first. */
   async backups(): Promise<Array<{ path: string; modified: number }>> {
     const dir = this.settings.backupDir;
     if (!(await exists(dir))) return [];
     const names = (await fs.readdir(dir)).filter(
-      (n) => n.startsWith(PREFIX) && n.endsWith('.zip'),
+      (fileName) => fileName.startsWith(PREFIX) && fileName.endsWith('.zip'),
     );
     const files = await Promise.all(
-      names.map(async (n) => ({
-        path: join(dir, n),
-        modified: (await fs.stat(join(dir, n))).mtimeMs,
+      names.map(async (fileName) => ({
+        path: join(dir, fileName),
+        modified: (await fs.stat(join(dir, fileName))).mtimeMs,
       })),
     );
-    return files.sort((a, b) => b.modified - a.modified);
+    return files.sort((left, right) => right.modified - left.modified);
   }
 
   private async write(pgData: string): Promise<string> {
@@ -129,10 +126,10 @@ export class DataBackup {
 async function walk(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const nested = await Promise.all(
-    entries.map((e) => {
-      const path = join(dir, e.name);
-      if (e.isDirectory()) return walk(path);
-      return Promise.resolve(e.isFile() ? [path] : []);
+    entries.map((entry) => {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) return walk(path);
+      return Promise.resolve(entry.isFile() ? [path] : []);
     }),
   );
   return nested.flat();

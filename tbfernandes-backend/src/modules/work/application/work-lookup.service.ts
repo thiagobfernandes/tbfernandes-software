@@ -14,7 +14,6 @@ import {
 } from '../work.lookup';
 import { TaskService } from './task.service';
 
-/** Implements the work module's public API (WRK-08) on top of its own repositories. */
 @Injectable()
 export class WorkLookupService implements WorkLookup, FollowUpTasks {
   constructor(
@@ -46,31 +45,31 @@ export class WorkLookupService implements WorkLookup, FollowUpTasks {
 
   async projects(ownerId: string): Promise<ProjectView[]> {
     return (await this.projectsRepo.findAll(ownerId)).map((project) => {
-      const d = project.details;
+      const details = project.details;
       return {
         id: project.id,
-        name: d.name,
+        name: details.name,
         status: project.status.toLowerCase(),
-        companyId: d.companyId,
-        goalId: d.goalId,
-        dueDate: d.dueDate,
-        nextDelivery: d.nextDelivery,
+        companyId: details.companyId,
+        goalId: details.goalId,
+        dueDate: details.dueDate,
+        nextDelivery: details.nextDelivery,
       };
     });
   }
 
   async tasks(ownerId: string): Promise<TaskView[]> {
     return (await this.tasksRepo.findAll(ownerId)).map((task) => {
-      const d = task.details;
+      const details = task.details;
       return {
         id: task.id,
-        title: d.title,
-        description: d.description,
+        title: details.title,
+        description: details.description,
         status: task.status.toLowerCase(),
-        priority: (d.priority ?? 'NORMAL').toLowerCase(),
-        projectId: d.projectId,
-        goalId: d.goalId,
-        dueDate: d.dueDate,
+        priority: (details.priority ?? 'NORMAL').toLowerCase(),
+        projectId: details.projectId,
+        goalId: details.goalId,
+        dueDate: details.dueDate,
       };
     });
   }

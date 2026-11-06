@@ -86,7 +86,9 @@ export class SqlMigrator {
 
   private isApplied(script: MigrationScript, applied: AppliedRow[]): boolean {
     if (script.kind === 'versioned') {
-      const row = applied.find((r) => r.version === script.version);
+      const row = applied.find(
+        (appliedScript) => appliedScript.version === script.version,
+      );
       if (row && row.checksum !== script.checksum) {
         Logger.warn(
           `Migration ${script.script} changed after it was applied; applied migrations must not be edited`,
@@ -95,7 +97,11 @@ export class SqlMigrator {
       return !!row;
     }
     const last = applied
-      .filter((r) => r.version === null && r.script === script.script)
+      .filter(
+        (appliedScript) =>
+          appliedScript.version === null &&
+          appliedScript.script === script.script,
+      )
       .pop();
     return !!last && last.checksum === script.checksum;
   }

@@ -28,103 +28,100 @@ const optionalCents = (value: number | null) =>
 const optionalNumber = (cents: number | null) =>
   cents == null ? null : Money.toNumber(cents);
 
-/** JSON ↔ FinanceEntry. */
 export const EntryMapper = {
-  toDetails(r: ValidEntryRequest): EntryDetails {
-    return { ...r, amount: Money.cents(r.amount) };
+  toDetails(request: ValidEntryRequest): EntryDetails {
+    return { ...request, amount: Money.cents(request.amount) };
   },
 
   toResponse(entry: FinanceEntry): EntryResponse {
-    const d = entry.details;
+    const details = entry.details;
     return {
       id: entry.id,
-      kind: d.kind.toLowerCase(),
-      scope: d.scope.toLowerCase(),
-      category: d.category,
-      description: d.description,
-      amount: Money.toNumber(d.amount),
-      date: d.date,
-      recurring: d.recurring,
+      kind: details.kind.toLowerCase(),
+      scope: details.scope.toLowerCase(),
+      category: details.category,
+      description: details.description,
+      amount: Money.toNumber(details.amount),
+      date: details.date,
+      recurring: details.recurring,
     };
   },
 };
 
-function totals(t: MonthTotals): MonthTotalsResponse {
+function totals(monthTotals: MonthTotals): MonthTotalsResponse {
   return {
-    month: t.month,
-    income: Money.toNumber(t.income),
-    expense: Money.toNumber(t.expense),
-    balance: Money.toNumber(t.balance),
+    month: monthTotals.month,
+    income: Money.toNumber(monthTotals.income),
+    expense: Money.toNumber(monthTotals.expense),
+    balance: Money.toNumber(monthTotals.balance),
   };
 }
 
-/** CashFlow → JSON. */
 export const CashFlowMapper = {
-  toResponse(c: CashFlow): CashFlowResponse {
+  toResponse(cashFlow: CashFlow): CashFlowResponse {
     return {
-      month: c.month,
-      scope: c.scope?.toLowerCase() ?? 'all',
-      totals: totals(c.totals),
-      series: c.series.map(totals),
-      expensesByCategory: c.expensesByCategory.map((e) => ({
-        category: e.category,
-        amount: Money.toNumber(e.amount),
+      month: cashFlow.month,
+      scope: cashFlow.scope?.toLowerCase() ?? 'all',
+      totals: totals(cashFlow.totals),
+      series: cashFlow.series.map(totals),
+      expensesByCategory: cashFlow.expensesByCategory.map((categoryTotal) => ({
+        category: categoryTotal.category,
+        amount: Money.toNumber(categoryTotal.amount),
       })),
     };
   },
 };
 
-/** JSON ↔ PurchaseGoal. */
 export const PurchaseMapper = {
-  toDetails(r: ValidPurchaseRequest): PurchaseDetails {
+  toDetails(request: ValidPurchaseRequest): PurchaseDetails {
     return {
-      ...r,
-      estimated: Money.cents(r.estimated),
-      reserved: optionalCents(r.reserved),
-      monthlySaving: optionalCents(r.monthlySaving),
-      paid: optionalCents(r.paid),
+      ...request,
+      estimated: Money.cents(request.estimated),
+      reserved: optionalCents(request.reserved),
+      monthlySaving: optionalCents(request.monthlySaving),
+      paid: optionalCents(request.paid),
     };
   },
 
   toResponse(purchase: PurchaseGoal): PurchaseResponse {
-    const d = purchase.details;
+    const details = purchase.details;
     return {
       id: purchase.id,
-      name: d.name,
-      description: d.description,
-      estimated: Money.toNumber(d.estimated),
+      name: details.name,
+      description: details.description,
+      estimated: Money.toNumber(details.estimated),
       reserved: Money.toNumber(purchase.reserved),
-      monthlySaving: optionalNumber(d.monthlySaving),
+      monthlySaving: optionalNumber(details.monthlySaving),
       priority: purchase.priority.toLowerCase(),
-      desiredDate: d.desiredDate,
-      goalId: d.goalId,
+      desiredDate: details.desiredDate,
+      goalId: details.goalId,
       status: purchase.status.toLowerCase(),
-      paid: optionalNumber(d.paid),
+      paid: optionalNumber(details.paid),
     };
   },
 
-  toProjection(p: Projection): ProjectionResponse {
-    return { ...p, missing: Money.toNumber(p.missing) };
+  toProjection(projection: Projection): ProjectionResponse {
+    return { ...projection, missing: Money.toNumber(projection.missing) };
   },
 };
 
 /** BankConnection → JSON. The provider's id stays inside the backend. */
 export const ConnectionMapper = {
   toResponse(connection: BankConnection): ConnectionResponse {
-    const d = connection.details;
+    const details = connection.details;
     return {
       id: connection.id,
-      institution: d.institution,
-      scope: d.scope.toLowerCase(),
-      status: d.status.toLowerCase(),
-      lastSyncedAt: toInstant(d.lastSyncedAt),
-      lastError: d.lastError,
-      accounts: d.accounts.map((a) => ({
-        externalId: a.externalId,
-        name: a.name,
-        type: a.type.toLowerCase(),
-        balance: optionalNumber(a.balance),
-        currency: a.currency,
+      institution: details.institution,
+      scope: details.scope.toLowerCase(),
+      status: details.status.toLowerCase(),
+      lastSyncedAt: toInstant(details.lastSyncedAt),
+      lastError: details.lastError,
+      accounts: details.accounts.map((account) => ({
+        externalId: account.externalId,
+        name: account.name,
+        type: account.type.toLowerCase(),
+        balance: optionalNumber(account.balance),
+        currency: account.currency,
       })),
     };
   },

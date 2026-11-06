@@ -25,7 +25,6 @@ export type GoalStatus = (typeof GOAL_STATUSES)[number];
 export const GOAL_PRIORITIES = ['LOW', 'NORMAL', 'HIGH'] as const;
 export type GoalPriority = (typeof GOAL_PRIORITIES)[number];
 
-/** The editable fields of a goal. */
 export interface GoalDetails {
   name: string;
   description: string | null;
@@ -40,7 +39,6 @@ export interface GoalDetails {
   parentId: string | null;
 }
 
-/** The fields of a goal once its rules have run. */
 export type ValidGoalDetails = Omit<GoalDetails, 'indicator'> & {
   indicator: Indicator | null;
 };
@@ -48,7 +46,6 @@ export type ValidGoalDetails = Omit<GoalDetails, 'indicator'> & {
 export const SELF_PARENT_MESSAGE =
   'Uma meta não pode ser submeta dela mesma nem das suas submetas';
 
-/** A goal or sub-goal (RF-GOL-01, RF-GOL-02). */
 export class Goal {
   private constructor(
     readonly id: string,
@@ -64,14 +61,16 @@ export class Goal {
     );
   }
 
-  /** Rebuilds a goal already stored; no rules run. */
   static restore(id: string, ownerId: string, details: ValidGoalDetails) {
     return new Goal(id, ownerId, details);
   }
 
   get details(): ValidGoalDetails {
-    const d = this._details;
-    return { ...d, indicator: d.indicator && { ...d.indicator } };
+    const details = this._details;
+    return {
+      ...details,
+      indicator: details.indicator && { ...details.indicator },
+    };
   }
 
   get status(): GoalStatus {
@@ -103,32 +102,44 @@ export class Goal {
    * counted in "tasks" goes up by one. Returns true if anything changed.
    */
   linkedTaskCompleted(): boolean {
-    const d = this._details;
+    const details = this._details;
     const status = this.status === 'PLANNED' ? 'ACTIVE' : this.status;
-    let indicator = d.indicator;
+    let indicator = details.indicator;
     if (indicator && indicator.unit.toLowerCase() === 'tasks')
       indicator = { ...indicator, current: indicator.current + 100 };
-    if (status === this.status && indicator === d.indicator) return false;
-    this._details = { ...d, status, indicator };
+    if (status === this.status && indicator === details.indicator) return false;
+    this._details = { ...details, status, indicator };
     return true;
   }
 
-  private static validated(id: string, d: GoalDetails): ValidGoalDetails {
-    if (d.parentId != null && d.parentId === id) {
+  private static validated(id: string, details: GoalDetails): ValidGoalDetails {
+    if (details.parentId != null && details.parentId === id) {
       throw new BusinessRuleViolationError('RN-19', SELF_PARENT_MESSAGE);
     }
     return {
-      name: Require.text(d.name, 'name', 200),
-      description: Require.optionalText(d.description, 'description', 2000),
-      area: Require.present(d.area, 'area'),
-      status: d.status ?? 'PLANNED',
-      priority: d.priority ?? 'NORMAL',
-      currentState: Require.optionalText(d.currentState, 'currentState', 2000),
-      desiredResult: Require.text(d.desiredResult, 'desiredResult', 2000),
-      doneCriteria: Require.optionalText(d.doneCriteria, 'doneCriteria', 1000),
-      dueDate: d.dueDate ?? null,
-      indicator: d.indicator && Indicators.of(d.indicator),
-      parentId: d.parentId ?? null,
+      name: Require.text(details.name, 'name', 200),
+      description: Require.optionalText(
+        details.description,
+        'description',
+        2000,
+      ),
+      area: Require.present(details.area, 'area'),
+      status: details.status ?? 'PLANNED',
+      priority: details.priority ?? 'NORMAL',
+      currentState: Require.optionalText(
+        details.currentState,
+        'currentState',
+        2000,
+      ),
+      desiredResult: Require.text(details.desiredResult, 'desiredResult', 2000),
+      doneCriteria: Require.optionalText(
+        details.doneCriteria,
+        'doneCriteria',
+        1000,
+      ),
+      dueDate: details.dueDate ?? null,
+      indicator: details.indicator && Indicators.of(details.indicator),
+      parentId: details.parentId ?? null,
     };
   }
 }

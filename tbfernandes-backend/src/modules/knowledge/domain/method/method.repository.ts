@@ -1,6 +1,5 @@
 import { Method } from './method';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class MethodRepository {
   abstract create(method: Method): Promise<Method>;
   abstract save(method: Method): Promise<Method>;

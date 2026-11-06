@@ -11,7 +11,6 @@ export const EMBEDDED_DATABASE = 'tbfernandes';
 const WINDOWS = process.platform === 'win32';
 const TIMEOUT_S = 90;
 
-/** Connection settings of the running server. */
 export interface EmbeddedConnection {
   host: string;
   port: number;
@@ -234,7 +233,6 @@ export class EmbeddedPostgres {
     return this.exec('pg_ctl', args, logName, true);
   }
 
-  /** Runs a PostgreSQL tool with its output in logs/<logName>; returns the exit code. */
   private async exec(
     name: string,
     args: string[],

@@ -104,18 +104,19 @@ O `OwnerContext` é implementado pelo módulo identity (`SessionOwnerContext`), 
 ### IA do assistente (etapa 8)
 
 - Classe abstrata: `LanguageModel`, em `modules/assistant/application`. O modelo transforma a pergunta em um `StructuredQuery` (saída estruturada em JSON) e depois reescreve o texto. Ele nunca acessa o banco: `QueryEngine` executa a consulta sobre o retrato dos dados, e as referências vêm sempre dessa execução, então todo link aponta para um registro real (RN-20).
-- Implementações (em `modules/assistant/infrastructure/model`): `DisabledLanguageModel` (padrão, `TBF_ASSISTANT_MODEL=none`) e `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`). Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
+- Implementações (em `modules/assistant/infrastructure/model`): `DisabledLanguageModel` (padrão, `TBF_ASSISTANT_MODEL=none`), `AnthropicLanguageModel` (`anthropic`, com `ANTHROPIC_API_KEY`, saída estruturada estrita) e `OpenAiCompatibleLanguageModel` (`openai-compatible`: Groq por padrão, xAI ou Ollama pela URL; modo JSON com o schema nas instruções, validado por `QueryPlans`). Os prompts ficam em `model/prompts.ts`, iguais para todos. Detalhes em [etapa 10](implementacao/etapa-10-assistente-ia.md).
 - Se o modelo falhar, a API responde com as regras; o assistente nunca fica fora do ar por causa da IA.
 
 ### RAG do assistente (etapa 11)
 
 - Perguntas abertas são respondidas com trechos das notas e snippets. `KnowledgeRetrievalService` mantém o índice `assistant.knowledge_chunk` em dia (só reprocessa o que mudou) e `PassageRanker` faz a busca híbrida (BM25 + cosseno) em TypeScript puro.
-- Portas: `EmbeddingModel` (adaptadores `DisabledEmbeddingModel`, padrão, e `VoyageEmbeddingModel`, com `TBF_ASSISTANT_EMBEDDING=voyage`) e `KnowledgeIndex` (`SqlKnowledgeIndex`). O `LanguageModel` ganhou `answerFromPassages`.
+- Portas: `EmbeddingModel` (adaptadores `DisabledEmbeddingModel`, padrão, `VoyageEmbeddingModel`, com `TBF_ASSISTANT_EMBEDDING=voyage`, e `OllamaEmbeddingModel`, com `ollama`, local e gratuito, `bge-m3` por padrão) e `KnowledgeIndex` (`SqlKnowledgeIndex`). O `LanguageModel` ganhou `answerFromPassages`.
+- Observabilidade (AST-05): `AssistantTracer`, em `modules/assistant/application`, com `DisabledTracer` (padrão) e `LangfuseTracer` (`TBF_ASSISTANT_TRACING=langfuse`, OpenTelemetry com provider próprio e `LangfuseSpanProcessor`). Um trace `answer-question` por pergunta, com `userId` do dono; os adapters de modelo e de embedding abrem generations e embeddings, e a busca do RAG abre um retriever. Falha no tracing nunca muda a resposta.
 - Sem pgvector: os vetores ficam em `real[]` porque o PostgreSQL embutido do app desktop não tem a extensão. Detalhes em [etapa 11](implementacao/etapa-11-rag.md).
 
 ### Leitura entre módulos do assistant
 
-O assistant monta um `Workspace` (retrato só leitura) com as APIs públicas `WorkLookup`, `KnowledgeLookup`, `GoalsLookup`, `LearningLookup`, `FinanceLookup` e `ContactsLookup`. As respostas (`RuleBasedAssistant`) e o grafo (`KnowledgeGraphs`) são funções puras desse retrato, testadas sem Nest.
+O assistant monta um `Workspace` (retrato só leitura, lido pelo `WorkspaceReader`) com as APIs públicas `WorkLookup`, `KnowledgeLookup`, `GoalsLookup`, `LearningLookup`, `FinanceLookup` e `ContactsLookup`. As respostas (`RuleBasedAssistant`) e o grafo (`KnowledgeGraphs`) são funções puras desse retrato, testadas sem Nest.
 
 ## 6. Convenções
 

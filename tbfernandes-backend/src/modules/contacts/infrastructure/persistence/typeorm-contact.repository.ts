@@ -5,7 +5,6 @@ import { Contact, ContactRepository } from '../../domain';
 import { ContactEntity } from './contact.entity';
 import { ContactPersistenceMapper as Mapper } from './mappers/contact.persistence-mapper';
 
-/** ContactRepository on TypeORM. */
 @Injectable()
 export class TypeOrmContactRepository extends ContactRepository {
   private readonly rows: BaseRepository<ContactEntity>;

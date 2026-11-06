@@ -22,71 +22,70 @@ import { StudyResponse, ValidStudyRequest } from '../study.request';
 /** Stable order, so equal data gives equal JSON. */
 const sorted = (ids: readonly string[]) => [...ids].sort();
 
-/** JSON ↔ Study. */
 export const StudyMapper = {
-  toDetails(r: ValidStudyRequest): StudyDetails {
-    return { ...r, skillIds: r.skillIds ?? [] };
+  toDetails(request: ValidStudyRequest): StudyDetails {
+    return { ...request, skillIds: request.skillIds ?? [] };
   },
   toResponse(study: Study): StudyResponse {
-    const d = study.details;
+    const details = study.details;
     return {
       id: study.id,
-      ...d,
+      ...details,
       status: study.status.toLowerCase(),
-      skillIds: sorted(d.skillIds),
+      skillIds: sorted(details.skillIds),
     };
   },
 };
 
-/** JSON ↔ Material. */
 export const MaterialMapper = {
-  toDetails(r: ValidMaterialRequest): MaterialDetails {
-    return { ...r };
+  toDetails(request: ValidMaterialRequest): MaterialDetails {
+    return { ...request };
   },
   toResponse(material: Material): MaterialResponse {
-    const d = material.details;
+    const details = material.details;
     return {
       id: material.id,
-      ...d,
-      type: d.type.toLowerCase(),
+      ...details,
+      type: details.type.toLowerCase(),
       status: material.status.toLowerCase(),
     };
   },
 };
 
-/** JSON ↔ Skill. */
 export const SkillMapper = {
-  toDetails(r: ValidSkillRequest): SkillDetails {
-    return { ...r, level: r.level ?? 0 };
+  toDetails(request: ValidSkillRequest): SkillDetails {
+    return { ...request, level: request.level ?? 0 };
   },
   toResponse(skill: Skill): SkillResponse {
     return { id: skill.id, ...skill.details };
   },
 };
 
-/** JSON ↔ Certification. */
 export const CertificationMapper = {
-  toDetails(r: ValidCertificationRequest): CertificationDetails {
-    return { ...r, studyIds: r.studyIds ?? [] };
+  toDetails(request: ValidCertificationRequest): CertificationDetails {
+    return { ...request, studyIds: request.studyIds ?? [] };
   },
-  toResponse(c: Certification): CertificationResponse {
-    const d = c.details;
+  toResponse(certification: Certification): CertificationResponse {
+    const details = certification.details;
     return {
-      id: c.id,
-      ...d,
-      status: c.status.toLowerCase(),
-      studyIds: sorted(d.studyIds),
+      id: certification.id,
+      ...details,
+      status: certification.status.toLowerCase(),
+      studyIds: sorted(details.studyIds),
     };
   },
 };
 
-/** JSON ↔ Education. */
 export const EducationMapper = {
-  toDetails(r: ValidEducationRequest): EducationDetails {
-    return { ...r };
+  toDetails(request: ValidEducationRequest): EducationDetails {
+    return { ...request };
   },
   toResponse(education: Education): EducationResponse {
-    const d = education.details;
-    return { id: education.id, ...d, status: d.status.toLowerCase() };
+    const details = education.details;
+    return {
+      id: education.id,
+      ...details,
+      status: details.status.toLowerCase(),
+    };
   },
 };

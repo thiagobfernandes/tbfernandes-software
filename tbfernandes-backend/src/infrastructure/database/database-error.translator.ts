@@ -2,7 +2,6 @@ import { OptimisticLockVersionMismatchError, QueryFailedError } from 'typeorm';
 import { ConflictError, DomainError } from '../../common/domain';
 import { RequestContext } from '../../common/context/request-context';
 
-/** PostgreSQL error codes the API answers with 409 instead of 500. */
 const UNIQUE_VIOLATION = '23505';
 const FOREIGN_KEY_VIOLATION = '23503';
 

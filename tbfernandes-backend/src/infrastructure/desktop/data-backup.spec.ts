@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import { Logger } from '../logger';
 import { DataBackup } from './data-backup';
 
-/** Port of DataBackupTest; the zip is read back with the system's unzip. */
 describe('DataBackup', () => {
   let dir: string;
   let pgData: string;
@@ -37,10 +36,9 @@ describe('DataBackup', () => {
       now: () => now,
     });
 
-  /** Runs a backup and stamps the new file with the fake clock, as the file system would. */
   async function run(version: string) {
     const before = new Set(
-      (await backup(version).backups()).map((b) => b.path),
+      (await backup(version).backups()).map((file) => file.path),
     );
     await backup(version).runIfDue(pgData);
     for (const file of await backup(version).backups()) {
@@ -82,7 +80,7 @@ describe('DataBackup', () => {
   });
 
   it('keeps only the newest', async () => {
-    for (let i = 0; i < 5; i++) {
+    for (let index = 0; index < 5; index++) {
       await run('1.0.0');
       now = new Date(now.getTime() + 24 * 3_600_000);
     }

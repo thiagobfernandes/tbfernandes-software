@@ -8,7 +8,6 @@ import {
 } from '../domain';
 import { GoalsLookup, GoalView } from '../goals.lookup';
 
-/** GoalsLookup: goals with their computed progress. */
 @Injectable()
 export class GoalsLookupService extends GoalsLookup {
   constructor(
@@ -27,21 +26,23 @@ export class GoalsLookupService extends GoalsLookup {
       this.work.tasks(ownerId),
     ]);
     const byGoal = new Map<string, Milestone[]>();
-    for (const m of milestones) {
-      const goalId = m.details.goalId;
-      byGoal.set(goalId, [...(byGoal.get(goalId) ?? []), m]);
+    for (const milestone of milestones) {
+      const goalId = milestone.details.goalId;
+      byGoal.set(goalId, [...(byGoal.get(goalId) ?? []), milestone]);
     }
     return goals.map((goal) => {
       const projectIds = new Set(
-        projects.filter((p) => p.goalId === goal.id).map((p) => p.id),
+        projects
+          .filter((project) => project.goalId === goal.id)
+          .map((project) => project.id),
       );
       const linked = tasks
         .filter(
-          (t) =>
-            t.goalId === goal.id ||
-            (t.projectId != null && projectIds.has(t.projectId)),
+          (task) =>
+            task.goalId === goal.id ||
+            (task.projectId != null && projectIds.has(task.projectId)),
         )
-        .map((t) => t.status);
+        .map((task) => task.status);
       const progress = GoalProgresses.of(
         goal,
         byGoal.get(goal.id) ?? [],

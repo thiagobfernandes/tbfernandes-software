@@ -1,7 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { answerOf } from '../domain';
+import { OllamaEmbeddingModel } from './embedding/ollama-embedding.model';
 import { VoyageEmbeddingModel } from './embedding/voyage-embedding.model';
 import { AnthropicLanguageModel } from './model/anthropic-language.model';
+import { OpenAiCompatibleLanguageModel } from './model/openai-compatible-language.model';
 
 interface Captured {
   url: string;
@@ -9,11 +11,10 @@ interface Captured {
   body: Record<string, unknown>;
 }
 
-/** A fetch that answers with the queued JSON bodies and records each request. */
 function fakeFetch(responses: unknown[], requests: Captured[]): typeof fetch {
   return (input: RequestInfo | URL, init?: RequestInit) => {
     const headers: Record<string, string> = {};
-    new Headers(init?.headers).forEach((v, k) => (headers[k] = v));
+    new Headers(init?.headers).forEach((value, key) => (headers[key] = value));
     requests.push({
       url: String(input instanceof Request ? input.url : input),
       headers,
@@ -245,5 +246,149 @@ describe('AnthropicLanguageModel', () => {
       () =>
         new AnthropicLanguageModel({ model: 'claude-opus-5-5', apiKey: '' }),
     ).toThrow('ANTHROPIC_API_KEY');
+  });
+});
+
+describe('OllamaEmbeddingModel', () => {
+  const settings = { baseUrl: 'http://ollama.test/', model: 'bge-m3' };
+
+  it('embeds documents and questions the same way, without a key', async () => {
+    const requests: Captured[] = [];
+    const model = new OllamaEmbeddingModel(
+      settings,
+      fakeFetch(
+        [{ embeddings: [[0.1], [0.2]] }, { embeddings: [[0.3]] }],
+        requests,
+      ),
+    );
+    expect(await model.embedDocuments(['primeiro', 'segundo'])).toEqual([
+      [0.1],
+      [0.2],
+    ]);
+    expect(await model.embedQuery('como instalei o docker?')).toEqual([0.3]);
+    expect(requests[0].url).toBe('http://ollama.test/api/embed');
+    expect(requests[0].body).toEqual({
+      model: 'bge-m3',
+      input: ['primeiro', 'segundo'],
+    });
+    expect(requests[0].headers.authorization).toBeUndefined();
+    expect(model.name()).toBe('ollama:bge-m3');
+  });
+
+  it('fails when vectors are missing', async () => {
+    const model = new OllamaEmbeddingModel(
+      settings,
+      fakeFetch([{ embeddings: [] }], []),
+    );
+    await expect(model.embedDocuments(['texto'])).rejects.toThrow();
+  });
+});
+
+describe('OpenAiCompatibleLanguageModel', () => {
+  const TODAY = '2026-10-30';
+  const settings = {
+    baseUrl: 'https://api.groq.com/openai/v1',
+    model: 'openai/gpt-oss-120b',
+    apiKey: 'gsk-test',
+  };
+  const completion = (content: string, finishReason = 'stop') => ({
+    choices: [
+      { message: { role: 'assistant', content }, finish_reason: finishReason },
+    ],
+  });
+  const plan = {
+    answerable: true,
+    subject: 'tasks',
+    aggregate: 'LIST',
+    text: '',
+    statuses: [],
+    priorities: ['high'],
+    openOnly: true,
+    project: '',
+    company: '',
+    dueFrom: '',
+    dueTo: '2026-10-29',
+    month: '',
+    sort: 'DUE_DATE',
+    limit: 5,
+  };
+
+  it('asks for the query in JSON mode with the schema and maps it', async () => {
+    const requests: Captured[] = [];
+    const model = new OpenAiCompatibleLanguageModel(
+      settings,
+      fakeFetch([completion(JSON.stringify(plan))], requests),
+    );
+    const query = await model.toQuery('Tarefas urgentes atrasadas?', TODAY);
+    expect(query).toMatchObject({
+      subject: 'TASKS',
+      priorities: ['high'],
+      dueTo: '2026-10-29',
+      limit: 5,
+    });
+    expect(requests[0].url).toBe(
+      'https://api.groq.com/openai/v1/chat/completions',
+    );
+    expect(requests[0].headers.authorization).toBe('Bearer gsk-test');
+    const body = requests[0].body as {
+      model: string;
+      response_format: { type: string };
+      messages: Array<{ role: string; content: string }>;
+    };
+    expect(body.model).toBe('openai/gpt-oss-120b');
+    expect(body.response_format).toEqual({ type: 'json_object' });
+    expect(body.messages[0].content).toContain('"CASH_FLOW"');
+    expect(body.messages[1].content).toBe(
+      'Today is 2026-10-30.\n\nQuestion: Tarefas urgentes atrasadas?',
+    );
+  });
+
+  it('writes an answer from the passages and sends no key to a local server', async () => {
+    const requests: Captured[] = [];
+    const model = new OpenAiCompatibleLanguageModel(
+      { ...settings, baseUrl: 'http://ollama:11434/v1', apiKey: '' },
+      fakeFetch([completion('{"text": " Use o compose [1]. "}')], requests),
+    );
+    const text = await model.answerFromPassages('Como subo?', [
+      {
+        source: { kind: 'NOTE', id: 'x' },
+        title: 'Docker',
+        text: 'docker compose up -d',
+        score: 1,
+      },
+    ]);
+    expect(text).toBe('Use o compose [1].');
+    expect(requests[0].headers.authorization).toBeUndefined();
+  });
+
+  it('has no answer for a refusal or an empty reply', async () => {
+    const model = new OpenAiCompatibleLanguageModel(
+      settings,
+      fakeFetch(
+        [
+          { choices: [{ message: { content: null, refusal: 'não' } }] },
+          completion('{"text": ""}'),
+        ],
+        [],
+      ),
+    );
+    const grounded = answerOf('Texto', [], 'rules');
+    expect(await model.answer('Pergunta', grounded)).toBeNull();
+    expect(await model.answer('Pergunta', grounded)).toBeNull();
+  });
+
+  it('fails on a reply cut at the token limit or not in JSON', async () => {
+    const model = new OpenAiCompatibleLanguageModel(
+      settings,
+      fakeFetch(
+        [completion('{"text": "Voc', 'length'), completion('Você tem 2.')],
+        [],
+      ),
+    );
+    const grounded = answerOf('Texto', [], 'rules');
+    await expect(model.answer('Pergunta', grounded)).rejects.toThrow(
+      'token limit',
+    );
+    await expect(model.answer('Pergunta', grounded)).rejects.toThrow();
   });
 });

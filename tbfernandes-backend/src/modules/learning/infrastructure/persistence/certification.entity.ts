@@ -29,7 +29,6 @@ export class CertificationEntity extends AuditedEntity {
   @Column('varchar', { nullable: true })
   validationUrl: string | null;
 
-  /** Read through the relation; written by the repository. */
   @OneToMany(() => CertificationStudyEntity, (link) => link.certification)
   studies?: CertificationStudyEntity[];
 }
@@ -42,9 +41,13 @@ export class CertificationStudyEntity {
   @PrimaryColumn('uuid')
   studyId: string;
 
-  @ManyToOne(() => CertificationEntity, (c) => c.studies, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(
+    () => CertificationEntity,
+    (certification) => certification.studies,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'certification_id' })
   certification?: CertificationEntity;
 }

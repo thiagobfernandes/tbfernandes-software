@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { PURCHASE_PRIORITIES, PURCHASE_STATUSES } from '../domain';
 import type { PurchasePriority, PurchaseStatus } from '../domain';
 
@@ -11,7 +11,6 @@ export class PurchaseRequest {
   monthlySaving?: number | null;
   /** low | normal | high */
   priority?: string | null;
-  /** YYYY-MM-DD */
   desiredDate?: string | null;
   goalId?: string | null;
   /** planned | saving | bought */
@@ -35,19 +34,18 @@ export interface ValidPurchaseRequest {
 const optionalAmount = () => Joi.number().allow(null).default(null);
 
 export const purchaseRequestSchema = Joi.object<ValidPurchaseRequest>({
-  name: J.requiredText(200),
-  description: J.optionalText(2000),
+  name: RequestFields.requiredText(200),
+  description: RequestFields.optionalText(2000),
   estimated: Joi.number().required(),
   reserved: optionalAmount(),
   monthlySaving: optionalAmount(),
-  priority: J.optionalEnumOf(PURCHASE_PRIORITIES),
-  desiredDate: J.optionalIsoDate(),
-  goalId: J.optionalUuid(),
-  status: J.optionalEnumOf(PURCHASE_STATUSES),
+  priority: RequestFields.optionalEnumOf(PURCHASE_PRIORITIES),
+  desiredDate: RequestFields.optionalIsoDate(),
+  goalId: RequestFields.optionalUuid(),
+  status: RequestFields.optionalEnumOf(PURCHASE_STATUSES),
   paid: optionalAmount(),
 });
 
-/** Same shape as the frontend's PurchaseGoal type. */
 export class PurchaseResponse {
   id: string;
   name: string;
@@ -67,7 +65,6 @@ export class ProjectionResponse {
   missing: number;
   ready: boolean;
   months: number | null;
-  /** YYYY-MM */
   month: string | null;
   onTime: boolean | null;
 }

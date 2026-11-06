@@ -18,7 +18,6 @@ import {
 } from '../domain';
 import { ProjectDeleted, WorkEvents } from '../work.events';
 
-/** Project use cases (RF-WRK-04..06, WRK-11). */
 @Injectable()
 export class ProjectService {
   constructor(

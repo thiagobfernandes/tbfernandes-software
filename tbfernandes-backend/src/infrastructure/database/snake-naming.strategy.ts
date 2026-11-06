@@ -3,7 +3,6 @@ import { DefaultNamingStrategy, NamingStrategyInterface } from 'typeorm';
 const snake = (value: string) =>
   value.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
 
-/** camelCase properties, snake_case columns, as the SQL migrations write them. */
 export class SnakeNamingStrategy
   extends DefaultNamingStrategy
   implements NamingStrategyInterface

@@ -9,7 +9,7 @@ Regras para qualquer mudança no repositório, por pessoa ou pelo Claude Code. Q
 | Textos de interface, toasts, validações, mensagens de erro da API para o usuário, respostas do assistente | português (pt-BR) |
 | Documentação em `docs/`, `README`s, `CLAUDE.md` | português |
 | Nomes no código: classes, funções, variáveis, rotas, tabelas, colunas, enums, chaves JSON | inglês |
-| Comentários de código | inglês (como o código atual) |
+| Comentários de código (só quando necessários, ver [Clean code](#clean-code)) | inglês (como o código atual) |
 | Mensagens de commit | inglês, Conventional Commits |
 
 Datas e dinheiro sempre formatados com `Intl` em `pt-BR` (dinheiro em BRL).
@@ -20,6 +20,20 @@ Datas e dinheiro sempre formatados com `Intl` em `pt-BR` (dinheiro em BRL).
 - Sem código morto, `console.log` ou `System.out` esquecido.
 - Não adicionar dependência sem motivo concreto; preferir o que a stack já tem.
 - Segredos só por variável de ambiente. Variáveis `NEXT_PUBLIC_*` só com valores que podem ir para o navegador.
+
+## Clean code
+
+Valem para o backend e são verificadas pelo ESLint (`tbfernandes-backend/eslint.config.mjs`); o CI falha se alguma for quebrada.
+
+| Regra | Na prática | ESLint |
+|---|---|---|
+| **Nomes descritivos** | Nada de variável de uma letra: `task`, `details`, `entity`, `index`, `left`/`right` num `sort`. Só `_` para parâmetro ignorado. Função diz o que devolve (`taskRows`, `toReferenceResponse`), não só o assunto. | `id-length` (mín. 2) |
+| **Sem sombreamento** | Um nome interno não reaproveita o de fora (`projects.find((candidate) => …)` em vez de `(project)` dentro de `const project = …`). | `@typescript-eslint/no-shadow` |
+| **Funções pequenas** | Até 50 linhas (testes ficam de fora). Passou disso, extraia passos com nome: `fromHttp`, `embed`, `termStatistics`. | `max-lines-per-function` |
+| **Fluxo plano** | Complexidade ciclomática até 10, no máximo 3 níveis de bloco e 3 callbacks aninhados. Cadeia de `if` que escolhe uma fonte vira funções pequenas encadeadas com `??` (ver `GoalProgresses.of`); `switch` que só mapeia valores vira tabela (ver `LISTINGS` no `QueryEngine`). | `complexity`, `max-depth`, `max-nested-callbacks` |
+| **Sem ternário aninhado** | Use `if` com retorno antecipado ou uma função auxiliar. | `no-nested-ternary` |
+| **Constantes com nome** | Valor solto com significado vira constante (`DONE_TASK_STATUS`, `LENGTH_NORMALIZATION`). | — |
+| **Comentário só quando necessário** | O código diz *o quê*; comentário só explica *por quê*: uma decisão que não é óbvia, um contrato externo, um limite, um risco. Não repita o nome da função ou do tipo ("Implemented in infrastructure", "JSON ↔ Note", "The editable fields of…"). Diretivas do ESLint ficam. | — |
 
 ## Backend
 

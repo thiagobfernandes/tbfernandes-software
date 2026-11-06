@@ -8,7 +8,6 @@ import { NotFoundError } from '../../../common/domain';
 import { Material, MaterialDetails, MaterialRepository } from '../domain';
 import { StudyService } from './study.service';
 
-/** Material use cases (RF-LRN-02). */
 @Injectable()
 export class MaterialService {
   constructor(

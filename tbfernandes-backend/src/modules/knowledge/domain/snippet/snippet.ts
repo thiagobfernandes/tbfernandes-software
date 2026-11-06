@@ -2,7 +2,6 @@ import { InvalidArgumentError, Require } from '../../../../common/domain';
 import { KnowledgeLinks } from '../knowledge-links';
 import { Tags } from '../tags';
 
-/** The editable fields of a snippet. */
 export interface SnippetDetails {
   title: string;
   /** Lower case, e.g. "java". */
@@ -41,7 +40,6 @@ export class Snippet {
     );
   }
 
-  /** Rebuilds a snippet already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -73,17 +71,21 @@ export class Snippet {
     return true;
   }
 
-  private static validated(d: SnippetDetails): SnippetDetails {
-    if (d.code == null || d.code.trim() === '') {
+  private static validated(details: SnippetDetails): SnippetDetails {
+    if (details.code == null || details.code.trim() === '') {
       throw new InvalidArgumentError('code é obrigatório');
     }
     return {
-      title: Require.text(d.title, 'title', 200),
-      language: Require.text(d.language, 'language', 30).toLowerCase(),
-      code: d.code,
-      explanation: Require.optionalText(d.explanation, 'explanation', 5000),
-      sourceUrl: Require.optionalText(d.sourceUrl, 'sourceUrl', 2000),
-      tags: Tags.normalize(d.tags),
+      title: Require.text(details.title, 'title', 200),
+      language: Require.text(details.language, 'language', 30).toLowerCase(),
+      code: details.code,
+      explanation: Require.optionalText(
+        details.explanation,
+        'explanation',
+        5000,
+      ),
+      sourceUrl: Require.optionalText(details.sourceUrl, 'sourceUrl', 2000),
+      tags: Tags.normalize(details.tags),
     };
   }
 }

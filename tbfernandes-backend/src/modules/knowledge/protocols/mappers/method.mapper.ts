@@ -3,7 +3,6 @@ import { ValidMethodRequest } from '../method.request';
 import { MethodResponse } from '../method.response';
 import { tagList } from './links.mapper';
 
-/** JSON ↔ Method. */
 export const MethodMapper = {
   toDetails(request: ValidMethodRequest): MethodDetails {
     return {
@@ -18,16 +17,16 @@ export const MethodMapper = {
   },
 
   toResponse(method: Method): MethodResponse {
-    const d = method.details;
+    const details = method.details;
     return {
       id: method.id,
-      title: d.title,
-      summary: d.summary,
-      category: d.category.toLowerCase(),
-      steps: d.steps,
-      examples: d.examples,
-      tags: d.tags,
-      lastReviewed: d.lastReviewed,
+      title: details.title,
+      summary: details.summary,
+      category: details.category.toLowerCase(),
+      steps: details.steps,
+      examples: details.examples,
+      tags: details.tags,
+      lastReviewed: details.lastReviewed,
     };
   },
 };

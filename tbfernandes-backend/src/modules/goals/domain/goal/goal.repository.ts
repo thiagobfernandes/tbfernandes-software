@@ -1,6 +1,5 @@
 import { Goal } from './goal';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class GoalRepository {
   abstract create(goal: Goal): Promise<Goal>;
   abstract save(goal: Goal): Promise<Goal>;

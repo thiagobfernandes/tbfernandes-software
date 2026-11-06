@@ -8,7 +8,6 @@ export interface EntryFilter {
   scope?: EntryScope | null;
 }
 
-/** Implemented in infrastructure/persistence. */
 export abstract class FinanceEntryRepository {
   abstract create(entry: FinanceEntry): Promise<FinanceEntry>;
   abstract save(entry: FinanceEntry): Promise<FinanceEntry>;

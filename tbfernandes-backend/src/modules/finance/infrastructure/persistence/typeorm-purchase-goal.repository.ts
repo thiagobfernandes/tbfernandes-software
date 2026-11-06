@@ -5,7 +5,6 @@ import { PurchaseGoal, PurchaseGoalRepository } from '../../domain';
 import { PurchaseGoalPersistenceMapper as Mapper } from './mappers/purchase-goal.persistence-mapper';
 import { PurchaseGoalEntity } from './purchase-goal.entity';
 
-/** PurchaseGoalRepository on TypeORM. */
 @Injectable()
 export class TypeOrmPurchaseGoalRepository extends PurchaseGoalRepository {
   private readonly rows: BaseRepository<PurchaseGoalEntity>;

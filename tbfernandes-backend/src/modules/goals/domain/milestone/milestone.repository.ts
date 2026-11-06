@@ -1,6 +1,5 @@
 import { Milestone } from './milestone';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class MilestoneRepository {
   abstract create(milestone: Milestone): Promise<Milestone>;
   abstract save(milestone: Milestone): Promise<Milestone>;

@@ -139,6 +139,7 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | AST-02 | Porta `LanguageModel` e adaptador desligado | P | ✅ etapa 8 |
 | AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ✅ etapa 10 |
 | AST-04 | Embeddings de notas e snippets e respostas com RAG (RF-AST-03). Vetores em `real[]`, sem pgvector, por causa do app desktop | G | ✅ etapa 11 |
+| AST-05 | Traces do assistente na Langfuse: um trace por pergunta, generations com modelo e tokens, retriever do RAG, dados pessoais mascarados | M | ✅ |
 
 ## Épico IDN — Identity e segurança
 

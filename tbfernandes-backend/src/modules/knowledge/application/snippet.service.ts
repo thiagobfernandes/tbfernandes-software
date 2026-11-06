@@ -14,7 +14,6 @@ import {
 import { LinkValidator } from './link-validator';
 import { blankToNull } from './search-text';
 
-/** Snippet use cases (RF-KNW-02..04). */
 @Injectable()
 export class SnippetService {
   constructor(

@@ -60,7 +60,7 @@ describe('CashFlows', () => {
       entry({ amount: 90050, category: 'Food' }),
       entry({ amount: 10000, category: 'Food', date: '2031-01-12' }),
     ]);
-    expect(flow.series.map((m) => m.month)).toEqual([
+    expect(flow.series.map((point) => point.month)).toEqual([
       '2031-01',
       '2031-02',
       '2031-03',

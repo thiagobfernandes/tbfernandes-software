@@ -59,7 +59,6 @@ export class FinanceEntry {
     );
   }
 
-  /** Rebuilds an entry already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -78,22 +77,21 @@ export class FinanceEntry {
     this._details = FinanceEntry.validated(details);
   }
 
-  private static validated(d: EntryDetails): EntryDetails {
+  private static validated(details: EntryDetails): EntryDetails {
     return {
-      kind: Require.present(d.kind, 'kind'),
-      scope: Require.present(d.scope, 'scope'),
-      category: Require.text(d.category, 'category', 60),
-      description: Require.text(d.description, 'description', 300),
-      amount: Money.positive(d.amount, 'amount'),
-      date: Require.present(d.date, 'date'),
-      recurring: d.recurring ?? false,
+      kind: Require.present(details.kind, 'kind'),
+      scope: Require.present(details.scope, 'scope'),
+      category: Require.text(details.category, 'category', 60),
+      description: Require.text(details.description, 'description', 300),
+      amount: Money.positive(details.amount, 'amount'),
+      date: Require.present(details.date, 'date'),
+      recurring: details.recurring ?? false,
     };
   }
 }
 
-/** Sum of the entries of one kind, in cents. */
 export function totalOf(entries: readonly FinanceEntry[], kind: EntryKind) {
   return entries
-    .filter((e) => e.details.kind === kind)
-    .reduce((sum, e) => sum + e.details.amount, 0);
+    .filter((entry) => entry.details.kind === kind)
+    .reduce((sum, entry) => sum + entry.details.amount, 0);
 }

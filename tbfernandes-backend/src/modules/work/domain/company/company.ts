@@ -11,7 +11,6 @@ export type CompanyRelationship = (typeof COMPANY_RELATIONSHIPS)[number];
 export const COMPANY_STATUSES = ['ACTIVE', 'INACTIVE', 'CLOSED'] as const;
 export type CompanyStatus = (typeof COMPANY_STATUSES)[number];
 
-/** The editable fields of a company, as one value. */
 export interface CompanyDetails {
   name: string;
   tradeName: string | null;
@@ -41,7 +40,6 @@ export class Company {
     );
   }
 
-  /** Rebuilds a company already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -62,15 +60,23 @@ export class Company {
     this._details = Company.validated(details);
   }
 
-  private static validated(d: CompanyDetails): CompanyDetails {
+  private static validated(details: CompanyDetails): CompanyDetails {
     return {
-      name: Require.text(d.name, 'name', 120),
-      tradeName: Require.optionalText(d.tradeName, 'tradeName', 120),
-      relationship: Require.present(d.relationship, 'relationship'),
-      status: d.status ?? 'ACTIVE',
-      description: Require.optionalText(d.description, 'description', 2000),
-      startDate: Require.present(d.startDate, 'startDate'),
-      mainContact: Require.optionalText(d.mainContact, 'mainContact', 120),
+      name: Require.text(details.name, 'name', 120),
+      tradeName: Require.optionalText(details.tradeName, 'tradeName', 120),
+      relationship: Require.present(details.relationship, 'relationship'),
+      status: details.status ?? 'ACTIVE',
+      description: Require.optionalText(
+        details.description,
+        'description',
+        2000,
+      ),
+      startDate: Require.present(details.startDate, 'startDate'),
+      mainContact: Require.optionalText(
+        details.mainContact,
+        'mainContact',
+        120,
+      ),
     };
   }
 }

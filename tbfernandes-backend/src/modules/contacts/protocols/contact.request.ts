@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 
 /** Body of POST and PUT /contacts. A registered company or a company name, not both (RN-23). */
 export class ContactRequest {
@@ -11,7 +11,6 @@ export class ContactRequest {
   profileUrl?: string | null;
   specialties?: string[] | null;
   context?: string | null;
-  /** YYYY-MM-DD */
   nextContact?: string | null;
   notes?: string | null;
 }
@@ -31,20 +30,20 @@ export interface ValidContactRequest {
 }
 
 export const contactRequestSchema = Joi.object<ValidContactRequest>({
-  name: J.requiredText(120),
-  companyId: J.optionalUuid(),
-  companyName: J.optionalText(120),
-  role: J.optionalText(120),
-  email: J.optionalText(254),
-  phone: J.optionalText(40),
-  profileUrl: J.optionalText(2000),
+  name: RequestFields.requiredText(120),
+  companyId: RequestFields.optionalUuid(),
+  companyName: RequestFields.optionalText(120),
+  role: RequestFields.optionalText(120),
+  email: RequestFields.optionalText(254),
+  phone: RequestFields.optionalText(40),
+  profileUrl: RequestFields.optionalText(2000),
   specialties: Joi.array()
     .items(Joi.string().allow('', null))
     .allow(null)
     .default([]),
-  context: J.optionalText(2000),
-  nextContact: J.optionalIsoDate(),
-  notes: J.optionalText(5000),
+  context: RequestFields.optionalText(2000),
+  nextContact: RequestFields.optionalIsoDate(),
+  notes: RequestFields.optionalText(5000),
 });
 
 export interface ContactListQuery {
@@ -53,5 +52,5 @@ export interface ContactListQuery {
 
 export const contactListQuerySchema = Joi.object<ContactListQuery>({
   dueWithinDays: Joi.number().integer().min(0).default(null),
-  ...J.paging(),
+  ...RequestFields.paging(),
 });

@@ -4,36 +4,35 @@ import {
   CertificationStudyEntity,
 } from '../certification.entity';
 
-/** Certification ↔ learning.certification row and its certification_study rows. */
 export const CertificationPersistenceMapper = {
-  toDomain(e: CertificationEntity): Certification {
-    return Certification.restore(e.id, e.ownerId, {
-      name: e.name,
-      issuer: e.issuer,
-      status: e.status,
-      obtainedAt: e.obtainedAt,
-      expiresAt: e.expiresAt,
-      validationUrl: e.validationUrl,
-      studyIds: (e.studies ?? []).map((link) => link.studyId),
+  toDomain(entity: CertificationEntity): Certification {
+    return Certification.restore(entity.id, entity.ownerId, {
+      name: entity.name,
+      issuer: entity.issuer,
+      status: entity.status,
+      obtainedAt: entity.obtainedAt,
+      expiresAt: entity.expiresAt,
+      validationUrl: entity.validationUrl,
+      studyIds: (entity.studies ?? []).map((link) => link.studyId),
     });
   },
 
   /** The certification row only; study links come from toStudyEntities. */
   toEntity(
     certification: Certification,
-    e: CertificationEntity = new CertificationEntity(),
+    entity: CertificationEntity = new CertificationEntity(),
   ): CertificationEntity {
-    const d = certification.details;
-    e.id = certification.id;
-    e.ownerId = certification.ownerId;
-    e.name = d.name;
-    e.issuer = d.issuer;
-    e.status = certification.status;
-    e.obtainedAt = d.obtainedAt;
-    e.expiresAt = d.expiresAt;
-    e.validationUrl = d.validationUrl;
-    delete e.studies;
-    return e;
+    const details = certification.details;
+    entity.id = certification.id;
+    entity.ownerId = certification.ownerId;
+    entity.name = details.name;
+    entity.issuer = details.issuer;
+    entity.status = certification.status;
+    entity.obtainedAt = details.obtainedAt;
+    entity.expiresAt = details.expiresAt;
+    entity.validationUrl = details.validationUrl;
+    delete entity.studies;
+    return entity;
   },
 
   toStudyEntities(certification: Certification): CertificationStudyEntity[] {

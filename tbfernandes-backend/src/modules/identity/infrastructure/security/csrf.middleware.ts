@@ -9,9 +9,9 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 /** Called by external services with their own secret, never by the browser. */
 const EXEMPT = ['/api/v1/webhooks/'];
 
-function same(a: string, b: string): boolean {
-  const left = Buffer.from(a);
-  const right = Buffer.from(b);
+function same(expected: string, actual: string): boolean {
+  const left = Buffer.from(expected);
+  const right = Buffer.from(actual);
   return left.length === right.length && timingSafeEqual(left, right);
 }
 

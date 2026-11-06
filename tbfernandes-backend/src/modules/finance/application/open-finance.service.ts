@@ -40,7 +40,6 @@ export interface SyncResult {
   connection: BankConnection;
 }
 
-/** Open finance use cases (epic FIN-OF): connect a bank, import its transactions, disconnect. */
 @Injectable()
 export class OpenFinanceService {
   constructor(
@@ -174,7 +173,6 @@ export class OpenFinanceService {
       await this.entries.deleteImported(connection.ownerId, transactionIds);
   }
 
-  /** FIN-OF-05: runs the syncs that registrations and webhooks ask for. */
   syncRequested(event: ConnectionSyncRequested): Promise<void> {
     return this.uow.run(async () => {
       if (!(await this.repository.findByExternalId(event.externalId))) {
@@ -239,15 +237,16 @@ export class OpenFinanceService {
       return 0;
     }
     let imported = 0;
-    for (const t of transactions) {
-      if (await this.entries.existsExternal(connection.ownerId, t.id)) continue;
+    for (const transaction of transactions) {
+      if (await this.entries.existsExternal(connection.ownerId, transaction.id))
+        continue;
       const entry = connection.importEntry(
         this.ids.newId(),
-        t.id,
-        t.date,
-        t.description,
-        t.amount,
-        t.category,
+        transaction.id,
+        transaction.date,
+        transaction.description,
+        transaction.amount,
+        transaction.category,
       );
       if (entry) {
         await this.entries.create(entry);
@@ -257,12 +256,12 @@ export class OpenFinanceService {
     connection.synced(
       external.institution,
       external.status,
-      accounts.map((a) => ({
-        externalId: a.id,
-        name: a.name,
-        type: a.type,
-        balance: a.balance,
-        currency: a.currency,
+      accounts.map((account) => ({
+        externalId: account.id,
+        name: account.name,
+        type: account.type,
+        balance: account.balance,
+        currency: account.currency,
       })),
       this.clock.now(),
     );

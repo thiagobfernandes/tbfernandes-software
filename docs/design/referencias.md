@@ -50,8 +50,8 @@ Os sites Dribbble, Behance e obsidian.md não abrem a partir do ambiente do Clau
 
 ## Estrutura de navegação
 
-- Sidebar com **grupos recolhíveis por área** (Trabalho, Conhecimento, Crescimento, Finanças, Rede), cada um com **subitens** e contadores quando fizer sentido. Visão geral, Calendário e Assistente no topo; Configurações no fim.
-- Header com breadcrumbs, busca global (`Ctrl K`), alternância de tema e avatar.
+- Sidebar com **grupos recolhíveis por área** (Trabalho, Conhecimento, Crescimento, Finanças, Rede), cada um com **subitens** e contadores quando fizer sentido. Visão geral, Calendário e Assistente no topo; Configurações no fim. Largura de 224 px (56 px recolhida), itens de 32 px; só o grupo da página atual abre por padrão, e o botão ao lado do logo (`Ctrl .`) recolhe os demais.
+- Header com botão de recolher a sidebar (`Ctrl B`), ícone da área e breadcrumbs à esquerda, busca global (`Ctrl K`) centralizada, tema e avatar à direita.
 - No celular a sidebar vira menu lateral (`mobile-nav`).
 
 ## Padrões de tela
