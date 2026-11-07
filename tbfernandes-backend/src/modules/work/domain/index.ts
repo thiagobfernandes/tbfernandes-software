@@ -4,3 +4,5 @@ export * from './project/project';
 export * from './project/project.repository';
 export * from './task/task';
 export * from './task/task.repository';
+export * from './appointment/appointment';
+export * from './appointment/appointment.repository';

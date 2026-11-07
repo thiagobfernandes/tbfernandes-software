@@ -32,8 +32,9 @@ Os sites Dribbble, Behance e obsidian.md não abrem a partir do ambiente do Clau
 
 ## Linguagem visual
 
-- **Tema escuro navy é o principal** (`--background: #0c1821`), com tema claro equivalente. Toda tela é conferida nos dois.
-- **Cor de destaque teal** (`--primary`), usada com moderação: item ativo, progresso, nó raiz, foco.
+- **Paleta preto e dourado** (trocada em 2026-11-07, a pedido do Thiago): preto principal `#080808` (fundo), grafite `#1C1C1C` (cards e seções), dourado `#D4AF37` (botões e destaques, `--primary`), ouro envelhecido `#B89546` (bordas de foco e detalhes, `--ring`), champagne `#F5E9CF` (títulos e textos claros, `--foreground`).
+- **Tema escuro é o principal**, com tema claro equivalente (fundo creme, dourado mais fechado `#8A6A12` para ter contraste). Toda tela é conferida nos dois.
+- **Dourado com moderação**: item ativo, botão principal, progresso, seleção na agenda, foco.
 - **Cards** com borda fina (`border-border`), cantos `--radius` (0.625rem), sem sombra pesada; título em semibold + subtítulo em `text-muted-foreground`.
 - **Números grandes e leves** nos cards de métrica; unidade menor ao lado.
 - **Chips** pequenos com borda para prazo ("Vence hoje", "Atrasada 2d"), ponto colorido para prioridade.
@@ -46,7 +47,7 @@ Os sites Dribbble, Behance e obsidian.md não abrem a partir do ambiente do Clau
 
 - **Logo:** notebook com "t" + palavra "tbfernandes", em dourado degradê. Arquivos em `tbfernandes-frontend/public/brand/`: `logo-tbfernandes.png` (completa) e `logo-symbol.png` (só o notebook). O dourado funciona nos dois temas, então não há versão clara e escura.
 - **Onde aparece:** `components/layout/brand-mark.tsx` (barra lateral, menu do celular e tela de carregamento; com a barra recolhida, só o símbolo), splash do desktop (`public/desktop-splash.html`) e `src/app/favicon.ico`.
-- **Ícone do Windows:** o símbolo dourado num quadrado navy arredondado. Para trocar, gere um PNG quadrado de 1024 px e rode `npx tauri icon <arquivo>.png` em `tbfernandes-desktop/`. Depois apague o que não usamos (`android/`, `ios/`, `Square*`, `StoreLogo.png`, `64x64.png`).
+- **Ícone do Windows:** o símbolo dourado num quadrado escuro arredondado. Para trocar, gere um PNG quadrado de 1024 px e rode `npx tauri icon <arquivo>.png` em `tbfernandes-desktop/`. Depois apague o que não usamos (`android/`, `ios/`, `Square*`, `StoreLogo.png`, `64x64.png`).
 
 ## Estrutura de navegação
 

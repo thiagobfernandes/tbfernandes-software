@@ -21,6 +21,7 @@ erDiagram
     COMPANY ||--o{ PROJECT : "company_id"
     PROJECT ||--o{ TASK : "project_id"
     TASK ||--o{ TASK_CHECKLIST_ITEM : "task_id"
+    TASK |o--o{ APPOINTMENT : "task_id"
 
     NOTE ||--o{ NOTE_LINK : "note_id"
     SNIPPET ||--o{ SNIPPET_LINK : "snippet_id"
@@ -82,6 +83,16 @@ erDiagram
         int checklist_total
         uuid goal_id "goals.goal"
         timestamptz completed_at
+    }
+    APPOINTMENT {
+        uuid id PK
+        uuid owner_id
+        varchar title
+        date day
+        time start_time
+        time end_time "> start_time"
+        uuid task_id FK "ON DELETE SET NULL"
+        varchar note
     }
     TASK_CHECKLIST_ITEM {
         uuid task_id PK, FK
@@ -245,6 +256,7 @@ erDiagram
 | `companies` | `Company` | `work.company` | |
 | `projects` | `Project` | `work.project` | `goalId` → `goal_id` sem FK |
 | `tasks` | `Task` | `work.task` + `work.task_checklist_item` | `checklist {done,total}` → `checklist_done/total`; `checklistItems` → tabela filha ordenada |
+| `appointments` | `Appointment` | `work.appointment` | `date` → `day`; excluir a tarefa deixa o agendamento sem tarefa (FK `ON DELETE SET NULL`) |
 | `notes` | `Note` | `knowledge.note` + `knowledge.note_link` | `projectIds`/`taskIds` → linhas em `note_link` |
 | `snippets` | `Snippet` | `knowledge.snippet` + `knowledge.snippet_link` | idem, em `snippet_link` |
 | `methods` | `Method` | `knowledge.method` + `method_step` + `method_example` | `steps` e `examples` ordenados por `position` |

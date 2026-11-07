@@ -54,6 +54,13 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-WRK-12 | Manter checklist itemizado da tarefa (adicionar, marcar, remover itens). | M |
 | RF-WRK-13 | Painel (dashboard) com totais: tarefas abertas, atrasadas, concluídas na semana, projetos ativos. | S |
 
+### 2.3.1 Work — Agenda (`/calendar`, visões Dia e Semana)
+
+| ID | Requisito | Prio |
+|---|---|---|
+| RF-WRK-14 | Agendar um intervalo de horário (título, data, início, fim, tarefa opcional, nota), editar e excluir. Por início e fim ou por início e duração. | S |
+| RF-WRK-15 | Na grade de horas, clicar e arrastar numa área vazia seleciona o intervalo (de 15 em 15 min) e abre o agendamento já preenchido com o dia, o início e o fim. | S |
+
 ### 2.4 Knowledge (`/knowledge`, `/methods`)
 
 | ID | Requisito | Prio |
@@ -154,6 +161,8 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RN-23 | Um contato aponta para uma empresa cadastrada ou só para o nome de uma organização, nunca os dois. | Contacts |
 | RN-24 | Uma interação gera no máximo uma tarefa de follow-up. | Contacts |
 | RN-25 | Senha entre 12 e 128 caracteres, sem regras de composição; trocar a senha exige a atual. Login errado responde igual para e-mail desconhecido e senha errada. | Identity |
+| RN-26 | O fim de um agendamento é depois do início, no mesmo dia. | `Appointment` |
+| RN-27 | Dois agendamentos do mesmo dono não ocupam o mesmo horário (encostar, como 10:00–11:00 e 11:00–12:00, pode). | `Appointment.ensureNoOverlap` |
 | RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais
@@ -218,6 +227,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Companies / Company detail | RF-WRK-01..03 | work |
 | Projects / Project detail | RF-WRK-04..06, RF-KNW-03 | work, knowledge |
 | Tasks (lista, quadro, linha do tempo) | RF-WRK-07..12 | work |
+| Calendar (mês, semana, dia, agendamentos) | RF-WRK-14, RF-WRK-15 | work |
 | Knowledge, Snippets, Graph | RF-KNW-01..05 | knowledge |
 | Methods | RF-KNW-06 | knowledge |
 | Goals / Goal detail | RF-GOL-01..05 | goals |

@@ -11,6 +11,7 @@ import { connectRemote, remote } from "@/lib/api/remote-store";
 import { uuidv7 } from "@/lib/api/uuid";
 import { env } from "@/lib/env";
 
+import type { Appointment } from "@/features/calendar/types/appointment";
 import type { Contact, Interaction } from "@/features/contacts/types/contact";
 import type {
   FinanceEntry,
@@ -28,6 +29,7 @@ import type {
 import type { Method } from "@/features/methods/types/method";
 import type { Company, Project } from "@/features/projects/types/project";
 import type { Task } from "@/features/tasks/types/task";
+import { sampleAppointments } from "@/lib/sample-data/agenda";
 import {
   sampleCertifications,
   sampleEducations,
@@ -70,6 +72,7 @@ export type AppData = {
   purchases: PurchaseGoal[];
   contacts: Contact[];
   interactions: Interaction[];
+  appointments: Appointment[];
 };
 
 /** Kept for the work screens written before the other modules existed. */
@@ -100,6 +103,7 @@ const initialData: AppData = {
   purchases: samplePurchases,
   contacts: sampleContacts,
   interactions: sampleInteractions,
+  appointments: sampleAppointments,
 };
 
 const idPrefixes: Record<CollectionKey, string> = {
@@ -120,6 +124,7 @@ const idPrefixes: Record<CollectionKey, string> = {
   purchases: "pu",
   contacts: "ct",
   interactions: "i",
+  appointments: "ap",
 };
 
 const useApi = env.dataSource === "api";

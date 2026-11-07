@@ -45,6 +45,8 @@ Versão 0.2 · 2026-10-26 · O contrato executável é o OpenAPI em `http://loca
 | GET / PUT / DELETE | `/tasks/{id}` | detalhe, edita, exclui | WRK-03 |
 | PATCH | `/tasks/{id}/status` | `{ status }`, usado pelo quadro (RN-06, RN-07) | WRK-04 |
 | GET | `/dashboard/summary` | contadores do painel | WRK-07 |
+| GET / POST | `/appointments` | lista (por data e início), cria `{ title, date, startTime, endTime, taskId?, note? }`; horários `HH:mm:ss` (422 com RN-26 ou RN-27) | WRK-12 |
+| GET / PUT / DELETE | `/appointments/{id}` | detalhe, edita, exclui | WRK-12 |
 
 ## Knowledge
 

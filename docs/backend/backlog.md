@@ -55,6 +55,7 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | WRK-09 | Evento `TaskDeleted` para limpar vínculos de conhecimento e follow-ups | P | ✅ |
 | WRK-10 | Ligar telas Companies, Projects e Tasks à API (trocar `workActions` por `apiFetch`) | G | ✅ etapa 9 |
 | WRK-11 | Excluir empresa sem projetos (com projetos: 409) e projeto, mantendo as tarefas sem projeto (RN-01) | P | ✅ |
+| WRK-12 | Agenda: agendamentos com horário, visões Dia/Semana no calendário e arrastar para agendar (RF-WRK-14, RF-WRK-15, RN-26, RN-27) | M | ✅ |
 
 Critérios de aceite principais:
 - WRK-04: mover para `done` preenche `completedAt`; sair de `done` limpa; `blocked → done` retorna 422 com `rule: "RN-07"`.

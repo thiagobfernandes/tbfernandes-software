@@ -62,6 +62,7 @@ const importOrder: CollectionKey[] = [
   "purchases",
   "contacts",
   "interactions",
+  "appointments",
 ];
 
 const idListFields = ["projectIds", "taskIds", "skillIds", "studyIds"];
