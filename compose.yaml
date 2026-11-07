@@ -2,6 +2,7 @@
 # Only the database, for `npm run dev` in tbfernandes-backend/: `docker compose up -d postgres`.
 # Ollama (free local embeddings for the assistant) is in the "ai" profile:
 # `docker compose --profile ai up -d --build`, or COMPOSE_PROFILES=ai in .env.
+# The "backup" service dumps the database to ./backups every 10 minutes (docs/como-rodar.md).
 # Settings come from .env (see .env.example). How to run and deploy: docs/como-rodar.md.
 name: tbfernandes
 
@@ -23,6 +24,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: tbf
+      PGPASSWORD: ${TBF_DB_PASSWORD:-tbf}
+      PGDATABASE: tbfernandes
+      TBF_BACKUP_INTERVAL: ${TBF_BACKUP_INTERVAL:-600}
+      TBF_BACKUP_OWNER: ${TBF_BACKUP_OWNER:-1000:1000}
+      TBF_BACKUP_MIN_RATIO: ${TBF_BACKUP_MIN_RATIO:-50}
+      TBF_BACKUP_FORCE: ${TBF_BACKUP_FORCE:-false}
+    volumes:
+      - ./tbfernandes-backup/backup.sh:/usr/local/bin/backup.sh:ro
+      - ${TBF_BACKUP_DIR:-./backups}:/backups
+    entrypoint: ["sh", "/usr/local/bin/backup.sh"]
+    command: ["loop"]
 
   backend:
     build: ./tbfernandes-backend

@@ -30,6 +30,28 @@ docker compose down                                     # para tudo e mantém os
 
 **Os dados reais ficam no volume `api_tbf-pgdata`.** `docker compose down -v` apaga esse volume. Não use sem ter um backup.
 
+### Backup do banco
+
+O serviço `backup` sobe junto com o compose e faz um `pg_dump` a cada 10 minutos (`TBF_BACKUP_INTERVAL`, em segundos) em `./backups/` no host (`TBF_BACKUP_DIR`). A pasta fica fora dos volumes do Docker, então sobrevive ao `docker compose down -v`, e não vai para o git. Só o arquivo mais recente fica guardado: o anterior é apagado depois que o novo foi gerado e conferido com `pg_restore --list`.
+
+Proteção contra banco vazio: se o dump novo tiver menos da metade do tamanho do anterior (`TBF_BACKUP_MIN_RATIO`, em %), o serviço entende que o banco foi recriado, mantém o backup antigo e avisa no log. Se você apagou muitos dados de propósito, rode um backup com `TBF_BACKUP_FORCE=true`, ou apague o arquivo antigo.
+
+```bash
+docker compose logs -f backup                                   # acompanhar os backups
+docker compose exec backup sh /usr/local/bin/backup.sh now      # backup agora
+```
+
+Para restaurar depois de apagar o volume, suba só o banco e restaure antes de subir o backend:
+
+```bash
+docker compose down -v
+docker compose up -d postgres backup
+docker compose exec backup sh /usr/local/bin/backup.sh restore  # o mais recente; ou passe o nome do arquivo
+docker compose up -d --build
+```
+
+A restauração usa `pg_restore --clean --if-exists` numa transação só e traz junto o `flyway_schema_history`, então o backend sobe sem reaplicar migrações. Enquanto ela roda, o serviço não faz backups.
+
 Se a porta 80 estiver ocupada, use `TBF_HTTP_PORT=8090` no `.env`.
 
 ### Deploy
