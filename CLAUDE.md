@@ -13,9 +13,11 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend | — |
 | `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
 | `tbfernandes-backup/` | Script do serviço `backup`: `pg_dump` a cada 10 min em `./backups/`, só o último fica | [docs/como-rodar.md](docs/como-rodar.md#backup-do-banco) |
+| `deploy/` | Produção na EC2: compose, Caddy, script e timer do deploy automático | [docs/deploy.md](docs/deploy.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
 | `.github/workflows/ci.yml` | CI: lint, typecheck, testes, e2e e build no backend; `npm ci && npm run lint && npm run build` no frontend; imagens do compose construídas e testadas pelo nginx | — |
+| `.github/workflows/deploy-api.yml` | Depois do CI verde na `main`: publica a imagem do backend no GHCR e espera a EC2 aplicar | [docs/deploy.md](docs/deploy.md) |
 
 ## Onde está cada regra
 
@@ -30,6 +32,7 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | Modelo de dados e contrato REST | [docs/backend/modelo-de-dados.md](docs/backend/modelo-de-dados.md), [docs/backend/api.md](docs/backend/api.md) |
 | Diagramas UML | [docs/backend/diagramas.md](docs/backend/diagramas.md) |
 | Backlog, épicos e o que falta | [docs/backend/backlog.md](docs/backend/backlog.md), [docs/estado-atual.md](docs/estado-atual.md) |
+| Produção, deploy, rollback, backup | [docs/deploy.md](docs/deploy.md) |
 | Decisões gerais de stack | [docs/decisoes-tecnicas.md](docs/decisoes-tecnicas.md) |
 | O que foi feito em cada etapa | [docs/backend/implementacao/](docs/backend/implementacao/README.md) |
 

@@ -1,0 +1,36 @@
+{
+	admin off
+}
+
+{$TBF_API_DOMAIN:api.software.tbfernandes.com.br} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		-Server
+	}
+
+	handle /deploy-status {
+		root * /srv/status
+		rewrite * /deploy-status.json
+		header Content-Type "application/json"
+		header Cache-Control "no-store"
+		file_server
+	}
+
+	handle {
+		reverse_proxy backend:8080 {
+			transport http {
+				read_timeout 120s
+			}
+		}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

@@ -1,0 +1,93 @@
+name: tbfernandes
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-tbfernandes}
+      POSTGRES_USER: ${DB_USERNAME:-tbf}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    shm_size: 128mb
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${DB_USERNAME:-tbf}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDATABASE: ${DB_NAME:-tbfernandes}
+      TBF_BACKUP_INTERVAL: ${TBF_BACKUP_INTERVAL:-600}
+      TBF_BACKUP_OWNER: "1000:1000"
+      TBF_BACKUP_MIN_RATIO: ${TBF_BACKUP_MIN_RATIO:-50}
+    volumes:
+      - ./backup.sh:/usr/local/bin/backup.sh:ro
+      - ./backups:/backups
+    networks: [internal]
+    entrypoint: ["sh", "/usr/local/bin/backup.sh"]
+    command: ["loop"]
+
+  backend:
+    image: tbfernandes-backend:current
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      TBF_PROFILE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      TBF_TRUST_PROXY: "true"
+      TBF_COOKIE_SECURE: "true"
+      NODE_OPTIONS: --max-old-space-size=512
+    networks: [internal, edge]
+    mem_limit: 768m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./status:/srv/status:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [edge]
+
+networks:
+  internal:
+    internal: true
+  edge:
+
+volumes:
+  pgdata:
+    name: tbfernandes_pgdata
+  caddy-data:
+    name: tbfernandes_caddy_data
+  caddy-config:
+    name: tbfernandes_caddy_config

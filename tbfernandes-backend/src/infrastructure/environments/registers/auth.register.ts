@@ -10,6 +10,7 @@ export interface AuthConfig {
   bootstrap: { email: string; password: string; name: string };
   sessionSecret: string;
   cookieSecure: boolean;
+  cookieDomain: string | undefined;
 }
 
 export const authConfig = registerAs('auth', (): AuthConfig => ({
@@ -27,4 +28,5 @@ export const authConfig = registerAs('auth', (): AuthConfig => ({
   sessionSecret:
     process.env.TBF_SESSION_SECRET || randomBytes(32).toString('hex'),
   cookieSecure: process.env.TBF_COOKIE_SECURE === 'true',
+  cookieDomain: process.env.TBF_COOKIE_DOMAIN || undefined,
 }));

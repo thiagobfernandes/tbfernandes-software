@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR=${TBF_APP_DIR:-/srv/tbfernandes}
+IMAGE=${TBF_IMAGE:-ghcr.io/thiagobfernandes/tbfernandes-backend}
+CHANNEL=${TBF_CHANNEL:-prod}
+LOCAL=tbfernandes-backend
+TREE_LABEL=br.com.tbfernandes.backend-tree
+
+cd "$APP_DIR"
+exec 9>"$APP_DIR/.deploy.lock"
+flock -n 9 || exit 0
+
+log() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) [deploy] $*"; }
+
+status() {
+  local tmp="$APP_DIR/status/.deploy-status.json"
+  jq -n --arg state "$1" --arg tree "$2" --arg revision "$3" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{state: $state, tree: $tree, revision: $revision, at: $at}' >"$tmp"
+  chmod 644 "$tmp"
+  mv "$tmp" "$APP_DIR/status/deploy-status.json"
+}
+
+label() { docker image inspect -f "{{index .Config.Labels \"$2\"}}" "$1" 2>/dev/null || true; }
+
+compose() { docker compose -f "$APP_DIR/compose.prod.yaml" --env-file "$APP_DIR/.env" "$@"; }
+
+docker pull -q "$IMAGE:$CHANNEL" >/dev/null
+new=$(docker image inspect -f '{{.Id}}' "$IMAGE:$CHANNEL")
+current=$(docker image inspect -f '{{.Id}}' "$LOCAL:current" 2>/dev/null || echo none)
+running=$(docker inspect -f '{{.Image}}' "$(compose ps -q backend 2>/dev/null)" 2>/dev/null || echo none)
+
+if [[ "${1:-}" != "--force" ]]; then
+  [[ "$new" == "$current" && "$running" == "$current" ]] && exit 0
+  [[ -f .failed-image && "$(cat .failed-image)" == "$new" ]] && exit 0
+fi
+
+tree=$(label "$IMAGE:$CHANNEL" "$TREE_LABEL")
+revision=$(label "$IMAGE:$CHANNEL" org.opencontainers.image.revision)
+log "nova imagem ${new:7:12} (árvore ${tree:0:12}, commit ${revision:0:12})"
+status deploying "$tree" "$revision"
+
+if compose ps --status running -q postgres | grep -q .; then
+  log "backup antes do deploy"
+  compose exec -T backup sh /usr/local/bin/backup.sh now || log "backup falhou, seguindo com o último disponível"
+  mkdir -p backups/pre-deploy
+  last=$(ls -1t backups/tbfernandes-*.dump 2>/dev/null | head -n 1 || true)
+  [[ -n "$last" ]] && cp "$last" "backups/pre-deploy/$(date -u +%Y%m%d-%H%M%S)-${revision:0:12}.dump"
+  ls -1t backups/pre-deploy/*.dump 2>/dev/null | tail -n +6 | xargs -r rm -f
+fi
+
+if [[ "$current" != none ]]; then
+  docker tag "$LOCAL:current" "$LOCAL:previous"
+fi
+docker tag "$IMAGE:$CHANNEL" "$LOCAL:current"
+
+if compose up -d --wait --wait-timeout 240 --remove-orphans; then
+  rm -f .failed-image
+  status healthy "$tree" "$revision"
+  log "deploy saudável"
+else
+  log "deploy não ficou saudável, logs do backend:"
+  compose logs --no-color --tail 80 backend || true
+  if [[ "$current" != none ]]; then
+    docker tag "$LOCAL:previous" "$LOCAL:current"
+    compose up -d --wait --wait-timeout 240 backend && log "versão anterior restaurada" || log "a versão anterior também não ficou saudável"
+  fi
+  echo "$new" >.failed-image
+  status failed "$tree" "$revision"
+  docker image prune -f >/dev/null
+  exit 1
+fi
+
+docker image prune -f >/dev/null

@@ -1,0 +1,10 @@
+[Unit]
+Description=TBFernandes: procura imagem nova do backend a cada minuto
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=1min
+Unit=tbf-deploy.service
+
+[Install]
+WantedBy=timers.target

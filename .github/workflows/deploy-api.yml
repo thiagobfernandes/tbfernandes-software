@@ -1,0 +1,110 @@
+# Backend em produção (docs/deploy.md): depois do CI verde na main, publica a imagem no GHCR
+# com a tag "prod". A EC2 aplica a imagem sozinha (tbf-deploy.timer) e este job espera o
+# resultado em /deploy-status. Rollback: "Run workflow" com o commit desejado em "ref".
+name: deploy-api
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Commit, tag ou branch a publicar (rollback: um commit antigo da main)"
+        required: true
+        default: main
+
+permissions: {}
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/thiagobfernandes/tbfernandes-backend
+  API_URL: https://api.software.tbfernandes.com.br
+
+jobs:
+  publish:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ env.API_URL }}
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.workflow_run.head_sha }}
+
+      - name: Identify the backend tree
+        id: meta
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "tree=$(git rev-parse HEAD:tbfernandes-backend)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Reuse the image when the backend did not change
+        id: existing
+        run: |
+          if docker buildx imagetools inspect "$IMAGE:tree-${{ steps.meta.outputs.tree }}" >/dev/null 2>&1; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and push
+        if: steps.existing.outputs.found != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: tbfernandes-backend
+          push: true
+          provenance: false
+          tags: |
+            ${{ env.IMAGE }}:tree-${{ steps.meta.outputs.tree }}
+            ${{ env.IMAGE }}:sha-${{ steps.meta.outputs.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.meta.outputs.sha }}
+            br.com.tbfernandes.backend-tree=${{ steps.meta.outputs.tree }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Promote to prod
+        run: docker buildx imagetools create -t "$IMAGE:prod" "$IMAGE:tree-${{ steps.meta.outputs.tree }}"
+
+      - name: Wait for the EC2 to apply it
+        env:
+          TREE: ${{ steps.meta.outputs.tree }}
+        run: |
+          for i in $(seq 1 60); do
+            status=$(curl -fsS --max-time 10 "$API_URL/deploy-status" || echo '{}')
+            state=$(jq -r '.state // ""' <<<"$status")
+            tree=$(jq -r '.tree // ""' <<<"$status")
+            echo "[$i] state=${state:-?} tree=${tree:0:12}"
+            if [ "$tree" = "$TREE" ] && [ "$state" = "healthy" ]; then break; fi
+            if [ "$tree" = "$TREE" ] && [ "$state" = "failed" ]; then
+              echo "::error::A EC2 não conseguiu subir esta versão e voltou para a anterior. Veja journalctl -u tbf-deploy na instância."
+              exit 1
+            fi
+            if [ "$i" = 60 ]; then echo "::error::A EC2 não aplicou a imagem em 10 minutos."; exit 1; fi
+            sleep 10
+          done
+
+      - name: Health check over HTTPS
+        run: |
+          curl -fsS --max-time 10 "$API_URL/actuator/health" | tee /dev/stderr | grep -q UP
+          echo "### API em produção: árvore \`${{ steps.meta.outputs.tree }}\`, commit \`${{ steps.meta.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
