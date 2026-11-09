@@ -8,7 +8,6 @@ export const STUDY_STATUSES = [
 ] as const;
 export type StudyStatus = (typeof STUDY_STATUSES)[number];
 
-/** The editable fields of a study plan. */
 export interface StudyDetails {
   name: string;
   description: string | null;
@@ -21,7 +20,6 @@ export interface StudyDetails {
   nextActivity: string | null;
 }
 
-/** A study plan (RF-LRN-01). */
 export class Study {
   private constructor(
     readonly id: string,
@@ -37,7 +35,6 @@ export class Study {
     );
   }
 
-  /** Rebuilds a study already stored; no rules run. */
   static restore(id: string, ownerId: string, details: StudyDetails): Study {
     return new Study(id, ownerId, details);
   }
@@ -54,17 +51,25 @@ export class Study {
     this._details = Study.validated(details);
   }
 
-  private static validated(d: StudyDetails): StudyDetails {
-    Require.dateOrder(d.startDate, d.dueDate, 'dueDate');
+  private static validated(details: StudyDetails): StudyDetails {
+    Require.dateOrder(details.startDate, details.dueDate, 'dueDate');
     return {
-      name: Require.text(d.name, 'name', 200),
-      description: Require.optionalText(d.description, 'description', 2000),
-      status: d.status ?? 'PLANNED',
-      goalId: d.goalId ?? null,
-      skillIds: [...new Set(d.skillIds ?? [])],
-      startDate: d.startDate ?? null,
-      dueDate: d.dueDate ?? null,
-      nextActivity: Require.optionalText(d.nextActivity, 'nextActivity', 300),
+      name: Require.text(details.name, 'name', 200),
+      description: Require.optionalText(
+        details.description,
+        'description',
+        2000,
+      ),
+      status: details.status ?? 'PLANNED',
+      goalId: details.goalId ?? null,
+      skillIds: [...new Set(details.skillIds ?? [])],
+      startDate: details.startDate ?? null,
+      dueDate: details.dueDate ?? null,
+      nextActivity: Require.optionalText(
+        details.nextActivity,
+        'nextActivity',
+        300,
+      ),
     };
   }
 }

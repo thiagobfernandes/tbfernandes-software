@@ -1,4 +1,3 @@
-/** Same shape as the frontend's Note type. */
 export class NoteResponse {
   id: string;
   title: string;

@@ -1,42 +1,41 @@
 import { FinanceEntry } from '../../../domain';
 import { FinanceEntryEntity } from '../finance-entry.entity';
 
-/** FinanceEntry ↔ finance.entry row. */
 export const FinanceEntryPersistenceMapper = {
-  toDomain(e: FinanceEntryEntity): FinanceEntry {
+  toDomain(entity: FinanceEntryEntity): FinanceEntry {
     return FinanceEntry.restore(
-      e.id,
-      e.ownerId,
+      entity.id,
+      entity.ownerId,
       {
-        kind: e.kind,
-        scope: e.scope,
-        category: e.category,
-        description: e.description,
-        amount: e.amount,
-        date: e.entryDate,
-        recurring: e.recurring,
+        kind: entity.kind,
+        scope: entity.scope,
+        category: entity.category,
+        description: entity.description,
+        amount: entity.amount,
+        date: entity.entryDate,
+        recurring: entity.recurring,
       },
-      e.source,
-      e.externalId,
+      entity.source,
+      entity.externalId,
     );
   },
 
   toEntity(
     entry: FinanceEntry,
-    e: FinanceEntryEntity = new FinanceEntryEntity(),
+    entity: FinanceEntryEntity = new FinanceEntryEntity(),
   ): FinanceEntryEntity {
-    const d = entry.details;
-    e.id = entry.id;
-    e.ownerId = entry.ownerId;
-    e.kind = d.kind;
-    e.scope = d.scope;
-    e.category = d.category;
-    e.description = d.description;
-    e.amount = d.amount;
-    e.entryDate = d.date;
-    e.recurring = d.recurring;
-    e.source = entry.source;
-    e.externalId = entry.externalId;
-    return e;
+    const details = entry.details;
+    entity.id = entry.id;
+    entity.ownerId = entry.ownerId;
+    entity.kind = details.kind;
+    entity.scope = details.scope;
+    entity.category = details.category;
+    entity.description = details.description;
+    entity.amount = details.amount;
+    entity.entryDate = details.date;
+    entity.recurring = details.recurring;
+    entity.source = entry.source;
+    entity.externalId = entry.externalId;
+    return entity;
   },
 };

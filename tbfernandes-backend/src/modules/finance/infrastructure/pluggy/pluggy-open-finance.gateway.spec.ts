@@ -14,12 +14,11 @@ interface Expectation {
   json?: unknown;
 }
 
-/** FIN-OF-07: the gateway against Pluggy's documented contract, without calling Pluggy. */
 class FakePluggy {
   private readonly expected: Expectation[] = [];
 
-  expect(e: Expectation): this {
-    this.expected.push(e);
+  expect(expectation: Expectation): this {
+    this.expected.push(expectation);
     return this;
   }
 
@@ -27,26 +26,33 @@ class FakePluggy {
     return this.expect({
       url: `${BASE}/auth`,
       method: 'POST',
-      body: (b) =>
-        expect(b).toEqual({ clientId: 'id', clientSecret: 'secret' }),
+      body: (body) =>
+        expect(body).toEqual({ clientId: 'id', clientSecret: 'secret' }),
       json: { apiKey: key },
     });
   }
 
   readonly fetch = ((url: string, init: RequestInit) => {
-    const e = this.expected.shift();
-    if (!e) throw new Error(`Unexpected request ${url}`);
-    expect(url).toBe(e.url);
-    if (e.method) expect(init.method).toBe(e.method);
+    const expectation = this.expected.shift();
+    if (!expectation) throw new Error(`Unexpected request ${url}`);
+    expect(url).toBe(expectation.url);
+    if (expectation.method) expect(init.method).toBe(expectation.method);
     const headers = init.headers as Record<string, string>;
-    if (e.key) expect(headers['X-API-KEY']).toBe(e.key);
-    if (e.body)
-      e.body(JSON.parse(init.body as string) as Record<string, unknown>);
-    const status = e.status ?? 200;
+    if (expectation.key) expect(headers['X-API-KEY']).toBe(expectation.key);
+    if (expectation.body)
+      expectation.body(
+        JSON.parse(init.body as string) as Record<string, unknown>,
+      );
+    const status = expectation.status ?? 200;
     return Promise.resolve(
-      new Response(e.json === undefined ? null : JSON.stringify(e.json), {
-        status,
-      }),
+      new Response(
+        expectation.json === undefined
+          ? null
+          : JSON.stringify(expectation.json),
+        {
+          status,
+        },
+      ),
     );
   }) as unknown as typeof fetch;
 
@@ -70,11 +76,11 @@ const CHECKING: ExternalAccount = {
 };
 const CARD: ExternalAccount = { ...CHECKING, id: 'card', type: 'CREDIT' };
 
-const tx = (t: Record<string, unknown>) => ({
+const tx = (overrides: Record<string, unknown>) => ({
   date: '2031-03-05T00:00:00.000Z',
   currencyCode: 'BRL',
   status: 'POSTED',
-  ...t,
+  ...overrides,
 });
 
 describe('PluggyOpenFinanceGateway', () => {
@@ -103,8 +109,8 @@ describe('PluggyOpenFinanceGateway', () => {
         url: `${BASE}/connect_token`,
         method: 'POST',
         key: 'key-1',
-        body: (b) =>
-          expect(b).toEqual({
+        body: (body) =>
+          expect(body).toEqual({
             options: { clientUserId: 'me', avoidDuplicates: true },
           }),
         json: { accessToken: 'tok-1' },
@@ -112,7 +118,7 @@ describe('PluggyOpenFinanceGateway', () => {
       .expect({
         url: `${BASE}/connect_token`,
         key: 'key-1',
-        body: (b) => expect(b.itemId).toBe('item'),
+        body: (body) => expect(body.itemId).toBe('item'),
         json: { accessToken: 'tok-2' },
       });
 
@@ -210,7 +216,7 @@ describe('PluggyOpenFinanceGateway', () => {
 
     const accounts = await gateway.listAccounts('item');
 
-    expect(accounts.map((a) => a.type)).toEqual(['BANK', 'CREDIT']);
+    expect(accounts.map((account) => account.type)).toEqual(['BANK', 'CREDIT']);
     expect(accounts[0].balance).toBe(10050);
   });
 
@@ -261,7 +267,10 @@ describe('PluggyOpenFinanceGateway', () => {
       '2031-03-31',
     );
 
-    expect(transactions.map((t) => t.id)).toEqual(['t1', 't3']);
+    expect(transactions.map((transaction) => transaction.id)).toEqual([
+      't1',
+      't3',
+    ]);
     expect(transactions[0]).toMatchObject({
       date: '2031-03-05',
       amount: -1050,
@@ -296,7 +305,9 @@ describe('PluggyOpenFinanceGateway', () => {
       '2031-03-31',
     );
 
-    expect(transactions.map((t) => t.amount)).toEqual([-5000, 5000, -5530]);
+    expect(transactions.map((transaction) => transaction.amount)).toEqual([
+      -5000, 5000, -5530,
+    ]);
   });
 
   it('does not fail when the connection to delete is already gone', async () => {

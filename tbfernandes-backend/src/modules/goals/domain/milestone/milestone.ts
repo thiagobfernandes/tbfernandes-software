@@ -1,6 +1,5 @@
 import { IsoDate, Require } from '../../../../common/domain';
 
-/** The editable fields of a milestone. */
 export interface MilestoneDetails {
   goalId: string;
   title: string;
@@ -8,7 +7,6 @@ export interface MilestoneDetails {
   done: boolean;
 }
 
-/** A checkpoint of a goal (RF-GOL-03). */
 export class Milestone {
   private constructor(
     readonly id: string,
@@ -24,7 +22,6 @@ export class Milestone {
     );
   }
 
-  /** Rebuilds a milestone already stored; no rules run. */
   static restore(id: string, ownerId: string, details: MilestoneDetails) {
     return new Milestone(id, ownerId, details);
   }
@@ -37,12 +34,12 @@ export class Milestone {
     this._details = Milestone.validated(details);
   }
 
-  private static validated(d: MilestoneDetails): MilestoneDetails {
+  private static validated(details: MilestoneDetails): MilestoneDetails {
     return {
-      goalId: Require.present(d.goalId, 'goalId'),
-      title: Require.text(d.title, 'title', 200),
-      dueDate: d.dueDate ?? null,
-      done: d.done ?? false,
+      goalId: Require.present(details.goalId, 'goalId'),
+      title: Require.text(details.title, 'title', 200),
+      dueDate: details.dueDate ?? null,
+      done: details.done ?? false,
     };
   }
 }

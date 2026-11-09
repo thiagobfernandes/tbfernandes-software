@@ -5,7 +5,6 @@ import { startApp } from './support/test-app';
 
 const TOKEN = 'launch-token-0123456789abcdef';
 
-/** Desktop profile: no request gets through without the launch token. */
 describe('Desktop token', () => {
   let app: INestApplication<App>;
 

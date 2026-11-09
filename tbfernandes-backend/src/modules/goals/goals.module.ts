@@ -17,10 +17,6 @@ import { TypeOrmMilestoneRepository } from './infrastructure/persistence/typeorm
 import { GoalController } from './web/goal.controller';
 import { MilestoneController } from './web/milestone.controller';
 
-/**
- * Goals: goals, sub-goals, milestones and indicators. Reads work, learning and finance
- * through their public APIs and listens to work's task-completed event (GOL-05).
- */
 @Module({
   imports: [
     WorkModule,

@@ -5,7 +5,6 @@ import { Clock } from '../../common/application';
 import { IsoDate } from '../../common/domain';
 import { appConfig } from '../environments/registers';
 
-/** The real clock, in the configured time zone (TBF_TIME_ZONE). */
 @Injectable()
 export class SystemClock extends Clock {
   private readonly zone: string;

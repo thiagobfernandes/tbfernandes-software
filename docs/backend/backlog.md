@@ -55,6 +55,7 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | WRK-09 | Evento `TaskDeleted` para limpar vínculos de conhecimento e follow-ups | P | ✅ |
 | WRK-10 | Ligar telas Companies, Projects e Tasks à API (trocar `workActions` por `apiFetch`) | G | ✅ etapa 9 |
 | WRK-11 | Excluir empresa sem projetos (com projetos: 409) e projeto, mantendo as tarefas sem projeto (RN-01) | P | ✅ |
+| WRK-12 | Agenda: agendamentos com horário, visões Dia/Semana no calendário e arrastar para agendar (RF-WRK-14, RF-WRK-15, RN-26, RN-27) | M | ✅ |
 
 Critérios de aceite principais:
 - WRK-04: mover para `done` preenche `completedAt`; sair de `done` limpa; `blocked → done` retorna 422 com `rule: "RN-07"`.
@@ -139,6 +140,7 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | AST-02 | Porta `LanguageModel` e adaptador desligado | P | ✅ etapa 8 |
 | AST-03 | Respostas com IA, só leitura, citando os registros usados (RF-AST-02, RN-20) | G | ✅ etapa 10 |
 | AST-04 | Embeddings de notas e snippets e respostas com RAG (RF-AST-03). Vetores em `real[]`, sem pgvector, por causa do app desktop | G | ✅ etapa 11 |
+| AST-05 | Traces do assistente na Langfuse: um trace por pergunta, generations com modelo e tokens, retriever do RAG, dados pessoais mascarados | M | ✅ |
 
 ## Épico IDN — Identity e segurança
 

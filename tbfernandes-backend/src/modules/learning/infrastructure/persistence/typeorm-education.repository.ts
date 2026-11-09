@@ -5,7 +5,6 @@ import { Education, EducationRepository } from '../../domain';
 import { EducationEntity } from './education.entity';
 import { EducationPersistenceMapper as Mapper } from './mappers/education.persistence-mapper';
 
-/** EducationRepository on TypeORM. */
 @Injectable()
 export class TypeOrmEducationRepository extends EducationRepository {
   private readonly rows: BaseRepository<EducationEntity>;

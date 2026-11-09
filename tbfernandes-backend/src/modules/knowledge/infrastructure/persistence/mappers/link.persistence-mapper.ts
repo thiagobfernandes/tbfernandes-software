@@ -6,7 +6,6 @@ interface LinkRow {
   targetId: string;
 }
 
-/** KnowledgeLinks ↔ rows of note_link / snippet_link. */
 export const LinkPersistenceMapper = {
   toLinks(rows: readonly LinkRow[] | undefined): KnowledgeLinks {
     const all = rows ?? [];

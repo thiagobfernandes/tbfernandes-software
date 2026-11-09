@@ -6,7 +6,6 @@ import { Skill, SkillRepository } from '../../domain';
 import { SkillEntity } from './skill.entity';
 import { SkillPersistenceMapper as Mapper } from './mappers/skill.persistence-mapper';
 
-/** SkillRepository on TypeORM. */
 @Injectable()
 export class TypeOrmSkillRepository extends SkillRepository {
   private readonly rows: BaseRepository<SkillEntity>;

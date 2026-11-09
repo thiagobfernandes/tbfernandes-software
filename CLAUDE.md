@@ -12,9 +12,12 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | `tbfernandes-backend/` | Backend NestJS 11, TypeScript, TypeORM, PostgreSQL 17, migrações SQL no formato do Flyway (ADR-009) | [tbfernandes-backend/CLAUDE.md](tbfernandes-backend/CLAUDE.md) |
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend | — |
 | `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
+| `tbfernandes-backup/` | Script do serviço `backup`: `pg_dump` a cada 10 min em `./backups/`, só o último fica | [docs/como-rodar.md](docs/como-rodar.md#backup-do-banco) |
+| `deploy/` | Produção na EC2: compose, Caddy, script e timer do deploy automático | [docs/deploy.md](docs/deploy.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
 | `.github/workflows/ci.yml` | CI: lint, typecheck, testes, e2e e build no backend; `npm ci && npm run lint && npm run build` no frontend; imagens do compose construídas e testadas pelo nginx | — |
+| `.github/workflows/deploy-api.yml` | Depois do CI verde na `main`: publica a imagem do backend no GHCR e espera a EC2 aplicar | [docs/deploy.md](docs/deploy.md) |
 
 ## Onde está cada regra
 
@@ -29,6 +32,7 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | Modelo de dados e contrato REST | [docs/backend/modelo-de-dados.md](docs/backend/modelo-de-dados.md), [docs/backend/api.md](docs/backend/api.md) |
 | Diagramas UML | [docs/backend/diagramas.md](docs/backend/diagramas.md) |
 | Backlog, épicos e o que falta | [docs/backend/backlog.md](docs/backend/backlog.md), [docs/estado-atual.md](docs/estado-atual.md) |
+| Produção, deploy, rollback, backup | [docs/deploy.md](docs/deploy.md) |
 | Decisões gerais de stack | [docs/decisoes-tecnicas.md](docs/decisoes-tecnicas.md) |
 | O que foi feito em cada etapa | [docs/backend/implementacao/](docs/backend/implementacao/README.md) |
 
@@ -40,7 +44,7 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 4. **Clean architecture leve.** `domain` em TypeScript puro → `application` (casos de uso) → `infrastructure` (persistência, integrações), `protocols` (DTOs) e `web` (controllers). Sem pacotes `adapter/in`, `adapter/out` ou `port`. Regras de negócio sempre no domínio, com teste unitário.
 5. **Banco só por Flyway.** Nova migração `V<n>__<descricao>.sql`; nunca editar uma já aplicada. Um schema por módulo, sem FK entre schemas.
 6. **Frontend por feature.** Páginas finas em `tbfernandes-frontend/src/app`, código em `tbfernandes-frontend/src/features/<feature>`. Toda tela lê e grava pelo store (`tbfernandes-frontend/src/lib/sample-data/store.ts`), que funciona em modo local (simulado) ou API.
-7. **Design.** Toda tela nova segue as referências e a linguagem visual aprovada (paleta navy escura, cards de métrica estilo Luma, timeline estilo Cindr, quadro estilo AturnDeck/Ronas). Antes de inventar um layout, procure uma tela existente parecida e reutilize os componentes de `components/shared`. Detalhes em [docs/design/referencias.md](docs/design/referencias.md).
+7. **Design.** Toda tela nova segue as referências e a linguagem visual aprovada (paleta preto e dourado, cards de métrica estilo Luma, timeline estilo Cindr, quadro estilo AturnDeck/Ronas). Antes de inventar um layout, procure uma tela existente parecida e reutilize os componentes de `components/shared`. Detalhes em [docs/design/referencias.md](docs/design/referencias.md).
 8. **Fatias verticais.** Entregas pequenas de ponta a ponta: migração → domínio → caso de uso → API → tela, com testes e docs atualizados no mesmo commit.
 9. **Documentar junto.** Mudou regra, modelo, contrato ou tela? Atualize o documento correspondente em `docs/` no mesmo commit. Itens do backlog citados no commit (`[WRK-04]`).
 10. **Segredos** só em variáveis de ambiente (`.env.local`, que não vai para o git). Nada de credenciais no repositório.

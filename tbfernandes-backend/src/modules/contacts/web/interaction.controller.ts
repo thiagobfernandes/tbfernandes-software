@@ -84,7 +84,6 @@ export class InteractionController {
     await this.interactions.delete(id);
   }
 
-  /** CTC-03: creates a follow-up task in work, once per interaction (RN-24). */
   @Post(':id/follow-up')
   @HttpCode(200)
   @ApiBody({ type: FollowUpRequest })

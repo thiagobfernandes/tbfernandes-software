@@ -13,7 +13,6 @@ import {
 } from '../domain';
 import { ContactService } from './contact.service';
 
-/** Interaction use cases (RF-CTC-02, RF-CTC-03). */
 @Injectable()
 export class InteractionService {
   constructor(

@@ -13,7 +13,6 @@ export const INTERACTION_KINDS = [
 ] as const;
 export type InteractionKind = (typeof INTERACTION_KINDS)[number];
 
-/** The editable fields of an interaction. */
 export interface InteractionDetails {
   contactId: string;
   date: IsoDate;
@@ -23,7 +22,6 @@ export interface InteractionDetails {
   followUpTaskId: string | null;
 }
 
-/** Something that happened with a contact (RF-CTC-02). */
 export class Interaction {
   private constructor(
     readonly id: string,
@@ -43,7 +41,6 @@ export class Interaction {
     );
   }
 
-  /** Rebuilds an interaction already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -75,13 +72,13 @@ export class Interaction {
     this._details = { ...this._details, followUpTaskId: null };
   }
 
-  private static validated(d: InteractionDetails): InteractionDetails {
+  private static validated(details: InteractionDetails): InteractionDetails {
     return {
-      contactId: Require.present(d.contactId, 'contactId'),
-      date: Require.present(d.date, 'date'),
-      kind: Require.present(d.kind, 'kind'),
-      summary: Require.text(d.summary, 'summary', 2000),
-      followUpTaskId: d.followUpTaskId ?? null,
+      contactId: Require.present(details.contactId, 'contactId'),
+      date: Require.present(details.date, 'date'),
+      kind: Require.present(details.kind, 'kind'),
+      summary: Require.text(details.summary, 'summary', 2000),
+      followUpTaskId: details.followUpTaskId ?? null,
     };
   }
 }

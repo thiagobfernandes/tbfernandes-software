@@ -10,8 +10,9 @@ import type { App } from 'supertest/types';
  */
 export async function startApp(
   env: Record<string, string> = {},
-  /** Replaces providers, e.g. a fake bank provider. */
-  override: (builder: TestingModuleBuilder) => TestingModuleBuilder = (b) => b,
+  override: (builder: TestingModuleBuilder) => TestingModuleBuilder = (
+    builder,
+  ) => builder,
 ): Promise<INestApplication<App>> {
   Object.assign(process.env, {
     TBF_PROFILE: 'test',
@@ -38,7 +39,6 @@ export async function startApp(
   return app;
 }
 
-/** Asserts 201 and returns the new id. */
 export async function create(
   app: INestApplication<App>,
   uri: string,

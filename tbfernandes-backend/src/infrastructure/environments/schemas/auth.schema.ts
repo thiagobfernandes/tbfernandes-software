@@ -18,4 +18,5 @@ export const authEnvironmentSchema = Joi.object({
   TBF_AUTH_BOOTSTRAP_NAME: Joi.string().allow('').default(''),
   TBF_SESSION_SECRET: Joi.string().allow('').default(''),
   TBF_COOKIE_SECURE: Joi.boolean().default(false),
+  TBF_COOKIE_DOMAIN: Joi.string().allow('').default(''),
 });

@@ -1,6 +1,5 @@
 import { Interaction } from './interaction';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class InteractionRepository {
   abstract create(interaction: Interaction): Promise<Interaction>;
   abstract save(interaction: Interaction): Promise<Interaction>;

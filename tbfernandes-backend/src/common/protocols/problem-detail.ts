@@ -7,9 +7,7 @@ export interface ProblemDetail {
   status: number;
   detail?: string;
   instance?: string;
-  /** Business rule that refused the request (RN-xx). */
   rule?: string;
-  /** Field errors, by field name. */
   errors?: Record<string, string[]>;
 }
 

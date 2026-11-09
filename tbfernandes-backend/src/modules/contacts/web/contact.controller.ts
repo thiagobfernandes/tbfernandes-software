@@ -30,7 +30,6 @@ import type { ContactListQuery, ValidContactRequest } from '../protocols';
 export class ContactController {
   constructor(private readonly contacts: ContactService) {}
 
-  /** CTC-04: dueWithinDays keeps contacts to reach out to now or in the next days. */
   @Get()
   @ApiQuery({ name: 'dueWithinDays', required: false, type: Number })
   async list(

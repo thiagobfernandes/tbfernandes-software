@@ -11,7 +11,6 @@ import {
   profileRequestSchema,
 } from '../protocols';
 
-/** The signed-in user's profile and password (IDN-03). */
 @ApiTags('identity')
 @Controller('me')
 export class MeController {

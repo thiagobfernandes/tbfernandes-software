@@ -34,7 +34,7 @@ export class TypeOrmBankConnectionRepository extends BankConnectionRepository {
   }
 
   async saveIfAbsent(connection: BankConnection): Promise<BankConnection> {
-    const d = connection.details;
+    const details = connection.details;
     await this.tx.manager.query(
       `INSERT INTO finance.bank_connection (id, owner_id, external_id, institution, scope, status)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -43,9 +43,9 @@ export class TypeOrmBankConnectionRepository extends BankConnectionRepository {
         connection.id,
         connection.ownerId,
         connection.externalId,
-        d.institution,
-        d.scope,
-        d.status,
+        details.institution,
+        details.scope,
+        details.status,
       ],
     );
     return (await this.findByExternalId(connection.externalId))!;

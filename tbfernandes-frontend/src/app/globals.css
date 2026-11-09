@@ -4,9 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Brand palette (from the product vision):
- *   ink    #0C1821   navy   #1B2A41   slate  #324A5F
- *   teal   #2DD4BF   lilac  #CCC9DC   white  #FFFFFF
+ * Brand palette, black and gold:
+ *   black      #080808   graphite   #1C1C1C   gold       #D4AF37
+ *   aged gold  #B89546   champagne  #F5E9CF
  * Intermediate tones below are derived from these to keep contrast
  * accessible. Change colors here only; components consume the tokens.
  */
@@ -14,70 +14,70 @@
 :root {
   --radius: 0.625rem;
 
-  --background: #ffffff;
-  --foreground: #0c1821;
+  --background: #fbf7ee;
+  --foreground: #080808;
   --card: #ffffff;
-  --card-foreground: #0c1821;
+  --card-foreground: #080808;
   --popover: #ffffff;
-  --popover-foreground: #0c1821;
-  /* #2DD4BF fails contrast on white, so light mode uses a deeper teal. */
-  --primary: #0f766e;
+  --popover-foreground: #080808;
+  /* #D4AF37 fails contrast on light surfaces, so light mode uses a deeper gold. */
+  --primary: #8a6a12;
   --primary-foreground: #ffffff;
-  --secondary: #f1f0f6;
-  --secondary-foreground: #1b2a41;
-  --muted: #f1f0f6;
-  --muted-foreground: #4b5d70;
-  --accent: #e9f8f6;
-  --accent-foreground: #0c1821;
-  --destructive: #dc2626;
-  --border: #e2e0ea;
-  --input: #d6d3e1;
-  --ring: #0f766e;
+  --secondary: #f5e9cf;
+  --secondary-foreground: #1c1c1c;
+  --muted: #f3ecdc;
+  --muted-foreground: #5e5443;
+  --accent: #f5e9cf;
+  --accent-foreground: #080808;
+  --destructive: #c62828;
+  --border: #e6dcc6;
+  --input: #d3c29a;
+  --ring: #b89546;
 
-  --sidebar: #f7f7fa;
-  --sidebar-foreground: #1b2a41;
-  --sidebar-primary: #0f766e;
+  --sidebar: #f7f1e3;
+  --sidebar-foreground: #1c1c1c;
+  --sidebar-primary: #8a6a12;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e9f8f6;
-  --sidebar-accent-foreground: #0c1821;
-  --sidebar-border: #e2e0ea;
-  --sidebar-ring: #0f766e;
+  --sidebar-accent: #f0e3c4;
+  --sidebar-accent-foreground: #080808;
+  --sidebar-border: #e6dcc6;
+  --sidebar-ring: #b89546;
 
-  --success: #15803d;
-  --warning: #b45309;
+  --success: #2e7d32;
+  --warning: #a35f00;
 }
 
 .dark {
-  --background: #0c1821;
-  --foreground: #ffffff;
-  --card: #13212f;
-  --card-foreground: #ffffff;
-  --popover: #1b2a41;
-  --popover-foreground: #ffffff;
-  --primary: #2dd4bf;
-  --primary-foreground: #0c1821;
-  --secondary: #1b2a41;
-  --secondary-foreground: #ffffff;
-  --muted: #1b2a41;
-  --muted-foreground: #ccc9dc;
-  --accent: #1b2a41;
-  --accent-foreground: #ffffff;
-  --destructive: #f87171;
-  --border: #23364b;
-  --input: #324a5f;
-  --ring: #2dd4bf;
+  --background: #080808;
+  --foreground: #f5e9cf;
+  --card: #1c1c1c;
+  --card-foreground: #f5e9cf;
+  --popover: #1c1c1c;
+  --popover-foreground: #f5e9cf;
+  --primary: #d4af37;
+  --primary-foreground: #080808;
+  --secondary: #262626;
+  --secondary-foreground: #f5e9cf;
+  --muted: #242424;
+  --muted-foreground: #b9ae98;
+  --accent: #2a2417;
+  --accent-foreground: #f5e9cf;
+  --destructive: #ef6b6b;
+  --border: #33302a;
+  --input: #5b4c2c;
+  --ring: #b89546;
 
-  --sidebar: #0f1d29;
-  --sidebar-foreground: #ccc9dc;
-  --sidebar-primary: #2dd4bf;
-  --sidebar-primary-foreground: #0c1821;
-  --sidebar-accent: #1b2a41;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1b2a41;
-  --sidebar-ring: #2dd4bf;
+  --sidebar: #0f0f0f;
+  --sidebar-foreground: #e6dabf;
+  --sidebar-primary: #d4af37;
+  --sidebar-primary-foreground: #080808;
+  --sidebar-accent: #2a2417;
+  --sidebar-accent-foreground: #f5e9cf;
+  --sidebar-border: #262420;
+  --sidebar-ring: #b89546;
 
-  --success: #4ade80;
-  --warning: #fbbf24;
+  --success: #6fcf7f;
+  --warning: #f0b84d;
 }
 
 @theme inline {
@@ -218,15 +218,15 @@
  */
 @layer components {
   .hljs {
-    --code-keyword: #0f766e;
+    --code-keyword: #8a6a12;
     --code-string: #7c3aed;
-    --code-number: #b45309;
+    --code-number: #a35f00;
     --code-title: #0369a1;
     --code-comment: var(--muted-foreground);
     color: var(--foreground);
   }
   .dark .hljs {
-    --code-keyword: #2dd4bf;
+    --code-keyword: #d4af37;
     --code-string: #c4b5fd;
     --code-number: #fbbf24;
     --code-title: #7dd3fc;
@@ -265,6 +265,6 @@
 
 /* Chart series colors, validated for CVD separation on both surfaces. */
 :root {
-  --chart-income: #0d9488;
+  --chart-income: #a8841c;
   --chart-expense: #c026d3;
 }

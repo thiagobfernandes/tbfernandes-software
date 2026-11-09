@@ -3,7 +3,6 @@ import { UnauthenticatedError } from '../../../common/domain';
 import { AppUserRepository } from '../domain';
 import { PasswordHasher } from './password-hasher';
 
-/** IDN-01: checks e-mail and password and returns the account id to keep in the session. */
 @Injectable()
 export class AuthenticationService {
   constructor(

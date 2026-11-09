@@ -7,7 +7,6 @@ import {
 import { NotFoundError } from '../../../common/domain';
 import { Education, EducationDetails, EducationRepository } from '../domain';
 
-/** Formal education use cases (RF-LRN-05). */
 @Injectable()
 export class EducationService {
   constructor(

@@ -5,11 +5,9 @@ import { DocumentKey, IndexedChunk } from '../domain';
  * embeddings. It is derived data, rebuilt from the knowledge module at any time.
  */
 export abstract class KnowledgeIndex {
-  /** The fingerprint each indexed document had when it was indexed, by keyOf(document). */
   abstract fingerprints(
     ownerId: string,
   ): Promise<Map<string, { key: DocumentKey; fingerprint: string }>>;
-  /** Replaces every passage of the document. */
   abstract replace(
     ownerId: string,
     document: DocumentKey,

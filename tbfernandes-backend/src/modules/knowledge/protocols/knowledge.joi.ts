@@ -1,6 +1,5 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 
-/** Pieces shared by the note and snippet requests. */
 export const KnowledgeJoi = {
   /** Tags as typed; the domain trims, lowercases and removes repeats. */
   tags() {
@@ -12,6 +11,6 @@ export const KnowledgeJoi = {
 
   /** Ids of linked projects or tasks. Absent or null means none. */
   ids() {
-    return J.uuidList().allow(null);
+    return RequestFields.uuidList().allow(null);
   },
 };

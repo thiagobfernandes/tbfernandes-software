@@ -8,12 +8,10 @@ import { Answer, Passage, StructuredQuery } from '../domain';
  * so every link points to a real record. null means no model is configured or it could not help.
  */
 export abstract class LanguageModel {
-  /** The question as a query, or null when a lookup cannot answer it. */
   abstract toQuery(
     question: string,
     today: IsoDate,
   ): Promise<StructuredQuery | null>;
-  /** The grounded answer's text rewritten for the question. */
   abstract answer(question: string, grounded: Answer): Promise<string | null>;
   /**
    * An answer written only from the passages of notes and snippets (AST-04), citing them as

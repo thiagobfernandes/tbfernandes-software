@@ -1,6 +1,5 @@
 import { BankConnection } from './bank-connection';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class BankConnectionRepository {
   abstract save(connection: BankConnection): Promise<BankConnection>;
   /**

@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { ENTRY_KINDS, ENTRY_SCOPES } from '../domain';
 import type { EntryKind, EntryScope } from '../domain';
 
@@ -11,7 +11,6 @@ export class EntryRequest {
   category: string;
   description: string;
   amount: number;
-  /** YYYY-MM-DD */
   date: string;
   recurring?: boolean | null;
 }
@@ -27,12 +26,12 @@ export interface ValidEntryRequest {
 }
 
 export const entryRequestSchema = Joi.object<ValidEntryRequest>({
-  kind: J.enumOf(ENTRY_KINDS).required(),
-  scope: J.enumOf(ENTRY_SCOPES).required(),
-  category: J.requiredText(60),
-  description: J.requiredText(300),
+  kind: RequestFields.enumOf(ENTRY_KINDS).required(),
+  scope: RequestFields.enumOf(ENTRY_SCOPES).required(),
+  category: RequestFields.requiredText(60),
+  description: RequestFields.requiredText(300),
   amount: Joi.number().required(),
-  date: J.isoDate().required(),
+  date: RequestFields.isoDate().required(),
   recurring: Joi.boolean().allow(null).empty(null).default(false),
 });
 
@@ -42,9 +41,9 @@ export interface EntryListQuery {
 }
 
 export const entryListQuerySchema = Joi.object<EntryListQuery>({
-  month: J.yearMonth().default(null),
-  scope: J.optionalEnumOf(ENTRY_SCOPES),
-  ...J.paging(),
+  month: RequestFields.yearMonth().default(null),
+  scope: RequestFields.optionalEnumOf(ENTRY_SCOPES),
+  ...RequestFields.paging(),
 });
 
 export interface CashFlowQuery {
@@ -54,12 +53,11 @@ export interface CashFlowQuery {
 }
 
 export const cashFlowQuerySchema = Joi.object<CashFlowQuery>({
-  month: J.yearMonth().default(null),
+  month: RequestFields.yearMonth().default(null),
   months: Joi.number().integer().default(6),
-  scope: J.optionalEnumOf(ENTRY_SCOPES),
+  scope: RequestFields.optionalEnumOf(ENTRY_SCOPES),
 });
 
-/** Same shape as the frontend's FinanceEntry type. */
 export class EntryResponse {
   id: string;
   kind: string;
@@ -72,7 +70,6 @@ export class EntryResponse {
 }
 
 export class MonthTotalsResponse {
-  /** YYYY-MM */
   month: string;
   income: number;
   expense: number;

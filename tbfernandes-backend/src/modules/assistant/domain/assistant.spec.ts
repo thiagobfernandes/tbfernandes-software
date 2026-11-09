@@ -20,8 +20,6 @@ import {
 
 const day = (base: string, days: number) => IsoDates.plusDays(base, days);
 
-// --- Rule-based assistant -----------------------------------------------------------------
-
 const TODAY = '2026-10-26';
 const COMPANY = randomUUID();
 const PROJECT = randomUUID();
@@ -220,7 +218,7 @@ describe('RuleBasedAssistant', () => {
     expect(goals.text).toBe(
       'Metas ativas:\n- **Senior role**: 50% (1/2 marcos)',
     );
-    expect(goals.references.map((r) => r.href)).toEqual([
+    expect(goals.references.map((reference) => reference.href)).toEqual([
       `/goals/view?id=${GOAL}`,
     ]);
     expect(
@@ -236,7 +234,10 @@ describe('RuleBasedAssistant', () => {
     expect(answer.text).toBe(
       'Encontrei 2 itens relacionados nos seus dados. Abra abaixo.',
     );
-    expect(answer.references.map((r) => r.kind)).toEqual(['Nota', 'Snippet']);
+    expect(answer.references.map((reference) => reference.kind)).toEqual([
+      'Nota',
+      'Snippet',
+    ]);
     expect(RuleBasedAssistant.answer('xyz', workspace()).references).toEqual(
       [],
     );
@@ -253,8 +254,6 @@ describe('RuleBasedAssistant', () => {
     expect(RuleBasedAssistant.mentions('status do p?', 'P')).toBe(true);
   });
 });
-
-// --- Query engine -------------------------------------------------------------------------
 
 describe('QueryEngine', () => {
   const today = '2026-10-30';
@@ -342,9 +341,9 @@ describe('QueryEngine', () => {
       },
     ],
   };
-  const labels = (q: Parameters<typeof StructuredQueries.of>[0]) =>
-    QueryEngine.run(StructuredQueries.of(q), data).references.map(
-      (r) => r.label,
+  const labels = (query: Parameters<typeof StructuredQueries.of>[0]) =>
+    QueryEngine.run(StructuredQueries.of(query), data).references.map(
+      (reference) => reference.label,
     );
 
   it('overdue open tasks include only what is late and not finished', () => {
@@ -362,7 +361,7 @@ describe('QueryEngine', () => {
     );
     expect(answer.text).not.toContain('Tarefa antiga');
     expect(answer.text).not.toContain('Publicar migração');
-    expect(answer.references.map((r) => r.label)).toEqual([
+    expect(answer.references.map((reference) => reference.label)).toEqual([
       'Revisar contrato',
       'Corrigir relatório',
     ]);
@@ -439,8 +438,6 @@ describe('QueryEngine', () => {
   });
 });
 
-// --- Knowledge graph ----------------------------------------------------------------------
-
 describe('KnowledgeGraphs', () => {
   it('has the same nodes and edges as the frontend', () => {
     const graph = KnowledgeGraphs.of(workspace());
@@ -488,8 +485,6 @@ describe('KnowledgeGraphs', () => {
   });
 });
 
-// --- Retrieval: documents, chunks, ranking, grounded answers ------------------------------
-
 describe('KnowledgeDocuments', () => {
   it('turns notes and snippets into documents with their tags', () => {
     const noteId = randomUUID();
@@ -515,7 +510,7 @@ describe('KnowledgeDocuments', () => {
         },
       ],
     );
-    expect(documents.map((d) => d.text)).toEqual([
+    expect(documents.map((document) => document.text)).toEqual([
       'Engine no WSL\n\nTags: devops',
       '',
     ]);
@@ -561,9 +556,11 @@ describe('TextChunker', () => {
   });
 
   it('starts a new passage when the next paragraph does not fit', () => {
-    const a = 'a'.repeat(60);
-    const b = 'b'.repeat(60);
-    expect(TextChunker.split(`${a}\n\n${b}`, 100)).toEqual([a, b]);
+    const firstParagraph = 'a'.repeat(60);
+    const secondParagraph = 'b'.repeat(60);
+    expect(
+      TextChunker.split(`${firstParagraph}\n\n${secondParagraph}`, 100),
+    ).toEqual([firstParagraph, secondParagraph]);
   });
 
   it('cuts a long paragraph at the end of a sentence', () => {
@@ -578,7 +575,7 @@ describe('TextChunker', () => {
 
   it('cuts at the limit when there is no space', () => {
     expect(
-      TextChunker.split('x'.repeat(250), 100).map((c) => c.length),
+      TextChunker.split('x'.repeat(250), 100).map((chunk) => chunk.length),
     ).toEqual([100, 100, 50]);
   });
 
@@ -602,7 +599,8 @@ describe('PassageRanker', () => {
     text: string,
     vector: number[] | null,
   ): IndexedChunk => ({ source, position, title, text, vector });
-  const sources = (passages: Passage[]) => passages.map((p) => p.source);
+  const sources = (passages: Passage[]) =>
+    passages.map((passage) => passage.source);
 
   it('finds passages by their words, ignoring accents and case', () => {
     const found = PassageRanker.rank(
@@ -681,8 +679,10 @@ describe('PassageRanker', () => {
       chunk(KAFKA, 0, 'Kafka', 'docker no kafka', null),
     ];
     const found = PassageRanker.rank('docker', null, chunks, 10);
-    expect(found.filter((p) => p.source === DOCKER)).toHaveLength(2);
-    expect(found.filter((p) => p.source === KAFKA)).toHaveLength(1);
+    expect(found.filter((passage) => passage.source === DOCKER)).toHaveLength(
+      2,
+    );
+    expect(found.filter((passage) => passage.source === KAFKA)).toHaveLength(1);
     expect(PassageRanker.rank('docker', null, chunks, 1)).toHaveLength(1);
   });
 
@@ -726,7 +726,7 @@ describe('GroundedAnswer', () => {
     expect(answer.text).toBe(
       'Use o compose [1]. Instale o Engine [2] e o systemd [2].',
     );
-    expect(answer.references.map((r) => r.label)).toEqual([
+    expect(answer.references.map((reference) => reference.label)).toEqual([
       'compose up',
       'Docker no WSL',
     ]);
@@ -748,7 +748,7 @@ describe('GroundedAnswer', () => {
       GroundedAnswer.fromModel(
         'Não encontrei isso nas suas notas.',
         passages,
-      ).references.map((r) => r.label),
+      ).references.map((reference) => reference.label),
     ).toEqual(['Docker no WSL', 'compose up']);
   });
 
@@ -756,7 +756,7 @@ describe('GroundedAnswer', () => {
     const answer = GroundedAnswer.excerpts(passages);
     expect(answer.source).toBe('search');
     expect(answer.text).toContain('Encontrei 2 trechos');
-    expect(answer.references.map((r) => r.excerpt)).toEqual([
+    expect(answer.references.map((reference) => reference.excerpt)).toEqual([
       'Instale o Docker Engine.',
       'Sobe tudo em segundo plano.',
     ]);

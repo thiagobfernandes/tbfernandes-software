@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { METHOD_CATEGORIES, MethodCategory } from '../domain';
 import { KnowledgeJoi } from './knowledge.joi';
 
@@ -12,7 +12,6 @@ export class MethodExampleRequest {
   content: string;
 }
 
-/** Body of POST and PUT /methods. */
 export class MethodRequest {
   title: string;
   summary: string;
@@ -22,7 +21,6 @@ export class MethodRequest {
   steps: MethodStepRequest[];
   examples?: MethodExampleRequest[] | null;
   tags?: string[] | null;
-  /** YYYY-MM-DD */
   lastReviewed: string;
 }
 
@@ -37,14 +35,14 @@ export interface ValidMethodRequest {
 }
 
 export const methodRequestSchema = Joi.object<ValidMethodRequest>({
-  title: J.requiredText(200),
-  summary: J.requiredText(1000),
-  category: J.enumOf(METHOD_CATEGORIES).required(),
+  title: RequestFields.requiredText(200),
+  summary: RequestFields.requiredText(1000),
+  category: RequestFields.enumOf(METHOD_CATEGORIES).required(),
   steps: Joi.array()
     .items(
       Joi.object({
-        title: J.requiredText(200),
-        detail: J.optionalText(2000),
+        title: RequestFields.requiredText(200),
+        detail: RequestFields.optionalText(2000),
       }),
     )
     .min(1)
@@ -52,12 +50,12 @@ export const methodRequestSchema = Joi.object<ValidMethodRequest>({
   examples: Joi.array()
     .items(
       Joi.object({
-        title: J.requiredText(200),
+        title: RequestFields.requiredText(200),
         content: Joi.string().required(),
       }),
     )
     .allow(null)
     .default([]),
   tags: KnowledgeJoi.tags(),
-  lastReviewed: J.isoDate().required(),
+  lastReviewed: RequestFields.isoDate().required(),
 });

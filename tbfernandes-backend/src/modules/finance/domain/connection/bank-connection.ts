@@ -80,7 +80,6 @@ export class BankConnection {
     );
   }
 
-  /** Rebuilds a connection already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -91,8 +90,11 @@ export class BankConnection {
   }
 
   get details(): ConnectionDetails {
-    const d = this._details;
-    return { ...d, accounts: d.accounts.map((a) => ({ ...a })) };
+    const details = this._details;
+    return {
+      ...details,
+      accounts: details.accounts.map((account) => ({ ...account })),
+    };
   }
 
   /**
@@ -149,14 +151,14 @@ export class BankConnection {
     };
   }
 
-  private static validated(d: ConnectionDetails): ConnectionDetails {
+  private static validated(details: ConnectionDetails): ConnectionDetails {
     return {
-      institution: Require.text(d.institution, 'institution', 200),
-      scope: Require.present(d.scope, 'scope'),
-      status: Require.present(d.status, 'status'),
-      lastSyncedAt: d.lastSyncedAt,
-      lastError: d.lastError,
-      accounts: [...d.accounts],
+      institution: Require.text(details.institution, 'institution', 200),
+      scope: Require.present(details.scope, 'scope'),
+      status: Require.present(details.status, 'status'),
+      lastSyncedAt: details.lastSyncedAt,
+      lastError: details.lastError,
+      accounts: [...details.accounts],
     };
   }
 }

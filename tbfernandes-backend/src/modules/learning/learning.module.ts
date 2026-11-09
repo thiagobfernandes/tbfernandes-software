@@ -36,10 +36,6 @@ import { MaterialController } from './web/material.controller';
 import { SkillController } from './web/skill.controller';
 import { StudyController } from './web/study.controller';
 
-/**
- * Learning: studies, materials, skills, certifications and formal education. Other modules
- * read it through LearningLookup.
- */
 @Module({
   imports: [
     DatabaseModule.forFeature([

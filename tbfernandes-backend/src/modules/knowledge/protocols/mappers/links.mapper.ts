@@ -1,6 +1,5 @@
 import { KnowledgeLinks } from '../../domain';
 
-/** JSON id lists ↔ KnowledgeLinks. */
 export const LinksMapper = {
   toLinks(request: {
     projectIds: string[] | null;

@@ -13,7 +13,6 @@ import {
   StudyRepository,
 } from '../domain';
 
-/** Certification use cases (RF-LRN-04, LRN-06). */
 @Injectable()
 export class CertificationService {
   constructor(
@@ -71,7 +70,9 @@ export class CertificationService {
     if (expiringWithinDays == null) return all;
     const today = this.clock.today();
     const limit = IsoDates.plusDays(today, expiringWithinDays);
-    return all.filter((c) => c.expiresBetween(today, limit));
+    return all.filter((certification) =>
+      certification.expiresBetween(today, limit),
+    );
   }
 
   private async checkStudies(ownerId: string, ids: string[]): Promise<void> {

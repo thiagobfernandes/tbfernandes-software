@@ -1,7 +1,6 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { CERTIFICATION_STATUSES, CertificationStatus } from '../domain';
 
-/** Body of POST and PUT /certifications. */
 export class CertificationRequest {
   name: string;
   issuer: string;
@@ -25,13 +24,13 @@ export interface ValidCertificationRequest {
 
 export const certificationRequestSchema = Joi.object<ValidCertificationRequest>(
   {
-    name: J.requiredText(200),
-    issuer: J.requiredText(120),
-    status: J.optionalEnumOf(CERTIFICATION_STATUSES),
-    obtainedAt: J.optionalIsoDate(),
-    expiresAt: J.optionalIsoDate(),
-    validationUrl: J.optionalText(2000),
-    studyIds: J.uuidList().allow(null),
+    name: RequestFields.requiredText(200),
+    issuer: RequestFields.requiredText(120),
+    status: RequestFields.optionalEnumOf(CERTIFICATION_STATUSES),
+    obtainedAt: RequestFields.optionalIsoDate(),
+    expiresAt: RequestFields.optionalIsoDate(),
+    validationUrl: RequestFields.optionalText(2000),
+    studyIds: RequestFields.uuidList().allow(null),
   },
 );
 
@@ -39,10 +38,9 @@ export const certificationListQuerySchema = Joi.object<{
   expiringWithinDays: number | null;
 }>({
   expiringWithinDays: Joi.number().integer().min(0).default(null),
-  ...J.paging(),
+  ...RequestFields.paging(),
 });
 
-/** Same shape as the frontend's Certification type. */
 export class CertificationResponse {
   id: string;
   name: string;

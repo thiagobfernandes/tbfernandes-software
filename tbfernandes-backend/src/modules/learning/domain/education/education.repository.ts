@@ -1,6 +1,5 @@
 import { Education } from './education';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class EducationRepository {
   abstract create(education: Education): Promise<Education>;
   abstract save(education: Education): Promise<Education>;

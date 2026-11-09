@@ -1,7 +1,9 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
+import type { ConfigType } from '@nestjs/config';
 import type { NextFunction, Request, Response } from 'express';
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { sendProblem } from '../../../../common/protocols/problem-detail';
+import { authConfig } from '../../../../infrastructure/environments/registers';
 
 export const CSRF_COOKIE = 'XSRF-TOKEN';
 export const CSRF_HEADER = 'x-xsrf-token';
@@ -9,9 +11,9 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 /** Called by external services with their own secret, never by the browser. */
 const EXEMPT = ['/api/v1/webhooks/'];
 
-function same(a: string, b: string): boolean {
-  const left = Buffer.from(a);
-  const right = Buffer.from(b);
+function same(expected: string, actual: string): boolean {
+  const left = Buffer.from(expected);
+  const right = Buffer.from(actual);
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
@@ -21,6 +23,11 @@ function same(a: string, b: string): boolean {
  */
 @Injectable()
 export class CsrfMiddleware implements NestMiddleware {
+  constructor(
+    @Inject(authConfig.KEY)
+    private readonly config: ConfigType<typeof authConfig>,
+  ) {}
+
   use(req: Request, res: Response, next: NextFunction): void {
     const cookies = req.cookies as
       Record<string, string | undefined> | undefined;
@@ -30,6 +37,8 @@ export class CsrfMiddleware implements NestMiddleware {
         path: '/',
         sameSite: 'lax',
         httpOnly: false,
+        secure: this.config.cookieSecure,
+        domain: this.config.cookieDomain,
       });
     }
     if (

@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { ENTRY_SCOPES } from '../domain';
 import type { EntryScope } from '../domain';
 
@@ -13,12 +13,10 @@ export interface ValidTokenRequest {
 }
 
 export const tokenRequestSchema = Joi.object<ValidTokenRequest>({
-  scope: J.enumOf(ENTRY_SCOPES).required(),
+  scope: RequestFields.enumOf(ENTRY_SCOPES).required(),
 });
 
-/** Body of POST /finance/connections, sent when the connect widget succeeds. */
 export class RegisterRequest {
-  /** The provider's id for the new connection. */
   itemId: string;
   scope: string;
 }
@@ -29,8 +27,8 @@ export interface ValidRegisterRequest {
 }
 
 export const registerRequestSchema = Joi.object<ValidRegisterRequest>({
-  itemId: J.requiredText(120),
-  scope: J.enumOf(ENTRY_SCOPES).required(),
+  itemId: RequestFields.requiredText(120),
+  scope: RequestFields.enumOf(ENTRY_SCOPES).required(),
 });
 
 /** What Pluggy posts to /webhooks/pluggy. Other fields are ignored. */
@@ -74,7 +72,6 @@ export class BankAccountResponse {
   currency: string | null;
 }
 
-/** Same shape as the frontend's BankConnection type. */
 export class ConnectionResponse {
   id: string;
   institution: string;

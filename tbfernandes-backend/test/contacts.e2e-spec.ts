@@ -14,7 +14,6 @@ const inDays = (days: number) => {
   return date.toISOString().slice(0, 10);
 };
 
-/** Port of ContactsApiIntegrationTests. */
 describe('Contacts API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
@@ -107,13 +106,13 @@ describe('Contacts API', () => {
     expect(tasksAfter).toHaveLength(tasksBefore.length);
 
     const due = await http().get('/api/v1/contacts?dueWithinDays=7');
-    expect((due.body as { id: string }[]).map((c) => c.id)).toContain(
-      contactId,
-    );
+    expect(
+      (due.body as { id: string }[]).map((contact) => contact.id),
+    ).toContain(contactId);
     const notDue = await http().get('/api/v1/contacts?dueWithinDays=1');
-    expect((notDue.body as { id: string }[]).map((c) => c.id)).not.toContain(
-      contactId,
-    );
+    expect(
+      (notDue.body as { id: string }[]).map((contact) => contact.id),
+    ).not.toContain(contactId);
 
     expect((await http().delete(`/api/v1/tasks/${taskId}`)).status).toBe(204);
     await eventually(async () => {

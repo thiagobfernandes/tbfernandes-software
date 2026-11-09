@@ -48,29 +48,33 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         ? exception
         : translateDatabaseError(exception);
     if (domain) return ProblemDetailsFilter.fromDomain(domain);
-    if (exception instanceof HttpException) {
-      const status = exception.getStatus();
-      const body = exception.getResponse();
-      const detail =
-        typeof body === 'string'
-          ? body
-          : ((body as { message?: unknown }).message ?? exception.message);
-      const text = Array.isArray(detail)
-        ? detail.join('; ')
-        : typeof detail === 'string'
-          ? detail
-          : JSON.stringify(detail);
-      // body-parser's own message for a body that is not JSON.
-      if (
-        status === 400 &&
-        (exception.cause instanceof SyntaxError || /\bJSON\b/.test(text))
-      ) {
-        return { status, detail: 'O corpo da requisição não é um JSON válido' };
-      }
-      return { status, detail: text };
-    }
+    if (exception instanceof HttpException)
+      return ProblemDetailsFilter.fromHttp(exception);
     Logger.error('Unexpected error', exception);
     return { status: 500, detail: 'Erro inesperado' };
+  }
+
+  private static fromHttp(exception: HttpException): ProblemDetail {
+    const status = exception.getStatus();
+    const detail = ProblemDetailsFilter.httpDetail(exception);
+    // body-parser's own message for a body that is not JSON.
+    const invalidJson =
+      status === 400 &&
+      (exception.cause instanceof SyntaxError || /\bJSON\b/.test(detail));
+    if (invalidJson)
+      return { status, detail: 'O corpo da requisição não é um JSON válido' };
+    return { status, detail };
+  }
+
+  private static httpDetail(exception: HttpException): string {
+    const body = exception.getResponse();
+    const message =
+      typeof body === 'string'
+        ? body
+        : ((body as { message?: unknown }).message ?? exception.message);
+    if (Array.isArray(message)) return message.join('; ');
+    if (typeof message === 'string') return message;
+    return JSON.stringify(message);
   }
 
   private static fromDomain(error: DomainError): ProblemDetail {

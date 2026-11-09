@@ -15,8 +15,8 @@ function postgresBin(): string | null {
   const root = '/usr/lib/postgresql';
   if (!existsSync(root)) return null;
   const versions = readdirSync(root)
-    .filter((v) => existsSync(join(root, v, 'bin', 'initdb')))
-    .sort((a, b) => Number(b) - Number(a));
+    .filter((value) => existsSync(join(root, value, 'bin', 'initdb')))
+    .sort((left, right) => Number(right) - Number(left));
   return versions.length ? join(root, versions[0], 'bin') : null;
 }
 

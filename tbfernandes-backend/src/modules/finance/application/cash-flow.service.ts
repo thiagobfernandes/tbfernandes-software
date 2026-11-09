@@ -8,10 +8,8 @@ import {
   FinanceEntryRepository,
 } from '../domain';
 
-/** How many months the cash flow shows at most. */
 export const MAX_CASH_FLOW_MONTHS = 24;
 
-/** FIN-02: cash flow of a month and the months before it. */
 @Injectable()
 export class CashFlowService {
   constructor(

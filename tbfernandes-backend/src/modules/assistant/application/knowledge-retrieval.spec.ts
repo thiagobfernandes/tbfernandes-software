@@ -4,6 +4,17 @@ import { DocumentKey, IndexedChunk, KnowledgeDocument, keyOf } from '../domain';
 import { EmbeddingModel } from './embedding.model';
 import { KnowledgeIndex } from './knowledge.index';
 import { KnowledgeRetrievalService } from './knowledge-retrieval.service';
+import { AssistantTracer, TraceStep } from './assistant-tracer';
+
+const NO_TRACING = {
+  trace: (
+    _name: string,
+    _context: unknown,
+    work: (step: TraceStep) => unknown,
+  ) => work({ update: () => undefined }),
+  step: (_name: string, _kind: unknown, work: (step: TraceStep) => unknown) =>
+    work({ update: () => undefined }),
+} as unknown as AssistantTracer;
 
 const OWNER = randomUUID();
 
@@ -16,7 +27,7 @@ class FakeEmbeddings extends EmbeddingModel {
   embedDocuments(texts: string[]): Promise<number[][]> {
     this.documentCalls++;
     if (this.failing) return Promise.reject(new Error('Provider down'));
-    return Promise.resolve(texts.map((t) => [1, t.length]));
+    return Promise.resolve(texts.map((text) => [1, text.length]));
   }
   embedQuery(): Promise<number[]> {
     if (this.failing) return Promise.reject(new Error('Provider down'));
@@ -38,9 +49,9 @@ class MemoryIndex extends KnowledgeIndex {
   fingerprints() {
     return Promise.resolve(
       new Map(
-        [...this.entries].map(([k, e]) => [
-          k,
-          { key: e.key, fingerprint: e.fingerprint },
+        [...this.entries].map(([key, entry]) => [
+          key,
+          { key: entry.key, fingerprint: entry.fingerprint },
         ]),
       ),
     );
@@ -56,14 +67,16 @@ class MemoryIndex extends KnowledgeIndex {
     return Promise.resolve();
   }
   remove(_owner: string, keys: DocumentKey[]) {
-    keys.forEach((k) => this.entries.delete(keyOf(k)));
+    keys.forEach((key) => this.entries.delete(keyOf(key)));
     return Promise.resolve();
   }
   chunks() {
-    return Promise.resolve([...this.entries.values()].flatMap((e) => e.chunks));
+    return Promise.resolve(
+      [...this.entries.values()].flatMap((entry) => entry.chunks),
+    );
   }
   models() {
-    return new Set([...this.entries.values()].map((e) => e.model));
+    return new Set([...this.entries.values()].map((entry) => entry.model));
   }
 }
 
@@ -92,13 +105,14 @@ describe('KnowledgeRetrievalService (AST-04)', () => {
       index,
       embeddings,
       noTransactions,
+      NO_TRACING,
     );
   });
 
   it('indexes new documents once and finds them', async () => {
     const found = await retrieval.search(OWNER, 'docker', [docker, kafka]);
     await retrieval.search(OWNER, 'docker', [docker, kafka]);
-    expect(found.map((p) => p.source)).toEqual([docker.key]);
+    expect(found.map((passage) => passage.source)).toEqual([docker.key]);
     expect(embeddings.documentCalls).toBe(1);
     for (const chunk of await index.chunks())
       expect(chunk.vector).not.toBeNull();
@@ -109,7 +123,7 @@ describe('KnowledgeRetrievalService (AST-04)', () => {
     await retrieval.search(OWNER, 'docker', [docker, kafka]);
     const edited = { ...docker, text: 'Agora com Podman.' };
     const found = await retrieval.search(OWNER, 'podman', [edited]);
-    expect(found.map((p) => p.text)).toEqual(['Agora com Podman.']);
+    expect(found.map((passage) => passage.text)).toEqual(['Agora com Podman.']);
     expect([...index.entries.keys()]).toEqual([keyOf(docker.key)]);
     expect(embeddings.documentCalls).toBe(2);
   });
@@ -127,7 +141,7 @@ describe('KnowledgeRetrievalService (AST-04)', () => {
   it('finds everything by words without a provider', async () => {
     embeddings.on = false;
     const found = await retrieval.search(OWNER, 'kafka', [docker, kafka]);
-    expect(found.map((p) => p.source)).toEqual([kafka.key]);
+    expect(found.map((passage) => passage.source)).toEqual([kafka.key]);
     expect(embeddings.documentCalls).toBe(0);
   });
 

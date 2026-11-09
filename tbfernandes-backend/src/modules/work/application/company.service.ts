@@ -14,7 +14,6 @@ import {
 } from '../domain';
 import { CompanyDeleted, WorkEvents } from '../work.events';
 
-/** Company use cases (RF-WRK-01..03, WRK-11). */
 @Injectable()
 export class CompanyService {
   constructor(

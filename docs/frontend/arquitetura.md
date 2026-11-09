@@ -54,6 +54,8 @@ A sidebar tem grupos recolhíveis por área, cada um com subitens (`lib/constant
 
 Páginas de detalhe recebem o id na query string (`/projects/view?id=…`), não no caminho, para o app poder ser exportado como arquivos estáticos no build desktop. Monte os links com `lib/routes.ts` (`projectHref`, `companyHref`, `goalHref`, `methodHref`) e leia o id com `useQueryId()` dentro de um `Suspense`.
 
+Por padrão só o grupo da página atual fica aberto; grupos abertos ou fechados à mão ficam em memória (`components/layout/sidebar-state.ts`) até o usuário recolhê-los. Atalhos: `Ctrl/⌘ B` recolhe ou expande a sidebar (vira uma faixa de ícones, preferência salva no `localStorage`) e `Ctrl/⌘ .` volta ao layout padrão (sidebar aberta e só o grupo atual expandido). O logo leva à visão geral.
+
 Busca global: `Ctrl/⌘ K` (`features/search`), cobrindo todos os módulos. Ao criar uma rota nova, adicione-a em `navigation.ts` e, se tiver registros, em `search-index.ts`.
 
 ## 4. Dados
@@ -97,7 +99,7 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 
 ## 7. Padrões de tela
 
-- Lista com filtros + alternância Lista/Quadro quando o recurso tem status (tarefas); datas no `/calendar`; timeline nos projetos.
+- Lista com filtros + alternância Lista/Quadro quando o recurso tem status (tarefas); datas no `/calendar` (mês; semana e dia com grade de horas, onde arrastar numa área vazia abre o agendamento preenchido, hook `features/calendar/hooks/use-drag-to-select-range.ts`); timeline nos projetos.
 - Quadro kanban com arrastar e soltar, inclusive por toque (`features/tasks/hooks/use-touch-drag.ts`).
 - Detalhe em página própria (`/projects/view?id=`) ou em `Sheet` lateral (tarefa).
 - Criar/editar em `Dialog`; excluir sempre com confirmação; feedback por toast (sonner).

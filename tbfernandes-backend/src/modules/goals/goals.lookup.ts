@@ -11,7 +11,6 @@ export interface GoalView {
   basis: string;
 }
 
-/** Read access to goals and their progress for other modules (assistant). */
 export abstract class GoalsLookup {
   abstract goals(ownerId: string): Promise<GoalView[]>;
 }

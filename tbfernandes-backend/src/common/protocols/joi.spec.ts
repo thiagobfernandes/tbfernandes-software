@@ -1,14 +1,14 @@
 import { JoiValidationPipe } from '../pipes/joi-validation.pipe';
 import { RequestValidationError } from '../pipes/request-validation.error';
-import { J, Joi } from './joi';
+import { RequestFields, Joi } from './joi';
 
 describe('request schemas', () => {
   const pipe = new JoiValidationPipe(
     Joi.object({
-      name: J.requiredText(5),
-      note: J.optionalText(10),
-      status: J.optionalEnumOf(['IN_PROGRESS', 'DONE'] as const),
-      day: J.optionalIsoDate(),
+      name: RequestFields.requiredText(5),
+      note: RequestFields.optionalText(10),
+      status: RequestFields.optionalEnumOf(['IN_PROGRESS', 'DONE'] as const),
+      day: RequestFields.optionalIsoDate(),
     }),
   );
 

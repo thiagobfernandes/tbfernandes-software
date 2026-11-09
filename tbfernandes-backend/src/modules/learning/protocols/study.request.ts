@@ -1,7 +1,6 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { STUDY_STATUSES, StudyStatus } from '../domain';
 
-/** Body of POST and PUT /studies. */
 export class StudyRequest {
   name: string;
   description?: string | null;
@@ -26,17 +25,16 @@ export interface ValidStudyRequest {
 }
 
 export const studyRequestSchema = Joi.object<ValidStudyRequest>({
-  name: J.requiredText(200),
-  description: J.optionalText(2000),
-  status: J.optionalEnumOf(STUDY_STATUSES),
-  goalId: J.optionalUuid(),
-  skillIds: J.uuidList().allow(null),
-  startDate: J.optionalIsoDate(),
-  dueDate: J.optionalIsoDate(),
-  nextActivity: J.optionalText(300),
+  name: RequestFields.requiredText(200),
+  description: RequestFields.optionalText(2000),
+  status: RequestFields.optionalEnumOf(STUDY_STATUSES),
+  goalId: RequestFields.optionalUuid(),
+  skillIds: RequestFields.uuidList().allow(null),
+  startDate: RequestFields.optionalIsoDate(),
+  dueDate: RequestFields.optionalIsoDate(),
+  nextActivity: RequestFields.optionalText(300),
 });
 
-/** Same shape as the frontend's Study type. */
 export class StudyResponse {
   id: string;
   name: string;

@@ -27,7 +27,7 @@ export function BrandMark({
           src={wordmark}
           alt="TBFernandes"
           priority
-          className="h-6 w-auto max-w-full"
+          className="h-5 w-auto max-w-full"
         />
       )}
     </div>

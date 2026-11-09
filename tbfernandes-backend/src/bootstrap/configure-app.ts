@@ -12,7 +12,23 @@ import { SESSION_COOKIE } from '../modules/identity/infrastructure/security/sess
 
 const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
-/** HTTP settings shared by main.ts and the e2e tests. */
+function sessionMiddleware(auth: AuthConfig) {
+  return session({
+    name: SESSION_COOKIE,
+    secret: auth.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: auth.cookieSecure,
+      domain: auth.cookieDomain,
+      maxAge: SEVEN_DAYS,
+    },
+  });
+}
+
 export function configureApp(app: INestApplication): INestApplication {
   const config = app.get(ConfigService);
   const appCfg = config.getOrThrow<AppConfig>('app');
@@ -33,21 +49,7 @@ export function configureApp(app: INestApplication): INestApplication {
   });
   app.use(cookieParser());
   // In-memory sessions, like the servlet session before: one instance, one person.
-  app.use(
-    session({
-      name: SESSION_COOKIE,
-      secret: auth.sessionSecret,
-      resave: false,
-      saveUninitialized: false,
-      rolling: true,
-      cookie: {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: auth.cookieSecure,
-        maxAge: SEVEN_DAYS,
-      },
-    }),
-  );
+  app.use(sessionMiddleware(auth));
 
   if (appCfg.swagger) {
     const document = SwaggerModule.createDocument(

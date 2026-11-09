@@ -19,7 +19,6 @@ export class KnowledgeLinks {
     return new KnowledgeLinks([], []);
   }
 
-  /** The same links without a deleted work item (KNW-06). */
   without(workItemId: string): KnowledgeLinks {
     return new KnowledgeLinks(
       this.projectIds.filter((id) => id !== workItemId),

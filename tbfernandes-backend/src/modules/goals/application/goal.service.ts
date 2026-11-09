@@ -16,7 +16,6 @@ import {
   SELF_PARENT_MESSAGE,
 } from '../domain';
 
-/** Goal use cases (RF-GOL-01, RF-GOL-02, RF-GOL-04). */
 @Injectable()
 export class GoalService {
   constructor(

@@ -11,37 +11,36 @@ import type {
   ReferenceResponse,
 } from './assistant.responses';
 
-const reference = (r: Reference): ReferenceResponse => ({
-  kind: r.kind,
-  label: r.label,
-  href: r.href,
-  excerpt: r.excerpt,
+const toReferenceResponse = (reference: Reference): ReferenceResponse => ({
+  kind: reference.kind,
+  label: reference.label,
+  href: reference.href,
+  excerpt: reference.excerpt,
 });
 
-const query = (q: StructuredQuery): QueryResponse => ({
-  // Enums in lower case, as everywhere else in the API.
-  subject: q.subject.toLowerCase(),
-  aggregate: q.aggregate.toLowerCase(),
-  text: q.text,
-  statuses: [...q.statuses],
-  priorities: [...q.priorities],
-  openOnly: q.openOnly,
-  project: q.project,
-  company: q.company,
-  dueFrom: q.dueFrom,
-  dueTo: q.dueTo,
-  month: q.month,
-  sort: q.sort.toLowerCase(),
-  limit: q.limit,
+const toQueryResponse = (query: StructuredQuery): QueryResponse => ({
+  subject: query.subject.toLowerCase(),
+  aggregate: query.aggregate.toLowerCase(),
+  text: query.text,
+  statuses: [...query.statuses],
+  priorities: [...query.priorities],
+  openOnly: query.openOnly,
+  project: query.project,
+  company: query.company,
+  dueFrom: query.dueFrom,
+  dueTo: query.dueTo,
+  month: query.month,
+  sort: query.sort.toLowerCase(),
+  limit: query.limit,
 });
 
 export const AnswerMapper = {
   toResponse(answer: Answer): AnswerResponse {
     return {
       text: answer.text,
-      references: answer.references.map(reference),
+      references: answer.references.map(toReferenceResponse),
       source: answer.source,
-      query: answer.query ? query(answer.query) : null,
+      query: answer.query ? toQueryResponse(answer.query) : null,
     };
   },
 };
@@ -49,13 +48,16 @@ export const AnswerMapper = {
 export const GraphMapper = {
   toResponse(graph: KnowledgeGraph): GraphResponse {
     return {
-      nodes: graph.nodes.map((n) => ({
-        id: n.id,
-        kind: n.kind,
-        label: n.label,
-        href: n.href,
+      nodes: graph.nodes.map((node) => ({
+        id: node.id,
+        kind: node.kind,
+        label: node.label,
+        href: node.href,
       })),
-      edges: graph.edges.map((e) => ({ source: e.source, target: e.target })),
+      edges: graph.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+      })),
     };
   },
 };

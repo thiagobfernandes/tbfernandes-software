@@ -1,4 +1,3 @@
-/** Same shape as the frontend's Contact type. */
 export class ContactResponse {
   id: string;
   name: string;

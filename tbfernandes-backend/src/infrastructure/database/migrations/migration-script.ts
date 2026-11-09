@@ -2,10 +2,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { flywayChecksum } from './flyway-checksum';
 
-/** One SQL file: versioned (`V<n>__<description>.sql`) or repeatable (`R__<description>.sql`). */
 export interface MigrationScript {
   kind: 'versioned' | 'repeatable';
-  /** "12" for V12__x.sql; null for repeatable scripts. */
   version: string | null;
   description: string;
   script: string;
@@ -32,11 +30,11 @@ function parse(path: string): MigrationScript | undefined {
   };
 }
 
-function compareVersions(a: string, b: string): number {
-  const left = a.split('.').map(Number);
-  const right = b.split('.').map(Number);
-  for (let i = 0; i < Math.max(left.length, right.length); i++) {
-    const diff = (left[i] ?? 0) - (right[i] ?? 0);
+function compareVersions(leftVersion: string, rightVersion: string): number {
+  const left = leftVersion.split('.').map(Number);
+  const right = rightVersion.split('.').map(Number);
+  for (let index = 0; index < Math.max(left.length, right.length); index++) {
+    const diff = (left[index] ?? 0) - (right[index] ?? 0);
     if (diff !== 0) return diff;
   }
   return 0;
@@ -49,10 +47,10 @@ export function loadScripts(locations: string[]): MigrationScript[] {
     .map(parse)
     .filter((script): script is MigrationScript => !!script);
   const versioned = scripts
-    .filter((s) => s.kind === 'versioned')
-    .sort((a, b) => compareVersions(a.version!, b.version!));
+    .filter((script) => script.kind === 'versioned')
+    .sort((left, right) => compareVersions(left.version!, right.version!));
   const repeatable = scripts
-    .filter((s) => s.kind === 'repeatable')
-    .sort((a, b) => a.description.localeCompare(b.description));
+    .filter((script) => script.kind === 'repeatable')
+    .sort((left, right) => left.description.localeCompare(right.description));
   return [...versioned, ...repeatable];
 }

@@ -7,7 +7,6 @@ export abstract class EmbeddingModel {
   /** Stored with every vector, so changing the model embeds the documents again. "none" when off. */
   abstract name(): string;
   abstract enabled(): boolean;
-  /** One vector per text, in the same order. */
   abstract embedDocuments(texts: string[]): Promise<number[][]>;
   abstract embedQuery(question: string): Promise<number[]>;
 }

@@ -1,21 +1,20 @@
 import { Education } from '../../../domain';
 import { EducationEntity } from '../education.entity';
 
-/** Education ↔ learning.education row. */
 export const EducationPersistenceMapper = {
-  toDomain(e: EducationEntity): Education {
-    return Education.restore(e.id, e.ownerId, {
-      institution: e.institution,
-      course: e.course,
-      degree: e.degree,
-      status: e.status,
-      startDate: e.startDate,
-      endDate: e.endDate,
+  toDomain(entity: EducationEntity): Education {
+    return Education.restore(entity.id, entity.ownerId, {
+      institution: entity.institution,
+      course: entity.course,
+      degree: entity.degree,
+      status: entity.status,
+      startDate: entity.startDate,
+      endDate: entity.endDate,
     });
   },
 
-  toEntity(ed: Education, e: EducationEntity = new EducationEntity()) {
-    Object.assign(e, ed.details, { id: ed.id, ownerId: ed.ownerId });
-    return e;
+  toEntity(ed: Education, entity: EducationEntity = new EducationEntity()) {
+    Object.assign(entity, ed.details, { id: ed.id, ownerId: ed.ownerId });
+    return entity;
   },
 };

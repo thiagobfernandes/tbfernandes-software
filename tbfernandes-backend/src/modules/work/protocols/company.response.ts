@@ -1,4 +1,3 @@
-/** Same shape as the frontend's Company type. */
 export class CompanyResponse {
   id: string;
   name: string;

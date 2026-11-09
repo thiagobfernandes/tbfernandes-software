@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   BadgeCheck,
@@ -12,6 +12,7 @@ import {
   GraduationCap,
   ListChecks,
   MessageCircle,
+  Plus,
   ShoppingCart,
   Target,
   type LucideIcon,
@@ -29,6 +30,14 @@ import {
   type CalendarEvent,
   type EventKind,
 } from "@/features/calendar/lib/calendar-events";
+import {
+  AppointmentSheet,
+  type AppointmentDraft,
+} from "@/features/calendar/components/appointment-sheet";
+import { TimeGrid } from "@/features/calendar/components/time-grid";
+import type { TimeRange } from "@/features/calendar/hooks/use-drag-to-select-range";
+import { minutesToTime } from "@/features/calendar/lib/time";
+import type { Appointment } from "@/features/calendar/types/appointment";
 import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { addDays, daysBetween, parseDay, toDay } from "@/lib/dates";
 import { useAppData } from "@/lib/sample-data/store";
@@ -36,6 +45,12 @@ import { useToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const views = [
+  ["day", "Dia"],
+  ["week", "Semana"],
+  ["month", "Mês"],
+] as const;
+type CalendarView = (typeof views)[number][0];
 const MAX_CHIPS = 3;
 
 // Icon and tint per kind: the icon carries the meaning, the tint helps scanning.
@@ -98,32 +113,88 @@ const monthFormat = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "UTC",
 });
 
+const rangeDayFormat = new Intl.DateTimeFormat("pt-BR", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+});
+
+function startOfWeek(day: string) {
+  return addDays(day, -((parseDay(day).getUTCDay() + 6) % 7));
+}
+
+function shiftMonth(day: string, amount: number) {
+  const date = parseDay(day);
+  return toDay(
+    new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + amount, 1)),
+  );
+}
+
+type SheetState =
+  | { open: false }
+  | { open: true; draft?: AppointmentDraft; appointment?: Appointment };
+
 export function CalendarPage() {
   const data = useAppData();
   const today = useToday();
-  const [monthOffset, setMonthOffset] = useState(0);
+  const [view, setView] = useState<CalendarView>("week");
+  const [cursor, setCursor] = useState<string>();
   const [selectedDay, setSelectedDay] = useState<string>();
   const [hidden, setHidden] = useState<Set<EventKind>>(new Set());
   const [taskId, setTaskId] = useState<string>();
+  const [sheet, setSheet] = useState<SheetState>({ open: false });
+  const [heldRange, setHeldRange] = useState<TimeRange | null>(null);
 
   const allEvents = useMemo(() => buildCalendarEvents(data), [data]);
   const visible = allEvents.filter((event) => !hidden.has(event.kind));
   const byDay = eventsByDay(visible);
   const day = selectedDay ?? today;
+  const focus = cursor ?? today;
 
-  const todayDate = parseDay(today);
-  const month = new Date(
-    Date.UTC(
-      todayDate.getUTCFullYear(),
-      todayDate.getUTCMonth() + monthOffset,
-      1,
-    ),
-  );
-  // Monday-first grid that always shows 6 weeks.
-  const gridStart = addDays(toDay(month), -((month.getUTCDay() + 6) % 7));
+  const month = parseDay(shiftMonth(focus, 0));
+  const gridStart = startOfWeek(toDay(month));
   const cells = Array.from({ length: 42 }, (_, index) =>
     addDays(gridStart, index),
   );
+  const weekStart = startOfWeek(focus);
+  const gridDays =
+    view === "day"
+      ? [focus]
+      : Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+  const taskTitles = useMemo(
+    () => new Map(data.tasks.map((task) => [task.id, task.title])),
+    [data.tasks],
+  );
+
+  const periodLabels: Record<CalendarView, () => string> = {
+    month: () => monthFormat.format(month),
+    day: () => longDay.format(parseDay(focus)),
+    week: () =>
+      `${rangeDayFormat.format(parseDay(gridDays[0]))} a ${rangeDayFormat.format(parseDay(gridDays[6]))}`,
+  };
+
+  function move(direction: -1 | 1) {
+    if (view === "month") setCursor(shiftMonth(focus, direction));
+    else setCursor(addDays(focus, direction * (view === "week" ? 7 : 1)));
+  }
+
+  const openForRange = useCallback((range: TimeRange) => {
+    setHeldRange(range);
+    setSheet({
+      open: true,
+      draft: {
+        date: range.day,
+        startTime: minutesToTime(range.startMinutes),
+        endTime: minutesToTime(range.endMinutes),
+      },
+    });
+  }, []);
+
+  function closeSheet(open: boolean) {
+    if (open) return;
+    setSheet({ open: false });
+    setHeldRange(null);
+  }
 
   const upcoming = visible.filter((event) => {
     const diff = daysBetween(today, event.day);
@@ -144,7 +215,7 @@ export function CalendarPage() {
   }
 
   function goToToday() {
-    setMonthOffset(0);
+    setCursor(undefined);
     setSelectedDay(undefined);
   }
 
@@ -153,7 +224,26 @@ export function CalendarPage() {
       <PageHeading
         title="Calendário"
         description="Todas as datas em um só lugar: tarefas, prazos, marcos, follow-ups e renovações."
-        actions={<SampleDataBadge />}
+        actions={
+          <>
+            <SampleDataBadge />
+            <Button
+              size="sm"
+              onClick={() =>
+                setSheet({
+                  open: true,
+                  draft: {
+                    date: view === "month" ? day : focus,
+                    startTime: "09:00:00",
+                    endTime: "10:00:00",
+                  },
+                })
+              }
+            >
+              <Plus /> Novo agendamento
+            </Button>
+          </>
+        }
       />
 
       <div
@@ -184,163 +274,225 @@ export function CalendarPage() {
         })}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div
+        className={cn(
+          "grid gap-6",
+          view === "month" && "xl:grid-cols-[minmax(0,1fr)_340px]",
+        )}
+      >
         <section
-          aria-label="Mês"
-          className="flex flex-col gap-4 rounded-2xl border bg-card p-4 md:p-5"
+          aria-label="Agenda"
+          className="flex min-w-0 flex-col gap-4 rounded-2xl border bg-card p-4 md:p-5"
         >
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">
-              {monthFormat.format(month)}
-            </h2>
-            <div className="flex gap-1">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Período anterior"
+                  onClick={() => move(-1)}
+                >
+                  <ChevronLeft />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Próximo período"
+                  onClick={() => move(1)}
+                >
+                  <ChevronRight />
+                </Button>
+              </div>
               <Button variant="outline" size="sm" onClick={goToToday}>
                 Hoje
               </Button>
-              <Button
-                variant="outline"
-                size="icon-sm"
-                aria-label="Mês anterior"
-                onClick={() => setMonthOffset((value) => value - 1)}
-              >
-                <ChevronLeft />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon-sm"
-                aria-label="Próximo mês"
-                onClick={() => setMonthOffset((value) => value + 1)}
-              >
-                <ChevronRight />
-              </Button>
+              <h2 className="text-base font-semibold first-letter:uppercase md:text-lg">
+                {periodLabels[view]()}
+              </h2>
+            </div>
+            <div
+              role="radiogroup"
+              aria-label="Visão"
+              className="inline-flex h-8 rounded-md border p-0.5"
+            >
+              {views.map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={view === value}
+                  onClick={() => setView(value)}
+                  className={cn(
+                    "rounded px-3 text-xs font-medium text-muted-foreground transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                    view === value && "bg-primary text-primary-foreground",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-xs">
-            {weekdays.map((weekday) => (
-              <span
-                key={weekday}
-                className="px-1 pb-1 text-center text-muted-foreground md:text-left"
-              >
-                {weekday}
-              </span>
-            ))}
-            {cells.map((cell) => {
-              const date = parseDay(cell);
-              const inMonth = date.getUTCMonth() === month.getUTCMonth();
-              const events = byDay.get(cell) ?? [];
-              const isToday = cell === today;
-              const isSelected = cell === day;
-              return (
-                <button
-                  key={cell}
-                  type="button"
-                  onClick={() => setSelectedDay(cell)}
-                  aria-pressed={isSelected}
-                  aria-label={`${longDay.format(date)}, ${events.length} ${events.length === 1 ? "item" : "itens"}`}
-                  className={cn(
-                    "flex min-h-14 flex-col items-center gap-1 rounded-lg border border-transparent p-1 text-left transition-colors outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 md:min-h-28 md:items-stretch md:p-1.5",
-                    !inMonth && "text-muted-foreground/50",
-                    isSelected && "border-primary/60 bg-primary/5",
-                  )}
+          {view !== "month" ? (
+            <>
+              <TimeGrid
+                days={gridDays}
+                today={today}
+                appointments={data.appointments}
+                taskTitles={taskTitles}
+                heldSelection={sheet.open ? heldRange : null}
+                onSelectRange={openForRange}
+                onOpenAppointment={(appointment) =>
+                  setSheet({ open: true, appointment })
+                }
+                allDay={(gridDay) =>
+                  (byDay.get(gridDay) ?? [])
+                    .slice(0, 2)
+                    .map((event) => <EventChip key={event.id} event={event} />)
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Clique e arraste numa área vazia para agendar. No celular,
+                segure um instante antes de arrastar. Esc cancela.
+              </p>
+            </>
+          ) : (
+            <div className="grid grid-cols-7 gap-1 text-xs">
+              {weekdays.map((weekday) => (
+                <span
+                  key={weekday}
+                  className="px-1 pb-1 text-center text-muted-foreground md:text-left"
                 >
-                  <span
+                  {weekday}
+                </span>
+              ))}
+              {cells.map((cell) => {
+                const date = parseDay(cell);
+                const inMonth = date.getUTCMonth() === month.getUTCMonth();
+                const events = byDay.get(cell) ?? [];
+                const isToday = cell === today;
+                const isSelected = cell === day;
+                return (
+                  <button
+                    key={cell}
+                    type="button"
+                    onClick={() => setSelectedDay(cell)}
+                    aria-pressed={isSelected}
+                    aria-label={`${longDay.format(date)}, ${events.length} ${events.length === 1 ? "item" : "itens"}`}
                     className={cn(
-                      "flex size-6 items-center justify-center rounded-full tabular-nums",
-                      isToday &&
-                        "bg-primary font-semibold text-primary-foreground",
+                      "flex min-h-14 flex-col items-center gap-1 rounded-lg border border-transparent p-1 text-left transition-colors outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 md:min-h-28 md:items-stretch md:p-1.5",
+                      !inMonth && "text-muted-foreground/50",
+                      isSelected && "border-primary/60 bg-primary/5",
                     )}
                   >
-                    {date.getUTCDate()}
-                  </span>
-                  {/* Small screens: one dot per kind present that day. */}
-                  <span className="flex flex-wrap justify-center gap-0.5 md:hidden">
-                    {[...new Set(events.map((event) => event.kind))].map(
-                      (kind) => (
-                        <span
-                          key={kind}
-                          aria-hidden
-                          className={cn(
-                            "size-1.5 rounded-full",
-                            kindStyles[kind].dot,
-                          )}
-                        />
-                      ),
-                    )}
-                  </span>
-                  <span className="hidden flex-col gap-0.5 md:flex">
-                    {events.slice(0, MAX_CHIPS).map((event) => (
-                      <EventChip key={event.id} event={event} />
-                    ))}
-                    {events.length > MAX_CHIPS && (
-                      <span className="px-1 text-[11px] text-muted-foreground">
-                        +{events.length - MAX_CHIPS} mais
-                      </span>
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    <span
+                      className={cn(
+                        "flex size-6 items-center justify-center rounded-full tabular-nums",
+                        isToday &&
+                          "bg-primary font-semibold text-primary-foreground",
+                      )}
+                    >
+                      {date.getUTCDate()}
+                    </span>
+                    {/* Small screens: one dot per kind present that day. */}
+                    <span className="flex flex-wrap justify-center gap-0.5 md:hidden">
+                      {[...new Set(events.map((event) => event.kind))].map(
+                        (kind) => (
+                          <span
+                            key={kind}
+                            aria-hidden
+                            className={cn(
+                              "size-1.5 rounded-full",
+                              kindStyles[kind].dot,
+                            )}
+                          />
+                        ),
+                      )}
+                    </span>
+                    <span className="hidden flex-col gap-0.5 md:flex">
+                      {events.slice(0, MAX_CHIPS).map((event) => (
+                        <EventChip key={event.id} event={event} />
+                      ))}
+                      {events.length > MAX_CHIPS && (
+                        <span className="px-1 text-[11px] text-muted-foreground">
+                          +{events.length - MAX_CHIPS} mais
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </section>
 
-        <aside className="flex flex-col gap-6">
-          <section
-            aria-label="Dia selecionado"
-            className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
-          >
-            <h2 className="text-sm font-semibold">
-              {day === today ? "Hoje · " : ""}
-              {longDay.format(parseDay(day))}
-            </h2>
-            <EventList
-              events={byDay.get(day) ?? []}
-              today={today}
-              onOpenTask={setTaskId}
-              empty="Nada neste dia."
-            />
-          </section>
-
-          {overdue.length > 0 && (
+        {view === "month" && (
+          <aside className="flex flex-col gap-6">
             <section
-              aria-label="Atrasados"
+              aria-label="Dia selecionado"
               className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
             >
               <h2 className="text-sm font-semibold">
-                Atrasados{" "}
+                {day === today ? "Hoje · " : ""}
+                {longDay.format(parseDay(day))}
+              </h2>
+              <EventList
+                events={byDay.get(day) ?? []}
+                today={today}
+                onOpenTask={setTaskId}
+                empty="Nada neste dia."
+              />
+            </section>
+
+            {overdue.length > 0 && (
+              <section
+                aria-label="Atrasados"
+                className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
+              >
+                <h2 className="text-sm font-semibold">
+                  Atrasados{" "}
+                  <span className="font-normal text-muted-foreground">
+                    ({overdue.length})
+                  </span>
+                </h2>
+                <EventList
+                  events={overdue}
+                  today={today}
+                  onOpenTask={setTaskId}
+                  showDay
+                />
+              </section>
+            )}
+
+            <section
+              aria-label="Próximos 14 dias"
+              className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
+            >
+              <h2 className="text-sm font-semibold">
+                Próximos 14 dias{" "}
                 <span className="font-normal text-muted-foreground">
-                  ({overdue.length})
+                  ({upcoming.length})
                 </span>
               </h2>
               <EventList
-                events={overdue}
+                events={upcoming}
                 today={today}
                 onOpenTask={setTaskId}
                 showDay
+                empty="Nada agendado."
               />
             </section>
-          )}
-
-          <section
-            aria-label="Próximos 14 dias"
-            className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
-          >
-            <h2 className="text-sm font-semibold">
-              Próximos 14 dias{" "}
-              <span className="font-normal text-muted-foreground">
-                ({upcoming.length})
-              </span>
-            </h2>
-            <EventList
-              events={upcoming}
-              today={today}
-              onOpenTask={setTaskId}
-              showDay
-              empty="Nada agendado."
-            />
-          </section>
-        </aside>
+          </aside>
+        )}
       </div>
+
+      <AppointmentSheet
+        open={sheet.open}
+        onOpenChange={closeSheet}
+        draft={sheet.open ? sheet.draft : undefined}
+        appointment={sheet.open ? sheet.appointment : undefined}
+      />
 
       <TaskDetailSheet
         taskId={taskId}

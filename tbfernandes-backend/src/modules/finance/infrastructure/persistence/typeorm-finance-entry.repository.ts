@@ -16,7 +16,6 @@ import {
 import { FinanceEntryEntity } from './finance-entry.entity';
 import { FinanceEntryPersistenceMapper as Mapper } from './mappers/finance-entry.persistence-mapper';
 
-/** FinanceEntryRepository on TypeORM. */
 @Injectable()
 export class TypeOrmFinanceEntryRepository extends FinanceEntryRepository {
   private readonly rows: BaseRepository<FinanceEntryEntity>;

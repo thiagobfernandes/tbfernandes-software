@@ -8,7 +8,6 @@ import { WorkSummaryResponse } from '../protocols';
 export class DashboardController {
   constructor(private readonly summaries: WorkSummaryService) {}
 
-  /** Counters of the dashboard cards (WRK-07). */
   @Get('summary')
   summary(): Promise<WorkSummaryResponse> {
     return this.summaries.summary();

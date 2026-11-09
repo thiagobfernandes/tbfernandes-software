@@ -9,6 +9,7 @@ import {
   PassageRanker,
   TextChunker,
 } from '../domain';
+import { AssistantTracer } from './assistant-tracer';
 import { EmbeddingModel } from './embedding.model';
 import { KnowledgeIndex } from './knowledge.index';
 
@@ -34,35 +35,59 @@ export class KnowledgeRetrievalService {
     private readonly index: KnowledgeIndex,
     private readonly embeddings: EmbeddingModel,
     private readonly uow: UnitOfWork,
+    private readonly tracer: AssistantTracer,
   ) {}
 
   /** The passages that best answer the question, or an empty list. Never fails. */
-  async search(
+  search(
     ownerId: string,
     question: string,
     documents: KnowledgeDocument[],
   ): Promise<Passage[]> {
-    try {
-      await this.synchronize(ownerId, documents);
-      let questionVector: number[] | null = null;
-      if (this.embeddings.enabled()) {
-        try {
-          questionVector = await this.embeddings.embedQuery(question);
-        } catch (error) {
-          this.logger.warn(
-            `Embedding model failed for the question, searching by words: ${String(error)}`,
-          );
-        }
+    return this.tracer.step('retrieve-passages', 'retriever', async (step) => {
+      step.update({ input: question });
+      try {
+        await this.synchronize(ownerId, documents);
+        const questionVector = await this.questionVector(question);
+        const chunks = await this.index.chunks(ownerId);
+        const passages = PassageRanker.rank(
+          question,
+          questionVector,
+          chunks,
+          PASSAGES,
+        );
+        step.update({
+          output: passages.map((passage, position) => ({
+            position: position + 1,
+            kind: passage.source.kind,
+            title: passage.title,
+            score: passage.score,
+            text: passage.text,
+          })),
+          metadata: {
+            documents: documents.length,
+            indexedChunks: chunks.length,
+            byMeaning: questionVector !== null,
+          },
+        });
+        return passages;
+      } catch (error) {
+        this.logger.warn(`Knowledge retrieval failed: ${String(error)}`);
+        step.update({ failure: String(error) });
+        return [];
       }
-      return PassageRanker.rank(
-        question,
-        questionVector,
-        await this.index.chunks(ownerId),
-        PASSAGES,
-      );
+    });
+  }
+
+  private async questionVector(question: string): Promise<number[] | null> {
+    if (!this.embeddings.enabled()) return null;
+    try {
+      return await this.embeddings.embedQuery(question);
     } catch (error) {
-      this.logger.warn(`Knowledge retrieval failed: ${String(error)}`);
-      return [];
+      this.logger.warn(
+        `Embedding model failed for the question, searching by words: ${String(error)}`,
+      );
+      return null;
     }
   }
 
@@ -86,11 +111,11 @@ export class KnowledgeRetrievalService {
   ): Promise<void> {
     const indexed = await this.index.fingerprints(ownerId);
     const model = this.embeddings.enabled() ? this.embeddings.name() : NO_MODEL;
-    const current = new Set(documents.map((d) => keyOf(d.key)));
+    const current = new Set(documents.map((document) => keyOf(document.key)));
     const changed = documents.filter(
-      (d) =>
-        KnowledgeDocuments.fingerprint(d, model) !==
-        indexed.get(keyOf(d.key))?.fingerprint,
+      (document) =>
+        KnowledgeDocuments.fingerprint(document, model) !==
+        indexed.get(keyOf(document.key))?.fingerprint,
     );
     const removed = [...indexed.entries()]
       .filter(([key]) => !current.has(key))
@@ -104,6 +129,30 @@ export class KnowledgeRetrievalService {
         changed.slice(from, from + BATCH),
         model,
       );
+    }
+  }
+
+  /** Falls back to indexing by words only when the embedding model fails. */
+  private async embed(
+    texts: string[],
+    model: string,
+    documentCount: number,
+  ): Promise<{ vectors: number[][] | null; storedModel: string }> {
+    if (model === NO_MODEL || texts.length === 0)
+      return { vectors: null, storedModel: model };
+    try {
+      const vectors = await this.embeddings.embedDocuments(texts);
+      if (vectors.length !== texts.length) {
+        throw new Error(
+          `Expected ${texts.length} vectors, got ${vectors.length}`,
+        );
+      }
+      return { vectors, storedModel: model };
+    } catch (error) {
+      this.logger.warn(
+        `Embedding model failed, indexing ${documentCount} documents by words only: ${String(error)}`,
+      );
+      return { vectors: null, storedModel: NO_MODEL };
     }
   }
 
@@ -121,27 +170,14 @@ export class KnowledgeRetrievalService {
       chunks.forEach((chunk) => texts.push(`${document.title}\n\n${chunk}`));
       return chunks;
     });
-    let vectors: number[][] | null = null;
-    let storedModel = model;
-    if (model !== NO_MODEL && texts.length) {
-      try {
-        vectors = await this.embeddings.embedDocuments(texts);
-        if (vectors.length !== texts.length) {
-          throw new Error(
-            `Expected ${texts.length} vectors, got ${vectors.length}`,
-          );
-        }
-      } catch (error) {
-        this.logger.warn(
-          `Embedding model failed, indexing ${documents.length} documents by words only: ${String(error)}`,
-        );
-        vectors = null;
-        storedModel = NO_MODEL;
-      }
-    }
+    const { vectors, storedModel } = await this.embed(
+      texts,
+      model,
+      documents.length,
+    );
     let next = 0;
-    for (const [d, document] of documents.entries()) {
-      const rows: IndexedChunk[] = chunksPerDocument[d].map(
+    for (const [documentIndex, document] of documents.entries()) {
+      const rows: IndexedChunk[] = chunksPerDocument[documentIndex].map(
         (text, position) => ({
           source: document.key,
           position,

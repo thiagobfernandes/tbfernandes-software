@@ -1,40 +1,39 @@
 import { Project } from '../../../domain';
 import { ProjectEntity } from '../project.entity';
 
-/** Project ↔ work.project row. */
 export const ProjectPersistenceMapper = {
-  toDomain(e: ProjectEntity): Project {
-    return Project.restore(e.id, e.ownerId, {
-      name: e.name,
-      description: e.description,
-      companyId: e.companyId,
-      category: e.category,
-      status: e.status,
-      color: e.color,
-      startDate: e.startDate,
-      dueDate: e.dueDate,
-      nextDelivery: e.nextDelivery,
-      goalId: e.goalId,
+  toDomain(entity: ProjectEntity): Project {
+    return Project.restore(entity.id, entity.ownerId, {
+      name: entity.name,
+      description: entity.description,
+      companyId: entity.companyId,
+      category: entity.category,
+      status: entity.status,
+      color: entity.color,
+      startDate: entity.startDate,
+      dueDate: entity.dueDate,
+      nextDelivery: entity.nextDelivery,
+      goalId: entity.goalId,
     });
   },
 
   toEntity(
     project: Project,
-    e: ProjectEntity = new ProjectEntity(),
+    entity: ProjectEntity = new ProjectEntity(),
   ): ProjectEntity {
-    const d = project.details;
-    e.id = project.id;
-    e.ownerId = project.ownerId;
-    e.name = d.name;
-    e.description = d.description;
-    e.companyId = d.companyId;
-    e.category = d.category;
-    e.status = project.status;
-    e.color = d.color ?? 'TEAL';
-    e.startDate = d.startDate;
-    e.dueDate = d.dueDate;
-    e.nextDelivery = d.nextDelivery;
-    e.goalId = d.goalId;
-    return e;
+    const details = project.details;
+    entity.id = project.id;
+    entity.ownerId = project.ownerId;
+    entity.name = details.name;
+    entity.description = details.description;
+    entity.companyId = details.companyId;
+    entity.category = details.category;
+    entity.status = project.status;
+    entity.color = details.color ?? 'TEAL';
+    entity.startDate = details.startDate;
+    entity.dueDate = details.dueDate;
+    entity.nextDelivery = details.nextDelivery;
+    entity.goalId = details.goalId;
+    return entity;
   },
 };

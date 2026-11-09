@@ -1,4 +1,4 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import {
   TASK_PRIORITIES,
   TASK_STATUSES,
@@ -18,7 +18,6 @@ export class ChecklistItemDto {
   done?: boolean;
 }
 
-/** Body of POST and PUT /tasks. */
 export class TaskRequest {
   title: string;
   description?: string | null;
@@ -52,15 +51,15 @@ export interface ValidTaskRequest {
 }
 
 export const taskRequestSchema = Joi.object<ValidTaskRequest>({
-  title: J.requiredText(200),
-  description: J.optionalText(5000),
-  projectId: J.optionalUuid(),
-  status: J.optionalEnumOf(TASK_STATUSES),
-  priority: J.optionalEnumOf(TASK_PRIORITIES),
-  tag: J.optionalText(40),
-  startDate: J.optionalIsoDate(),
-  dueDate: J.optionalIsoDate(),
-  doneCriteria: J.optionalText(1000),
+  title: RequestFields.requiredText(200),
+  description: RequestFields.optionalText(5000),
+  projectId: RequestFields.optionalUuid(),
+  status: RequestFields.optionalEnumOf(TASK_STATUSES),
+  priority: RequestFields.optionalEnumOf(TASK_PRIORITIES),
+  tag: RequestFields.optionalText(40),
+  startDate: RequestFields.optionalIsoDate(),
+  dueDate: RequestFields.optionalIsoDate(),
+  doneCriteria: RequestFields.optionalText(1000),
   checklist: Joi.object({
     done: Joi.number().integer().min(0).required(),
     total: Joi.number().integer().min(0).required(),
@@ -70,15 +69,15 @@ export const taskRequestSchema = Joi.object<ValidTaskRequest>({
   checklistItems: Joi.array()
     .items(
       Joi.object({
-        id: J.optionalUuid(),
-        title: J.requiredText(200),
+        id: RequestFields.optionalUuid(),
+        title: RequestFields.requiredText(200),
         done: Joi.boolean().allow(null).default(false),
       }),
     )
     .allow(null)
     .empty(null)
     .default([]),
-  goalId: J.optionalUuid(),
+  goalId: RequestFields.optionalUuid(),
 });
 
 export class StatusRequest {
@@ -86,7 +85,7 @@ export class StatusRequest {
 }
 
 export const statusRequestSchema = Joi.object<{ status: TaskStatus }>({
-  status: J.enumOf(TASK_STATUSES).required(),
+  status: RequestFields.enumOf(TASK_STATUSES).required(),
 });
 
 export interface TaskListQuery {
@@ -98,10 +97,10 @@ export interface TaskListQuery {
 }
 
 export const taskListQuerySchema = Joi.object<TaskListQuery>({
-  projectId: J.optionalUuid(),
-  status: J.optionalEnumOf(TASK_STATUSES),
-  dueFrom: J.optionalIsoDate(),
-  dueTo: J.optionalIsoDate(),
+  projectId: RequestFields.optionalUuid(),
+  status: RequestFields.optionalEnumOf(TASK_STATUSES),
+  dueFrom: RequestFields.optionalIsoDate(),
+  dueTo: RequestFields.optionalIsoDate(),
   overdue: Joi.boolean().default(false),
-  ...J.paging(),
+  ...RequestFields.paging(),
 });

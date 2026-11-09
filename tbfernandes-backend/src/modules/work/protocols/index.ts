@@ -8,3 +8,6 @@ export * from './project.response';
 export * from './task.request';
 export * from './task.response';
 export * from './work-summary.response';
+export * from './appointment.request';
+export * from './appointment.response';
+export * from './mappers/appointment.mapper';

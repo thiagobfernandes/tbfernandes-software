@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { NoteRepository, SnippetRepository } from '../domain';
 import { KnowledgeLookup, NoteView, SnippetView } from '../knowledge.lookup';
 
-/** Implements the knowledge module's public API on top of its own repositories. */
 @Injectable()
 export class KnowledgeLookupService extends KnowledgeLookup {
   constructor(
@@ -14,12 +13,12 @@ export class KnowledgeLookupService extends KnowledgeLookup {
 
   async notes(ownerId: string): Promise<NoteView[]> {
     return (await this.notesRepo.search(ownerId, null, null)).map((note) => {
-      const d = note.details;
+      const details = note.details;
       return {
         id: note.id,
-        title: d.title,
-        body: d.body,
-        tags: d.tags,
+        title: details.title,
+        body: details.body,
+        tags: details.tags,
         projectIds: [...note.links.projectIds],
         taskIds: [...note.links.taskIds],
       };
@@ -33,12 +32,12 @@ export class KnowledgeLookupService extends KnowledgeLookup {
       tag: null,
     });
     return all.map((snippet) => {
-      const d = snippet.details;
+      const details = snippet.details;
       return {
         id: snippet.id,
-        title: d.title,
-        explanation: d.explanation,
-        tags: d.tags,
+        title: details.title,
+        explanation: details.explanation,
+        tags: details.tags,
         projectIds: [...snippet.links.projectIds],
         taskIds: [...snippet.links.taskIds],
       };

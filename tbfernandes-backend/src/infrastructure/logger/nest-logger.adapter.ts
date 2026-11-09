@@ -1,7 +1,6 @@
 import { LoggerService } from '@nestjs/common';
 import { Logger } from './logger';
 
-/** Sends Nest's own messages (startup, routes, errors) through the same Logger. */
 export class NestLoggerAdapter implements LoggerService {
   log(message: unknown, context?: string): void {
     Logger.info(this.format(message, context));

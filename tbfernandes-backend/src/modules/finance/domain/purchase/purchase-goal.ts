@@ -13,7 +13,6 @@ export type PurchasePriority = (typeof PURCHASE_PRIORITIES)[number];
 export const PURCHASE_STATUSES = ['PLANNED', 'SAVING', 'BOUGHT'] as const;
 export type PurchaseStatus = (typeof PURCHASE_STATUSES)[number];
 
-/** The editable fields of a purchase goal. */
 export interface PurchaseDetails {
   name: string;
   description: string | null;
@@ -40,7 +39,6 @@ export interface Projection {
   onTime: boolean | null;
 }
 
-/** Something to buy and the money set aside for it (RF-FIN-03). */
 export class PurchaseGoal {
   private constructor(
     readonly id: string,
@@ -56,7 +54,6 @@ export class PurchaseGoal {
     );
   }
 
-  /** Rebuilds a purchase goal already stored; no rules run. */
   static restore(id: string, ownerId: string, details: PurchaseDetails) {
     return new PurchaseGoal(id, ownerId, details);
   }
@@ -83,45 +80,54 @@ export class PurchaseGoal {
 
   /** Same rule as the frontend's finance/lib/projection.ts. */
   project(today: IsoDate): Projection {
-    const d = this._details;
-    const missing = Math.max(d.estimated - this.reserved, 0);
+    const details = this._details;
+    const missing = Math.max(details.estimated - this.reserved, 0);
     if (missing === 0)
       return { missing, ready: true, months: null, month: null, onTime: null };
-    if (d.monthlySaving == null)
+    if (details.monthlySaving == null)
       return { missing, ready: false, months: null, month: null, onTime: null };
-    const months = Math.ceil(missing / d.monthlySaving);
+    const months = Math.ceil(missing / details.monthlySaving);
     const month = YearMonths.plusMonths(YearMonths.of(today), months);
     const onTime =
-      d.desiredDate == null ? null : month <= YearMonths.of(d.desiredDate);
+      details.desiredDate == null
+        ? null
+        : month <= YearMonths.of(details.desiredDate);
     return { missing, ready: false, months, month, onTime };
   }
 
-  private static validated(d: PurchaseDetails): PurchaseDetails {
-    const reserved = d.reserved ?? 0;
+  private static validated(details: PurchaseDetails): PurchaseDetails {
+    const reserved = details.reserved ?? 0;
     if (reserved < 0) {
       throw new BusinessRuleViolationError(
         'RN-18',
         'O valor reservado não pode ser negativo',
       );
     }
-    const status = d.status ?? 'PLANNED';
-    if (status === 'BOUGHT' && d.paid == null) {
+    const status = details.status ?? 'PLANNED';
+    if (status === 'BOUGHT' && details.paid == null) {
       throw new BusinessRuleViolationError(
         'RN-17',
         'Uma compra feita precisa do valor pago',
       );
     }
     return {
-      name: Require.text(d.name, 'name', 200),
-      description: Require.optionalText(d.description, 'description', 2000),
-      estimated: Money.positive(d.estimated, 'estimated'),
+      name: Require.text(details.name, 'name', 200),
+      description: Require.optionalText(
+        details.description,
+        'description',
+        2000,
+      ),
+      estimated: Money.positive(details.estimated, 'estimated'),
       reserved,
-      monthlySaving: Money.optionalPositive(d.monthlySaving, 'monthlySaving'),
-      priority: d.priority ?? 'NORMAL',
-      desiredDate: d.desiredDate ?? null,
-      goalId: d.goalId ?? null,
+      monthlySaving: Money.optionalPositive(
+        details.monthlySaving,
+        'monthlySaving',
+      ),
+      priority: details.priority ?? 'NORMAL',
+      desiredDate: details.desiredDate ?? null,
+      goalId: details.goalId ?? null,
       status,
-      paid: Money.optionalPositive(d.paid, 'paid'),
+      paid: Money.optionalPositive(details.paid, 'paid'),
     };
   }
 }

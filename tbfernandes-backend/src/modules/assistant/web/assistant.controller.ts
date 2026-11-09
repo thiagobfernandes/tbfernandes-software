@@ -26,7 +26,6 @@ export class AssistantController {
     return AnswerMapper.toResponse(await this.assistant.ask(request.question));
   }
 
-  /** KNW-05: nodes and edges of the knowledge graph screen. */
   @Get('graph')
   async graph(): Promise<GraphResponse> {
     return GraphMapper.toResponse(await this.assistant.graph());

@@ -6,7 +6,6 @@ import {
   TaskRepository,
 } from '../domain';
 
-/** Numbers for the dashboard cards (RF-WRK-13). */
 export interface WorkSummary {
   openTasks: number;
   overdueTasks: number;

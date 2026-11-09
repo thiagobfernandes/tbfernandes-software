@@ -1,7 +1,6 @@
 import { AppUser } from '../../../domain';
 import { AppUserEntity } from '../app-user.entity';
 
-/** AppUser ↔ identity.app_user row. */
 export const AppUserPersistenceMapper = {
   toDomain(entity: AppUserEntity): AppUser {
     return AppUser.restore(

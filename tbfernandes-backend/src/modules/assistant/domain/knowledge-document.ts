@@ -12,7 +12,6 @@ export const DocumentKinds = {
   },
 };
 
-/** Identifies the record a passage came from. */
 export interface DocumentKey {
   kind: DocumentKind;
   id: string;
@@ -20,10 +19,6 @@ export interface DocumentKey {
 
 export const keyOf = (key: DocumentKey) => `${key.kind}:${key.id}`;
 
-/**
- * A note or snippet as the retrieval index sees it (AST-04): its title and the text that is
- * split into passages. The links match the ones the rule-based assistant builds.
- */
 export interface KnowledgeDocument {
   key: DocumentKey;
   title: string;
@@ -38,15 +33,15 @@ const withTags = (body: string | null, tags: string[]) => {
 export const KnowledgeDocuments = {
   of(notes: NoteRecord[], snippets: SnippetRecord[]): KnowledgeDocument[] {
     return [
-      ...notes.map((n) => ({
-        key: { kind: 'NOTE' as const, id: n.id },
-        title: n.title,
-        text: withTags(n.body, n.tags),
+      ...notes.map((note) => ({
+        key: { kind: 'NOTE' as const, id: note.id },
+        title: note.title,
+        text: withTags(note.body, note.tags),
       })),
-      ...snippets.map((s) => ({
-        key: { kind: 'SNIPPET' as const, id: s.id },
-        title: s.title,
-        text: withTags(s.explanation, s.tags),
+      ...snippets.map((snippet) => ({
+        key: { kind: 'SNIPPET' as const, id: snippet.id },
+        title: snippet.title,
+        text: withTags(snippet.explanation, snippet.tags),
       })),
     ];
   },
@@ -82,7 +77,6 @@ export interface IndexedChunk {
   vector: number[] | null;
 }
 
-/** A passage found for a question, with its relevance from 0 to 1 (AST-04). */
 export interface Passage {
   source: DocumentKey;
   title: string;
@@ -90,5 +84,5 @@ export interface Passage {
   score: number;
 }
 
-export const passageHref = (p: Passage) =>
-  DocumentKinds.href(p.source.kind, p.source.id);
+export const passageHref = (passage: Passage) =>
+  DocumentKinds.href(passage.source.kind, passage.source.id);

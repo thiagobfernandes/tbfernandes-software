@@ -69,24 +69,23 @@ export class ZipWriter {
     this.entries.push(entry);
   }
 
-  /** Writes the central directory and closes the file. */
   async close(): Promise<void> {
     const start = this.offset;
-    for (const e of this.entries) {
+    for (const entry of this.entries) {
       const record = Buffer.alloc(46);
       record.writeUInt32LE(0x02014b50, 0);
       record.writeUInt16LE(20, 4);
       record.writeUInt16LE(20, 6);
       record.writeUInt16LE(UTF8_NAMES, 8);
       record.writeUInt16LE(DEFLATE, 10);
-      record.writeUInt16LE(e.time, 12);
-      record.writeUInt16LE(e.date, 14);
-      record.writeUInt32LE(e.crc, 16);
-      record.writeUInt32LE(e.compressed, 20);
-      record.writeUInt32LE(e.size, 24);
-      record.writeUInt16LE(e.name.length, 28);
-      record.writeUInt32LE(e.offset, 42);
-      await this.write(Buffer.concat([record, e.name]));
+      record.writeUInt16LE(entry.time, 12);
+      record.writeUInt16LE(entry.date, 14);
+      record.writeUInt32LE(entry.crc, 16);
+      record.writeUInt32LE(entry.compressed, 20);
+      record.writeUInt32LE(entry.size, 24);
+      record.writeUInt16LE(entry.name.length, 28);
+      record.writeUInt32LE(entry.offset, 42);
+      await this.write(Buffer.concat([record, entry.name]));
     }
     const end = Buffer.alloc(22);
     end.writeUInt32LE(0x06054b50, 0);
@@ -102,7 +101,6 @@ export class ZipWriter {
     );
   }
 
-  /** Stops writing without the central directory, after a failure. */
   abort(): void {
     this.out.destroy();
   }

@@ -2,15 +2,12 @@ import { Require } from '../../../../common/domain';
 import { KnowledgeLinks } from '../knowledge-links';
 import { Tags } from '../tags';
 
-/** The editable fields of a note. */
 export interface NoteDetails {
   title: string;
-  /** Markdown */
   body: string;
   tags: string[];
 }
 
-/** A Markdown note (RF-KNW-01). createdAt and updatedAt come from persistence. */
 export class Note {
   private constructor(
     readonly id: string,
@@ -35,7 +32,6 @@ export class Note {
     );
   }
 
-  /** Rebuilds a note already stored; no rules run. */
   static restore(
     id: string,
     ownerId: string,
@@ -67,11 +63,11 @@ export class Note {
     return true;
   }
 
-  private static validated(d: NoteDetails): NoteDetails {
+  private static validated(details: NoteDetails): NoteDetails {
     return {
-      title: Require.text(d.title, 'title', 200),
-      body: d.body ?? '',
-      tags: Tags.normalize(d.tags),
+      title: Require.text(details.title, 'title', 200),
+      body: details.body ?? '',
+      tags: Tags.normalize(details.tags),
     };
   }
 }

@@ -5,9 +5,8 @@ export const MIN_COSINE = 0.35;
 export const VECTOR_WEIGHT = 0.7;
 export const MAX_PER_DOCUMENT = 2;
 const K1 = 1.2;
-const B = 0.75;
+const LENGTH_NORMALIZATION = 0.75;
 
-/** Common Portuguese and English words that say nothing about what is asked. */
 const STOP_WORDS = new Set(
   (
     'que qual quais como onde quando por para com sem uma uns umas dos das nos nas pelo pela ' +
@@ -38,8 +37,8 @@ export const PassageRanker = {
     const lexical = bm25(terms, chunks);
     const maxLexical = Math.max(0, ...lexical);
     const scored: Passage[] = [];
-    chunks.forEach((chunk, i) => {
-      const words = maxLexical > 0 ? lexical[i] / maxLexical : 0;
+    chunks.forEach((chunk, index) => {
+      const words = maxLexical > 0 ? lexical[index] / maxLexical : 0;
       let score: number;
       if (
         questionVector != null &&
@@ -61,7 +60,7 @@ export const PassageRanker = {
         score: Math.min(1, score),
       });
     });
-    scored.sort((a, b) => b.score - a.score);
+    scored.sort((left, right) => right.score - left.score);
     const perDocument = new Map<string, number>();
     const result: Passage[] = [];
     for (const passage of scored) {
@@ -81,55 +80,95 @@ export const PassageRanker = {
       .replace(/\p{M}+/gu, '')
       .toLowerCase()
       .split(/[^\p{L}\p{N}]+/u)
-      .filter((w) => w.length >= 3 && !STOP_WORDS.has(w));
+      .filter((word) => word.length >= 3 && !STOP_WORDS.has(word));
   },
 
-  cosine(a: number[], b: number[]): number {
+  cosine(left: number[], right: number[]): number {
     let dot = 0;
     let normA = 0;
     let normB = 0;
-    for (let i = 0; i < a.length; i++) {
-      dot += a[i] * b[i];
-      normA += a[i] * a[i];
-      normB += b[i] * b[i];
+    for (let index = 0; index < left.length; index++) {
+      dot += left[index] * right[index];
+      normA += left[index] * left[index];
+      normB += right[index] * right[index];
     }
     return normA === 0 || normB === 0 ? 0 : dot / Math.sqrt(normA * normB);
   },
 };
 
-/** Okapi BM25 of each chunk (title and text) for the question's terms. */
-function bm25(terms: Set<string>, chunks: IndexedChunk[]): number[] {
-  const scores = new Array<number>(chunks.length).fill(0);
-  if (terms.size === 0) return scores;
-  const frequencies: Map<string, number>[] = [];
+interface TermStatistics {
+  termCountsPerChunk: Map<string, number>[];
+  lengths: number[];
+  documentFrequency: Map<string, number>;
+  averageLength: number;
+}
+
+function countTerms(words: string[], terms: Set<string>): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const word of words)
+    if (terms.has(word)) counts.set(word, (counts.get(word) ?? 0) + 1);
+  return counts;
+}
+
+function termStatistics(
+  terms: Set<string>,
+  chunks: IndexedChunk[],
+): TermStatistics {
+  const termCountsPerChunk: Map<string, number>[] = [];
   const lengths: number[] = [];
   const documentFrequency = new Map<string, number>();
-  let totalLength = 0;
   for (const chunk of chunks) {
     const words = PassageRanker.tokens(`${chunk.title} ${chunk.text}`);
-    totalLength += words.length;
-    const tf = new Map<string, number>();
-    for (const word of words)
-      if (terms.has(word)) tf.set(word, (tf.get(word) ?? 0) + 1);
-    for (const term of tf.keys())
+    const counts = countTerms(words, terms);
+    for (const term of counts.keys())
       documentFrequency.set(term, (documentFrequency.get(term) ?? 0) + 1);
-    frequencies.push(tf);
+    termCountsPerChunk.push(counts);
     lengths.push(words.length);
   }
-  const averageLength = Math.max(1, totalLength / chunks.length);
-  const n = chunks.length;
-  for (let i = 0; i < n; i++) {
+  const totalLength = lengths.reduce((sum, length) => sum + length, 0);
+  return {
+    termCountsPerChunk,
+    lengths,
+    documentFrequency,
+    averageLength: Math.max(1, totalLength / chunks.length),
+  };
+}
+
+function termScore(
+  termFrequency: number,
+  documentFrequency: number,
+  chunkCount: number,
+  lengthRatio: number,
+): number {
+  const inverseDocumentFrequency = Math.log(
+    1 + (chunkCount - documentFrequency + 0.5) / (documentFrequency + 0.5),
+  );
+  const lengthPenalty =
+    1 - LENGTH_NORMALIZATION + LENGTH_NORMALIZATION * lengthRatio;
+  return (
+    (inverseDocumentFrequency * (termFrequency * (K1 + 1))) /
+    (termFrequency + K1 * lengthPenalty)
+  );
+}
+
+function bm25(terms: Set<string>, chunks: IndexedChunk[]): number[] {
+  if (terms.size === 0) return new Array<number>(chunks.length).fill(0);
+  const statistics = termStatistics(terms, chunks);
+  return chunks.map((_, chunkIndex) => {
+    const termCounts = statistics.termCountsPerChunk[chunkIndex];
+    const lengthRatio =
+      statistics.lengths[chunkIndex] / statistics.averageLength;
     let score = 0;
     for (const term of terms) {
-      const f = frequencies[i].get(term);
-      if (f == null) continue;
-      const df = documentFrequency.get(term)!;
-      const idf = Math.log(1 + (n - df + 0.5) / (df + 0.5));
-      score +=
-        (idf * (f * (K1 + 1))) /
-        (f + K1 * (1 - B + (B * lengths[i]) / averageLength));
+      const termFrequency = termCounts.get(term);
+      if (termFrequency == null) continue;
+      score += termScore(
+        termFrequency,
+        statistics.documentFrequency.get(term)!,
+        chunks.length,
+        lengthRatio,
+      );
     }
-    scores[i] = score;
-  }
-  return scores;
+    return score;
+  });
 }

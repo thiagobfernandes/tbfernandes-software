@@ -1,7 +1,6 @@
-import { J, Joi } from '../../../common/protocols';
+import { RequestFields, Joi } from '../../../common/protocols';
 import { EDUCATION_STATUSES, EducationStatus } from '../domain';
 
-/** Body of POST and PUT /educations. */
 export class EducationRequest {
   institution: string;
   course: string;
@@ -22,15 +21,14 @@ export interface ValidEducationRequest {
 }
 
 export const educationRequestSchema = Joi.object<ValidEducationRequest>({
-  institution: J.requiredText(200),
-  course: J.requiredText(200),
-  degree: J.requiredText(80),
-  status: J.enumOf(EDUCATION_STATUSES).required(),
-  startDate: J.isoDate().required(),
-  endDate: J.optionalIsoDate(),
+  institution: RequestFields.requiredText(200),
+  course: RequestFields.requiredText(200),
+  degree: RequestFields.requiredText(80),
+  status: RequestFields.enumOf(EDUCATION_STATUSES).required(),
+  startDate: RequestFields.isoDate().required(),
+  endDate: RequestFields.optionalIsoDate(),
 });
 
-/** Same shape as the frontend's Education type. */
 export class EducationResponse {
   id: string;
   institution: string;

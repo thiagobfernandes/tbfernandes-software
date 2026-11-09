@@ -6,6 +6,11 @@ import { InvalidArgumentError, Require } from '../../../../common/domain';
  */
 export type Hundredths = number;
 
+const numberWithoutExponent = (value: number) =>
+  /e/i.test(String(value))
+    ? value.toFixed(20).replace(/\.?0+$/, '')
+    : String(value);
+
 export const Decimals = {
   /**
    * From a JSON number or numeric text, rounding half away from zero like PostgreSQL does
@@ -13,11 +18,7 @@ export const Decimals = {
    */
   hundredths(value: number | string): Hundredths {
     const text =
-      typeof value === 'number'
-        ? /e/i.test(String(value))
-          ? value.toFixed(20).replace(/\.?0+$/, '')
-          : String(value)
-        : value.trim();
+      typeof value === 'number' ? numberWithoutExponent(value) : value.trim();
     const match = /^(-?)(\d*)(?:\.(\d*))?$/.exec(text);
     if (!match) throw new InvalidArgumentError(`valor inválido: ${text}`);
     const [, sign, whole, fraction = ''] = match;
@@ -55,23 +56,25 @@ export interface IndicatorDetails {
 }
 
 export const Indicators = {
-  of(i: IndicatorDetails): Indicator {
-    const target = Require.present(i.target, 'indicator target');
+  of(details: IndicatorDetails): Indicator {
+    const target = Require.present(details.target, 'indicator target');
     if (target <= 0)
       throw new InvalidArgumentError(
         'indicator target deve ser maior que zero',
       );
     return {
-      label: Require.text(i.label, 'indicator label', 120),
-      current: i.current ?? 0,
+      label: Require.text(details.label, 'indicator label', 120),
+      current: details.current ?? 0,
       target,
-      unit: Require.text(i.unit, 'indicator unit', 20),
+      unit: Require.text(details.unit, 'indicator unit', 20),
     };
   },
 
   /** Progress from 0 to 100, rounded half up like the frontend's Math.round, capped. */
-  roundedPercent(i: Indicator): number {
-    const percent = Math.floor((200 * i.current + i.target) / (2 * i.target));
+  roundedPercent(indicator: Indicator): number {
+    const percent = Math.floor(
+      (200 * indicator.current + indicator.target) / (2 * indicator.target),
+    );
     return Math.min(100, Math.max(0, percent));
   },
 };

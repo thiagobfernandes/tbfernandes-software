@@ -1,6 +1,5 @@
 import { EmbeddingModel } from '../../application/embedding.model';
 
-/** Default: no embeddings, so retrieval finds passages by their words only (AST-04). */
 export class DisabledEmbeddingModel extends EmbeddingModel {
   name(): string {
     return 'none';

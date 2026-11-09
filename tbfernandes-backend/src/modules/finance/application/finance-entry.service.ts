@@ -12,7 +12,6 @@ import {
   FinanceEntryRepository,
 } from '../domain';
 
-/** Manual cash flow entries (RF-FIN-01). Imported ones come from OpenFinanceService. */
 @Injectable()
 export class FinanceEntryService {
   constructor(

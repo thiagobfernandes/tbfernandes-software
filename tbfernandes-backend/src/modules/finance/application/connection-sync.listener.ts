@@ -4,7 +4,6 @@ import { CONNECTION_SYNC_REQUESTED } from './connection-sync-requested';
 import type { ConnectionSyncRequested } from './connection-sync-requested';
 import { OpenFinanceService } from './open-finance.service';
 
-/** FIN-OF-05: syncs a connection after the request that asked for it has answered. */
 @Injectable()
 export class ConnectionSyncListener {
   constructor(private readonly service: OpenFinanceService) {}

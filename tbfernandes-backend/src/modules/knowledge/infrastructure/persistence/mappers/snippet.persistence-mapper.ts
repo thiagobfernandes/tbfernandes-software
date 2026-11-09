@@ -2,39 +2,38 @@ import { Snippet } from '../../../domain';
 import { SnippetEntity, SnippetLinkEntity } from '../snippet.entity';
 import { LinkPersistenceMapper } from './link.persistence-mapper';
 
-/** Snippet ↔ knowledge.snippet row and its knowledge.snippet_link rows. */
 export const SnippetPersistenceMapper = {
-  toDomain(e: SnippetEntity): Snippet {
+  toDomain(entity: SnippetEntity): Snippet {
     return Snippet.restore(
-      e.id,
-      e.ownerId,
+      entity.id,
+      entity.ownerId,
       {
-        title: e.title,
-        language: e.language,
-        code: e.code,
-        explanation: e.explanation,
-        sourceUrl: e.sourceUrl,
-        tags: e.tags ?? [],
+        title: entity.title,
+        language: entity.language,
+        code: entity.code,
+        explanation: entity.explanation,
+        sourceUrl: entity.sourceUrl,
+        tags: entity.tags ?? [],
       },
-      LinkPersistenceMapper.toLinks(e.links),
-      e.createdAt,
-      e.updatedAt,
+      LinkPersistenceMapper.toLinks(entity.links),
+      entity.createdAt,
+      entity.updatedAt,
     );
   },
 
   /** The snippet row only; links come from toLinkEntities. */
-  toEntity(snippet: Snippet, e: SnippetEntity = new SnippetEntity()) {
-    const d = snippet.details;
-    e.id = snippet.id;
-    e.ownerId = snippet.ownerId;
-    e.title = d.title;
-    e.language = d.language;
-    e.code = d.code;
-    e.explanation = d.explanation;
-    e.sourceUrl = d.sourceUrl;
-    e.tags = d.tags;
-    delete e.links;
-    return e;
+  toEntity(snippet: Snippet, entity: SnippetEntity = new SnippetEntity()) {
+    const details = snippet.details;
+    entity.id = snippet.id;
+    entity.ownerId = snippet.ownerId;
+    entity.title = details.title;
+    entity.language = details.language;
+    entity.code = details.code;
+    entity.explanation = details.explanation;
+    entity.sourceUrl = details.sourceUrl;
+    entity.tags = details.tags;
+    delete entity.links;
+    return entity;
   },
 
   toLinkEntities(snippet: Snippet): SnippetLinkEntity[] {

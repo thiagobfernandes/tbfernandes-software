@@ -5,7 +5,6 @@ import { Milestone, MilestoneRepository } from '../../domain';
 import { MilestoneEntity } from './milestone.entity';
 import { MilestonePersistenceMapper as Mapper } from './mappers/milestone.persistence-mapper';
 
-/** MilestoneRepository on TypeORM. */
 @Injectable()
 export class TypeOrmMilestoneRepository extends MilestoneRepository {
   private readonly rows: BaseRepository<MilestoneEntity>;

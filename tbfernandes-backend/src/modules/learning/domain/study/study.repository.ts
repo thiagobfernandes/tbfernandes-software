@@ -1,6 +1,5 @@
 import { Study } from './study';
 
-/** Implemented in infrastructure/persistence. */
 export abstract class StudyRepository {
   abstract create(study: Study): Promise<Study>;
   abstract save(study: Study): Promise<Study>;

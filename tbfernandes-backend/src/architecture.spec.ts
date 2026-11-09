@@ -1,13 +1,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
-/**
- * Architecture rules (docs/backend/arquitetura.md), checked on the import statements of
- * every source file, like ArchitectureTests did with ArchUnit.
- */
 const SRC = __dirname;
 
-/** Which modules each module may use, through their public API (index.ts) only. */
 const ALLOWED_MODULE_DEPENDENCIES: Record<string, string[]> = {
   identity: [],
   work: [],
@@ -22,7 +17,6 @@ const ALLOWED_MODULE_DEPENDENCIES: Record<string, string[]> = {
 interface SourceImport {
   file: string;
   specifier: string;
-  /** Resolved path inside src/, or undefined for packages. */
   target?: string;
 }
 
@@ -54,19 +48,24 @@ const moduleOf = (path: string) =>
 const layerOf = (path: string) =>
   parts(path)[0] === 'modules' ? parts(path)[2] : undefined;
 
-function violations(predicate: (i: SourceImport) => boolean): string[] {
-  return imports.filter(predicate).map((i) => `${i.file} -> ${i.specifier}`);
+function violations(
+  predicate: (sourceImport: SourceImport) => boolean,
+): string[] {
+  return imports
+    .filter(predicate)
+    .map((sourceImport) => `${sourceImport.file} -> ${sourceImport.specifier}`);
 }
 
 describe('architecture', () => {
   it('a module uses another only through its public API and in the allowed direction', () => {
     expect(
-      violations((i) => {
-        const from = moduleOf(i.file);
-        const to = i.target && moduleOf(i.target);
+      violations((sourceImport) => {
+        const from = moduleOf(sourceImport.file);
+        const to = sourceImport.target && moduleOf(sourceImport.target);
         if (!from || !to || from === to) return false;
         const publicApi =
-          parts(i.target!).length === 2 || parts(i.target!)[2] === 'index';
+          parts(sourceImport.target!).length === 2 ||
+          parts(sourceImport.target!)[2] === 'index';
         return !publicApi || !ALLOWED_MODULE_DEPENDENCIES[from]?.includes(to);
       }),
     ).toEqual([]);
@@ -74,15 +73,16 @@ describe('architecture', () => {
 
   it('domain is plain TypeScript and depends on no other layer', () => {
     expect(
-      violations((i) => {
+      violations((sourceImport) => {
         const inDomain =
-          layerOf(i.file) === 'domain' ||
-          i.file.startsWith(join('common', 'domain'));
+          layerOf(sourceImport.file) === 'domain' ||
+          sourceImport.file.startsWith(join('common', 'domain'));
         if (!inDomain) return false;
-        if (!i.target) return !i.specifier.startsWith('node:'); // Node built-ins only, no packages
+        if (!sourceImport.target)
+          return !sourceImport.specifier.startsWith('node:');
         return !(
-          layerOf(i.target) === 'domain' ||
-          i.target.startsWith(join('common', 'domain'))
+          layerOf(sourceImport.target) === 'domain' ||
+          sourceImport.target.startsWith(join('common', 'domain'))
         );
       }),
     ).toEqual([]);
@@ -90,16 +90,16 @@ describe('architecture', () => {
 
   it('application talks to interfaces, never to persistence, HTTP or DTOs', () => {
     expect(
-      violations((i) => {
-        if (layerOf(i.file) !== 'application') return false;
-        if (!i.target)
+      violations((sourceImport) => {
+        if (layerOf(sourceImport.file) !== 'application') return false;
+        if (!sourceImport.target)
           return /^(typeorm|express|pg|@nestjs\/(typeorm|platform-express|swagger))/.test(
-            i.specifier,
+            sourceImport.specifier,
           );
-        const layer = layerOf(i.target);
+        const layer = layerOf(sourceImport.target);
         return (
           ['infrastructure', 'protocols', 'web'].includes(layer ?? '') ||
-          i.target.startsWith('infrastructure')
+          sourceImport.target.startsWith('infrastructure')
         );
       }),
     ).toEqual([]);
@@ -107,13 +107,14 @@ describe('architecture', () => {
 
   it('protocols never reach persistence or controllers', () => {
     expect(
-      violations((i) => {
-        if (layerOf(i.file) !== 'protocols') return false;
-        if (!i.target) return /^(typeorm|pg|express)/.test(i.specifier);
+      violations((sourceImport) => {
+        if (layerOf(sourceImport.file) !== 'protocols') return false;
+        if (!sourceImport.target)
+          return /^(typeorm|pg|express)/.test(sourceImport.specifier);
         return (
           ['infrastructure', 'web', 'application'].includes(
-            layerOf(i.target) ?? '',
-          ) || i.target.startsWith('infrastructure')
+            layerOf(sourceImport.target) ?? '',
+          ) || sourceImport.target.startsWith('infrastructure')
         );
       }),
     ).toEqual([]);

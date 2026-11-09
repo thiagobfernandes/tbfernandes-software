@@ -2,16 +2,15 @@ import { AppUser, Profile } from '../../domain';
 import { MeResponse } from '../me.response';
 import { ProfileRequest } from '../profile.request';
 
-/** Account ↔ JSON of /me. */
 export const MeMapper = {
   toResponse(user: AppUser): MeResponse {
-    const p = user.profile;
+    const profile = user.profile;
     return {
       id: user.id,
-      name: p.name,
-      email: p.email,
-      locale: p.locale ?? 'pt-BR',
-      timeZone: p.timeZone ?? 'America/Sao_Paulo',
+      name: profile.name,
+      email: profile.email,
+      locale: profile.locale ?? 'pt-BR',
+      timeZone: profile.timeZone ?? 'America/Sao_Paulo',
       hasPassword: user.canLogIn(),
     };
   },

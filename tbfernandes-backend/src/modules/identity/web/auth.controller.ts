@@ -13,7 +13,6 @@ import {
   SessionResponse,
 } from '../protocols';
 
-/** Login and logout for session mode (IDN-01). */
 @ApiTags('identity')
 @Public()
 @Controller('auth')
@@ -50,6 +49,9 @@ export class AuthController {
   @HttpCode(204)
   async logout(@Req() req: Request): Promise<void> {
     await new Promise<void>((resolve) => req.session.destroy(() => resolve()));
-    req.res?.clearCookie(SESSION_COOKIE, { path: '/' });
+    req.res?.clearCookie(SESSION_COOKIE, {
+      path: '/',
+      domain: this.config.cookieDomain,
+    });
   }
 }

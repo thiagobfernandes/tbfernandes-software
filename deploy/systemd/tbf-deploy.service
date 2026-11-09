@@ -1,0 +1,13 @@
+[Unit]
+Description=TBFernandes: aplica a imagem nova do backend publicada no GHCR
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=docker
+WorkingDirectory=/srv/tbfernandes
+ExecStart=/srv/tbfernandes/bin/tbf-deploy
+TimeoutStartSec=900

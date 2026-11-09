@@ -4,7 +4,7 @@ Atualizado em 2026-11-03. Atualize esta página ao terminar uma etapa.
 
 ## O que existe
 
-- **Frontend** completo para todos os módulos: Trabalho (empresas, projetos com timeline, tarefas com lista e quadro), Conhecimento (notas, snippets, grafo, métodos), Crescimento (metas, aprendizado, certificações), Finanças (fluxo de caixa, compras planejadas), Rede (contatos), Assistente, Calendário, busca global `Ctrl K`, visão geral com cards de vida, arrastar no quadro (mouse e toque), configurações com exportar/importar.
+- **Frontend** completo para todos os módulos: Trabalho (empresas, projetos com timeline, tarefas com lista e quadro), Conhecimento (notas, snippets, grafo, métodos), Crescimento (metas, aprendizado, certificações), Finanças (fluxo de caixa, compras planejadas), Rede (contatos), Assistente, Calendário (mês, semana e dia, com arrastar para agendar), busca global `Ctrl K`, visão geral com cards de vida, arrastar no quadro (mouse e toque), configurações com exportar/importar.
 - **Grafo estilo Obsidian**: links `[[Título]]` entre notas, snippets e métodos, nós de métodos, estudos, habilidades e tags, zoom na roda e na pinça, arrastar nós, grafo local de 1 ou 2 saltos e grafo local na leitura da nota.
 - **Interface em pt-BR** (patch 0016) e mensagens da API e respostas do assistente em pt-BR (0017).
 - **Backend** (escrito em Java e reescrito em NestJS, abaixo) com as etapas 1 a 11 do [backlog](backend/backlog.md#sequência-sugerida): todos os módulos com API, Flyway, testes (89), CI, OpenAPI, login por sessão, perfil `prod`, assistente por regras, grafo, Open Finance pela Pluggy e assistente com IA por consultas estruturadas (os dois últimos desligados por padrão).
@@ -22,7 +22,7 @@ Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md)
 | FIN-OF: validação real | Código pronto ([etapa 7](backend/implementacao/etapa-7-open-finance.md)), testado contra o contrato documentado. Falta rodar com credenciais da Pluggy e registrar o webhook. Categorias vêm em inglês |
 | AST-03: validação real | Código pronto ([etapa 10](backend/implementacao/etapa-10-assistente-ia.md)), testado contra o contrato da API em um servidor local. Falta rodar com uma chave da Anthropic |
 | Deploy com HTTPS | O compose está pronto para deploy, mas o nginx escuta só na porta 80. O certificado ainda não foi definido |
-| AST-04: validação real | RAG pronto ([etapa 11](backend/implementacao/etapa-11-rag.md)), testado com servidores locais no lugar da Voyage e da Anthropic. Falta rodar com `VOYAGE_API_KEY` e `ANTHROPIC_API_KEY` |
+| AST-04: validação real | RAG pronto ([etapa 11](backend/implementacao/etapa-11-rag.md)), testado com servidores locais no lugar da Voyage e da Anthropic. Configuração gratuita (Groq + Ollama) disponível e testada contra a Groq com `openai/gpt-oss-120b`; falta validar as respostas com dados reais |
 | Chaves no app desktop | As chaves de IA só entram por variável de ambiente do Windows. Falta uma tela de configurações para elas |
 | PLT-07 | Job de verificação de referências órfãs entre módulos |
 | IDN-06 | Limitar tentativas de login |

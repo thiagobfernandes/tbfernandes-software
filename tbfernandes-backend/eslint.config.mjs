@@ -33,6 +33,33 @@ export default tseslint.config(
     },
   },
   {
+    // Clean code (docs/padroes-de-codigo.md#clean-code): descriptive names, no shadowing,
+    // small functions with flat control flow.
+    rules: {
+      'id-length': [
+        'error',
+        { min: 2, properties: 'never', exceptions: ['_'] },
+      ],
+      '@typescript-eslint/no-shadow': 'error',
+      'no-nested-ternary': 'error',
+      complexity: ['error', 10],
+      'max-depth': ['error', 3],
+      'max-nested-callbacks': ['error', 3],
+      'max-lines-per-function': [
+        'error',
+        { max: 50, skipBlankLines: true, skipComments: true },
+      ],
+    },
+  },
+  {
+    // describe/it blocks are long by nature.
+    files: ['test/**/*.ts', 'src/**/*.spec.ts'],
+    rules: {
+      'max-lines-per-function': 'off',
+      'max-nested-callbacks': 'off',
+    },
+  },
+  {
     // supertest bodies are untyped JSON.
     files: ['test/**/*.ts', 'src/**/*.spec.ts'],
     rules: {

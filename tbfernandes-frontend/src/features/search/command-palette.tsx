@@ -68,7 +68,7 @@ export function CommandPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="relative hidden h-9 w-full max-w-sm items-center gap-2 rounded-full border border-input bg-muted/50 pr-2 pl-3 text-sm text-muted-foreground outline-none hover:border-primary/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:flex"
+        className="relative hidden h-9 w-full items-center gap-2 rounded-full border border-input bg-muted/50 pr-2 pl-3 text-sm text-muted-foreground outline-none hover:border-primary/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:flex"
       >
         <Search className="size-4" aria-hidden />
         <span className="flex-1 text-left">Buscar em tudo…</span>

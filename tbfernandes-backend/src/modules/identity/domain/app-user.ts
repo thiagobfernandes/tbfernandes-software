@@ -34,7 +34,6 @@ export class AppUser {
     );
   }
 
-  /** Rebuilds an account already stored; no rules run. */
   static restore(
     id: string,
     profile: Profile,
@@ -51,7 +50,6 @@ export class AppUser {
     return this._passwordHash;
   }
 
-  /** IDN-03. */
   updateProfile(profile: Profile): void {
     this._profile = AppUser.validated(profile);
   }
@@ -64,17 +62,17 @@ export class AppUser {
     return this._passwordHash !== null;
   }
 
-  private static validated(p: Profile): Profile {
-    const email = Require.text(p.email, 'email', 254).toLowerCase();
+  private static validated(profile: Profile): Profile {
+    const email = Require.text(profile.email, 'email', 254).toLowerCase();
     if (!EMAIL.test(email))
       throw new InvalidArgumentError('email não é válido');
-    const timeZone = p.timeZone ?? 'America/Sao_Paulo';
+    const timeZone = profile.timeZone ?? 'America/Sao_Paulo';
     if (!isTimeZone(timeZone))
       throw new InvalidArgumentError('timeZone não é um fuso horário válido');
     return {
-      name: Require.text(p.name, 'name', 120),
+      name: Require.text(profile.name, 'name', 120),
       email,
-      locale: p.locale ?? 'pt-BR',
+      locale: profile.locale ?? 'pt-BR',
       timeZone,
     };
   }

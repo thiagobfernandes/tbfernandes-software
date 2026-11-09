@@ -8,7 +8,6 @@ export class MethodExampleResponse {
   content: string;
 }
 
-/** Same shape as the frontend's Method type. */
 export class MethodResponse {
   id: string;
   title: string;

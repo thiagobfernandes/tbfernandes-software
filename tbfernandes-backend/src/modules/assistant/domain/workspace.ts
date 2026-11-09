@@ -98,10 +98,6 @@ export interface ContactRecord {
   nextContact: IsoDate | null;
 }
 
-/**
- * Read-only snapshot of one owner's data, built from the other modules' public APIs. The
- * answers and the graph are pure functions of it.
- */
 export interface Workspace {
   today: IsoDate;
   companies: CompanyRecord[];
@@ -116,5 +112,5 @@ export interface Workspace {
   contacts: ContactRecord[];
 }
 
-export const isOpenTask = (t: TaskRecord) =>
-  t.status !== 'done' && t.status !== 'canceled';
+export const isOpenTask = (task: TaskRecord) =>
+  task.status !== 'done' && task.status !== 'canceled';

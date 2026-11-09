@@ -33,11 +33,6 @@ import { FinanceEntryController } from './web/finance-entry.controller';
 import { PluggyWebhookController } from './web/pluggy-webhook.controller';
 import { PurchaseController } from './web/purchase.controller';
 
-/**
- * Finance: cash flow entries (personal and business), purchase goals and bank data imported
- * through open finance. The bank provider sits behind OpenFinanceGateway; the Pluggy client
- * is off unless PLUGGY_ENABLED=true (RN-15).
- */
 @Module({
   imports: [
     DatabaseModule.forFeature([

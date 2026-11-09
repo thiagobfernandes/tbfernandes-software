@@ -17,7 +17,6 @@ import {
 } from '../domain';
 import { TaskCompleted, TaskDeleted, WorkEvents } from '../work.events';
 
-/** Task use cases (RF-WRK-07..11). TaskCompleted leaves after the commit. */
 @Injectable()
 export class TaskService {
   constructor(
@@ -65,7 +64,6 @@ export class TaskService {
     });
   }
 
-  /** Used by the board drag and drop and the status menu. */
   changeStatus(id: string, status: TaskStatus): Promise<Task> {
     return this.uow.run(async () => {
       const task = await this.get(id);

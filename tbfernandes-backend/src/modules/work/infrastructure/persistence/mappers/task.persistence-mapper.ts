@@ -1,54 +1,53 @@
 import { Task } from '../../../domain';
 import { TaskChecklistItemEntity, TaskEntity } from '../task.entity';
 
-/** Task ↔ work.task row and its work.task_checklist_item rows. */
 export const TaskPersistenceMapper = {
-  toDomain(e: TaskEntity): Task {
-    const items = [...(e.checklistItems ?? [])]
-      .sort((a, b) => a.position - b.position)
+  toDomain(entity: TaskEntity): Task {
+    const items = [...(entity.checklistItems ?? [])]
+      .sort((left, right) => left.position - right.position)
       .map((item) => ({ id: item.id, title: item.title, done: item.done }));
     return Task.restore(
-      e.id,
-      e.ownerId,
+      entity.id,
+      entity.ownerId,
       {
-        title: e.title,
-        description: e.description,
-        projectId: e.projectId,
-        priority: e.priority,
-        tag: e.tag,
-        startDate: e.startDate,
-        dueDate: e.dueDate,
-        doneCriteria: e.doneCriteria,
-        checklistDone: e.checklistDone,
-        checklistTotal: e.checklistTotal,
+        title: entity.title,
+        description: entity.description,
+        projectId: entity.projectId,
+        priority: entity.priority,
+        tag: entity.tag,
+        startDate: entity.startDate,
+        dueDate: entity.dueDate,
+        doneCriteria: entity.doneCriteria,
+        checklistDone: entity.checklistDone,
+        checklistTotal: entity.checklistTotal,
         checklistItems: items,
-        goalId: e.goalId,
+        goalId: entity.goalId,
       },
-      e.status,
-      e.completedAt,
+      entity.status,
+      entity.completedAt,
     );
   },
 
   /** The task row only; items come from toItemEntities. */
-  toEntity(task: Task, e: TaskEntity = new TaskEntity()): TaskEntity {
-    const d = task.details;
-    e.id = task.id;
-    e.ownerId = task.ownerId;
-    e.title = d.title;
-    e.description = d.description;
-    e.projectId = d.projectId;
-    e.status = task.status;
-    e.priority = d.priority ?? 'NORMAL';
-    e.tag = d.tag;
-    e.startDate = d.startDate;
-    e.dueDate = d.dueDate;
-    e.doneCriteria = d.doneCriteria;
-    e.checklistDone = d.checklistDone;
-    e.checklistTotal = d.checklistTotal;
-    e.goalId = d.goalId;
-    e.completedAt = task.completedAt;
-    delete e.checklistItems;
-    return e;
+  toEntity(task: Task, entity: TaskEntity = new TaskEntity()): TaskEntity {
+    const details = task.details;
+    entity.id = task.id;
+    entity.ownerId = task.ownerId;
+    entity.title = details.title;
+    entity.description = details.description;
+    entity.projectId = details.projectId;
+    entity.status = task.status;
+    entity.priority = details.priority ?? 'NORMAL';
+    entity.tag = details.tag;
+    entity.startDate = details.startDate;
+    entity.dueDate = details.dueDate;
+    entity.doneCriteria = details.doneCriteria;
+    entity.checklistDone = details.checklistDone;
+    entity.checklistTotal = details.checklistTotal;
+    entity.goalId = details.goalId;
+    entity.completedAt = task.completedAt;
+    delete entity.checklistItems;
+    return entity;
   },
 
   toItemEntities(task: Task): TaskChecklistItemEntity[] {

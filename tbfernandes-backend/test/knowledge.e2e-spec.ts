@@ -8,7 +8,6 @@ interface Item {
   projectIds: string[];
 }
 
-/** Port of KnowledgeApiIntegrationTests. */
 describe('Knowledge API', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
@@ -44,7 +43,7 @@ describe('Knowledge API', () => {
     const byTitle = await http().get('/api/v1/notes?q=flyw');
     const byTag = await http().get('/api/v1/notes?tag=flyway');
     for (const found of [byText, byTitle, byTag]) {
-      expect((found.body as Item[]).map((n) => n.id)).toContain(noteId);
+      expect((found.body as Item[]).map((item) => item.id)).toContain(noteId);
     }
 
     expect((await http().delete(`/api/v1/projects/${projectId}`)).status).toBe(
@@ -77,7 +76,7 @@ describe('Knowledge API', () => {
     const snippet = await http().get(`/api/v1/snippets/${id}`);
     expect(snippet.body).toMatchObject({ code, language: 'java' });
     const found = await http().get('/api/v1/snippets?language=Java&q=guard');
-    expect((found.body as Item[]).map((s) => s.id)).toContain(id);
+    expect((found.body as Item[]).map((item) => item.id)).toContain(id);
   });
 
   it('keeps the method step order and needs at least one step', async () => {

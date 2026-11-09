@@ -1,35 +1,34 @@
 import { Study } from '../../../domain';
 import { StudyEntity, StudySkillEntity } from '../study.entity';
 
-/** Study ↔ learning.study row and its learning.study_skill rows. */
 export const StudyPersistenceMapper = {
-  toDomain(e: StudyEntity): Study {
-    return Study.restore(e.id, e.ownerId, {
-      name: e.name,
-      description: e.description,
-      status: e.status,
-      goalId: e.goalId,
-      skillIds: (e.skills ?? []).map((link) => link.skillId),
-      startDate: e.startDate,
-      dueDate: e.dueDate,
-      nextActivity: e.nextActivity,
+  toDomain(entity: StudyEntity): Study {
+    return Study.restore(entity.id, entity.ownerId, {
+      name: entity.name,
+      description: entity.description,
+      status: entity.status,
+      goalId: entity.goalId,
+      skillIds: (entity.skills ?? []).map((link) => link.skillId),
+      startDate: entity.startDate,
+      dueDate: entity.dueDate,
+      nextActivity: entity.nextActivity,
     });
   },
 
   /** The study row only; skill links come from toSkillEntities. */
-  toEntity(study: Study, e: StudyEntity = new StudyEntity()): StudyEntity {
-    const d = study.details;
-    e.id = study.id;
-    e.ownerId = study.ownerId;
-    e.name = d.name;
-    e.description = d.description;
-    e.status = study.status;
-    e.goalId = d.goalId;
-    e.startDate = d.startDate;
-    e.dueDate = d.dueDate;
-    e.nextActivity = d.nextActivity;
-    delete e.skills;
-    return e;
+  toEntity(study: Study, entity: StudyEntity = new StudyEntity()): StudyEntity {
+    const details = study.details;
+    entity.id = study.id;
+    entity.ownerId = study.ownerId;
+    entity.name = details.name;
+    entity.description = details.description;
+    entity.status = study.status;
+    entity.goalId = details.goalId;
+    entity.startDate = details.startDate;
+    entity.dueDate = details.dueDate;
+    entity.nextActivity = details.nextActivity;
+    delete entity.skills;
+    return entity;
   },
 
   toSkillEntities(study: Study): StudySkillEntity[] {

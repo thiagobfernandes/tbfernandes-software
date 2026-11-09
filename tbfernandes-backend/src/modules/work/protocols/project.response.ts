@@ -1,4 +1,3 @@
-/** Same shape as the frontend's Project type. */
 export class ProjectResponse {
   id: string;
   name: string;

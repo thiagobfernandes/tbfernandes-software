@@ -1,5 +1,8 @@
 # The whole platform behind nginx: `docker compose up -d --build`, then http://localhost.
 # Only the database, for `npm run dev` in tbfernandes-backend/: `docker compose up -d postgres`.
+# Ollama (free local embeddings for the assistant) is in the "ai" profile:
+# `docker compose --profile ai up -d --build`, or COMPOSE_PROFILES=ai in .env.
+# The "backup" service dumps the database to ./backups every 10 minutes (docs/como-rodar.md).
 # Settings come from .env (see .env.example). How to run and deploy: docs/como-rodar.md.
 name: tbfernandes
 
@@ -21,6 +24,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: tbf
+      PGPASSWORD: ${TBF_DB_PASSWORD:-tbf}
+      PGDATABASE: tbfernandes
+      TBF_BACKUP_INTERVAL: ${TBF_BACKUP_INTERVAL:-600}
+      TBF_BACKUP_OWNER: ${TBF_BACKUP_OWNER:-1000:1000}
+      TBF_BACKUP_MIN_RATIO: ${TBF_BACKUP_MIN_RATIO:-50}
+      TBF_BACKUP_FORCE: ${TBF_BACKUP_FORCE:-false}
+    volumes:
+      - ./tbfernandes-backup/backup.sh:/usr/local/bin/backup.sh:ro
+      - ${TBF_BACKUP_DIR:-./backups}:/backups
+    entrypoint: ["sh", "/usr/local/bin/backup.sh"]
+    command: ["loop"]
 
   backend:
     build: ./tbfernandes-backend
@@ -44,12 +69,20 @@ services:
       # Empty: a new secret on each start, which signs everyone out on restart.
       TBF_SESSION_SECRET: ${TBF_SESSION_SECRET:-}
       TBF_COOKIE_SECURE: ${TBF_COOKIE_SECURE:-false}
+      # Empty names and URLs take the provider's default (src/infrastructure/environments).
       TBF_ASSISTANT_MODEL: ${TBF_ASSISTANT_MODEL:-none}
-      TBF_ASSISTANT_MODEL_NAME: ${TBF_ASSISTANT_MODEL_NAME:-claude-opus-5-5}
+      TBF_ASSISTANT_MODEL_NAME: ${TBF_ASSISTANT_MODEL_NAME:-}
+      TBF_ASSISTANT_MODEL_BASE_URL: ${TBF_ASSISTANT_MODEL_BASE_URL:-}
+      TBF_ASSISTANT_MODEL_API_KEY: ${TBF_ASSISTANT_MODEL_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       TBF_ASSISTANT_EMBEDDING: ${TBF_ASSISTANT_EMBEDDING:-none}
-      TBF_ASSISTANT_EMBEDDING_NAME: ${TBF_ASSISTANT_EMBEDDING_NAME:-voyage-3.5-lite}
+      TBF_ASSISTANT_EMBEDDING_NAME: ${TBF_ASSISTANT_EMBEDDING_NAME:-}
       VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+      OLLAMA_BASE_URL: http://ollama:11434
+      TBF_ASSISTANT_TRACING: ${TBF_ASSISTANT_TRACING:-none}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-}
       PLUGGY_ENABLED: ${PLUGGY_ENABLED:-false}
       PLUGGY_CLIENT_ID: ${PLUGGY_CLIENT_ID:-}
       PLUGGY_CLIENT_SECRET: ${PLUGGY_CLIENT_SECRET:-}
@@ -61,6 +94,34 @@ services:
       timeout: 3s
       retries: 12
       start_period: 20s
+
+  # Embeddings for the assistant, free and on this machine. Only with the "ai" profile.
+  ollama:
+    image: ollama/ollama:0.12.6
+    profiles: [ai]
+    restart: unless-stopped
+    ports:
+      # Local only, for `npm run dev`. Change it if Ollama is also installed on the host.
+      - "127.0.0.1:${TBF_OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - tbf-ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  # Downloads the embedding model once (it stays in the volume) and exits.
+  ollama-models:
+    image: ollama/ollama:0.12.6
+    profiles: [ai]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["ollama", "pull", "${TBF_ASSISTANT_EMBEDDING_NAME:-bge-m3}"]
+    restart: "no"
 
   frontend:
     build:
@@ -84,6 +145,7 @@ services:
       - "${TBF_HTTP_PORT:-80}:80"
 
 volumes:
+  tbf-ollama:
   tbf-pgdata:
     # The name it got when the database lived in api/compose.yaml. It holds real data: keep it.
     name: ${TBF_PGDATA_VOLUME:-api_tbf-pgdata}

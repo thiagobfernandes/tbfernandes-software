@@ -13,48 +13,53 @@ import type {
 
 /** JSON ↔ Goal. Indicator values in JSON numbers, hundredths in the domain. */
 export const GoalMapper = {
-  toDetails(r: ValidGoalRequest): GoalDetails {
-    const i = r.indicator;
+  toDetails(request: ValidGoalRequest): GoalDetails {
+    const indicator = request.indicator;
     return {
-      ...r,
-      indicator: i && {
-        label: i.label,
-        unit: i.unit,
-        current: i.current == null ? null : Decimals.hundredths(i.current),
-        target: i.target == null ? null : Decimals.hundredths(i.target),
+      ...request,
+      indicator: indicator && {
+        label: indicator.label,
+        unit: indicator.unit,
+        current:
+          indicator.current == null
+            ? null
+            : Decimals.hundredths(indicator.current),
+        target:
+          indicator.target == null
+            ? null
+            : Decimals.hundredths(indicator.target),
       },
     };
   },
 
   toResponse(goal: Goal): GoalResponse {
-    const d = goal.details;
-    const i = d.indicator;
+    const details = goal.details;
+    const indicator = details.indicator;
     return {
       id: goal.id,
-      name: d.name,
-      description: d.description,
-      area: d.area.toLowerCase(),
+      name: details.name,
+      description: details.description,
+      area: details.area.toLowerCase(),
       status: goal.status.toLowerCase(),
       priority: goal.priority.toLowerCase(),
-      currentState: d.currentState,
-      desiredResult: d.desiredResult,
-      doneCriteria: d.doneCriteria,
-      dueDate: d.dueDate,
-      indicator: i && {
-        label: i.label,
-        current: Decimals.toNumber(i.current),
-        target: Decimals.toNumber(i.target),
-        unit: i.unit,
+      currentState: details.currentState,
+      desiredResult: details.desiredResult,
+      doneCriteria: details.doneCriteria,
+      dueDate: details.dueDate,
+      indicator: indicator && {
+        label: indicator.label,
+        current: Decimals.toNumber(indicator.current),
+        target: Decimals.toNumber(indicator.target),
+        unit: indicator.unit,
       },
-      parentId: d.parentId,
+      parentId: details.parentId,
     };
   },
 };
 
-/** JSON ↔ Milestone. */
 export const MilestoneMapper = {
-  toDetails(r: ValidMilestoneRequest): MilestoneDetails {
-    return { ...r };
+  toDetails(request: ValidMilestoneRequest): MilestoneDetails {
+    return { ...request };
   },
 
   toResponse(milestone: Milestone): MilestoneResponse {

@@ -108,7 +108,6 @@ export const QUERY_PLAN_SCHEMA = {
   ],
 } as const;
 
-/** The rewritten answer, as the model has to return it. */
 export const ANSWER_DRAFT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -124,10 +123,11 @@ function oneOf<T extends string>(
   value: unknown,
   field: string,
 ): T {
-  const v = typeof value === 'string' ? value.trim().toUpperCase() : value;
-  if (!values.includes(v as T))
+  const normalized =
+    typeof value === 'string' ? value.trim().toUpperCase() : value;
+  if (!values.includes(normalized as T))
     throw new Error(`Unknown ${field}: ${String(value)}`);
-  return v as T;
+  return normalized as T;
 }
 
 function matching(
@@ -135,24 +135,23 @@ function matching(
   value: unknown,
   field: string,
 ): string | null {
-  const v = typeof value === 'string' ? value.trim() : '';
-  if (v === '') return null;
+  const trimmed = typeof value === 'string' ? value.trim() : '';
+  if (trimmed === '') return null;
   if (
-    !pattern.test(v) ||
-    Number.isNaN(Date.parse(pattern === MONTH ? `${v}-01` : v))
+    !pattern.test(trimmed) ||
+    Number.isNaN(Date.parse(pattern === MONTH ? `${trimmed}-01` : trimmed))
   ) {
-    throw new Error(`Invalid ${field}: ${v}`);
+    throw new Error(`Invalid ${field}: ${trimmed}`);
   }
-  return v;
+  return trimmed;
 }
 
 const strings = (value: unknown) =>
   Array.isArray(value)
-    ? value.filter((v): v is string => typeof v === 'string')
+    ? value.filter((item): item is string => typeof item === 'string')
     : [];
 
 export const QueryPlans = {
-  /** The plan as a query the engine can run, or null when the model says no lookup answers it. Throws on a malformed plan. */
   toQuery(raw: unknown): StructuredQuery | null {
     const plan = (raw ?? {}) as Partial<Record<keyof QueryPlan, unknown>>;
     if (plan.answerable !== true) return null;

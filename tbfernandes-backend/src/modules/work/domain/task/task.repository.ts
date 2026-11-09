@@ -13,7 +13,6 @@ export interface TaskFilter {
   overdueOn?: IsoDate | null;
 }
 
-/** Implemented in infrastructure/persistence. */
 export abstract class TaskRepository {
   abstract create(task: Task): Promise<Task>;
   abstract save(task: Task): Promise<Task>;

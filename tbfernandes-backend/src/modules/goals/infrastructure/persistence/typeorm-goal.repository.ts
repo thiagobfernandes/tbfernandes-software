@@ -5,7 +5,6 @@ import { Goal, GoalRepository } from '../../domain';
 import { GoalEntity } from './goal.entity';
 import { GoalPersistenceMapper as Mapper } from './mappers/goal.persistence-mapper';
 
-/** GoalRepository on TypeORM. */
 @Injectable()
 export class TypeOrmGoalRepository extends GoalRepository {
   private readonly rows: BaseRepository<GoalEntity>;

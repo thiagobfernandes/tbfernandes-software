@@ -1,5 +1,8 @@
+import { AssistantTracer } from '../../application/assistant-tracer';
 import { EmbeddingModel } from '../../application/embedding.model';
 import { postJson } from '../http-json';
+import { NO_TRACING } from '../tracing/disabled-tracer';
+import { embeddingTraceInput } from './embedding-trace';
 
 export interface VoyageSettings {
   baseUrl: string;
@@ -9,6 +12,7 @@ export interface VoyageSettings {
 
 interface EmbeddingResponse {
   data?: Array<{ index: number; embedding: number[] }> | null;
+  usage?: { total_tokens?: number } | null;
 }
 
 const TIMEOUT_MS = 30_000;
@@ -23,6 +27,7 @@ export class VoyageEmbeddingModel extends EmbeddingModel {
   constructor(
     private readonly settings: VoyageSettings,
     private readonly http: typeof fetch = fetch,
+    private readonly tracer: AssistantTracer = NO_TRACING,
   ) {
     super();
     if (!settings.apiKey) {
@@ -39,27 +44,42 @@ export class VoyageEmbeddingModel extends EmbeddingModel {
   }
 
   embedDocuments(texts: string[]): Promise<number[][]> {
-    return this.embed(texts, 'document');
+    return this.embed('embed-documents', texts, 'document');
   }
 
   async embedQuery(question: string): Promise<number[]> {
-    return (await this.embed([question], 'query'))[0];
+    return (await this.embed('embed-query', [question], 'query'))[0];
   }
 
-  private async embed(texts: string[], inputType: string): Promise<number[][]> {
-    const response = await postJson<EmbeddingResponse>(
-      this.http,
-      'Voyage',
-      `${this.settings.baseUrl.replace(/\/$/, '')}/v1/embeddings`,
-      { Authorization: `Bearer ${this.settings.apiKey}` },
-      { input: texts, model: this.settings.model, input_type: inputType },
-      TIMEOUT_MS,
-    );
-    if (!response?.data || response.data.length !== texts.length) {
-      throw new Error('Voyage returned no embedding for some of the texts');
-    }
-    return [...response.data]
-      .sort((a, b) => a.index - b.index)
-      .map((e) => e.embedding);
+  private embed(
+    name: string,
+    texts: string[],
+    inputType: string,
+  ): Promise<number[][]> {
+    return this.tracer.step(name, 'embedding', async (embedding) => {
+      embedding.update({
+        model: this.settings.model,
+        input: embeddingTraceInput(name, texts),
+        modelParameters: { input_type: inputType },
+      });
+      const response = await postJson<EmbeddingResponse>(
+        this.http,
+        'Voyage',
+        `${this.settings.baseUrl.replace(/\/$/, '')}/v1/embeddings`,
+        { Authorization: `Bearer ${this.settings.apiKey}` },
+        { input: texts, model: this.settings.model, input_type: inputType },
+        TIMEOUT_MS,
+      );
+      if (!response?.data || response.data.length !== texts.length) {
+        throw new Error('Voyage returned no embedding for some of the texts');
+      }
+      embedding.update({
+        output: { vectors: response.data.length },
+        usage: { input: response.usage?.total_tokens },
+      });
+      return [...response.data]
+        .sort((left, right) => left.index - right.index)
+        .map((item) => item.embedding);
+    });
   }
 }

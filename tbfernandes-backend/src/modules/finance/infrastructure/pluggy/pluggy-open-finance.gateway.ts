@@ -51,7 +51,6 @@ interface Page<T> {
   next?: string | null;
 }
 
-/** An HTTP answer Pluggy gave that is not a success. */
 class PluggyHttpError extends Error {
   constructor(readonly status: number) {
     super(`Pluggy answered ${status}`);
@@ -122,12 +121,12 @@ export class PluggyOpenFinanceGateway extends OpenFinanceGateway {
       'GET',
       `/accounts?${new URLSearchParams({ itemId: connectionId })}`,
     );
-    return page.results.map((a) => ({
-      id: a.id,
-      name: a.name,
-      type: a.type as AccountType,
-      balance: a.balance == null ? null : Money.cents(a.balance),
-      currency: a.currencyCode ?? null,
+    return page.results.map((account) => ({
+      id: account.id,
+      name: account.name,
+      type: account.type as AccountType,
+      balance: account.balance == null ? null : Money.cents(account.balance),
+      currency: account.currencyCode ?? null,
     }));
   }
 
@@ -144,9 +143,11 @@ export class PluggyOpenFinanceGateway extends OpenFinanceGateway {
     })}`;
     for (;;) {
       const page = await this.call<Page<TransactionResponse>>('GET', path);
-      for (const t of page.results) {
-        if (t.status !== 'PENDING')
-          transactions.push(PluggyOpenFinanceGateway.toTransaction(account, t));
+      for (const transaction of page.results) {
+        if (transaction.status !== 'PENDING')
+          transactions.push(
+            PluggyOpenFinanceGateway.toTransaction(account, transaction),
+          );
       }
       if (!page.next) return transactions;
       // "next" is the ready-to-use query string, so it is not encoded again.
@@ -167,23 +168,32 @@ export class PluggyOpenFinanceGateway extends OpenFinanceGateway {
 
   private static toTransaction(
     account: ExternalAccount,
-    t: TransactionResponse,
+    transaction: TransactionResponse,
   ): ExternalTransaction {
-    const value = Math.abs(Money.cents(t.amountInAccountCurrency ?? t.amount));
+    const value = Math.abs(
+      Money.cents(transaction.amountInAccountCurrency ?? transaction.amount),
+    );
     return {
-      id: t.id,
+      id: transaction.id,
       accountId: account.id,
-      date: new Date(t.date).toISOString().slice(0, 10),
-      description: t.description,
-      amount: PluggyOpenFinanceGateway.moneyOut(account, t) ? -value : value,
-      currency: t.currencyCode ?? null,
-      category: t.category ?? null,
+      date: new Date(transaction.date).toISOString().slice(0, 10),
+      description: transaction.description,
+      amount: PluggyOpenFinanceGateway.moneyOut(account, transaction)
+        ? -value
+        : value,
+      currency: transaction.currencyCode ?? null,
+      category: transaction.category ?? null,
     };
   }
 
   /** On a card a positive amount is a new charge and a negative one a payment; on a bank account "type" tells. */
-  private static moneyOut(account: ExternalAccount, t: TransactionResponse) {
-    return account.type === 'CREDIT' ? t.amount > 0 : t.type === 'DEBIT';
+  private static moneyOut(
+    account: ExternalAccount,
+    transaction: TransactionResponse,
+  ) {
+    return account.type === 'CREDIT'
+      ? transaction.amount > 0
+      : transaction.type === 'DEBIT';
   }
 
   private static status(itemStatus: string): ConnectionStatus {

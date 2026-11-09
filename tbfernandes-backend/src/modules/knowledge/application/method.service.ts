@@ -7,7 +7,6 @@ import {
 import { NotFoundError } from '../../../common/domain';
 import { Method, MethodDetails, MethodRepository } from '../domain';
 
-/** Working method use cases (RF-KNW-06). */
 @Injectable()
 export class MethodService {
   constructor(

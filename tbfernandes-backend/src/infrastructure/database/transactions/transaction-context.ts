@@ -8,7 +8,6 @@ interface TransactionState {
 
 const storage = new AsyncLocalStorage<TransactionState>();
 
-/** The transaction the current use case runs in, if any. */
 export const TransactionContext = {
   run<T>(
     manager: EntityManager,

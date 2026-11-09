@@ -33,10 +33,11 @@ src/
 - Schema: só SQL em `db/migration/V<n>__<descricao>.sql` (próximo número = maior + 1; nunca editar um aplicado). `db/dev` e `db/desktop` são `R__` por perfil. O `SqlMigrator` usa a tabela e o checksum do Flyway.
 - Toda raiz de agregado estende `AuditedEntity` (`owner_id`, `created_at`, `updated_at`, `version`) e toda consulta filtra pelo dono (`OwnerContext.currentOwnerId()`).
 - Ids: `IdGenerator.forNewAggregate()` (UUID v7 ou o `X-Client-Id`, ADR-007); filhos com `IdGenerator.newId()`.
-- Enums: MAIÚSCULAS no domínio e no banco, minúsculas no JSON (`J.enumOf`). Datas `YYYY-MM-DD` como texto.
+- Enums: MAIÚSCULAS no domínio e no banco, minúsculas no JSON (`RequestFields.enumOf`). Datas `YYYY-MM-DD` como texto.
 - Erros: lance `NotFoundError`, `ConflictError`, `BusinessRuleViolationError` (com a regra), `InvalidArgumentError`; o `ProblemDetailsFilter` responde em Problem Details. Mensagens para o usuário em **pt-BR**.
 - Nova variável de ambiente: no `register` e no `schema` Joi correspondentes.
 - Integrações externas (IA, Pluggy) atrás de uma classe abstrata em `application`, sem nome de fornecedor no domínio, desligadas por padrão.
+- **Clean code** ([padrões](../docs/padroes-de-codigo.md#clean-code), verificado pelo ESLint): nomes descritivos (sem variável de uma letra), sem sombreamento, funções de até 50 linhas e complexidade até 10, sem ternário aninhado. Comentário só para explicar um *porquê* que o código não mostra.
 - Nada de coautoria nem menção a ferramentas de IA nos commits, no código ou nos comentários.
 
 ## Verificar

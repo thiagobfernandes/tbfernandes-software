@@ -9,7 +9,6 @@ import { IsoDates, NotFoundError } from '../../../common/domain';
 import { WorkLookup } from '../../work';
 import { Contact, ContactDetails, ContactRepository } from '../domain';
 
-/** Contact use cases (RF-CTC-01, CTC-04). Talks to work only through its public API. */
 @Injectable()
 export class ContactService {
   constructor(
@@ -57,12 +56,12 @@ export class ContactService {
     if (dueWithinDays == null) return all;
     const limit = IsoDates.plusDays(this.clock.today(), dueWithinDays);
     return all
-      .filter((c) => {
-        const next = c.details.nextContact;
+      .filter((contact) => {
+        const next = contact.details.nextContact;
         return next != null && next <= limit;
       })
-      .sort((a, b) =>
-        a.details.nextContact!.localeCompare(b.details.nextContact!),
+      .sort((left, right) =>
+        left.details.nextContact!.localeCompare(right.details.nextContact!),
       );
   }
 
