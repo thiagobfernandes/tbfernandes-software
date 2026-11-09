@@ -12,6 +12,7 @@ import {
   ExternalServiceError,
   InvalidArgumentError,
   NotFoundError,
+  TooManyRequestsError,
   UnauthenticatedError,
 } from '../domain';
 import { RequestValidationError } from '../pipes/request-validation.error';
@@ -100,6 +101,8 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       return { status: 400, detail: error.message };
     if (error instanceof UnauthenticatedError)
       return { status: 401, detail: error.message };
+    if (error instanceof TooManyRequestsError)
+      return { status: 429, detail: error.message };
     if (error instanceof ExternalServiceError) {
       Logger.warn(error.message, error.cause);
       return { status: 502, detail: error.message };

@@ -43,7 +43,7 @@ Variáveis na Vercel (Production): `NEXT_PUBLIC_API_URL=https://api.software.tbf
 Mudou um desses arquivos? Copie para a EC2 (`scp`) e rode
 `docker compose -f compose.prod.yaml --env-file .env up -d`. Só a imagem do backend é automática.
 
-O cookie de sessão e o `XSRF-TOKEN` usam `TBF_COOKIE_DOMAIN=.software.tbfernandes.com.br`: a API e o
+O cookie do login (`TBF_TOKEN`, JWT) e o `XSRF-TOKEN` usam `TBF_COOKIE_DOMAIN=.software.tbfernandes.com.br`: a API e o
 frontend ficam em subdomínios diferentes e o frontend precisa ler o token CSRF.
 
 ## Operação
@@ -57,7 +57,7 @@ dc ps                                 # estado e health de cada serviço
 dc logs -f --tail 200 backend         # logs da API (também caddy, postgres, backup)
 journalctl -u tbf-deploy -n 100       # histórico dos deploys automáticos
 cat status/deploy-status.json         # último deploy
-dc restart backend                    # reinicia a API (encerra as sessões, que ficam em memória)
+dc restart backend                    # reinicia a API (o login continua valendo: é um JWT)
 dc up -d                              # sobe tudo de novo depois de mudar compose ou Caddyfile
 bin/tbf-deploy --force                # reaplica a imagem prod agora
 ```

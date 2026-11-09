@@ -10,8 +10,8 @@ NestJS 11 · TypeScript 5 (strict) · TypeORM 1 (sem `synchronize`) · PostgreSQ
 
 ```
 src/
-├── main.ts, app.module.ts, bootstrap/configure-app.ts   (prefixo /api/v1, CORS, sessão, Swagger)
-├── common/            kernel: domain (erros, Require, ids), application (OwnerContext, Clock, IdGenerator,
+├── main.ts, app.module.ts, bootstrap/configure-app.ts   (prefixo /api/v1, CORS, Swagger)
+├── common/            kernel: domain (errors/, Require, ids), application (OwnerContext, Clock, IdGenerator,
 │                      UnitOfWork, EventPublisher), middlewares, pipes, filters, interceptors, protocols (Joi)
 ├── infrastructure/    environments, database (TypeORM, SqlMigrator, transações), logger, events, time, ids, desktop
 └── modules/<modulo>/
@@ -34,7 +34,8 @@ src/
 - Toda raiz de agregado estende `AuditedEntity` (`owner_id`, `created_at`, `updated_at`, `version`) e toda consulta filtra pelo dono (`OwnerContext.currentOwnerId()`).
 - Ids: `IdGenerator.forNewAggregate()` (UUID v7 ou o `X-Client-Id`, ADR-007); filhos com `IdGenerator.newId()`.
 - Enums: MAIÚSCULAS no domínio e no banco, minúsculas no JSON (`RequestFields.enumOf`). Datas `YYYY-MM-DD` como texto.
-- Erros: lance `NotFoundError`, `ConflictError`, `BusinessRuleViolationError` (com a regra), `InvalidArgumentError`; o `ProblemDetailsFilter` responde em Problem Details. Mensagens para o usuário em **pt-BR**.
+- Erros: cada classe em um arquivo `<nome>.error.ts` dentro de uma pasta `errors/` (comuns em `common/domain/errors/`, do módulo em `modules/<modulo>/domain/errors/`, estendendo uma comum), nunca declarada inline em serviço, guard ou controller. Lance o erro de domínio, nunca `HttpException`; o `ProblemDetailsFilter` é o único que traduz para status HTTP. Mensagens para o usuário em **pt-BR**.
+- Autenticação: Passport (`local` + `jwt`), JWT em cookie HttpOnly, bcrypt para senha (`docs/backend/arquitetura.md`). Senha nunca em migração, seed ou arquivo versionado.
 - Nova variável de ambiente: no `register` e no `schema` Joi correspondentes.
 - Integrações externas (IA, Pluggy) atrás de uma classe abstrata em `application`, sem nome de fornecedor no domínio, desligadas por padrão.
 - **Clean code** ([padrões](../docs/padroes-de-codigo.md#clean-code), verificado pelo ESLint): nomes descritivos (sem variável de uma letra), sem sombreamento, funções de até 50 linhas e complexidade até 10, sem ternário aninhado. Comentário só para explicar um *porquê* que o código não mostra.

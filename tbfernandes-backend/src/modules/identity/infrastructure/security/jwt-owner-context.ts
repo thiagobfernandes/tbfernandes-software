@@ -4,14 +4,10 @@ import { OwnerContext } from '../../../../common/application';
 import { RequestContext } from '../../../../common/context/request-context';
 import { UnauthenticatedError } from '../../../../common/domain';
 import { authConfig } from '../../../../infrastructure/environments/registers';
-import './session';
+import './auth-token';
 
-/**
- * IDN-02: the owner is the signed-in account. In single-user mode, requests without a login
- * act as TBF_AUTH_OWNER_ID.
- */
 @Injectable()
-export class SessionOwnerContext extends OwnerContext {
+export class JwtOwnerContext extends OwnerContext {
   constructor(
     @Inject(authConfig.KEY)
     private readonly config: ConfigType<typeof authConfig>,
@@ -20,7 +16,7 @@ export class SessionOwnerContext extends OwnerContext {
   }
 
   currentOwnerId(): string {
-    const signedIn = RequestContext.request()?.session?.ownerId;
+    const signedIn = RequestContext.request()?.user?.ownerId;
     if (signedIn) return signedIn;
     if (this.config.mode === 'single-user') return this.config.ownerId;
     throw new UnauthenticatedError();

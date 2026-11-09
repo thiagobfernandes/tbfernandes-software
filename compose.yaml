@@ -66,8 +66,8 @@ services:
       TBF_AUTH_BOOTSTRAP_EMAIL: ${TBF_AUTH_BOOTSTRAP_EMAIL:-}
       TBF_AUTH_BOOTSTRAP_PASSWORD: ${TBF_AUTH_BOOTSTRAP_PASSWORD:-}
       TBF_AUTH_BOOTSTRAP_NAME: ${TBF_AUTH_BOOTSTRAP_NAME:-}
-      # Empty: a new secret on each start, which signs everyone out on restart.
-      TBF_SESSION_SECRET: ${TBF_SESSION_SECRET:-}
+      # Signs the login JWT. Empty: a new secret on each start, which signs everyone out.
+      TBF_JWT_SECRET: ${TBF_JWT_SECRET:-}
       TBF_COOKIE_SECURE: ${TBF_COOKIE_SECURE:-false}
       # Empty names and URLs take the provider's default (src/infrastructure/environments).
       TBF_ASSISTANT_MODEL: ${TBF_ASSISTANT_MODEL:-none}

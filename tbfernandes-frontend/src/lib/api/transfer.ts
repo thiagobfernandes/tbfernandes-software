@@ -2,7 +2,8 @@
 
 // Export (IDN-04) and import (IDN-05) of all data in the AppData format.
 
-import { ApiError, apiFetch } from "@/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
+import { ApiError } from "@/lib/errors";
 import { endpoints, isUuid, reload } from "@/lib/api/remote-store";
 import { uuidv5 } from "@/lib/api/uuid";
 import type { AppData, CollectionKey } from "@/lib/sample-data/store";

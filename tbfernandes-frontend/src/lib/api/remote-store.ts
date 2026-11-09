@@ -9,7 +9,8 @@
 import { useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
-import { ApiError, apiFetch } from "@/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
+import { errorMessage, isUnauthenticated } from "@/lib/errors";
 import type { components } from "@/lib/api/schema";
 import type { AppData, CollectionKey } from "@/lib/sample-data/store";
 
@@ -136,23 +137,25 @@ function enqueue(send: () => Promise<void>) {
 }
 
 async function handleFailure(error: unknown) {
-  if (error instanceof ApiError && error.problem.status === 401) {
+  if (isUnauthenticated(error)) {
     setStatus({ state: "signed-out" });
     return;
   }
-  toast.error(
-    error instanceof ApiError ? error.message : "The API could not be reached",
-    { description: "Your change was not saved; showing the saved data." },
-  );
+  toast.error(errorMessage(error), {
+    description: "A alteração não foi salva; mostrando os dados salvos.",
+  });
   await reload();
+}
+
+type Session = { mode: "single-user" | "session"; signedIn: boolean };
+
+export function fetchSession() {
+  return apiFetch<Session>("/api/v1/auth/session");
 }
 
 export async function reload() {
   try {
-    const session = await apiFetch<{
-      mode: "single-user" | "session";
-      signedIn: boolean;
-    }>("/api/v1/auth/session");
+    const session = await fetchSession();
     if (session.mode === "session" && !session.signedIn) {
       setStatus({ state: "signed-out" });
       return;
@@ -160,13 +163,10 @@ export async function reload() {
     hooks?.replaceAll(await fetchAppData());
     setStatus({ state: "ready", mode: session.mode });
   } catch (error) {
-    if (error instanceof ApiError && error.problem.status === 401) {
+    if (isUnauthenticated(error)) {
       setStatus({ state: "signed-out" });
     } else {
-      setStatus({
-        state: "unreachable",
-        message: error instanceof Error ? error.message : String(error),
-      });
+      setStatus({ state: "unreachable", message: errorMessage(error) });
     }
   }
 }
@@ -213,7 +213,7 @@ export async function signIn(email: string, password: string) {
   const body: components["schemas"]["LoginRequest"] = { email, password };
   await apiFetch("/api/v1/auth/login", { method: "POST", body });
   setStatus({ state: "loading" });
-  await reload();
+  if (hooks) await reload();
 }
 
 export async function signOut() {

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UnauthenticatedError } from '../../../common/domain';
-import { AppUserRepository } from '../domain';
+import { AppUserRepository, InvalidCredentialsError } from '../domain';
 import { PasswordHasher } from './password-hasher';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class AuthenticationService {
       !!user &&
       user.canLogIn() &&
       (await this.passwords.matches(password, user.passwordHash!));
-    if (!ok) throw new UnauthenticatedError('E-mail ou senha incorretos');
+    if (!ok) throw new InvalidCredentialsError();
     return user.id;
   }
 }

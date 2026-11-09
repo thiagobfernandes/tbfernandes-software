@@ -3,6 +3,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppUser, AppUserRepository } from '../src/modules/identity/domain';
 import { PasswordHasher } from '../src/modules/identity/application/password-hasher';
+import { JwtService } from '@nestjs/jwt';
 import { startApp } from './support/test-app';
 
 const OWNER = {
@@ -18,6 +19,7 @@ describe('Session auth', () => {
       TBF_AUTH_MODE: 'session',
       TBF_AUTH_BOOTSTRAP_EMAIL: OWNER.email,
       TBF_AUTH_BOOTSTRAP_PASSWORD: OWNER.password,
+      TBF_LOGIN_ATTEMPTS_PER_MINUTE: '100',
     });
   });
 
@@ -122,5 +124,77 @@ describe('Session auth', () => {
       .set('X-XSRF-TOKEN', owner.token)
       .send({ current: OWNER.password, next: 'short' });
     expect(short.status).toBe(422);
+  });
+
+  it('signs in with an httpOnly JWT cookie and refuses forged tokens', async () => {
+    const { agent, token } = await agentWithCsrf();
+    const response = await agent
+      .post('/api/v1/auth/login')
+      .set('X-XSRF-TOKEN', token)
+      .send(OWNER);
+    const cookie = ([] as string[])
+      .concat(response.headers['set-cookie'] ?? [])
+      .find((header) => header.startsWith('TBF_TOKEN='));
+    expect(cookie).toMatch(/HttpOnly/);
+    expect(cookie).toMatch(/SameSite=Lax/);
+
+    const http = request(app.getHttpServer());
+    const garbage = await http.get('/api/v1/me').set('Cookie', 'TBF_TOKEN=abc');
+    expect(garbage.status).toBe(401);
+
+    const foreign = new JwtService({ secret: 'x'.repeat(40) }).sign({
+      sub: '0192f000-0000-7000-8000-000000000001',
+    });
+    const forged = await http
+      .get('/api/v1/me')
+      .set('Cookie', `TBF_TOKEN=${foreign}`);
+    expect(forged.status).toBe(401);
+    expect(
+      (
+        await http
+          .get('/api/v1/auth/session')
+          .set('Cookie', `TBF_TOKEN=${foreign}`)
+      ).body.signedIn,
+    ).toBe(false);
+  });
+});
+
+describe('Login rate limit', () => {
+  let app: INestApplication<App>;
+
+  beforeAll(async () => {
+    app = await startApp({
+      TBF_AUTH_MODE: 'session',
+      TBF_AUTH_BOOTSTRAP_EMAIL: OWNER.email,
+      TBF_AUTH_BOOTSTRAP_PASSWORD: OWNER.password,
+      TBF_LOGIN_ATTEMPTS_PER_MINUTE: '2',
+    });
+  });
+
+  afterAll(async () => {
+    process.env.TBF_LOGIN_ATTEMPTS_PER_MINUTE = '100';
+    await app.close();
+  });
+
+  it('answers 429 after too many attempts', async () => {
+    const agent = request.agent(app.getHttpServer());
+    const session = await agent.get('/api/v1/auth/session');
+    const cookie = ([] as string[])
+      .concat(session.headers['set-cookie'] ?? [])
+      .find((header) => header.startsWith('XSRF-TOKEN='));
+    const token = decodeURIComponent(cookie!.split(';')[0].split('=')[1]);
+    const attempt = () =>
+      agent
+        .post('/api/v1/auth/login')
+        .set('X-XSRF-TOKEN', token)
+        .send({ ...OWNER, password: 'wrong password!' });
+
+    expect((await attempt()).status).toBe(401);
+    expect((await attempt()).status).toBe(401);
+    const blocked = await attempt();
+    expect(blocked.status).toBe(429);
+    expect(blocked.body.detail).toBe(
+      'Muitas tentativas de login. Tente de novo em um minuto.',
+    );
   });
 });

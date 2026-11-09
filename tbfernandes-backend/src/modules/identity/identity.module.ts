@@ -1,6 +1,9 @@
 import { Global, Inject, Module, OnApplicationBootstrap } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { OwnerContext } from '../../common/application';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { authConfig } from '../../infrastructure/environments/registers';
@@ -13,14 +16,36 @@ import { AppUserRepository } from './domain';
 import { AppUserEntity } from './infrastructure/persistence/app-user.entity';
 import { TypeOrmAppUserRepository } from './infrastructure/persistence/typeorm-app-user.repository';
 import { BcryptPasswordHasher } from './infrastructure/security/bcrypt-password-hasher';
-import { SessionGuard } from './infrastructure/security/session.guard';
-import { SessionOwnerContext } from './infrastructure/security/session-owner-context';
+import { AuthTokenService } from './infrastructure/security/auth-token.service';
+import { JwtAuthGuard } from './infrastructure/security/jwt-auth.guard';
+import { JwtOwnerContext } from './infrastructure/security/jwt-owner-context';
+import { JwtStrategy } from './infrastructure/security/jwt.strategy';
+import { LocalStrategy } from './infrastructure/security/local.strategy';
 import { AuthController } from './web/auth.controller';
 import { MeController } from './web/me.controller';
 
 @Global()
 @Module({
-  imports: [DatabaseModule.forFeature([AppUserEntity])],
+  imports: [
+    DatabaseModule.forFeature([AppUserEntity]),
+    PassportModule,
+    JwtModule.registerAsync({
+      inject: [authConfig.KEY],
+      useFactory: (config: ConfigType<typeof authConfig>) => ({
+        secret: config.jwtSecret,
+        signOptions: { algorithm: 'HS256', expiresIn: config.jwtTtlSeconds },
+        verifyOptions: { algorithms: ['HS256'] },
+      }),
+    }),
+    ThrottlerModule.forRootAsync({
+      inject: [authConfig.KEY],
+      useFactory: (config: ConfigType<typeof authConfig>) => ({
+        throttlers: [
+          { name: 'login', ttl: 60_000, limit: config.loginAttemptsPerMinute },
+        ],
+      }),
+    }),
+  ],
   controllers: [AuthController, MeController],
   providers: [
     ProfileService,
@@ -28,8 +53,11 @@ import { MeController } from './web/me.controller';
     AccountBootstrapService,
     { provide: AppUserRepository, useClass: TypeOrmAppUserRepository },
     { provide: PasswordHasher, useClass: BcryptPasswordHasher },
-    { provide: OwnerContext, useClass: SessionOwnerContext },
-    { provide: APP_GUARD, useClass: SessionGuard },
+    AuthTokenService,
+    LocalStrategy,
+    JwtStrategy,
+    { provide: OwnerContext, useClass: JwtOwnerContext },
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   exports: [OwnerContext],
 })

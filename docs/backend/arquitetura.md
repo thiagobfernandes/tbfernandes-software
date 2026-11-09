@@ -97,9 +97,15 @@ Clean architecture "completa" teria uma interface de caso de uso por operação,
 | Modo (`TBF_AUTH_MODE`) | Uso | Comportamento |
 |---|---|---|
 | `single-user` | desenvolvimento local (padrão do perfil `dev`) | sem login; toda requisição age como `TBF_AUTH_OWNER_ID` |
-| `session` | qualquer ambiente compartilhado (forçado no perfil `prod`) | login por `POST /api/v1/auth/login`, sessão em cookie HttpOnly/SameSite=Lax, CSRF no cookie `XSRF-TOKEN` devolvido no cabeçalho `X-XSRF-TOKEN` |
+| `session` | qualquer ambiente compartilhado (forçado no perfil `prod`) | login por `POST /api/v1/auth/login` com a estratégia `local` do Passport (senha conferida com bcrypt); a resposta grava um JWT (HS256, `TBF_JWT_SECRET`, validade `TBF_JWT_TTL_SECONDS`, 7 dias por padrão) no cookie `TBF_TOKEN` HttpOnly/SameSite=Lax, validado pela estratégia `jwt` em toda rota não `@Public()`; CSRF no cookie `XSRF-TOKEN` devolvido no cabeçalho `X-XSRF-TOKEN`; no máximo `TBF_LOGIN_ATTEMPTS_PER_MINUTE` tentativas de login por IP (5 por padrão, depois 429) |
 
-O `OwnerContext` é implementado pelo módulo identity (`SessionOwnerContext`), então nenhum outro módulo muda ao trocar de modo. Não há cadastro público: a conta é criada no início pelas variáveis `TBF_AUTH_BOOTSTRAP_*`.
+O `OwnerContext` é implementado pelo módulo identity (`JwtOwnerContext`, que lê o dono do token validado), então nenhum outro módulo muda ao trocar de modo. O token não guarda estado no servidor: reiniciar ou fazer deploy da API não desconecta ninguém; o logout apaga o cookie. Peças em `modules/identity/infrastructure/security/`: `local.strategy.ts`, `jwt.strategy.ts`, `jwt-auth.guard.ts` (guard global), `local-auth.guard.ts`, `login-throttler.guard.ts` e `auth-token.service.ts` (emite, lê e apaga o cookie).
+
+Não há cadastro público: a conta é criada no início pelas variáveis `TBF_AUTH_BOOTSTRAP_*`. Uma conta que já existe só ganha a senha do `.env` se não tiver senha ou se `TBF_AUTH_BOOTSTRAP_RESET_PASSWORD=true` (é assim que se troca uma senha esquecida; volte para `false` depois). A senha segue a RN-25 (12 a 128 caracteres). Nunca coloque senha em migração, seed ou outro arquivo do repositório.
+
+### Erros
+
+Cada classe de erro fica em um arquivo próprio dentro de uma pasta `errors/`: as comuns em `src/common/domain/errors/` (`NotFoundError`, `ConflictError`, `BusinessRuleViolationError`, `InvalidArgumentError`, `UnauthenticatedError`, `TooManyRequestsError`, `ExternalServiceError`) e as de um módulo em `src/modules/<modulo>/domain/errors/` (ex.: `InvalidCredentialsError`, `TooManyLoginAttemptsError` no identity), estendendo uma comum. Domínio, casos de uso e guards lançam esses erros, nunca `HttpException`; o `ProblemDetailsFilter` é o único lugar que os traduz em status HTTP e Problem Details (401, 404, 409, 422, 429…). No frontend, `src/lib/errors/` tem `ApiError` (resposta de erro da API), `NetworkError` (API inacessível) e `errorMessage()`, que dá o texto em pt-BR para mostrar ao usuário.
 
 ### IA do assistente (etapa 8)
 
