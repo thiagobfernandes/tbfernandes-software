@@ -26,8 +26,8 @@ Versão 0.2 · 2026-10-26 · O contrato executável é o OpenAPI em `http://loca
 | Método | Rota | Uso | Item |
 |---|---|---|---|
 | GET | `/auth/session` | `{ mode, signedIn }`; também grava o cookie `XSRF-TOKEN` | IDN-01 |
-| POST | `/auth/login` | `{ email, password }` → 204 e cookie de sessão | IDN-01 |
-| POST | `/auth/logout` | encerra a sessão | IDN-01 |
+| POST | `/auth/login` | `{ email, password }` → 204 e cookie `TBF_TOKEN` (JWT HttpOnly); 401 credenciais erradas, 429 tentativas demais | IDN-01 |
+| POST | `/auth/logout` | apaga o cookie `TBF_TOKEN` | IDN-01 |
 | GET / PUT | `/me` | perfil: nome, e-mail, idioma, fuso | IDN-02 |
 | PUT | `/me/password` | `{ current, next }` (RN-25) | IDN-03 |
 

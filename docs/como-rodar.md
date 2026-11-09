@@ -56,7 +56,7 @@ Se a porta 80 estiver ocupada, use `TBF_HTTP_PORT=8090` no `.env`.
 
 ### Deploy
 
-No servidor, no `.env`: `TBF_PROFILE=prod` (sem dados de exemplo e com login), `TBF_AUTH_MODE=session`, `TBF_DB_PASSWORD` forte, `TBF_SESSION_SECRET` (`openssl rand -hex 32`, para as sessões sobreviverem a um reinício) e `TBF_AUTH_BOOTSTRAP_*` para criar a conta. O perfil `prod` só aceita cookie seguro, então o acesso precisa ser por HTTPS: o nginx deste repositório escuta só na porta 80 e o certificado fica em um proxy à frente dele.
+No servidor, no `.env`: `TBF_PROFILE=prod` (sem dados de exemplo e com login), `TBF_AUTH_MODE=session`, `TBF_DB_PASSWORD` forte, `TBF_JWT_SECRET` (`openssl rand -hex 32`, assina o JWT do login; sem ele os logins valem só até o próximo reinício) e `TBF_AUTH_BOOTSTRAP_*` para criar a conta. O perfil `prod` só aceita cookie seguro, então o acesso precisa ser por HTTPS: o nginx deste repositório escuta só na porta 80 e o certificado fica em um proxy à frente dele.
 
 Um banco que já rodou no perfil `dev` tem o seed de exemplo registrado em `flyway_schema_history` e não sobe em `prod`. O deploy começa com um volume novo (`TBF_PGDATA_VOLUME`), e os dados entram por `pg_dump`/`pg_restore`.
 

@@ -1,23 +1,5 @@
 import { env } from "@/lib/env";
-
-/** Error body returned by the backend API (RFC 9457 Problem Details). */
-export type ProblemDetail = {
-  type?: string;
-  title?: string;
-  status: number;
-  detail?: string;
-  instance?: string;
-  errors?: Record<string, string[]>;
-};
-
-export class ApiError extends Error {
-  constructor(public readonly problem: ProblemDetail) {
-    super(
-      problem.detail ?? problem.title ?? `Request failed (${problem.status})`,
-    );
-    this.name = "ApiError";
-  }
-}
+import { ApiError, NetworkError, type ProblemDetail } from "@/lib/errors";
 
 type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
@@ -39,7 +21,7 @@ export async function apiFetch<T>(
   const method = (init.method ?? "GET").toUpperCase();
   const token = method === "GET" ? undefined : csrfToken();
   const desktopToken = env.desktopToken;
-  const response = await fetch(`${env.apiUrl}${path}`, {
+  const response = await send(`${env.apiUrl}${path}`, {
     ...init,
     credentials: "include",
     headers: {
@@ -62,4 +44,12 @@ export async function apiFetch<T>(
 
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
+}
+
+async function send(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (failure) {
+    throw new NetworkError(failure);
+  }
 }
