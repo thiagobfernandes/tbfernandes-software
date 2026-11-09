@@ -6,3 +6,6 @@ export * from './task/task';
 export * from './task/task.repository';
 export * from './appointment/appointment';
 export * from './appointment/appointment.repository';
+export * from './errors';
+export * from './time-entry/time-entry';
+export * from './time-entry/time-entry.repository';

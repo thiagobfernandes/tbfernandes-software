@@ -9,9 +9,9 @@ A linguagem visual atual foi aprovada em 2026-10-23 ("gostei dessa estilização
 | Referência | O que pegar | Onde já está aplicado |
 |---|---|---|
 | **Luma** (SaaS no Behance) — grafo | Árvore com conectores ortogonais e pontos, nó raiz com brilho, canvas escuro pontilhado | "Como seu trabalho se conecta" na visão geral, árvore de metas, `RelationTree` |
-| **Luma** — cards de métrica | Rótulo pequeno, número grande e leve + unidade, um visual pequeno (barras, pontos, anel, linha) | `MetricCard` + `metric-visuals` (visão geral) |
+| **Luma** — cards de métrica | Rótulo pequeno, número grande e leve + unidade, um visual pequeno (barras, pontos, anel, linha) | `MetricCard` + `metric-visuals` (visão geral), totais e cronômetro de `/time-tracking` |
 | **Obsidian** — grafo | Grafo de rede com nós coloridos por tipo, filtros por tipo, painel do nó selecionado, grafo local, links `[[…]]` | `/knowledge/graph`, conexões na leitura da nota |
-| **Cindr** (Dribbble) | Timeline escura por dia, pílula "hoje" com marcador vertical, barras com faixa colorida à esquerda e %, trilho direito com calendário do mês e to-do Hoje / Próximos 7 dias / Depois | Timeline de projetos, `agenda-panel` da visão geral, `/calendar` |
+| **Cindr** (Dribbble) | Timeline escura por dia, pílula "hoje" com marcador vertical, barras com faixa colorida à esquerda e %, trilho direito com calendário do mês e to-do Hoje / Próximos 7 dias / Depois | Timeline de projetos, `agenda-panel` da visão geral, `/calendar`, lista do dia em `/time-tracking` (faixa com a cor do projeto) |
 | **AturnDeck** (Dribbble) | Trilho de ícones + painel de projetos com Recentes/Categorias e contadores, cards kanban com prioridade, chip de data e progresso | Sidebar com contadores, quadro de tarefas |
 | **Ronas IT** (Dribbble) | Alternância Lista/Quadro/Calendário, barra de filtros, kanban com tag e prazo, trilho de atividade | `/tasks` (Lista/Quadro com busca) |
 

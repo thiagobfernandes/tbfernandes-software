@@ -5,6 +5,7 @@ import { NavigationBreadcrumbs } from "@/components/layout/navigation-breadcrumb
 import { SidebarToggle } from "@/components/layout/sidebar-toggle";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { CommandPalette } from "@/features/search/command-palette";
+import { RunningTimerChip } from "@/features/time-tracking/components/running-timer-chip";
 
 export function AppHeader() {
   return (
@@ -21,6 +22,7 @@ export function AppHeader() {
         <CommandPalette />
       </div>
       <div className="flex items-center justify-end gap-1 sm:flex-1">
+        <RunningTimerChip />
         <ThemeToggle />
         <span
           aria-label="Thiago Borges Fernandes"

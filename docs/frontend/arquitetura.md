@@ -45,7 +45,7 @@ A sidebar tem grupos recolhíveis por área, cada um com subitens (`lib/constant
 | Área | Rotas | Feature |
 |---|---|---|
 | — | `/` Visão geral, `/calendar` Calendário, `/assistant` Assistente | dashboard, calendar, assistant |
-| Trabalho | `/companies`, `/companies/view?id=`, `/projects`, `/projects/view?id=`, `/tasks` | companies, projects, tasks |
+| Trabalho | `/companies`, `/companies/view?id=`, `/projects`, `/projects/view?id=`, `/tasks`, `/time-tracking` Apontamentos | companies, projects, tasks, time-tracking |
 | Conhecimento | `/knowledge` Notas, `/knowledge/snippets`, `/knowledge/graph`, `/methods`, `/methods/view?id=` | knowledge, methods |
 | Crescimento | `/goals`, `/goals/view?id=`, `/learning`, `/certifications` | goals, learning |
 | Finanças | `/finance` Fluxo de caixa, `/finance/purchases` Compras planejadas | finance |

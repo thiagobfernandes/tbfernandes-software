@@ -60,6 +60,9 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 |---|---|---|
 | RF-WRK-14 | Agendar um intervalo de horário (título, data, início, fim, tarefa opcional, nota), editar e excluir. Por início e fim ou por início e duração. | S |
 | RF-WRK-15 | Na grade de horas, clicar e arrastar numa área vazia seleciona o intervalo (de 15 em 15 min) e abre o agendamento já preenchido com o dia, o início e o fim. | S |
+| RF-WRK-16 | Apontar em tempo real: iniciar um cronômetro dizendo no que estou trabalhando (descrição, projeto e tarefa opcionais), ver o tempo correndo e parar. Trocar de atividade para o apontamento atual e inicia o próximo no mesmo instante. | S |
+| RF-WRK-17 | Lançar, editar e excluir apontamentos de períodos passados; retomar um apontamento anterior com a mesma descrição, projeto e tarefa. | S |
+| RF-WRK-18 | Ver os apontamentos por dia (navegando entre os dias), com o total do dia, de hoje e da semana; o apontamento em andamento aparece no cabeçalho de todas as telas, com botão para parar. | S |
 
 ### 2.4 Knowledge (`/knowledge`, `/methods`)
 
@@ -163,6 +166,9 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RN-25 | Senha entre 12 e 128 caracteres, sem regras de composição; trocar a senha exige a atual. Login errado responde igual para e-mail desconhecido e senha errada. | Identity |
 | RN-26 | O fim de um agendamento é depois do início, no mesmo dia. | `Appointment` |
 | RN-27 | Dois agendamentos do mesmo dono não ocupam o mesmo horário (encostar, como 10:00–11:00 e 11:00–12:00, pode). | `Appointment.ensureNoOverlap` |
+| RN-28 | Só um apontamento em andamento (sem fim) por dono; iniciar outro exige parar o atual (409). | `TimeEntry.ensureCanCoexistWith` + índice único parcial |
+| RN-29 | O fim de um apontamento é depois do início, e nenhum dos dois fica no futuro (tolerância de 1 minuto para diferença de relógio). | `TimeEntry` |
+| RN-30 | Dois apontamentos do mesmo dono não se sobrepõem; o em andamento conta até agora. Encostar pode. | `TimeEntry.ensureCanCoexistWith` |
 | RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais
@@ -228,6 +234,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Projects / Project detail | RF-WRK-04..06, RF-KNW-03 | work, knowledge |
 | Tasks (lista, quadro, linha do tempo) | RF-WRK-07..12 | work |
 | Calendar (mês, semana, dia, agendamentos) | RF-WRK-14, RF-WRK-15 | work |
+| Apontamentos (`/time-tracking`) | RF-WRK-16, RF-WRK-17, RF-WRK-18 | work |
 | Knowledge, Snippets, Graph | RF-KNW-01..05 | knowledge |
 | Methods | RF-KNW-06 | knowledge |
 | Goals / Goal detail | RF-GOL-01..05 | goals |
