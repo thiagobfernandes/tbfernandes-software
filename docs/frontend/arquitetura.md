@@ -51,6 +51,9 @@ A sidebar tem grupos recolhíveis por área, cada um com subitens (`lib/constant
 | Finanças | `/finance` Fluxo de caixa, `/finance/purchases` Compras planejadas | finance |
 | Rede | `/contacts` | contacts |
 | — | `/settings` Configurações (aparência, dados, exportar/importar) | settings |
+| — | `/login` Entrar (fora do layout com sidebar; só no modo API com login) | auth |
+
+Sem login, o `DataGate` manda para `/login?next=<página atual>`; depois de entrar, o usuário volta para `next` (só caminhos internos, `safeNextPath` em `lib/routes.ts`).
 
 Páginas de detalhe recebem o id na query string (`/projects/view?id=…`), não no caminho, para o app poder ser exportado como arquivos estáticos no build desktop. Monte os links com `lib/routes.ts` (`projectHref`, `companyHref`, `goalHref`, `methodHref`) e leia o id com `useQueryId()` dentro de um `Suspense`.
 

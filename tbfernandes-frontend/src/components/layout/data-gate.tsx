@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { CloudOff, LogIn, RotateCw } from "lucide-react";
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { CloudOff, RotateCw } from "lucide-react";
 
-import { BrandMark } from "@/components/layout/brand-mark";
-import { FormField } from "@/components/shared/form-field";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,16 +13,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ApiError } from "@/lib/api/client";
-import { reload, signIn, useRemoteStatus } from "@/lib/api/remote-store";
+import { reload, useRemoteStatus } from "@/lib/api/remote-store";
 import { env } from "@/lib/env";
+import { loginHref } from "@/lib/routes";
 import { useAppData } from "@/lib/sample-data/store";
 
 /**
  * With the API as data source, shows the screens only once the data is
  * loaded, and the login when the API asks for one. Local mode renders the
- * screens directly.
+ * screens directly. Signed out, it sends the visitor to /login.
  */
 export function DataGate({ children }: { children: React.ReactNode }) {
   if (env.dataSource !== "api") return children;
@@ -36,7 +34,7 @@ function ApiGate({ children }: { children: React.ReactNode }) {
   const status = useRemoteStatus();
 
   if (status.state === "ready") return children;
-  if (status.state === "signed-out") return <SignIn />;
+  if (status.state === "signed-out") return <RedirectToLogin />;
   if (status.state === "unreachable") {
     return (
       <Centered>
@@ -69,72 +67,15 @@ function ApiGate({ children }: { children: React.ReactNode }) {
   return <PageSkeleton />;
 }
 
-function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string>();
-  const [busy, setBusy] = useState(false);
+function RedirectToLogin() {
+  const router = useRouter();
+  const pathname = usePathname();
 
-  async function submit(event: React.FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(undefined);
-    try {
-      await signIn(email.trim(), password);
-    } catch (failure) {
-      setError(
-        failure instanceof ApiError
-          ? failure.message
-          : "Não foi possível acessar a API",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
+  useEffect(() => {
+    router.replace(loginHref(`${pathname}${window.location.search}`));
+  }, [router, pathname]);
 
-  return (
-    <Centered>
-      <Card className="w-full max-w-sm">
-        <CardHeader className="items-start gap-3">
-          <BrandMark />
-          <div className="flex flex-col gap-1">
-            <CardTitle>Entrar</CardTitle>
-            <CardDescription>
-              Use a conta configurada para esta API.
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-            <FormField id="email" label="E-mail" required>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="username"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </FormField>
-            <FormField id="password" label="Senha" required error={error}>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                aria-invalid={Boolean(error)}
-                required
-              />
-            </FormField>
-            <Button type="submit" disabled={busy || !email || !password}>
-              <LogIn /> {busy ? "Entrando…" : "Entrar"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </Centered>
-  );
+  return <PageSkeleton />;
 }
 
 function Centered({ children }: { children: React.ReactNode }) {

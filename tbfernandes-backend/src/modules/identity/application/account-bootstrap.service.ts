@@ -7,11 +7,13 @@ export interface BootstrapAccount {
   email: string;
   password: string;
   name: string;
+  resetPassword?: boolean;
 }
 
 /**
  * Creates the owner account at startup, or gives an existing one a password, when
- * TBF_AUTH_BOOTSTRAP_EMAIL and _PASSWORD are set. There is no public sign-up.
+ * TBF_AUTH_BOOTSTRAP_EMAIL and _PASSWORD are set. There is no public sign-up, so
+ * TBF_AUTH_BOOTSTRAP_RESET_PASSWORD is also how a forgotten password is replaced.
  */
 @Injectable()
 export class AccountBootstrapService {
@@ -41,7 +43,7 @@ export class AccountBootstrapService {
         });
         result = 'created';
       }
-      if (!user.canLogIn()) {
+      if (await this.needsPassword(user, account)) {
         user.changePasswordHash(
           await this.passwords.hash(checkPassword(account.password)),
         );
@@ -50,5 +52,17 @@ export class AccountBootstrapService {
       await this.users.save(user);
       return result;
     });
+  }
+
+  private async needsPassword(
+    user: AppUser,
+    account: BootstrapAccount,
+  ): Promise<boolean> {
+    if (!user.canLogIn()) return true;
+    if (!account.resetPassword) return false;
+    return !(await this.passwords.matches(
+      account.password,
+      user.passwordHash!,
+    ));
   }
 }

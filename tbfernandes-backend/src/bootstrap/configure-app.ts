@@ -3,36 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import type { Express } from 'express';
-import session from 'express-session';
-import {
-  AppConfig,
-  AuthConfig,
-} from '../infrastructure/environments/registers';
-import { SESSION_COOKIE } from '../modules/identity/infrastructure/security/session';
-
-const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-
-function sessionMiddleware(auth: AuthConfig) {
-  return session({
-    name: SESSION_COOKIE,
-    secret: auth.sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    rolling: true,
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: auth.cookieSecure,
-      domain: auth.cookieDomain,
-      maxAge: SEVEN_DAYS,
-    },
-  });
-}
+import { AppConfig } from '../infrastructure/environments/registers';
 
 export function configureApp(app: INestApplication): INestApplication {
   const config = app.get(ConfigService);
   const appCfg = config.getOrThrow<AppConfig>('app');
-  const auth = config.getOrThrow<AuthConfig>('auth');
   const express = app.getHttpAdapter().getInstance() as Express;
 
   express.set('query parser', 'extended');
@@ -48,8 +23,6 @@ export function configureApp(app: INestApplication): INestApplication {
     exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Page-Size', 'Location'],
   });
   app.use(cookieParser());
-  // In-memory sessions, like the servlet session before: one instance, one person.
-  app.use(sessionMiddleware(auth));
 
   if (appCfg.swagger) {
     const document = SwaggerModule.createDocument(
