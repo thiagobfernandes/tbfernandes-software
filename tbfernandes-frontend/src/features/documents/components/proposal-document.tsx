@@ -12,9 +12,7 @@ function Footer({ data, page }: { data: ProposalData; page: number }) {
   return (
     <div className="foot">
       <img src={COMPANY.logo} alt={COMPANY.brand} />
-      <span>
-        Proposta nº {data.number} · {data.client}
-      </span>
+      <span>{data.client}</span>
       <span>{pad(page)}</span>
     </div>
   );
@@ -27,7 +25,6 @@ export function ProposalDocument({ data }: { data: ProposalData }) {
       <section className="page cover on-dark">
         <div className="cover-top">
           <img src={COMPANY.logo} alt={COMPANY.brand} />
-          <span>Proposta nº {data.number}</span>
         </div>
         <img className="cover-symbol" src={COMPANY.symbol} alt="" />
         <div className="cover-main">
@@ -176,6 +173,12 @@ export function ProposalDocument({ data }: { data: ProposalData }) {
               {COMPANY.email}
               <br />
               {COMPANY.site}
+              <br />
+              {COMPANY.sitesSite}
+              <br />
+              CNPJ {COMPANY.cnpj}
+              <br />
+              {COMPANY.invoiceNote}
             </div>
           </div>
         </div>

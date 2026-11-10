@@ -13,10 +13,7 @@ export function LetterDocument({ data }: { data: LetterData }) {
     <section className="sheet">
       <div className="lh-top">
         <img src={COMPANY.logo} alt={COMPANY.brand} />
-        <span>
-          {data.kicker}
-          {data.number && ` · nº ${data.number}`}
-        </span>
+        <span>{data.kicker}</span>
       </div>
       <div className="lh-rule" />
 
@@ -65,9 +62,15 @@ export function LetterDocument({ data }: { data: LetterData }) {
       )}
 
       <div className="lh-foot">
-        <span>{COMPANY.brand}</span>
         <span>
-          {COMPANY.phone} · {COMPANY.email} · {COMPANY.site}
+          {COMPANY.brand}
+          <br />
+          CNPJ {COMPANY.cnpj} · {COMPANY.invoiceNote}
+        </span>
+        <span className="lh-foot-contacts">
+          {COMPANY.phone} · {COMPANY.email}
+          <br />
+          {COMPANY.site} · {COMPANY.sitesSite}
         </span>
       </div>
     </section>
