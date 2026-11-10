@@ -4,6 +4,7 @@ import {
   Briefcase,
   Building2,
   Code2,
+  FilePenLine,
   FileText,
   FolderKanban,
   GraduationCap,
@@ -57,6 +58,7 @@ export const mainNavigation: NavEntry[] = [
       { title: "Projetos", href: "/projects", icon: FolderKanban },
       { title: "Tarefas", href: "/tasks", icon: ListChecks },
       { title: "Apontamentos", href: "/time-tracking", icon: Timer },
+      { title: "Edições", href: "/documents", icon: FilePenLine },
     ],
   },
   {
