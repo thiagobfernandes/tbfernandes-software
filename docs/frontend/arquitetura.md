@@ -45,7 +45,7 @@ A sidebar tem grupos recolhíveis por área, cada um com subitens (`lib/constant
 | Área | Rotas | Feature |
 |---|---|---|
 | — | `/` Visão geral, `/calendar` Calendário, `/assistant` Assistente | dashboard, calendar, assistant |
-| Trabalho | `/companies`, `/companies/view?id=`, `/projects`, `/projects/view?id=`, `/tasks`, `/time-tracking` Apontamentos | companies, projects, tasks, time-tracking |
+| Trabalho | `/companies`, `/companies/view?id=`, `/projects`, `/projects/view?id=`, `/tasks`, `/time-tracking` Apontamentos, `/documents` Edições, `/documents/edit?id=` | companies, projects, tasks, time-tracking, documents |
 | Conhecimento | `/knowledge` Notas, `/knowledge/snippets`, `/knowledge/graph`, `/methods`, `/methods/view?id=` | knowledge, methods |
 | Crescimento | `/goals`, `/goals/view?id=`, `/learning`, `/certifications` | goals, learning |
 | Finanças | `/finance` Fluxo de caixa, `/finance/purchases` Compras planejadas | finance |
@@ -107,3 +107,13 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 - Detalhe em página própria (`/projects/view?id=`) ou em `Sheet` lateral (tarefa).
 - Criar/editar em `Dialog`; excluir sempre com confirmação; feedback por toast (sonner).
 - Visual: veja [design/referencias.md](../design/referencias.md).
+
+## 8. Edições (documentos da empresa)
+
+`/documents` guarda os modelos padronizados de PDF da TB Fernandes Softwares (`features/documents`).
+
+- **Modelos** em `lib/templates.ts`: `proposal` (proposta comercial, 3 páginas A4: capa, escopo e etapas, investimento e assinatura) e `letter` (papel timbrado, texto livre com quebra de página). Cada modelo declara os valores padrão e os campos do formulário; para criar outro, acrescente um modelo ali, o tipo em `types/` e o componente das folhas.
+- **Identidade** (nome, contato, cidade, logo, foto) em `lib/company.ts`, a mesma do portfólio.
+- **Visual** em `lib/document-styles.ts`: CSS de impressão próprio, com escopo `.tbdoc`, paleta preto e dourado da plataforma, cobre do portfólio como acento e tipografia Fraunces + Manrope. É a única exceção à regra de cores por token, porque o CSS vai dentro dos arquivos exportados.
+- **Exportar**: “Gerar PDF” imprime um HTML autocontido num iframe oculto (escolher *Salvar como PDF*, A4, sem margens, gráficos de fundo); “Baixar HTML” salva o mesmo arquivo, com imagens embutidas, que também pode virar PDF pelo `scripts/pdf/html-to-pdf.mjs` do portfólio.
+- **Dados**: os documentos ficam no `localStorage` do navegador (`tbf-documents-v1`, `lib/document-store.ts`), fora do store principal, porque a API ainda não tem a coleção. O PDF/HTML exportado é a cópia definitiva.
