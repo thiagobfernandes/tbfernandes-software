@@ -53,7 +53,7 @@ export type EntityField<V> = {
   /** Spans both columns of the form grid. */
   full?: boolean;
 } & (
-  | { type: "text" | "url" | "date" }
+  | { type: "text" | "url" | "date" | "time" }
   | { type: "number"; step?: number; min?: number }
   | { type: "textarea" | "code"; rows?: number }
   | {

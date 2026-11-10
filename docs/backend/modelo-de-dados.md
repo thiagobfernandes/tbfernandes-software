@@ -22,6 +22,8 @@ erDiagram
     PROJECT ||--o{ TASK : "project_id"
     TASK ||--o{ TASK_CHECKLIST_ITEM : "task_id"
     TASK |o--o{ APPOINTMENT : "task_id"
+    TASK |o--o{ TIME_ENTRY : "task_id"
+    PROJECT |o--o{ TIME_ENTRY : "project_id"
 
     NOTE ||--o{ NOTE_LINK : "note_id"
     SNIPPET ||--o{ SNIPPET_LINK : "snippet_id"
@@ -92,6 +94,16 @@ erDiagram
         time start_time
         time end_time "> start_time"
         uuid task_id FK "ON DELETE SET NULL"
+        varchar note
+    }
+    TIME_ENTRY {
+        uuid id PK
+        uuid owner_id
+        varchar description
+        uuid project_id FK "ON DELETE SET NULL"
+        uuid task_id FK "ON DELETE SET NULL"
+        timestamptz started_at
+        timestamptz ended_at "null = em andamento; > started_at"
         varchar note
     }
     TASK_CHECKLIST_ITEM {
@@ -257,6 +269,7 @@ erDiagram
 | `projects` | `Project` | `work.project` | `goalId` → `goal_id` sem FK |
 | `tasks` | `Task` | `work.task` + `work.task_checklist_item` | `checklist {done,total}` → `checklist_done/total`; `checklistItems` → tabela filha ordenada |
 | `appointments` | `Appointment` | `work.appointment` | `date` → `day`; excluir a tarefa deixa o agendamento sem tarefa (FK `ON DELETE SET NULL`) |
+| `timeEntries` | `TimeEntry` | `work.time_entry` | `endedAt` ausente = em andamento; índice único parcial `(owner_id) WHERE ended_at IS NULL` (RN-28); excluir projeto ou tarefa deixa o apontamento sem vínculo |
 | `notes` | `Note` | `knowledge.note` + `knowledge.note_link` | `projectIds`/`taskIds` → linhas em `note_link` |
 | `snippets` | `Snippet` | `knowledge.snippet` + `knowledge.snippet_link` | idem, em `snippet_link` |
 | `methods` | `Method` | `knowledge.method` + `method_step` + `method_example` | `steps` e `examples` ordenados por `position` |

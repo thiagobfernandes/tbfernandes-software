@@ -4,6 +4,7 @@ import { AppointmentService } from './application/appointment.service';
 import { CompanyService } from './application/company.service';
 import { ProjectService } from './application/project.service';
 import { TaskService } from './application/task.service';
+import { TimeEntryService } from './application/time-entry.service';
 import { WorkLookupService } from './application/work-lookup.service';
 import { WorkSummaryService } from './application/work-summary.service';
 import {
@@ -11,6 +12,7 @@ import {
   CompanyRepository,
   ProjectRepository,
   TaskRepository,
+  TimeEntryRepository,
 } from './domain';
 import { AppointmentEntity } from './infrastructure/persistence/appointment.entity';
 import { CompanyEntity } from './infrastructure/persistence/company.entity';
@@ -23,11 +25,14 @@ import { TypeOrmAppointmentRepository } from './infrastructure/persistence/typeo
 import { TypeOrmCompanyRepository } from './infrastructure/persistence/typeorm-company.repository';
 import { TypeOrmProjectRepository } from './infrastructure/persistence/typeorm-project.repository';
 import { TypeOrmTaskRepository } from './infrastructure/persistence/typeorm-task.repository';
+import { TimeEntryEntity } from './infrastructure/persistence/time-entry.entity';
+import { TypeOrmTimeEntryRepository } from './infrastructure/persistence/typeorm-time-entry.repository';
 import { AppointmentController } from './web/appointment.controller';
 import { CompanyController } from './web/company.controller';
 import { DashboardController } from './web/dashboard.controller';
 import { ProjectController } from './web/project.controller';
 import { TaskController } from './web/task.controller';
+import { TimeEntryController } from './web/time-entry.controller';
 import { FollowUpTasks, WorkLookup } from './work.lookup';
 
 @Module({
@@ -38,6 +43,7 @@ import { FollowUpTasks, WorkLookup } from './work.lookup';
       TaskEntity,
       TaskChecklistItemEntity,
       AppointmentEntity,
+      TimeEntryEntity,
     ]),
   ],
   controllers: [
@@ -45,6 +51,7 @@ import { FollowUpTasks, WorkLookup } from './work.lookup';
     ProjectController,
     TaskController,
     AppointmentController,
+    TimeEntryController,
     DashboardController,
   ],
   providers: [
@@ -52,12 +59,14 @@ import { FollowUpTasks, WorkLookup } from './work.lookup';
     ProjectService,
     TaskService,
     AppointmentService,
+    TimeEntryService,
     WorkSummaryService,
     WorkLookupService,
     { provide: CompanyRepository, useClass: TypeOrmCompanyRepository },
     { provide: ProjectRepository, useClass: TypeOrmProjectRepository },
     { provide: TaskRepository, useClass: TypeOrmTaskRepository },
     { provide: AppointmentRepository, useClass: TypeOrmAppointmentRepository },
+    { provide: TimeEntryRepository, useClass: TypeOrmTimeEntryRepository },
     { provide: WorkLookup, useExisting: WorkLookupService },
     { provide: FollowUpTasks, useExisting: WorkLookupService },
   ],

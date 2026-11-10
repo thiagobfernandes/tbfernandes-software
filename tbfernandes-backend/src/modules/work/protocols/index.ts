@@ -11,3 +11,6 @@ export * from './work-summary.response';
 export * from './appointment.request';
 export * from './appointment.response';
 export * from './mappers/appointment.mapper';
+export * from './time-entry.request';
+export * from './time-entry.response';
+export * from './mappers/time-entry.mapper';

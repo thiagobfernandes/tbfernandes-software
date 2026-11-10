@@ -12,6 +12,7 @@ import { uuidv7 } from "@/lib/api/uuid";
 import { env } from "@/lib/env";
 
 import type { Appointment } from "@/features/calendar/types/appointment";
+import type { TimeEntry } from "@/features/time-tracking/types/time-entry";
 import type { Contact, Interaction } from "@/features/contacts/types/contact";
 import type {
   FinanceEntry,
@@ -30,6 +31,7 @@ import type { Method } from "@/features/methods/types/method";
 import type { Company, Project } from "@/features/projects/types/project";
 import type { Task } from "@/features/tasks/types/task";
 import { sampleAppointments } from "@/lib/sample-data/agenda";
+import { sampleTimeEntries } from "@/lib/sample-data/time-entries";
 import {
   sampleCertifications,
   sampleEducations,
@@ -73,6 +75,7 @@ export type AppData = {
   contacts: Contact[];
   interactions: Interaction[];
   appointments: Appointment[];
+  timeEntries: TimeEntry[];
 };
 
 /** Kept for the work screens written before the other modules existed. */
@@ -104,6 +107,7 @@ const initialData: AppData = {
   contacts: sampleContacts,
   interactions: sampleInteractions,
   appointments: sampleAppointments,
+  timeEntries: sampleTimeEntries,
 };
 
 const idPrefixes: Record<CollectionKey, string> = {
@@ -125,6 +129,7 @@ const idPrefixes: Record<CollectionKey, string> = {
   contacts: "ct",
   interactions: "i",
   appointments: "ap",
+  timeEntries: "te",
 };
 
 const useApi = env.dataSource === "api";
@@ -233,6 +238,9 @@ export const dataActions = {
       [key]: (data[key] as Item<K>[]).filter((item) => item.id !== id),
     });
     if (useApi) remote.remove(key, id);
+  },
+  all<K extends CollectionKey>(key: K) {
+    return load()[key] as Item<K>[];
   },
   get<K extends CollectionKey>(key: K, id?: string) {
     return (load()[key] as Item<K>[]).find((item) => item.id === id);

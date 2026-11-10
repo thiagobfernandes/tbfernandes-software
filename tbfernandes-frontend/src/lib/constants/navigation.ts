@@ -16,6 +16,7 @@ import {
   ShoppingCart,
   Sparkles,
   Target,
+  Timer,
   Users,
   Wallet,
   Workflow,
@@ -55,6 +56,7 @@ export const mainNavigation: NavEntry[] = [
       { title: "Empresas", href: "/companies", icon: Building2 },
       { title: "Projetos", href: "/projects", icon: FolderKanban },
       { title: "Tarefas", href: "/tasks", icon: ListChecks },
+      { title: "Apontamentos", href: "/time-tracking", icon: Timer },
     ],
   },
   {

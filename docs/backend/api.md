@@ -47,6 +47,8 @@ Versão 0.2 · 2026-10-26 · O contrato executável é o OpenAPI em `http://loca
 | GET | `/dashboard/summary` | contadores do painel | WRK-07 |
 | GET / POST | `/appointments` | lista (por data e início), cria `{ title, date, startTime, endTime, taskId?, note? }`; horários `HH:mm:ss` (422 com RN-26 ou RN-27) | WRK-12 |
 | GET / PUT / DELETE | `/appointments/{id}` | detalhe, edita, exclui | WRK-12 |
+| GET / POST | `/time-entries` | lista (mais recentes primeiro), cria `{ description, startedAt, endedAt?, projectId?, taskId?, note? }`; instantes ISO 8601; sem `endedAt` = em andamento; com `taskId`, o projeto vem da tarefa; resposta com `durationSeconds` (409 RN-28, 422 RN-29/RN-30, 404 projeto ou tarefa) | WRK-13 |
+| GET / PUT / DELETE | `/time-entries/{id}` | detalhe, edita (parar = PUT com `endedAt`), exclui | WRK-13 |
 
 ## Knowledge
 
