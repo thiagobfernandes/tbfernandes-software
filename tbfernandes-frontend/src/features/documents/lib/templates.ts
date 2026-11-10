@@ -120,7 +120,6 @@ const proposal: DocumentTemplate<"proposal"> = {
     {
       title: "Identificação",
       fields: [
-        { key: "number", label: "Número", kind: "text" },
         { key: "date", label: "Data", kind: "date" },
         {
           key: "validity",
@@ -227,7 +226,6 @@ const letter: DocumentTemplate<"letter"> = {
     {
       title: "Cabeçalho",
       fields: [
-        { key: "number", label: "Número", kind: "text" },
         { key: "date", label: "Data", kind: "date" },
         {
           key: "kicker",

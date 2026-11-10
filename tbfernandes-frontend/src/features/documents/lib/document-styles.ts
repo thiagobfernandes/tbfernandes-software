@@ -153,6 +153,7 @@ export const DOCUMENT_CSS = String.raw`
 .tbdoc .lh-sign b { display: block; font-family: var(--display); font-size: 13pt; font-weight: 600; }
 .tbdoc .lh-sign span { display: block; font-size: 9pt; color: var(--muted); }
 .tbdoc .lh-foot { display: flex; justify-content: space-between; gap: 8mm; margin-top: 14mm; padding-top: 8px; border-top: 1px solid var(--line); font-size: 8pt; color: var(--muted); break-inside: avoid; }
+.tbdoc .lh-foot-contacts { text-align: right; }
 
 @page { size: A4; margin: 0; }
 @page letter { size: A4; margin: 16mm 0 14mm; }
