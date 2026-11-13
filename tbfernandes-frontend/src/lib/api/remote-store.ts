@@ -35,6 +35,8 @@ export const endpoints: Record<CollectionKey, string> = {
   interactions: "/api/v1/interactions",
   appointments: "/api/v1/appointments",
   timeEntries: "/api/v1/time-entries",
+  routines: "/api/v1/routines",
+  routineChecks: "/api/v1/routine-checks",
 };
 
 /** Timestamps the API sends as instants but the screens handle as days. */

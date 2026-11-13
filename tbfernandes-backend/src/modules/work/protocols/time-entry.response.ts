@@ -3,6 +3,7 @@ export class TimeEntryResponse {
   description: string;
   projectId: string | null;
   taskId: string | null;
+  routineId: string | null;
   startedAt: string;
   endedAt: string | null;
   durationSeconds: number;

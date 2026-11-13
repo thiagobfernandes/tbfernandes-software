@@ -13,6 +13,7 @@ import { env } from "@/lib/env";
 
 import type { Appointment } from "@/features/calendar/types/appointment";
 import type { TimeEntry } from "@/features/time-tracking/types/time-entry";
+import type { Routine, RoutineCheck } from "@/features/routines/types/routine";
 import type { Contact, Interaction } from "@/features/contacts/types/contact";
 import type {
   FinanceEntry,
@@ -32,6 +33,10 @@ import type { Company, Project } from "@/features/projects/types/project";
 import type { Task } from "@/features/tasks/types/task";
 import { sampleAppointments } from "@/lib/sample-data/agenda";
 import { sampleTimeEntries } from "@/lib/sample-data/time-entries";
+import {
+  sampleRoutineChecks,
+  sampleRoutines,
+} from "@/lib/sample-data/routines";
 import {
   sampleCertifications,
   sampleEducations,
@@ -76,6 +81,8 @@ export type AppData = {
   interactions: Interaction[];
   appointments: Appointment[];
   timeEntries: TimeEntry[];
+  routines: Routine[];
+  routineChecks: RoutineCheck[];
 };
 
 /** Kept for the work screens written before the other modules existed. */
@@ -108,6 +115,8 @@ const initialData: AppData = {
   interactions: sampleInteractions,
   appointments: sampleAppointments,
   timeEntries: sampleTimeEntries,
+  routines: sampleRoutines,
+  routineChecks: sampleRoutineChecks,
 };
 
 const idPrefixes: Record<CollectionKey, string> = {
@@ -130,6 +139,8 @@ const idPrefixes: Record<CollectionKey, string> = {
   interactions: "i",
   appointments: "ap",
   timeEntries: "te",
+  routines: "rt",
+  routineChecks: "rc",
 };
 
 const useApi = env.dataSource === "api";
@@ -276,7 +287,36 @@ export const workActions = {
     if (next.status !== "done") next.completedAt = undefined;
     dataActions.update("tasks", id, next);
   },
-  deleteTask: (id: string) => dataActions.remove("tasks", id),
+  /** Removes the task; routines and time entries stay, unlinked. */
+  deleteTask(id: string) {
+    const data = load();
+    commit({
+      ...data,
+      tasks: data.tasks.filter((task) => task.id !== id),
+      routines: data.routines.map((routine) =>
+        routine.taskId === id ? { ...routine, taskId: undefined } : routine,
+      ),
+      timeEntries: data.timeEntries.map((entry) =>
+        entry.taskId === id ? { ...entry, taskId: undefined } : entry,
+      ),
+    });
+    if (useApi) remote.remove("tasks", id);
+  },
+  /** RN-34: removes the routine and its checks; time entries stay, unlinked. */
+  deleteRoutine(id: string) {
+    const data = load();
+    commit({
+      ...data,
+      routines: data.routines.filter((routine) => routine.id !== id),
+      routineChecks: data.routineChecks.filter(
+        (check) => check.routineId !== id,
+      ),
+      timeEntries: data.timeEntries.map((entry) =>
+        entry.routineId === id ? { ...entry, routineId: undefined } : entry,
+      ),
+    });
+    if (useApi) remote.remove("routines", id);
+  },
   /** Removes the project; its tasks and knowledge stay, unlinked. */
   deleteProject(id: string) {
     const data = load();
@@ -289,6 +329,11 @@ export const workActions = {
       projects: data.projects.filter((project) => project.id !== id),
       tasks: data.tasks.map((task) =>
         task.projectId === id ? { ...task, projectId: undefined } : task,
+      ),
+      routines: data.routines.map((routine) =>
+        routine.projectId === id
+          ? { ...routine, projectId: undefined }
+          : routine,
       ),
       notes: data.notes.map(unlink),
       snippets: data.snippets.map(unlink),

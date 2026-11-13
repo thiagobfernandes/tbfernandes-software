@@ -24,6 +24,10 @@ erDiagram
     TASK |o--o{ APPOINTMENT : "task_id"
     TASK |o--o{ TIME_ENTRY : "task_id"
     PROJECT |o--o{ TIME_ENTRY : "project_id"
+    TASK |o--o{ ROUTINE : "task_id"
+    PROJECT |o--o{ ROUTINE : "project_id"
+    ROUTINE ||--o{ ROUTINE_CHECK : "routine_id"
+    ROUTINE |o--o{ TIME_ENTRY : "routine_id"
 
     NOTE ||--o{ NOTE_LINK : "note_id"
     SNIPPET ||--o{ SNIPPET_LINK : "snippet_id"
@@ -102,8 +106,29 @@ erDiagram
         varchar description
         uuid project_id FK "ON DELETE SET NULL"
         uuid task_id FK "ON DELETE SET NULL"
+        uuid routine_id FK "ON DELETE SET NULL"
         timestamptz started_at
         timestamptz ended_at "null = em andamento; > started_at"
+        varchar note
+    }
+    ROUTINE {
+        uuid id PK
+        uuid owner_id
+        varchar title
+        varchar description
+        uuid project_id FK "ON DELETE SET NULL"
+        uuid task_id FK "ON DELETE SET NULL"
+        smallint_array weekdays "1 = seg ... 7 = dom; 1 a 7 itens"
+        time start_time
+        int target_minutes "1..1440"
+        date start_date
+        boolean active
+    }
+    ROUTINE_CHECK {
+        uuid id PK
+        uuid owner_id
+        uuid routine_id FK "ON DELETE CASCADE"
+        date day "único por rotina"
         varchar note
     }
     TASK_CHECKLIST_ITEM {
@@ -269,7 +294,9 @@ erDiagram
 | `projects` | `Project` | `work.project` | `goalId` → `goal_id` sem FK |
 | `tasks` | `Task` | `work.task` + `work.task_checklist_item` | `checklist {done,total}` → `checklist_done/total`; `checklistItems` → tabela filha ordenada |
 | `appointments` | `Appointment` | `work.appointment` | `date` → `day`; excluir a tarefa deixa o agendamento sem tarefa (FK `ON DELETE SET NULL`) |
-| `timeEntries` | `TimeEntry` | `work.time_entry` | `endedAt` ausente = em andamento; índice único parcial `(owner_id) WHERE ended_at IS NULL` (RN-28); excluir projeto ou tarefa deixa o apontamento sem vínculo |
+| `timeEntries` | `TimeEntry` | `work.time_entry` | `endedAt` ausente = em andamento; índice único parcial `(owner_id) WHERE ended_at IS NULL` (RN-28); excluir projeto, tarefa ou rotina deixa o apontamento sem vínculo |
+| `routines` | `Routine` | `work.routine` | `weekdays` → `smallint[]`; excluir projeto ou tarefa deixa a rotina sem vínculo |
+| `routineChecks` | `RoutineCheck` | `work.routine_check` | `date` → `day`; índice único `(routine_id, day)` (RN-33); some com a rotina |
 | `notes` | `Note` | `knowledge.note` + `knowledge.note_link` | `projectIds`/`taskIds` → linhas em `note_link` |
 | `snippets` | `Snippet` | `knowledge.snippet` + `knowledge.snippet_link` | idem, em `snippet_link` |
 | `methods` | `Method` | `knowledge.method` + `method_step` + `method_example` | `steps` e `examples` ordenados por `position` |

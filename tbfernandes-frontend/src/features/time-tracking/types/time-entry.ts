@@ -3,6 +3,7 @@ export type TimeEntry = {
   description: string;
   projectId?: string;
   taskId?: string;
+  routineId?: string;
   startedAt: string;
   endedAt?: string;
   note?: string;

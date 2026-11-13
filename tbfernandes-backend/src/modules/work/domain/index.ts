@@ -9,3 +9,7 @@ export * from './appointment/appointment.repository';
 export * from './errors';
 export * from './time-entry/time-entry';
 export * from './time-entry/time-entry.repository';
+export * from './routine/routine';
+export * from './routine/routine.repository';
+export * from './routine/routine-check';
+export * from './routine/routine-check.repository';

@@ -64,6 +64,8 @@ const importOrder: CollectionKey[] = [
   "contacts",
   "interactions",
   "appointments",
+  "routines",
+  "routineChecks",
   "timeEntries",
 ];
 

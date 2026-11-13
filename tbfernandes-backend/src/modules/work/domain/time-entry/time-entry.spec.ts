@@ -9,6 +9,7 @@ const details = (
   description: 'Revisar PR',
   projectId: null,
   taskId: null,
+  routineId: null,
   startedAt: at('09:00:00'),
   endedAt: at('10:00:00'),
   note: null,

@@ -3,7 +3,10 @@ import { dataActions } from "@/lib/sample-data/store";
 
 import { runningEntry } from "./time";
 
-type Activity = Pick<TimeEntry, "description" | "projectId" | "taskId">;
+type Activity = Pick<
+  TimeEntry,
+  "description" | "projectId" | "taskId" | "routineId"
+>;
 
 function currentRunning() {
   return runningEntry(dataActions.all("timeEntries"));
@@ -19,6 +22,7 @@ export const timeActions = {
       description: activity.description.trim(),
       projectId: activity.projectId,
       taskId: activity.taskId,
+      routineId: activity.routineId,
       startedAt: now,
     });
   },
