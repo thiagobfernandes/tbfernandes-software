@@ -15,6 +15,7 @@ export const TimeEntryMapper = {
       description: details.description,
       projectId: details.projectId,
       taskId: details.taskId,
+      routineId: details.routineId,
       startedAt: toInstant(details.startedAt)!,
       endedAt: toInstant(details.endedAt),
       durationSeconds: entry.durationSeconds(now),

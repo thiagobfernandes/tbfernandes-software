@@ -63,6 +63,9 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-WRK-16 | Apontar em tempo real: iniciar um cronômetro dizendo no que estou trabalhando (descrição, projeto e tarefa opcionais), ver o tempo correndo e parar. Trocar de atividade para o apontamento atual e inicia o próximo no mesmo instante. | S |
 | RF-WRK-17 | Lançar, editar e excluir apontamentos de períodos passados; retomar um apontamento anterior com a mesma descrição, projeto e tarefa. | S |
 | RF-WRK-18 | Ver os apontamentos por dia (navegando entre os dias), com o total do dia, de hoje e da semana; o apontamento em andamento aparece no cabeçalho de todas as telas, com botão para parar. | S |
+| RF-WRK-19 | Cadastrar rotinas: algo feito todo dia ou em dias da semana escolhidos, com horário e meta de tempo opcionais, data de início, projeto e tarefa opcionais; editar, pausar, retomar e excluir. | S |
+| RF-WRK-20 | Ver as rotinas programadas de cada dia (navegando entre os dias) e marcar ou desmarcar cada uma como feita; ver quantas foram feitas, a sequência de dias seguidos de cada rotina e a maior sequência. | S |
+| RF-WRK-21 | Iniciar o cronômetro a partir de uma rotina: o apontamento leva a rotina, a tarefa e o projeto dela, e o tempo apontado no dia aparece na rotina contra a meta. | S |
 
 ### 2.4 Knowledge (`/knowledge`, `/methods`)
 
@@ -169,6 +172,10 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RN-28 | Só um apontamento em andamento (sem fim) por dono; iniciar outro exige parar o atual (409). | `TimeEntry.ensureCanCoexistWith` + índice único parcial |
 | RN-29 | O fim de um apontamento é depois do início, e nenhum dos dois fica no futuro (tolerância de 1 minuto para diferença de relógio). | `TimeEntry` |
 | RN-30 | Dois apontamentos do mesmo dono não se sobrepõem; o em andamento conta até agora. Encostar pode. | `TimeEntry.ensureCanCoexistWith` |
+| RN-31 | Uma rotina tem de 1 a 7 dias da semana (1 = segunda … 7 = domingo; sem dias informados = todo dia); a meta de tempo, se houver, vai de 1 a 1440 minutos; o horário é `HH:mm`. | `Routine` |
+| RN-32 | Uma rotina só é marcada num dia em que está programada (ativa, a partir da data de início e num dos seus dias da semana) e nunca num dia futuro. | `Routine.isDueOn`, `RoutineCheck.create` |
+| RN-33 | Uma rotina é marcada no máximo uma vez por dia (409). | `RoutineCheckService` + índice único |
+| RN-34 | A rotina não gera tarefas: ela aponta para a tarefa que avança (marcar o dia não conclui a tarefa) e o projeto vem da tarefa. Um apontamento com rotina herda a tarefa e o projeto dela quando não tem os seus. Excluir a rotina apaga as marcações e mantém os apontamentos, sem a rotina; excluir a tarefa ou o projeto deixa a rotina sem vínculo. | `RoutineService`, `TimeEntryService` + FKs |
 | RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais
@@ -235,6 +242,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Tasks (lista, quadro, linha do tempo) | RF-WRK-07..12 | work |
 | Calendar (mês, semana, dia, agendamentos) | RF-WRK-14, RF-WRK-15 | work |
 | Apontamentos (`/time-tracking`) | RF-WRK-16, RF-WRK-17, RF-WRK-18 | work |
+| Rotinas (`/routines`) | RF-WRK-19, RF-WRK-20, RF-WRK-21 | work |
 | Knowledge, Snippets, Graph | RF-KNW-01..05 | knowledge |
 | Methods | RF-KNW-06 | knowledge |
 | Goals / Goal detail | RF-GOL-01..05 | goals |

@@ -7,6 +7,7 @@ export const TimeEntryPersistenceMapper = {
       description: entity.description,
       projectId: entity.projectId,
       taskId: entity.taskId,
+      routineId: entity.routineId,
       startedAt: new Date(entity.startedAt),
       endedAt: entity.endedAt ? new Date(entity.endedAt) : null,
       note: entity.note,
@@ -23,6 +24,7 @@ export const TimeEntryPersistenceMapper = {
     entity.description = details.description;
     entity.projectId = details.projectId;
     entity.taskId = details.taskId;
+    entity.routineId = details.routineId;
     entity.startedAt = details.startedAt;
     entity.endedAt = details.endedAt;
     entity.note = details.note;

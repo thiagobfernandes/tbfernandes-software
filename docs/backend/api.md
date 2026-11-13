@@ -47,8 +47,12 @@ Versão 0.2 · 2026-10-26 · O contrato executável é o OpenAPI em `http://loca
 | GET | `/dashboard/summary` | contadores do painel | WRK-07 |
 | GET / POST | `/appointments` | lista (por data e início), cria `{ title, date, startTime, endTime, taskId?, note? }`; horários `HH:mm:ss` (422 com RN-26 ou RN-27) | WRK-12 |
 | GET / PUT / DELETE | `/appointments/{id}` | detalhe, edita, exclui | WRK-12 |
-| GET / POST | `/time-entries` | lista (mais recentes primeiro), cria `{ description, startedAt, endedAt?, projectId?, taskId?, note? }`; instantes ISO 8601; sem `endedAt` = em andamento; com `taskId`, o projeto vem da tarefa; resposta com `durationSeconds` (409 RN-28, 422 RN-29/RN-30, 404 projeto ou tarefa) | WRK-13 |
+| GET / POST | `/time-entries` | lista (mais recentes primeiro), cria `{ description, startedAt, endedAt?, projectId?, taskId?, routineId?, note? }`; instantes ISO 8601; sem `endedAt` = em andamento; com `taskId`, o projeto vem da tarefa; resposta com `durationSeconds` (409 RN-28, 422 RN-29/RN-30, 404 projeto ou tarefa) | WRK-13 |
 | GET / PUT / DELETE | `/time-entries/{id}` | detalhe, edita (parar = PUT com `endedAt`), exclui | WRK-13 |
+| GET / POST | `/routines` | lista (ativas primeiro, por horário e título), cria `{ title, startDate, weekdays?, startTime?, targetMinutes?, projectId?, taskId?, description?, active? }`; `weekdays` ISO (1 = segunda … 7 = domingo), ausente = todo dia; com `taskId`, o projeto vem da tarefa (400 dias vazios, 422 RN-31, 404 projeto ou tarefa) | WRK-14 |
+| GET / PUT / DELETE | `/routines/{id}` | detalhe, edita (pausar = PUT com `active: false`), exclui junto com as marcações; os apontamentos ficam sem a rotina | WRK-14 |
+| GET / POST | `/routine-checks` | lista (dia mais recente primeiro; filtros `routineId`, `from`, `to`), marca a rotina como feita `{ routineId, date, note? }` (422 RN-32, 409 RN-33, 404 rotina) | WRK-14 |
+| GET / PUT / DELETE | `/routine-checks/{id}` | detalhe, edita só a nota, desmarca o dia | WRK-14 |
 
 ## Knowledge
 

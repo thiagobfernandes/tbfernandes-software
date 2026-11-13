@@ -12,6 +12,9 @@ export class TimeEntryEntity extends AuditedEntity {
   @Column('uuid', { nullable: true })
   taskId: string | null;
 
+  @Column('uuid', { nullable: true })
+  routineId: string | null;
+
   @Column('timestamptz')
   startedAt: Date;
 

@@ -9,6 +9,7 @@ export interface TimeEntryDetails {
   description: string;
   projectId: string | null;
   taskId: string | null;
+  routineId: string | null;
   startedAt: Date;
   endedAt: Date | null;
   note: string | null;
@@ -103,6 +104,7 @@ export class TimeEntry {
       description: Require.text(details.description, 'description', 200),
       projectId: details.projectId ?? null,
       taskId: details.taskId ?? null,
+      routineId: details.routineId ?? null,
       startedAt,
       endedAt,
       note: Require.optionalText(details.note, 'note', 2000),

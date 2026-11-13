@@ -8,6 +8,7 @@ import {
 import { NotFoundError } from '../../../common/domain';
 import {
   ProjectRepository,
+  RoutineRepository,
   TaskRepository,
   TimeEntry,
   TimeEntryDetails,
@@ -20,6 +21,7 @@ export class TimeEntryService {
     private readonly entries: TimeEntryRepository,
     private readonly projects: ProjectRepository,
     private readonly tasks: TaskRepository,
+    private readonly routines: RoutineRepository,
     private readonly owner: OwnerContext,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
@@ -65,14 +67,19 @@ export class TimeEntryService {
     return this.entries.findAll(this.owner.currentOwnerId());
   }
 
+  /**
+   * RN-34: an entry for a routine takes the routine's task and project when it has none;
+   * the task's project wins over the one sent.
+   */
   private async linked(
     ownerId: string,
     details: TimeEntryDetails,
   ): Promise<TimeEntryDetails> {
-    let projectId = details.projectId;
-    if (details.taskId != null) {
-      const task = await this.tasks.findById(ownerId, details.taskId);
-      if (!task) throw new NotFoundError('A tarefa', details.taskId);
+    const withRoutine = await this.withRoutine(ownerId, details);
+    let projectId = withRoutine.projectId;
+    if (withRoutine.taskId != null) {
+      const task = await this.tasks.findById(ownerId, withRoutine.taskId);
+      if (!task) throw new NotFoundError('A tarefa', withRoutine.taskId);
       projectId = task.details.projectId ?? projectId;
     }
     if (
@@ -80,7 +87,22 @@ export class TimeEntryService {
       !(await this.projects.findById(ownerId, projectId))
     )
       throw new NotFoundError('O projeto', projectId);
-    return { ...details, projectId };
+    return { ...withRoutine, projectId };
+  }
+
+  private async withRoutine(
+    ownerId: string,
+    details: TimeEntryDetails,
+  ): Promise<TimeEntryDetails> {
+    if (details.routineId == null) return details;
+    const routine = await this.routines.findById(ownerId, details.routineId);
+    if (!routine) throw new NotFoundError('A rotina', details.routineId);
+    const { taskId, projectId } = routine.details;
+    return {
+      ...details,
+      taskId: details.taskId ?? taskId,
+      projectId: details.projectId ?? projectId,
+    };
   }
 
   private async ensureCanCoexist(entry: TimeEntry, now: Date): Promise<void> {

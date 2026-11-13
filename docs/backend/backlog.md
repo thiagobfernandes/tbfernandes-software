@@ -57,6 +57,7 @@ Ordem de trabalho: uma fatia vertical por vez (migração → domínio → caso 
 | WRK-11 | Excluir empresa sem projetos (com projetos: 409) e projeto, mantendo as tarefas sem projeto (RN-01) | P | ✅ |
 | WRK-12 | Agenda: agendamentos com horário, visões Dia/Semana no calendário e arrastar para agendar (RF-WRK-14, RF-WRK-15, RN-26, RN-27) | M | ✅ |
 | WRK-13 | Apontamentos: cronômetro em tempo real, troca de atividade, lançamento manual, totais do dia e da semana e indicador no cabeçalho (RF-WRK-16..18, RN-28..30) | M | ✅ |
+| WRK-14 | Rotinas: atividades diárias (ou em dias da semana escolhidos) marcadas a cada dia, com sequência, meta de tempo e cronômetro que aponta na rotina, ligadas a tarefa e projeto (RF-WRK-19..21, RN-31..34) | M | ✅ |
 
 Critérios de aceite principais:
 - WRK-04: mover para `done` preenche `completedAt`; sair de `done` limpa; `blocked → done` retorna 422 com `rule: "RN-07"`.
