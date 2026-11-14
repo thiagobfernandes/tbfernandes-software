@@ -63,7 +63,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-WRK-16 | Apontar em tempo real: iniciar um cronômetro dizendo no que estou trabalhando (descrição, projeto e tarefa opcionais), ver o tempo correndo e parar. Trocar de atividade para o apontamento atual e inicia o próximo no mesmo instante. | S |
 | RF-WRK-17 | Lançar, editar e excluir apontamentos de períodos passados; retomar um apontamento anterior com a mesma descrição, projeto e tarefa. | S |
 | RF-WRK-18 | Ver os apontamentos por dia (navegando entre os dias), com o total do dia, de hoje e da semana; o apontamento em andamento aparece no cabeçalho de todas as telas, com botão para parar. | S |
-| RF-WRK-19 | Cadastrar rotinas: algo feito todo dia ou em dias da semana escolhidos, com horário e meta de tempo opcionais, data de início, projeto e tarefa opcionais; editar, pausar, retomar e excluir. | S |
+| RF-WRK-19 | Cadastrar rotinas: algo feito todo dia ou em dias da semana escolhidos, com horário e meta de tempo opcionais, data de início, projeto, tarefa e meta opcionais (a meta serve para hábitos sem projeto, como estudar ou treinar); editar, pausar, retomar e excluir. | S |
 | RF-WRK-20 | Ver as rotinas programadas de cada dia (navegando entre os dias) e marcar ou desmarcar cada uma como feita; ver quantas foram feitas, a sequência de dias seguidos de cada rotina e a maior sequência. | S |
 | RF-WRK-21 | Iniciar o cronômetro a partir de uma rotina: o apontamento leva a rotina, a tarefa e o projeto dela, e o tempo apontado no dia aparece na rotina contra a meta. | S |
 

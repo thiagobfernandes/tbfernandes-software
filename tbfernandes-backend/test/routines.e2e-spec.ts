@@ -62,6 +62,36 @@ describe('Routines API', () => {
     expect(invalid.status).toBe(400);
   });
 
+  it('links a routine to a goal without any project', async () => {
+    const goalId = await create(app, '/api/v1/goals', {
+      name: 'Falar inglês fluente',
+      area: 'learning',
+      desiredResult: 'Conversar 30 minutos sem travar',
+    });
+    const id = await create(app, '/api/v1/routines', {
+      title: 'Praticar inglês',
+      goalId,
+      weekdays: [1, 3, 5],
+      startDate: '2026-11-01',
+    });
+
+    const routine = await http().get(`/api/v1/routines/${id}`);
+    expect(routine.body).toMatchObject({
+      goalId,
+      projectId: null,
+      taskId: null,
+      weekdays: [1, 3, 5],
+    });
+
+    const unlinked = await http().put(`/api/v1/routines/${id}`).send({
+      title: 'Praticar inglês',
+      goalId: null,
+      startDate: '2026-11-01',
+    });
+    expect(unlinked.status).toBe(200);
+    expect(unlinked.body.goalId).toBeNull();
+  });
+
   it('checks a day once, refuses the future and unchecks (RN-32, RN-33)', async () => {
     const routineId = await create(app, '/api/v1/routines', {
       title: 'Revisar a agenda',

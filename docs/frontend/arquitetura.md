@@ -102,7 +102,7 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 
 ## 7. Padrões de tela
 
-- Lista com filtros + alternância Lista/Quadro quando o recurso tem status (tarefas); datas no `/calendar` (mês; semana e dia com grade de horas, onde arrastar numa área vazia abre o agendamento preenchido, hook `features/calendar/hooks/use-drag-to-select-range.ts`); timeline nos projetos.
+- Lista com filtros + alternância Por projeto/Lista/Quadro quando o recurso tem status (tarefas; "Por projeto" agrupa a lista em seções por projeto, sem projeto por último); datas no `/calendar` (mês; semana e dia com grade de horas, onde arrastar numa área vazia abre o agendamento preenchido, hook `features/calendar/hooks/use-drag-to-select-range.ts`); timeline nos projetos.
 - Quadro kanban com arrastar e soltar, inclusive por toque (`features/tasks/hooks/use-touch-drag.ts`).
 - Detalhe em página própria (`/projects/view?id=`) ou em `Sheet` lateral (tarefa).
 - Criar/editar em `Dialog`; excluir sempre com confirmação; feedback por toast (sonner).

@@ -18,6 +18,7 @@ export const routineSchema = z.object({
   startDate: z.iso.date("Escolha uma data"),
   projectId: z.string(),
   taskId: z.string(),
+  goalId: z.string(),
   active: z.boolean(),
 });
 
