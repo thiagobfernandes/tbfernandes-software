@@ -60,6 +60,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 |---|---|---|
 | RF-WRK-14 | Agendar um intervalo de horário (título, data, início, fim, tarefa opcional, nota), editar e excluir. Por início e fim ou por início e duração. | S |
 | RF-WRK-15 | Na grade de horas, clicar e arrastar numa área vazia seleciona o intervalo (de 15 em 15 min) e abre o agendamento já preenchido com o dia, o início e o fim. | S |
+| RF-WRK-22 | Ver as rotinas no calendário: na grade de horas, cada dia programado é um bloco do horário da rotina até o horário mais a meta de minutos (30 min sem meta); sem horário, fica no topo do dia; no mês, um resumo de feitas/total. Marcar e desmarcar o dia direto no calendário (nunca no futuro, RN-32). | S |
 | RF-WRK-16 | Apontar em tempo real: iniciar um cronômetro dizendo no que estou trabalhando (descrição, projeto e tarefa opcionais), ver o tempo correndo e parar. Trocar de atividade para o apontamento atual e inicia o próximo no mesmo instante. | S |
 | RF-WRK-17 | Lançar, editar e excluir apontamentos de períodos passados; retomar um apontamento anterior com a mesma descrição, projeto e tarefa. | S |
 | RF-WRK-18 | Ver os apontamentos por dia (navegando entre os dias), com o total do dia, de hoje e da semana; o apontamento em andamento aparece no cabeçalho de todas as telas, com botão para parar. | S |
@@ -240,7 +241,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Companies / Company detail | RF-WRK-01..03 | work |
 | Projects / Project detail | RF-WRK-04..06, RF-KNW-03 | work, knowledge |
 | Tasks (lista, quadro, linha do tempo) | RF-WRK-07..12 | work |
-| Calendar (mês, semana, dia, agendamentos) | RF-WRK-14, RF-WRK-15 | work |
+| Calendar (mês, semana, dia, agendamentos, rotinas) | RF-WRK-14, RF-WRK-15, RF-WRK-22 | work |
 | Apontamentos (`/time-tracking`) | RF-WRK-16, RF-WRK-17, RF-WRK-18 | work |
 | Rotinas (`/routines`) | RF-WRK-19, RF-WRK-20, RF-WRK-21 | work |
 | Knowledge, Snippets, Graph | RF-KNW-01..05 | knowledge |
