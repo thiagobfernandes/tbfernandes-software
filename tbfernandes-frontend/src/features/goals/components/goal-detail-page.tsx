@@ -43,6 +43,11 @@ import {
   tasksOfGoal,
 } from "@/features/goals/lib/goal-progress";
 import { goalAreaLabels } from "@/features/goals/types/goal";
+import {
+  checkOn,
+  frequencyLabel,
+  streak,
+} from "@/features/routines/lib/routines";
 import { priorityLabels } from "@/features/tasks/types/task";
 import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
@@ -83,6 +88,10 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
     (project) => project.goalId === goal.id,
   );
   const tasks = tasksOfGoal(data, goal.id);
+  const today = currentDay();
+  const routines = data.routines.filter(
+    (routine) => routine.goalId === goal.id && routine.active,
+  );
   const studies = data.studies.filter((study) => study.goalId === goal.id);
   const purchases = data.purchases.filter(
     (purchase) => purchase.goalId === goal.id,
@@ -416,6 +425,47 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
                       label={`Progresso de ${project.name}`}
                       barClassName={projectColorClasses[project.color].bg}
                     />
+                  </Link>
+                );
+              })}
+            </CardContent>
+          </Card>
+
+          <Card className="gap-3 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-base">Rotinas</CardTitle>
+              <CardDescription>Hábitos que movem esta meta.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              {routines.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Nenhuma rotina vinculada. Escolha esta meta ao editar uma
+                  rotina.
+                </p>
+              )}
+              {routines.map((routine) => {
+                const days = streak(routine, data.routineChecks, today);
+                const doneToday = Boolean(
+                  checkOn(data.routineChecks, routine.id, today),
+                );
+                return (
+                  <Link
+                    key={routine.id}
+                    href="/routines"
+                    className="flex items-center justify-between gap-2 rounded-lg text-sm hover:text-primary"
+                  >
+                    <span className="flex min-w-0 flex-col">
+                      <span className="truncate font-medium">
+                        {routine.title}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {frequencyLabel(routine.weekdays)}
+                        {doneToday && " · feita hoje"}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                      {days} {days === 1 ? "dia" : "dias"} seguidos
+                    </span>
                   </Link>
                 );
               })}

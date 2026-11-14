@@ -8,6 +8,7 @@ export const RoutinePersistenceMapper = {
       description: entity.description,
       projectId: entity.projectId,
       taskId: entity.taskId,
+      goalId: entity.goalId,
       weekdays: entity.weekdays.map(Number) as Weekday[],
       startTime: entity.startTime,
       targetMinutes: entity.targetMinutes,
@@ -27,6 +28,7 @@ export const RoutinePersistenceMapper = {
     entity.description = details.description;
     entity.projectId = details.projectId;
     entity.taskId = details.taskId;
+    entity.goalId = details.goalId;
     entity.weekdays = details.weekdays;
     entity.startTime = details.startTime;
     entity.targetMinutes = details.targetMinutes;

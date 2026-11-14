@@ -4,6 +4,7 @@ export class RoutineResponse {
   description: string | null;
   projectId: string | null;
   taskId: string | null;
+  goalId: string | null;
   weekdays: number[];
   startTime: string | null;
   targetMinutes: number | null;

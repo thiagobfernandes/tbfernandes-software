@@ -6,6 +6,8 @@ export type Routine = {
   projectId?: string;
   /** The task this routine moves forward; checking a day does not complete it. */
   taskId?: string;
+  /** The goal this habit serves; works with or without a project. */
+  goalId?: string;
   /** ISO weekdays: 1 = Monday ... 7 = Sunday. */
   weekdays: number[];
   /** HH:mm (the API also sends seconds). */

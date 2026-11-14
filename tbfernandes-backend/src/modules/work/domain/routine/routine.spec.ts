@@ -6,6 +6,7 @@ const details = (overrides: Partial<RoutineDetails> = {}): RoutineDetails => ({
   description: null,
   projectId: null,
   taskId: null,
+  goalId: null,
   weekdays: [1, 2, 3, 4, 5, 6, 7],
   startTime: null,
   targetMinutes: null,

@@ -118,6 +118,7 @@ erDiagram
         varchar description
         uuid project_id FK "ON DELETE SET NULL"
         uuid task_id FK "ON DELETE SET NULL"
+        uuid goal_id "goals.goal"
         smallint_array weekdays "1 = seg ... 7 = dom; 1 a 7 itens"
         time start_time
         int target_minutes "1..1440"
@@ -295,7 +296,7 @@ erDiagram
 | `tasks` | `Task` | `work.task` + `work.task_checklist_item` | `checklist {done,total}` → `checklist_done/total`; `checklistItems` → tabela filha ordenada |
 | `appointments` | `Appointment` | `work.appointment` | `date` → `day`; excluir a tarefa deixa o agendamento sem tarefa (FK `ON DELETE SET NULL`) |
 | `timeEntries` | `TimeEntry` | `work.time_entry` | `endedAt` ausente = em andamento; índice único parcial `(owner_id) WHERE ended_at IS NULL` (RN-28); excluir projeto, tarefa ou rotina deixa o apontamento sem vínculo |
-| `routines` | `Routine` | `work.routine` | `weekdays` → `smallint[]`; excluir projeto ou tarefa deixa a rotina sem vínculo |
+| `routines` | `Routine` | `work.routine` | `weekdays` → `smallint[]`; `goalId` → `goal_id` sem FK; excluir projeto ou tarefa deixa a rotina sem vínculo |
 | `routineChecks` | `RoutineCheck` | `work.routine_check` | `date` → `day`; índice único `(routine_id, day)` (RN-33); some com a rotina |
 | `notes` | `Note` | `knowledge.note` + `knowledge.note_link` | `projectIds`/`taskIds` → linhas em `note_link` |
 | `snippets` | `Snippet` | `knowledge.snippet` + `knowledge.snippet_link` | idem, em `snippet_link` |

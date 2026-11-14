@@ -11,12 +11,14 @@ export const EVERY_DAY: Weekday[] = [1, 2, 3, 4, 5, 6, 7];
 /**
  * The editable fields of a routine. taskId points to the task the routine moves forward
  * (the task is not completed by the routine); projectId follows the task when there is one.
+ * goalId points to the goals module (no FK): a habit can serve a goal without any project.
  */
 export interface RoutineDetails {
   title: string;
   description: string | null;
   projectId: string | null;
   taskId: string | null;
+  goalId: string | null;
   weekdays: Weekday[];
   startTime: string | null;
   targetMinutes: number | null;
@@ -84,6 +86,7 @@ export class Routine {
       ),
       projectId: details.projectId ?? null,
       taskId: details.taskId ?? null,
+      goalId: details.goalId ?? null,
       weekdays: Routine.validWeekdays(details.weekdays),
       startTime: Routine.validStartTime(details.startTime),
       targetMinutes: Routine.validTarget(details.targetMinutes),

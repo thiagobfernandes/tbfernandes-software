@@ -6,6 +6,7 @@ export class RoutineRequest {
   description?: string | null;
   projectId?: string | null;
   taskId?: string | null;
+  goalId?: string | null;
   /** ISO weekdays, 1 = Monday ... 7 = Sunday; absent means every day. */
   weekdays?: number[] | null;
   startTime?: string | null;
@@ -19,6 +20,7 @@ export interface ValidRoutineRequest {
   description: string | null;
   projectId: string | null;
   taskId: string | null;
+  goalId: string | null;
   weekdays: Weekday[];
   startTime: string | null;
   targetMinutes: number | null;
@@ -31,6 +33,7 @@ export const routineRequestSchema = Joi.object<ValidRoutineRequest>({
   description: RequestFields.optionalText(2000),
   projectId: RequestFields.optionalUuid(),
   taskId: RequestFields.optionalUuid(),
+  goalId: RequestFields.optionalUuid(),
   weekdays: Joi.array()
     .items(Joi.number().integer().min(1).max(7))
     .min(1)

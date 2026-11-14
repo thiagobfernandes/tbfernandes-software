@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Columns3, List, Plus, Search } from "lucide-react";
+import { Columns3, FolderKanban, List, Plus, Search } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -10,6 +10,7 @@ import { SampleDataBadge } from "@/components/shared/sample-data-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TasksByProject } from "@/features/tasks/components/tasks-by-project";
 import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
 import { TasksBoard } from "@/features/tasks/components/tasks-board";
@@ -67,6 +68,9 @@ export function TasksPage() {
       <Tabs defaultValue="board">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <TabsList>
+            <TabsTrigger value="by-project">
+              <FolderKanban /> Por projeto
+            </TabsTrigger>
             <TabsTrigger value="list">
               <List /> Lista
             </TabsTrigger>
@@ -134,6 +138,14 @@ export function TasksPage() {
           </div>
         </div>
 
+        <TabsContent value="by-project">
+          <TasksByProject
+            tasks={tasks}
+            projectsById={projectsById}
+            today={currentDay()}
+            onSelectTask={setSelectedTaskId}
+          />
+        </TabsContent>
         <TabsContent value="list">
           <TasksList
             tasks={tasks}

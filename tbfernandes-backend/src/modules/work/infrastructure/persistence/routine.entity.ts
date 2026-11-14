@@ -15,6 +15,9 @@ export class RoutineEntity extends AuditedEntity {
   @Column('uuid', { nullable: true })
   taskId: string | null;
 
+  @Column('uuid', { nullable: true })
+  goalId: string | null;
+
   @Column('smallint', { array: true })
   weekdays: number[];
 

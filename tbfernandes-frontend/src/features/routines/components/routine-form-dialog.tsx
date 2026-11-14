@@ -26,7 +26,7 @@ export function RoutineFormDialog({
   today,
   ...dialog
 }: RoutineFormDialogProps) {
-  const { projects, tasks } = useAppData();
+  const { projects, tasks, goals } = useAppData();
   const taskOptions = tasks
     .filter(
       (task) =>
@@ -50,6 +50,7 @@ export function RoutineFormDialog({
         startDate: item?.startDate ?? today,
         projectId: item?.projectId ?? "",
         taskId: item?.taskId ?? "",
+        goalId: item?.goalId ?? "",
         active: item?.active ?? true,
       }}
       fields={[
@@ -84,6 +85,18 @@ export function RoutineFormDialog({
           hint: "Opcional: comparada ao tempo apontado.",
         },
         { name: "startDate", label: "Começa em", type: "date", required: true },
+        {
+          name: "goalId",
+          label: "Meta",
+          type: "select",
+          optional: true,
+          hint: "Para hábitos: a rotina aparece na meta com a sequência de dias.",
+          options: goals
+            .filter(
+              (goal) => goal.status !== "completed" || goal.id === item?.goalId,
+            )
+            .map((goal) => ({ value: goal.id, label: goal.name })),
+        },
         {
           name: "projectId",
           label: "Projeto",
@@ -126,6 +139,7 @@ export function RoutineFormDialog({
             startDate: values.startDate,
             projectId: task?.projectId ?? values.projectId,
             taskId: values.taskId,
+            goalId: values.goalId,
             active: values.active,
           },
           item?.id,
