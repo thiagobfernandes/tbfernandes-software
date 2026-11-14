@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   BadgeCheck,
   CalendarDays,
+  Check,
   ChevronLeft,
   ChevronRight,
   FolderKanban,
@@ -13,6 +14,7 @@ import {
   ListChecks,
   MessageCircle,
   Plus,
+  Repeat,
   ShoppingCart,
   Target,
   type LucideIcon,
@@ -21,6 +23,8 @@ import {
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeading } from "@/components/shared/page-heading";
 import { SampleDataBadge } from "@/components/shared/sample-data-badge";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   buildCalendarEvents,
@@ -35,6 +39,12 @@ import {
   type AppointmentDraft,
 } from "@/features/calendar/components/appointment-sheet";
 import { TimeGrid } from "@/features/calendar/components/time-grid";
+import {
+  routineSlots,
+  type RoutineSlot,
+} from "@/features/calendar/lib/calendar-routines";
+import { rangeLabel } from "@/features/calendar/lib/time";
+import { routineActions } from "@/features/routines/lib/routine-actions";
 import type { TimeRange } from "@/features/calendar/hooks/use-drag-to-select-range";
 import { minutesToTime } from "@/features/calendar/lib/time";
 import type { Appointment } from "@/features/calendar/types/appointment";
@@ -141,6 +151,7 @@ export function CalendarPage() {
   const [cursor, setCursor] = useState<string>();
   const [selectedDay, setSelectedDay] = useState<string>();
   const [hidden, setHidden] = useState<Set<EventKind>>(new Set());
+  const [showRoutines, setShowRoutines] = useState(true);
   const [taskId, setTaskId] = useState<string>();
   const [sheet, setSheet] = useState<SheetState>({ open: false });
   const [heldRange, setHeldRange] = useState<TimeRange | null>(null);
@@ -161,6 +172,31 @@ export function CalendarPage() {
     view === "day"
       ? [focus]
       : Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+  const routineDays = view === "month" ? cells : gridDays;
+  const routinesByDay = new Map<string, RoutineSlot[]>();
+  if (showRoutines) {
+    for (const slot of routineSlots(
+      data.routines,
+      data.routineChecks,
+      routineDays,
+    )) {
+      routinesByDay.set(slot.day, [
+        ...(routinesByDay.get(slot.day) ?? []),
+        slot,
+      ]);
+    }
+  }
+  const visibleRoutines = [...routinesByDay.values()].flat();
+  const activeRoutines = data.routines.filter((routine) => routine.active);
+
+  function toggleRoutine(slot: RoutineSlot) {
+    if (slot.day > today) return;
+    const nowDone = routineActions.toggle(slot.routine, slot.day);
+    toast.success(nowDone ? "Rotina feita" : "Marcação desfeita", {
+      description: slot.routine.title,
+    });
+  }
+
   const taskTitles = useMemo(
     () => new Map(data.tasks.map((task) => [task.id, task.title])),
     [data.tasks],
@@ -272,6 +308,21 @@ export function CalendarPage() {
             </button>
           );
         })}
+        <button
+          type="button"
+          aria-pressed={showRoutines}
+          onClick={() => setShowRoutines((current) => !current)}
+          className={cn(
+            "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            showRoutines && "border-primary/60 bg-primary/10 text-foreground",
+          )}
+        >
+          <Repeat className="size-3.5" aria-hidden />
+          Rotinas
+          <span className="tabular-nums opacity-70">
+            {activeRoutines.length}
+          </span>
+        </button>
       </div>
 
       <div
@@ -340,21 +391,37 @@ export function CalendarPage() {
                 days={gridDays}
                 today={today}
                 appointments={data.appointments}
+                routines={visibleRoutines}
+                onToggleRoutine={toggleRoutine}
                 taskTitles={taskTitles}
                 heldSelection={sheet.open ? heldRange : null}
                 onSelectRange={openForRange}
                 onOpenAppointment={(appointment) =>
                   setSheet({ open: true, appointment })
                 }
-                allDay={(gridDay) =>
-                  (byDay.get(gridDay) ?? [])
-                    .slice(0, 2)
-                    .map((event) => <EventChip key={event.id} event={event} />)
-                }
+                allDay={(gridDay) => (
+                  <>
+                    {(byDay.get(gridDay) ?? []).slice(0, 2).map((event) => (
+                      <EventChip key={event.id} event={event} />
+                    ))}
+                    {(routinesByDay.get(gridDay) ?? [])
+                      .filter((slot) => slot.startMinutes === null)
+                      .map((slot) => (
+                        <RoutineChip
+                          key={slot.key}
+                          slot={slot}
+                          future={gridDay > today}
+                          onToggle={() => toggleRoutine(slot)}
+                        />
+                      ))}
+                  </>
+                )}
               />
               <p className="text-xs text-muted-foreground">
                 Clique e arraste numa área vazia para agendar. No celular,
-                segure um instante antes de arrastar. Esc cancela.
+                segure um instante antes de arrastar. Esc cancela. Rotinas
+                (tracejadas) vão do horário até a meta de minutos (30 min sem
+                meta); clique para marcar como feita.
               </p>
             </>
           ) : (
@@ -371,6 +438,10 @@ export function CalendarPage() {
                 const date = parseDay(cell);
                 const inMonth = date.getUTCMonth() === month.getUTCMonth();
                 const events = byDay.get(cell) ?? [];
+                const cellRoutines = routinesByDay.get(cell) ?? [];
+                const routinesDone = cellRoutines.filter(
+                  (slot) => slot.done,
+                ).length;
                 const isToday = cell === today;
                 const isSelected = cell === day;
                 return (
@@ -409,6 +480,12 @@ export function CalendarPage() {
                           />
                         ),
                       )}
+                      {cellRoutines.length > 0 && (
+                        <span
+                          aria-hidden
+                          className="size-1.5 rounded-full bg-success"
+                        />
+                      )}
                     </span>
                     <span className="hidden flex-col gap-0.5 md:flex">
                       {events.slice(0, MAX_CHIPS).map((event) => (
@@ -417,6 +494,19 @@ export function CalendarPage() {
                       {events.length > MAX_CHIPS && (
                         <span className="px-1 text-[11px] text-muted-foreground">
                           +{events.length - MAX_CHIPS} mais
+                        </span>
+                      )}
+                      {cellRoutines.length > 0 && (
+                        <span className="flex items-center gap-1 truncate rounded bg-success/10 px-1 py-0.5 text-[11px] leading-tight">
+                          <Repeat
+                            className="size-3 shrink-0 text-success"
+                            aria-hidden
+                          />
+                          <span className="truncate tabular-nums">
+                            {cell > today
+                              ? `${cellRoutines.length} ${cellRoutines.length === 1 ? "rotina" : "rotinas"}`
+                              : `${routinesDone}/${cellRoutines.length} rotinas`}
+                          </span>
                         </span>
                       )}
                     </span>
@@ -441,8 +531,23 @@ export function CalendarPage() {
                 events={byDay.get(day) ?? []}
                 today={today}
                 onOpenTask={setTaskId}
-                empty="Nada neste dia."
+                empty={
+                  routinesByDay.get(day)?.length ? undefined : "Nada neste dia."
+                }
               />
+              {(routinesByDay.get(day) ?? []).length > 0 && (
+                <ul aria-label="Rotinas do dia" className="flex flex-col gap-1">
+                  {(routinesByDay.get(day) ?? []).map((slot) => (
+                    <li key={slot.key}>
+                      <RoutineRow
+                        slot={slot}
+                        future={day > today}
+                        onToggle={() => toggleRoutine(slot)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
 
             {overdue.length > 0 && (
@@ -532,6 +637,7 @@ function EventList({
   empty?: string;
 }) {
   if (!events.length) {
+    if (!empty) return null;
     return (
       <p className="flex items-center gap-2 py-2 text-xs text-muted-foreground">
         <CalendarDays className="size-4" aria-hidden /> {empty}
@@ -591,5 +697,86 @@ function EventList({
         );
       })}
     </ul>
+  );
+}
+
+function RoutineChip({
+  slot,
+  future,
+  onToggle,
+}: {
+  slot: RoutineSlot;
+  future: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => !future && onToggle()}
+      aria-disabled={future}
+      aria-pressed={slot.done}
+      title={
+        future
+          ? "Só pode ser marcada no dia"
+          : slot.done
+            ? "Feita: clique para desmarcar"
+            : "Clique para marcar como feita"
+      }
+      className={cn(
+        "flex w-full items-center gap-1 truncate rounded border border-dashed border-success/60 bg-success/10 px-1 py-0.5 text-left text-[11px] leading-tight outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-disabled:cursor-default",
+        slot.done && "border-solid text-muted-foreground line-through",
+      )}
+    >
+      <Repeat className="size-3 shrink-0 text-success" aria-hidden />
+      <span className="truncate">{slot.routine.title}</span>
+    </button>
+  );
+}
+
+function RoutineRow({
+  slot,
+  future,
+  onToggle,
+}: {
+  slot: RoutineSlot;
+  future: boolean;
+  onToggle: () => void;
+}) {
+  const { routine } = slot;
+  const when =
+    slot.startMinutes !== null && slot.endMinutes !== null
+      ? rangeLabel(slot.startMinutes, slot.endMinutes)
+      : "Sem horário";
+  return (
+    <button
+      type="button"
+      onClick={() => !future && onToggle()}
+      aria-disabled={future}
+      aria-pressed={slot.done}
+      className="flex w-full items-center gap-2.5 rounded-md px-1.5 py-1.5 text-left outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-disabled:cursor-default aria-disabled:hover:bg-transparent"
+    >
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-success/10 text-success">
+        {slot.done ? (
+          <Check className="size-3.5" aria-hidden />
+        ) : (
+          <Repeat className="size-3.5" aria-hidden />
+        )}
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span
+          className={cn(
+            "truncate text-sm leading-snug",
+            slot.done && "text-muted-foreground line-through",
+          )}
+        >
+          {routine.title}
+        </span>
+        <span className="text-xs text-muted-foreground tabular-nums">
+          Rotina · {when}
+          {routine.targetMinutes ? ` · ${routine.targetMinutes} min` : ""}
+          {slot.done ? " · feita" : future ? "" : " · clique para marcar"}
+        </span>
+      </span>
+    </button>
   );
 }
