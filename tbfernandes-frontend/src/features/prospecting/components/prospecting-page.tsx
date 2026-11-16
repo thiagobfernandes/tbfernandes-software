@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Megaphone, Search } from "lucide-react";
+import { Megaphone, RefreshCw, Search } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -10,6 +10,8 @@ import { MetricCard } from "@/components/shared/metric-card";
 import { ProgressRing, TickBars } from "@/components/shared/metric-visuals";
 import { PageHeading } from "@/components/shared/page-heading";
 import { SampleDataBadge } from "@/components/shared/sample-data-badge";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,15 +26,21 @@ import {
   classificationLabel,
   formatInstant,
   funnelOf,
+  isWaiting,
   statusMeta,
   statusOrder,
 } from "@/features/prospecting/lib/prospecting";
+import { useWorkerPresence } from "@/features/prospecting/lib/worker-api";
 import type { LeadStatus } from "@/features/prospecting/types/prospecting";
+import { reload } from "@/lib/api/remote-store";
+import { env } from "@/lib/env";
 import { useAppData } from "@/lib/sample-data/store";
 import { useToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 const ALL = "all";
+const WAITING = "waiting";
+type Filter = LeadStatus | typeof ALL | typeof WAITING;
 
 export function ProspectingPage() {
   const data = useAppData();
@@ -40,12 +48,22 @@ export function ProspectingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<LeadStatus | typeof ALL>(ALL);
+  const [status, setStatus] = useState<Filter>(ALL);
+  const worker = useWorkerPresence();
+  const waiting = new Set(
+    data.sendRequests
+      .filter((request) => isWaiting(request.status))
+      .map((request) => request.leadId),
+  );
 
   const funnel = funnelOf(data.prospectLeads, data.prospectMessages, today);
   const needle = query.trim().toLowerCase();
   const visible = data.prospectLeads
-    .filter((lead) => status === ALL || lead.status === status)
+    .filter((lead) =>
+      status === WAITING
+        ? waiting.has(lead.id)
+        : status === ALL || lead.status === status,
+    )
     .filter((lead) =>
       [lead.name, lead.city, lead.whatsapp].some((text) =>
         text?.toLowerCase().includes(needle),
@@ -69,8 +87,33 @@ export function ProspectingPage() {
     <PageContainer className="max-w-none">
       <PageHeading
         title="Prospecção"
-        description="Leads abordados pelo WhatsApp automático, com a conversa de cada um."
-        actions={<SampleDataBadge />}
+        description={
+          waiting.size
+            ? `${waiting.size} mensage${waiting.size === 1 ? "m aguarda" : "ns aguardam"} sua decisão; sem resposta em 1 hora, saem sozinhas.`
+            : "Leads abordados pelo WhatsApp automático, com a conversa de cada um."
+        }
+        actions={
+          <>
+            <SampleDataBadge />
+            {worker && (
+              <Badge
+                variant="outline"
+                className={
+                  worker.connected
+                    ? "border-success/50 text-success"
+                    : "text-muted-foreground"
+                }
+              >
+                {worker.connected ? "Envio ligado" : "Envio desligado"}
+              </Badge>
+            )}
+            {env.dataSource === "api" && (
+              <Button variant="outline" size="sm" onClick={() => void reload()}>
+                <RefreshCw /> Atualizar
+              </Button>
+            )}
+          </>
+        }
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -118,15 +161,14 @@ export function ProspectingPage() {
               </label>
               <Select
                 value={status}
-                onValueChange={(value) =>
-                  setStatus(value as LeadStatus | typeof ALL)
-                }
+                onValueChange={(value) => setStatus(value as Filter)}
               >
                 <SelectTrigger className="w-36" aria-label="Filtrar por status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ALL}>Todos</SelectItem>
+                  <SelectItem value={WAITING}>Aguardando você</SelectItem>
                   {statusOrder.map((value) => (
                     <SelectItem key={value} value={value}>
                       {statusMeta[value].label}
@@ -152,7 +194,16 @@ export function ProspectingPage() {
                       <span className="truncate text-sm font-medium">
                         {lead.name}
                       </span>
-                      <StatusBadge status={lead.status} />
+                      {waiting.has(lead.id) ? (
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 border-primary/60 bg-primary/10 text-primary"
+                        >
+                          Aguardando você
+                        </Badge>
+                      ) : (
+                        <StatusBadge status={lead.status} />
+                      )}
                     </span>
                     <span className="truncate text-xs text-muted-foreground">
                       {[

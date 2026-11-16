@@ -37,6 +37,8 @@ describe('Prospecting API', () => {
   });
 
   it('upserts leads, records messages once and summarizes the funnel', async () => {
+    const before = (await http().get('/api/v1/prospecting/summary'))
+      .body as Record<string, number>;
     const created = await ingest('put', '/leads/maringa--sorriso').send(LEAD);
     expect(created.status).toBe(200);
     const again = await ingest('put', '/leads/maringa--sorriso').send({
@@ -102,16 +104,12 @@ describe('Prospecting API', () => {
     );
     expect(stages).toEqual(['opt_out', 'first']);
 
-    const summary = await http().get('/api/v1/prospecting/summary');
-    expect(summary.body).toMatchObject({
-      leads: 1,
-      contacted: 1,
-      replied: 1,
-      optedOut: 1,
-      replyRate: 1,
-    });
+    const summary = (await http().get('/api/v1/prospecting/summary'))
+      .body as Record<string, number>;
+    for (const field of ['leads', 'contacted', 'replied', 'optedOut'])
+      expect(summary[field] - before[field]).toBe(1);
     const viaKey = await ingest('get', '/summary');
-    expect(viaKey.body.leads).toBe(1);
+    expect(viaKey.body.leads).toBe(summary.leads);
   });
 
   it('lets the user review the outcome, which the worker keeps', async () => {

@@ -149,6 +149,15 @@ Falha ao falar com a Pluggy responde 502.
 | POST | `/webhooks/prospecting/leads/{externalId}/messages` | público, `X-Ingest-Key`; `{ direction, stage, body, sentAt }` → 201, ou 200 se já registrada (RN-36) | PRS-03 |
 | GET | `/webhooks/prospecting/summary` | público, `X-Ingest-Key`; o mesmo resumo, para a dashboard | PRS-04 |
 
+| GET | `/prospecting/send-requests?status=` | pedidos de envio, mais recente primeiro | PRS-05 |
+| PUT | `/prospecting/send-requests/{id}` | `{ status: "approved" }` envia agora; `{ status: "cancelled" }` nunca envia (RN-37) | PRS-05 |
+| GET | `/prospecting/worker` | `{ connected, lastSeenAt }`: se o worker está com o SSE aberto | PRS-05 |
+| GET | `/webhooks/prospecting/events` | `X-Ingest-Key`; Server-Sent Events `send` e `cancel` com `{ requestId }`, `ping` a cada 25 s | PRS-05 |
+| POST | `/webhooks/prospecting/leads/{externalId}/send-requests` | `X-Ingest-Key`; `{ stage, body }` cria o pedido, ou devolve o último do lead e etapa se não falhou | PRS-05 |
+| GET | `/webhooks/prospecting/send-requests/ready` | `X-Ingest-Key`; aprovados ou sem decisão há 1 hora | PRS-05 |
+| POST | `/webhooks/prospecting/send-requests/{id}/claim` | `X-Ingest-Key`; reserva antes de enviar (422 se não está liberado ou foi cancelado) | PRS-05 |
+| POST | `/webhooks/prospecting/send-requests/{id}/result` | `X-Ingest-Key`; `{ sent, error }` | PRS-05 |
+
 Sem `PROSPECTING_INGEST_KEY` (mínimo 32 caracteres), toda chamada do worker recebe 401. Os dados vão para o dono `TBF_AUTH_OWNER_ID`.
 
 ## Assistant

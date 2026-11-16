@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PendingSend } from "@/features/prospecting/components/pending-send";
 import { StatusBadge } from "@/features/prospecting/components/status-badge";
 import {
   classificationLabel,
@@ -44,6 +45,11 @@ export function LeadDetail({
   const messages = data.prospectMessages
     .filter((message) => message.leadId === lead.id)
     .sort((a, b) => a.sentAt.localeCompare(b.sentAt));
+  const pending = data.sendRequests.find(
+    (request) =>
+      request.leadId === lead.id &&
+      (request.status === "pending" || request.status === "approved"),
+  );
   const changed = status !== lead.status || notes !== (lead.notes ?? "");
   const whatsapp = whatsappHref(lead.whatsapp);
 
@@ -100,6 +106,8 @@ export function LeadDetail({
           )}
         </div>
       </header>
+
+      {pending && <PendingSend request={pending} />}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="flex flex-col gap-3 rounded-2xl border bg-card p-5">

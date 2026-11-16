@@ -32,6 +32,7 @@ import type { Method } from "@/features/methods/types/method";
 import type {
   ProspectLead,
   ProspectMessage,
+  SendRequest,
 } from "@/features/prospecting/types/prospecting";
 import type { Company, Project } from "@/features/projects/types/project";
 import type { Task } from "@/features/tasks/types/task";
@@ -61,6 +62,7 @@ import { sampleMethods } from "@/lib/sample-data/methods";
 import {
   sampleProspectLeads,
   sampleProspectMessages,
+  sampleSendRequests,
 } from "@/lib/sample-data/prospecting";
 import {
   sampleCompanies,
@@ -94,6 +96,8 @@ export type AppData = {
   /** Filled by the prospecting worker; the screen only reviews and deletes. */
   prospectLeads: ProspectLead[];
   prospectMessages: ProspectMessage[];
+  /** Messages waiting for approval; the screen approves or cancels them. */
+  sendRequests: SendRequest[];
 };
 
 /** Kept for the work screens written before the other modules existed. */
@@ -130,6 +134,7 @@ const initialData: AppData = {
   routineChecks: sampleRoutineChecks,
   prospectLeads: sampleProspectLeads,
   prospectMessages: sampleProspectMessages,
+  sendRequests: sampleSendRequests,
 };
 
 const idPrefixes: Record<CollectionKey, string> = {
@@ -156,6 +161,7 @@ const idPrefixes: Record<CollectionKey, string> = {
   routineChecks: "rc",
   prospectLeads: "pl",
   prospectMessages: "pm",
+  sendRequests: "sr",
 };
 
 const useApi = env.dataSource === "api";

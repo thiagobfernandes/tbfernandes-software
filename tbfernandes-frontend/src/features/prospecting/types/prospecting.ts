@@ -40,3 +40,22 @@ export type ProspectMessage = {
   body: string;
   sentAt: string;
 };
+
+export type SendRequestStatus =
+  "pending" | "approved" | "sending" | "sent" | "failed" | "cancelled";
+
+/**
+ * A message the worker is about to send. Approved, it goes out now;
+ * untouched, an hour after `requestedAt` (RN-37).
+ */
+export type SendRequest = {
+  id: string;
+  leadId: string;
+  stage: "first" | "follow_up_1" | "follow_up_2";
+  body: string;
+  status: SendRequestStatus;
+  requestedAt: string;
+  autoSendAt: string;
+  resolvedAt?: string;
+  error?: string;
+};

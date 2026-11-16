@@ -4,6 +4,7 @@
 import type {
   ProspectLead,
   ProspectMessage,
+  SendRequest,
 } from "@/features/prospecting/types/prospecting";
 
 export const sampleProspectLeads: ProspectLead[] = [
@@ -66,5 +67,17 @@ export const sampleProspectMessages: ProspectMessage[] = [
     stage: "first",
     body: "Olá, tudo bem? Aqui é o Thiago, da TB Fernandes Softwares. Montei algumas ideias de página para clínicas de Sarandi. Quer ver como ficaria a de vocês?",
     sentAt: "2026-10-22T13:00:00Z",
+  },
+];
+
+export const sampleSendRequests: SendRequest[] = [
+  {
+    id: "sr-1",
+    leadId: "pl-3",
+    stage: "first",
+    body: "Oi! Tudo bem? Sou o Thiago, da TB Fernandes Softwares. Faço sites para clínicas aqui de Maringá e montei uma ideia de página para a Odonto Demo. Posso te mandar para dar uma olhada?",
+    status: "pending",
+    requestedAt: "2026-10-23T12:30:00Z",
+    autoSendAt: "2026-10-23T13:30:00Z",
   },
 ];

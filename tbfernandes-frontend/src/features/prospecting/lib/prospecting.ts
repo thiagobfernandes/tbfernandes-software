@@ -33,6 +33,9 @@ export const statusOrder: LeadStatus[] = [
   "error",
 ];
 
+export const isWaiting = (status: string) =>
+  status === "pending" || status === "approved";
+
 export const classificationLabel: Record<LeadClassification, string> = {
   hot: "Quente",
   warm: "Morno",
