@@ -39,3 +39,9 @@ Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md)
 ### Prospecção: busca e envio independentes
 
 A rotina de busca do tb-site-factory sincroniza cada lead verificado com o CRM sem precisar ligar o WhatsApp. A rotina de envio lê os leads locais e cria os pedidos de aprovação depois, respeitando as travas existentes. A tela acompanha leads, mensagens e pedidos automaticamente por SSE (desktop: consulta a cada 3 segundos). As filas de sincronização da busca e do envio são arquivos separados.
+
+### Continuação: notificações e alinhamento da Prospecção
+
+Implementados o módulo de notificações (V21), eventos da Prospecção, lembretes de tarefas/contatos, API, SSE e sino no cabeçalho. O frontend mostra erros de carregamento/gravação, contador total e links para os destinos. As três colunas da Prospecção compartilham altura no desktop com rolagem interna.
+
+Validação local desta continuação: lint e tipos do frontend, lint/tipos/build do backend e 202 testes unitários aprovados. Um teste de backup foi bloqueado por `spawnSync unzip EPERM`; os e2e não iniciaram por indisponibilidade do runtime Docker. Builds web/desktop foram bloqueados pela restrição de abertura de portas do ambiente (Turbopack); a alternativa Webpack também foi bloqueada ao executar o compilador TypeScript. Validação visual em navegador permanece pendente.

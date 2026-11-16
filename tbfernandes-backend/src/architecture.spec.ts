@@ -12,6 +12,7 @@ const ALLOWED_MODULE_DEPENDENCIES: Record<string, string[]> = {
   goals: ['work', 'learning', 'finance'],
   learning: [],
   prospecting: [],
+  notifications: ['work', 'contacts', 'prospecting'],
   assistant: ['work', 'knowledge', 'goals', 'learning', 'finance', 'contacts'],
 };
 

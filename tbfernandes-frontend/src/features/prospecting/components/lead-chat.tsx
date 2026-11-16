@@ -116,9 +116,9 @@ export function LeadChat({
   return (
     <section
       aria-label={`Conversa com ${lead.name}`}
-      className="flex min-h-[32rem] min-w-0 flex-col overflow-hidden rounded-xl border bg-card xl:h-full xl:min-h-0"
+      className="flex h-[40rem] min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border bg-card xl:h-full"
     >
-      <header className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-3">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-5 py-3">
         <div className="flex min-w-0 flex-col">
           <h3 className="text-sm font-medium">Conversa no WhatsApp</h3>
           <span className="truncate text-xs text-muted-foreground tabular-nums">
@@ -148,7 +148,7 @@ export function LeadChat({
 
       <ol
         ref={scroller}
-        className="flex max-h-[32rem] min-h-0 flex-1 flex-col gap-3 overflow-y-auto bg-muted/30 px-5 py-4 xl:max-h-none"
+        className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain bg-muted/30 px-5 py-4"
       >
         {items.length === 0 && (
           <li className="m-auto max-w-xs text-center text-sm text-muted-foreground">
@@ -181,7 +181,10 @@ export function LeadChat({
         })}
       </ol>
 
-      <form onSubmit={send} className="flex flex-col gap-2 border-t p-4">
+      <form
+        onSubmit={send}
+        className="flex shrink-0 flex-col gap-2 border-t p-4"
+      >
         {optedOut ? (
           <p className="text-sm text-muted-foreground">
             Este lead pediu para não receber mensagens. O envio está bloqueado.
@@ -203,12 +206,10 @@ export function LeadChat({
                 placeholder="Escreva uma mensagem"
                 rows={2}
                 maxLength={4000}
-                className="min-h-11 resize-none max-sm:text-base"
+                className="max-h-40 min-h-11 resize-none max-sm:text-base"
               />
               <Button
                 type="submit"
-                size="icon"
-                className="size-11 active:scale-[0.97] motion-reduce:active:scale-100"
                 disabled={!draft.trim()}
                 aria-label="Enviar mensagem"
               >
@@ -251,7 +252,7 @@ function MessageBubble({
       </span>
       <p
         className={cn(
-          "animate-in rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line duration-200 fade-in-0 zoom-in-95 motion-reduce:animate-none",
+          "animate-in rounded-2xl px-4 py-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] whitespace-pre-line duration-200 fade-in-0 zoom-in-95 motion-reduce:animate-none",
           outbound
             ? "rounded-br-sm bg-primary/15"
             : "rounded-bl-sm border bg-card",
@@ -280,7 +281,7 @@ function QueuedBubble({ request }: { request: SendRequest }) {
       </span>
       <p
         className={cn(
-          "rounded-2xl rounded-br-sm border border-dashed px-4 py-2.5 text-sm whitespace-pre-line text-muted-foreground",
+          "rounded-2xl rounded-br-sm border border-dashed px-4 py-2.5 text-sm [overflow-wrap:anywhere] whitespace-pre-line text-muted-foreground",
           failed && "border-destructive/60",
         )}
       >

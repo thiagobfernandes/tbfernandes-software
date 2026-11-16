@@ -117,3 +117,11 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 - **Visual** em `lib/document-styles.ts`: CSS de impressão próprio, com escopo `.tbdoc`, paleta preto e dourado da plataforma, cobre do portfólio como acento e tipografia Fraunces + Manrope. É a única exceção à regra de cores por token, porque o CSS vai dentro dos arquivos exportados.
 - **Exportar**: “Gerar PDF” imprime um HTML autocontido num iframe oculto (escolher *Salvar como PDF*, A4, sem margens, gráficos de fundo); “Baixar HTML” salva o mesmo arquivo, com imagens embutidas, que também pode virar PDF pelo `scripts/pdf/html-to-pdf.mjs` do portfólio.
 - **Dados**: os documentos ficam no `localStorage` do navegador (`tbf-documents-v1`, `lib/document-store.ts`), fora do store principal, porque a API ainda não tem a coleção. O PDF/HTML exportado é a cópia definitiva.
+
+## Notificações no cabeçalho
+
+`features/notifications` integra o sino em todas as páginas do shell. O hook lê até 50 avisos e o contador total pela API, recebe SSE no navegador e reconcilia a cada minuto e ao recuperar foco. No desktop, consulta a cada 15 segundos para preservar a autenticação por header. É uma exceção ao store: os avisos só existem no servidor; o modo local mostra uma explicação, sem dados fictícios. Falhas de leitura e gravação têm feedback e permitem tentar novamente.
+
+O painel permite abrir o destino do aviso, marcar um ou todos como lidos e pedir permissão para alertas do navegador por ação explícita. Com permissão, novos avisos também geram alertas quando a aba está oculta.
+
+Na Prospecção, a partir de `xl`, lista, conversa e acompanhamento compartilham a altura do espaço de trabalho e rolam por dentro. O cabeçalho, paginação e compositor permanecem disponíveis. Em larguras menores, os painéis se reorganizam; a conversa conserva altura limitada e rolagem própria.

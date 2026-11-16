@@ -24,6 +24,7 @@ import { IdentityModule } from './modules/identity/identity.module';
 import { CsrfMiddleware } from './modules/identity/infrastructure/security/csrf.middleware';
 import { LearningModule } from './modules/learning/learning.module';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
+import { NotificationsModule } from './modules/notifications';
 import { ProspectingModule } from './modules/prospecting';
 import { WorkModule } from './modules/work/work.module';
 
@@ -42,6 +43,7 @@ import { WorkModule } from './modules/work/work.module';
     GoalsModule,
     AssistantModule,
     ProspectingModule,
+    NotificationsModule,
     DesktopModule.forProfile(process.env.TBF_PROFILE),
   ],
 })

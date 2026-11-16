@@ -78,9 +78,9 @@ export function LeadList({
   return (
     <section
       aria-label="Leads"
-      className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card xl:h-full"
+      className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border bg-card lg:max-xl:max-h-[48rem]"
     >
-      <div className="flex flex-col gap-2 border-b p-3">
+      <div className="flex shrink-0 flex-col gap-2 border-b p-3">
         <label className="relative">
           <span className="sr-only">Buscar leads</span>
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -117,7 +117,7 @@ export function LeadList({
         </Select>
       </div>
 
-      <ul className="flex flex-col divide-y xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
+      <ul className="flex min-h-0 flex-1 flex-col divide-y overflow-y-auto overscroll-contain">
         {shown.map((lead) => {
           const selected = lead.id === selectedId;
           const last = relativeTime(lead.lastMessageAt, now);
@@ -183,7 +183,7 @@ export function LeadList({
         )}
       </ul>
 
-      <footer className="mt-auto flex items-center justify-between gap-2 border-t px-3 py-2">
+      <footer className="mt-auto flex shrink-0 items-center justify-between gap-2 border-t px-3 py-2">
         <span className="text-xs text-muted-foreground tabular-nums">
           {from}–{to} de {leads.length}
           {leads.length !== total && ` (${total} no total)`}
@@ -192,7 +192,7 @@ export function LeadList({
           <Button
             variant="ghost"
             size="icon"
-            className="size-11 sm:size-8"
+            className="size-8"
             disabled={current === 0}
             onClick={() => setPage(current - 1)}
             aria-label="Página anterior"
@@ -205,7 +205,7 @@ export function LeadList({
           <Button
             variant="ghost"
             size="icon"
-            className="size-11 sm:size-8"
+            className="size-8"
             disabled={current >= pages - 1}
             onClick={() => setPage(current + 1)}
             aria-label="Próxima página"

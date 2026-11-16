@@ -4,6 +4,7 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { NavigationBreadcrumbs } from "@/components/layout/navigation-breadcrumbs";
 import { SidebarToggle } from "@/components/layout/sidebar-toggle";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { CommandPalette } from "@/features/search/command-palette";
 import { RunningTimerChip } from "@/features/time-tracking/components/running-timer-chip";
 
@@ -23,6 +24,7 @@ export function AppHeader() {
       </div>
       <div className="flex items-center justify-end gap-1 sm:flex-1">
         <RunningTimerChip />
+        <NotificationBell />
         <ThemeToggle />
         <span
           aria-label="Thiago Borges Fernandes"
