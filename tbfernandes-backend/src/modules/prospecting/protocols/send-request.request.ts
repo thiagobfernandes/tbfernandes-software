@@ -1,7 +1,7 @@
 import { Joi, RequestFields } from '../../../common/protocols';
 import {
+  ASKABLE_STAGES,
   SEND_REQUEST_STATUSES,
-  SENDABLE_STAGES,
   SendableStage,
   SendRequestStatus,
 } from '../domain';
@@ -19,7 +19,7 @@ export interface ValidSendAskRequest {
 }
 
 export const sendAskRequestSchema = Joi.object<ValidSendAskRequest>({
-  stage: RequestFields.enumOf(SENDABLE_STAGES).required(),
+  stage: RequestFields.enumOf(ASKABLE_STAGES).required(),
   body: RequestFields.requiredText(4000),
 });
 
@@ -59,4 +59,20 @@ export interface SendRequestListQuery {
 export const sendRequestListQuerySchema = Joi.object<SendRequestListQuery>({
   status: RequestFields.optionalEnumOf(SEND_REQUEST_STATUSES),
   ...RequestFields.paging(),
+});
+
+/** Body of POST /prospecting/send-requests: a message the user writes in the chat. */
+export class ManualSendRequest {
+  leadId: string;
+  body: string;
+}
+
+export interface ValidManualSendRequest {
+  leadId: string;
+  body: string;
+}
+
+export const manualSendRequestSchema = Joi.object<ValidManualSendRequest>({
+  leadId: RequestFields.uuid().required(),
+  body: RequestFields.requiredText(4000),
 });

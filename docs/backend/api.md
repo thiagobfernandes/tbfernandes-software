@@ -150,6 +150,7 @@ Falha ao falar com a Pluggy responde 502.
 | GET | `/webhooks/prospecting/summary` | público, `X-Ingest-Key`; o mesmo resumo, para a dashboard | PRS-04 |
 
 | GET | `/prospecting/send-requests?status=` | pedidos de envio, mais recente primeiro | PRS-05 |
+| POST | `/prospecting/send-requests` | `{ leadId, body }`: mensagem escrita no chat, já aprovada; 422 se o lead pediu para sair (RN-35) | PRS-06 |
 | PUT | `/prospecting/send-requests/{id}` | `{ status: "approved" }` envia agora; `{ status: "cancelled" }` nunca envia (RN-37) | PRS-05 |
 | GET | `/prospecting/worker` | `{ connected, lastSeenAt }`: se o worker está com o SSE aberto | PRS-05 |
 | GET | `/webhooks/prospecting/events` | `X-Ingest-Key`; Server-Sent Events `send` e `cancel` com `{ requestId }`, `ping` a cada 25 s | PRS-05 |

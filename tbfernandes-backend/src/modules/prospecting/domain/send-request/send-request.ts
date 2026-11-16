@@ -11,8 +11,10 @@ export const SEND_REQUEST_STATUSES = [
 ] as const;
 export type SendRequestStatus = (typeof SEND_REQUEST_STATUSES)[number];
 
-/** Stages the worker asks to send; replies are never requested. */
-export const SENDABLE_STAGES = ['FIRST', 'FOLLOW_UP_1', 'FOLLOW_UP_2'] as const;
+/** Stages the worker asks to send (the automatic sequence). */
+export const ASKABLE_STAGES = ['FIRST', 'FOLLOW_UP_1', 'FOLLOW_UP_2'] as const;
+/** Everything a request can carry: the sequence and the user's own messages. */
+export const SENDABLE_STAGES = [...ASKABLE_STAGES, 'MANUAL'] as const;
 export type SendableStage = (typeof SENDABLE_STAGES)[number] & MessageStage;
 
 /** RN-37: without the user's answer, a request goes out on its own after this long. */
@@ -63,6 +65,27 @@ export class SendRequest {
         error: null,
       },
     );
+  }
+
+  /** RF-PRS-06: a message the user wrote in the chat; already approved. */
+  static manual(
+    id: string,
+    ownerId: string,
+    request: { leadId: string; body: string },
+    now: Date,
+  ): SendRequest {
+    const created = SendRequest.create(
+      id,
+      ownerId,
+      { ...request, stage: 'MANUAL' },
+      now,
+    );
+    created._details = {
+      ...created._details,
+      status: 'APPROVED',
+      autoSendAt: now,
+    };
+    return created;
   }
 
   static restore(

@@ -30,7 +30,13 @@ export type ProspectLead = {
 
 export type MessageDirection = "outbound" | "inbound";
 export type MessageStage =
-  "first" | "follow_up_1" | "follow_up_2" | "reply" | "opt_out";
+  | "first"
+  | "follow_up_1"
+  | "follow_up_2"
+  | "reply"
+  | "opt_out"
+  /** Written by you in the chat. */
+  | "manual";
 
 export type ProspectMessage = {
   id: string;
@@ -51,7 +57,7 @@ export type SendRequestStatus =
 export type SendRequest = {
   id: string;
   leadId: string;
-  stage: "first" | "follow_up_1" | "follow_up_2";
+  stage: "first" | "follow_up_1" | "follow_up_2" | "manual";
   body: string;
   status: SendRequestStatus;
   requestedAt: string;

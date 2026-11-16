@@ -2,80 +2,73 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Megaphone, RefreshCw, Search } from "lucide-react";
+import { Megaphone, PlugZap, RefreshCw, Unplug } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { EmptyState } from "@/components/shared/empty-state";
-import { MetricCard } from "@/components/shared/metric-card";
-import { ProgressRing, TickBars } from "@/components/shared/metric-visuals";
 import { PageHeading } from "@/components/shared/page-heading";
 import { SampleDataBadge } from "@/components/shared/sample-data-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { DecisionQueue } from "@/features/prospecting/components/decision-queue";
+import { FunnelStrip } from "@/features/prospecting/components/funnel-strip";
 import { LeadDetail } from "@/features/prospecting/components/lead-detail";
-import { StatusBadge } from "@/features/prospecting/components/status-badge";
 import {
-  classificationLabel,
-  formatInstant,
-  funnelOf,
-  isWaiting,
-  statusMeta,
-  statusOrder,
-} from "@/features/prospecting/lib/prospecting";
+  ALL,
+  LeadList,
+  WAITING,
+  type LeadFilter,
+} from "@/features/prospecting/components/lead-list";
+import { funnelOf, isWaiting } from "@/features/prospecting/lib/prospecting";
 import { useProspectingLive } from "@/features/prospecting/lib/use-prospecting-live";
 import { useWorkerPresence } from "@/features/prospecting/lib/worker-api";
-import type { LeadStatus } from "@/features/prospecting/types/prospecting";
+import type { ProspectLead } from "@/features/prospecting/types/prospecting";
+import { useNow } from "@/features/time-tracking/hooks/use-now";
 import { reload } from "@/lib/api/remote-store";
 import { env } from "@/lib/env";
 import { useAppData } from "@/lib/sample-data/store";
 import { useToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
-const ALL = "all";
-const WAITING = "waiting";
-type Filter = LeadStatus | typeof ALL | typeof WAITING;
+const classificationOrder: Record<string, number> = {
+  hot: 0,
+  warm: 1,
+  cold: 2,
+};
 
 export function ProspectingPage() {
   const data = useAppData();
   useProspectingLive();
   const today = useToday();
+  const now = useNow(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<Filter>(ALL);
+  const [filter, setFilter] = useState<LeadFilter>(ALL);
   const worker = useWorkerPresence();
+  const workerConnected = worker ? worker.connected : null;
+
+  const funnel = funnelOf(data.prospectLeads, data.prospectMessages, today);
   const waiting = new Set(
     data.sendRequests
       .filter((request) => isWaiting(request.status))
       .map((request) => request.leadId),
   );
-
-  const funnel = funnelOf(data.prospectLeads, data.prospectMessages, today);
+  const pendingCount = data.sendRequests.filter(
+    (request) => request.status === "pending",
+  ).length;
   const needle = query.trim().toLowerCase();
   const visible = data.prospectLeads
-    .filter((lead) =>
-      status === WAITING
-        ? waiting.has(lead.id)
-        : status === ALL || lead.status === status,
-    )
+    .filter((lead) => {
+      if (filter === WAITING) return waiting.has(lead.id);
+      return filter === ALL || lead.status === filter;
+    })
     .filter((lead) =>
       [lead.name, lead.city, lead.whatsapp].some((text) =>
         text?.toLowerCase().includes(needle),
       ),
     )
-    .sort(
-      (a, b) =>
-        (b.lastMessageAt ?? "").localeCompare(a.lastMessageAt ?? "") ||
-        a.name.localeCompare(b.name),
-    );
+    .sort(compareLeads(waiting));
   const selectedId = searchParams.get("lead") ?? visible[0]?.id;
   const selected = data.prospectLeads.find((lead) => lead.id === selectedId);
 
@@ -86,26 +79,24 @@ export function ProspectingPage() {
   }
 
   return (
-    <PageContainer className="max-w-none">
+    <PageContainer className="flex max-w-none flex-col gap-6">
       <PageHeading
         title="Prospecção"
-        description={
-          waiting.size
-            ? `${waiting.size} mensage${waiting.size === 1 ? "m aguarda" : "ns aguardam"} sua decisão; sem resposta em 1 hora, saem sozinhas.`
-            : "Leads abordados pelo WhatsApp automático, com a conversa de cada um."
-        }
+        description={headline(pendingCount, funnel.contacted, funnel.queued)}
         actions={
           <>
             <SampleDataBadge />
             {worker && (
               <Badge
                 variant="outline"
-                className={
+                className={cn(
+                  "gap-1.5",
                   worker.connected
                     ? "border-success/50 text-success"
-                    : "text-muted-foreground"
-                }
+                    : "text-muted-foreground",
+                )}
               >
+                {worker.connected ? <PlugZap /> : <Unplug />}
                 {worker.connected ? "Envio ligado" : "Envio desligado"}
               </Badge>
             )}
@@ -118,27 +109,14 @@ export function ProspectingPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MetricCard
-          label="Leads"
-          value={funnel.leads}
-          visual={<TickBars values={funnel.sentPerDay} />}
-        />
-        <MetricCard label="Contatados" value={funnel.contacted} />
-        <MetricCard
-          label="Responderam"
-          value={Math.round(funnel.replyRate * 100)}
-          unit="%"
-          visual={
-            <ProgressRing value={funnel.replied} total={funnel.contacted} />
-          }
-        />
-        <MetricCard
-          label="Fecharam"
-          value={funnel.converted}
-          unit={funnel.optedOut ? `· ${funnel.optedOut} saíram` : undefined}
-        />
-      </div>
+      <FunnelStrip funnel={funnel} today={today} />
+
+      <DecisionQueue
+        requests={data.sendRequests}
+        leads={data.prospectLeads}
+        selectedId={selected?.id}
+        onSelect={select}
+      />
 
       {data.prospectLeads.length === 0 ? (
         <EmptyState
@@ -147,92 +125,25 @@ export function ProspectingPage() {
           description="Os leads aparecem aqui assim que a rotina de busca do tb-site-factory os verificar e sincronizar."
         />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
-          <aside className="flex flex-col gap-3">
-            <div className="flex gap-2">
-              <label className="relative flex-1">
-                <span className="sr-only">Buscar leads</span>
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Nome, cidade ou número"
-                  className="pl-9"
-                />
-              </label>
-              <Select
-                value={status}
-                onValueChange={(value) => setStatus(value as Filter)}
-              >
-                <SelectTrigger className="w-36" aria-label="Filtrar por status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL}>Todos</SelectItem>
-                  <SelectItem value={WAITING}>Aguardando você</SelectItem>
-                  {statusOrder.map((value) => (
-                    <SelectItem key={value} value={value}>
-                      {statusMeta[value].label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <ul className="flex flex-col gap-2">
-              {visible.map((lead) => (
-                <li key={lead.id}>
-                  <button
-                    type="button"
-                    aria-current={lead.id === selected?.id ? "true" : undefined}
-                    onClick={() => select(lead.id)}
-                    className={cn(
-                      "flex w-full flex-col gap-1.5 rounded-xl border bg-card p-3 text-left outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50",
-                      lead.id === selected?.id &&
-                        "border-primary/60 bg-primary/5",
-                    )}
-                  >
-                    <span className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium">
-                        {lead.name}
-                      </span>
-                      {waiting.has(lead.id) ? (
-                        <Badge
-                          variant="outline"
-                          className="shrink-0 border-primary/60 bg-primary/10 text-primary"
-                        >
-                          Aguardando você
-                        </Badge>
-                      ) : (
-                        <StatusBadge status={lead.status} />
-                      )}
-                    </span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {[
-                        lead.city,
-                        lead.classification &&
-                          classificationLabel[lead.classification],
-                        lead.lastMessageAt &&
-                          `última: ${formatInstant(lead.lastMessageAt)}`,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
-                  </button>
-                </li>
-              ))}
-              {visible.length === 0 && (
-                <li className="rounded-xl border border-dashed px-3 py-6 text-center text-xs text-muted-foreground">
-                  Nenhum lead encontrado.
-                </li>
-              )}
-            </ul>
-          </aside>
-
+        <div className="grid items-start gap-4 lg:grid-cols-[20rem_minmax(0,1fr)]">
+          <LeadList
+            leads={visible}
+            total={data.prospectLeads.length}
+            waiting={waiting}
+            selectedId={selected?.id}
+            now={now}
+            query={query}
+            onQuery={setQuery}
+            filter={filter}
+            onFilter={setFilter}
+            onSelect={select}
+          />
           {selected ? (
             <LeadDetail
               key={selected.id}
               lead={selected}
+              now={now}
+              workerConnected={workerConnected}
               onDeleted={() => select(undefined)}
             />
           ) : (
@@ -242,4 +153,22 @@ export function ProspectingPage() {
       )}
     </PageContainer>
   );
+}
+
+function headline(pending: number, contacted: number, queued: number) {
+  if (pending)
+    return `${pending} mensage${pending === 1 ? "m aguarda" : "ns aguardam"} sua decisão.`;
+  if (contacted === 0 && queued > 0)
+    return `${queued} leads sem site prontos para a primeira mensagem.`;
+  return "Leads abordados pelo WhatsApp, com a conversa e o resultado de cada um.";
+}
+
+/** Waiting for you first, then the latest conversation, then hot before warm. */
+function compareLeads(waiting: Set<string>) {
+  return (a: ProspectLead, b: ProspectLead) =>
+    Number(waiting.has(b.id)) - Number(waiting.has(a.id)) ||
+    (b.lastMessageAt ?? "").localeCompare(a.lastMessageAt ?? "") ||
+    (classificationOrder[a.classification ?? ""] ?? 9) -
+      (classificationOrder[b.classification ?? ""] ?? 9) ||
+    a.name.localeCompare(b.name);
 }
