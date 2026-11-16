@@ -50,6 +50,7 @@ export const stageLabel: Record<MessageStage, string> = {
   reply: "Resposta",
   opt_out: "Pediu para sair",
   manual: "Mensagem sua",
+  auto_reply: "Resposta automática",
 };
 
 const dateTime = new Intl.DateTimeFormat("pt-BR", {

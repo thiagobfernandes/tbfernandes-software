@@ -73,4 +73,17 @@ describe('Lead', () => {
     lead.syncFrom(source({ status: 'ACTIVE' }));
     expect(lead.details.status).toBe('OPTED_OUT');
   });
+
+  it('ignores automatic greetings and recounts after a reclassification (RN-38)', () => {
+    const lead = Lead.create('l1', 'o1', source());
+    lead.messageRecorded('OUTBOUND', 'FIRST', at('12:00:00'));
+    lead.messageRecorded('INBOUND', 'AUTO_REPLY', at('12:00:03'));
+    expect(lead.details.status).toBe('ACTIVE');
+    expect(lead.details.lastReplyAt).toBeNull();
+
+    lead.messageRecorded('INBOUND', 'REPLY', at('12:00:05'));
+    expect(lead.details.status).toBe('REPLIED');
+    lead.repliesRecounted(null);
+    expect(lead.details).toMatchObject({ status: 'ACTIVE', lastReplyAt: null });
+  });
 });

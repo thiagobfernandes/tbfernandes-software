@@ -145,6 +145,7 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | PRS-03 | Rota pública para o worker com `PROSPECTING_INGEST_KEY`, upsert idempotente (RF-PRS-03, RN-36) | M | ✅ |
 | PRS-05 | Pedidos de envio com aprovação ou envio automático em 1 hora, SSE para o worker e status do worker na tela (RF-PRS-05, RN-37) | M | ✅ |
 | PRS-06 | Mensagem manual pelo chat (etapa `manual`, V19) e redesign da tela: funil, fila de decisão, lista paginada, conversa e painel de acompanhamento (RF-PRS-06) | M | ✅ |
+| PRS-07 | Saudações automáticas do WhatsApp Business não contam como resposta (etapa `AUTO_REPLY`, V20) e reclassificação das já registradas (RN-38) | P | ✅ |
 | PRS-04 | Resumo do funil `/prospecting/summary` e tela Prospecção (RF-PRS-04) | M | ✅ |
 
 ## Épico AST — Assistant

@@ -83,6 +83,43 @@ export class LeadIngestionService {
     });
   }
 
+  /** RN-38: marks a received message as an automatic greeting (or back) and recounts the lead. */
+  reclassify(
+    ownerId: string,
+    externalId: string,
+    sentAt: Date,
+    stage: 'REPLY' | 'AUTO_REPLY',
+  ): Promise<LeadMessage> {
+    return this.uow.run(async () => {
+      const lead = await this.leads.findByExternalId(ownerId, externalId);
+      if (!lead) throw new NotFoundError('O lead', externalId);
+      const message = await this.messages.findSame(
+        ownerId,
+        lead.id,
+        'INBOUND',
+        sentAt,
+      );
+      if (!message) throw new NotFoundError('A mensagem', sentAt.toISOString());
+      message.reclassify(stage);
+      const saved = await this.messages.save(message);
+      const replies = (await this.messages.findAll(ownerId, lead.id)).filter(
+        (item) =>
+          item.details.direction === 'INBOUND' &&
+          (item.details.stage === 'REPLY' || item.details.stage === 'OPT_OUT'),
+      );
+      const last = replies.reduce<Date | null>(
+        (latestSoFar, item) =>
+          latestSoFar == null || item.details.sentAt > latestSoFar
+            ? item.details.sentAt
+            : latestSoFar,
+        null,
+      );
+      lead.repliesRecounted(last);
+      await this.leads.save(lead);
+      return saved;
+    });
+  }
+
   summary(ownerId: string): Promise<ProspectingSummary> {
     return summaryFor(ownerId, this.leads, this.messages, this.clock);
   }

@@ -125,6 +125,13 @@ export class Lead {
 
   private received(stage: MessageStage, at: Date): void {
     const details = this._details;
+    if (stage === 'AUTO_REPLY') {
+      this._details = {
+        ...details,
+        lastMessageAt: latest(details.lastMessageAt, at),
+      };
+      return;
+    }
     let status: LeadStatus = details.status;
     if (stage === 'OPT_OUT') status = 'OPTED_OUT';
     else if (!STICKY.includes(status)) status = 'REPLIED';
@@ -134,6 +141,19 @@ export class Lead {
       lastMessageAt: latest(details.lastMessageAt, at),
       lastReplyAt: latest(details.lastReplyAt, at),
     };
+  }
+
+  /**
+   * RN-38: after a reply turned out to be an automatic greeting, the last real reply is the
+   * one given; with none left, a lead marked as replied goes back to waiting for one.
+   */
+  repliesRecounted(lastRealReply: Date | null): void {
+    const details = this._details;
+    const status =
+      lastRealReply == null && details.status === 'REPLIED'
+        ? 'ACTIVE'
+        : details.status;
+    this._details = { ...details, lastReplyAt: lastRealReply, status };
   }
 
   private static validated(source: LeadSource): LeadSource {

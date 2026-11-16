@@ -23,6 +23,12 @@ export class TypeOrmLeadMessageRepository extends LeadMessageRepository {
     return message;
   }
 
+  async save(message: LeadMessage): Promise<LeadMessage> {
+    return Mapper.toDomain(
+      await this.rows.saveEntity(Mapper.toEntity(message)),
+    );
+  }
+
   async findAll(
     ownerId: string,
     leadId: string | null,

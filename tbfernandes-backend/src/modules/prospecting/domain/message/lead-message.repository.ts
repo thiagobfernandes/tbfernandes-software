@@ -2,6 +2,7 @@ import { LeadMessage, MessageDirection } from './lead-message';
 
 export abstract class LeadMessageRepository {
   abstract create(message: LeadMessage): Promise<LeadMessage>;
+  abstract save(message: LeadMessage): Promise<LeadMessage>;
   /** Newest first; all of the owner's when leadId is null. */
   abstract findAll(
     ownerId: string,

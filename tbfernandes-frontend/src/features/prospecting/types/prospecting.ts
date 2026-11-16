@@ -36,7 +36,9 @@ export type MessageStage =
   | "reply"
   | "opt_out"
   /** Written by you in the chat. */
-  | "manual";
+  | "manual"
+  /** The business's automatic greeting: not a reply (RN-38). */
+  | "auto_reply";
 
 export type ProspectMessage = {
   id: string;

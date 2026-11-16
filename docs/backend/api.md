@@ -147,6 +147,7 @@ Falha ao falar com a Pluggy responde 502.
 | GET | `/prospecting/summary` | funil, por status, classificação, cidade e envios por dia (30 dias) | PRS-04 |
 | PUT | `/webhooks/prospecting/leads/{externalId}` | público, `X-Ingest-Key`; cria ou atualiza pelo id do worker (RN-35) | PRS-03 |
 | POST | `/webhooks/prospecting/leads/{externalId}/messages` | público, `X-Ingest-Key`; `{ direction, stage, body, sentAt }` → 201, ou 200 se já registrada (RN-36) | PRS-03 |
+| PUT | `/webhooks/prospecting/leads/{externalId}/messages` | `X-Ingest-Key`; `{ sentAt, stage: "auto_reply" \| "reply" }` reclassifica uma mensagem recebida e reconta o lead (RN-38) | PRS-07 |
 | GET | `/webhooks/prospecting/summary` | público, `X-Ingest-Key`; o mesmo resumo, para a dashboard | PRS-04 |
 
 | GET | `/prospecting/send-requests?status=` | pedidos de envio, mais recente primeiro | PRS-05 |
