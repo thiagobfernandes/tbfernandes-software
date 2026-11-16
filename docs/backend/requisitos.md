@@ -121,6 +121,16 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-CTC-03 | Criar uma tarefa de follow-up a partir de uma interação. | S |
 | RF-CTC-04 | Listar contatos com próximo contato vencido ou próximo. | S |
 
+### 2.8.1 Prospecting (`/prospecting`)
+
+| Id | Requisito | Prior. |
+|---|---|---|
+| RF-PRS-01 | Guardar os leads abordados pela prospecção automática (nome, cidade, WhatsApp, Instagram, Maps, classificação e status), identificados pelo id do worker (`externalId`). | M |
+| RF-PRS-02 | Registrar cada mensagem enviada ou recebida (etapa, texto, horário) e manter as datas de 1º contato, última mensagem e última resposta e o status do lead. | M |
+| RF-PRS-03 | Receber leads e mensagens do worker de prospecção (tb-site-factory, no computador do usuário) por uma rota pública autenticada por chave (`X-Ingest-Key`). | M |
+| RF-PRS-05 | Antes de cada envio, o worker cria um pedido com o texto; o usuário envia agora ou cancela na tela, e o worker conectado por SSE (`/webhooks/prospecting/events`) recebe a decisão na hora. | M |
+| RF-PRS-04 | Mostrar o funil (leads, contatados, responderam, opt-out, fecharam, taxa de resposta, envios por dia e por cidade) e permitir ao usuário anotar e marcar o resultado de cada lead. | M |
+
 ### 2.9 Assistant (`/assistant`)
 
 | ID | Requisito | Prio |
@@ -177,6 +187,9 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RN-32 | Uma rotina só é marcada num dia em que está programada (ativa, a partir da data de início e num dos seus dias da semana) e nunca num dia futuro. | `Routine.isDueOn`, `RoutineCheck.create` |
 | RN-33 | Uma rotina é marcada no máximo uma vez por dia (409). | `RoutineCheckService` + índice único |
 | RN-34 | A rotina não gera tarefas: ela aponta para a tarefa que avança (marcar o dia não conclui a tarefa) e o projeto vem da tarefa. Um apontamento com rotina herda a tarefa e o projeto dela quando não tem os seus. Excluir a rotina apaga as marcações e mantém os apontamentos, sem a rotina; excluir a tarefa ou o projeto deixa a rotina sem vínculo. | `RoutineService`, `TimeEntryService` + FKs |
+| RN-35 | Um lead que pediu para sair não recebe mais mensagens (422), e o worker nunca desfaz um opt-out nem um "fechou" marcado pelo usuário ao sincronizar de novo. | `Lead.syncFrom`, `Lead.messageRecorded` |
+| RN-36 | A mesma mensagem (lead, direção e horário) é registrada uma vez só: o worker pode reenviar depois de uma falha e recebe a já gravada (200). | `LeadIngestionService.record` + índice único |
+| RN-37 | Um pedido de envio sem decisão sai sozinho 1 hora depois de criado, se o worker estiver rodando; aprovado, sai na hora. O worker reserva o pedido antes de enviar, então um cancelamento que chega antes sempre vence, e cada pedido é enviado uma vez só. | `SendRequest` |
 | RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais
@@ -250,5 +263,6 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Learning, Certifications | RF-LRN-01..06 | learning |
 | Finance (cash flow, purchases) | RF-FIN-01..04 | finance |
 | Contacts | RF-CTC-01..04 | contacts |
+| Prospecção (`/prospecting`) | RF-PRS-01..05 | prospecting |
 | Assistant | RF-AST-01 | assistant |
 | Settings | RF-GEN-01..03 | identity |

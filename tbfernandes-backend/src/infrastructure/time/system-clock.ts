@@ -25,4 +25,8 @@ export class SystemClock extends Clock {
   startOfWeek(): Date {
     return DateTime.now().setZone(this.zone).startOf('week').toJSDate();
   }
+
+  dayOf(instant: Date): IsoDate {
+    return DateTime.fromJSDate(instant).setZone(this.zone).toISODate()!;
+  }
 }

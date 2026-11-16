@@ -136,6 +136,16 @@ Feito na [etapa 7](implementacao/etapa-7-open-finance.md). Falta testar contra a
 | CTC-04 | Próximos contatos e vencidos (RF-CTC-04) | P | ✅ |
 | CTC-05 | Ligar tela Contacts à API | M | ✅ etapa 9 |
 
+## Épico PRS — Prospecção automática
+
+| Id | Item | Tam. | Status |
+|---|---|---|---|
+| PRS-01 | Leads e mensagens: schema `prospecting`, domínio e listagem (RF-PRS-01, RF-PRS-02, RN-35) | M | ✅ |
+| PRS-02 | Revisão do lead pelo usuário: status e anotações (RF-PRS-04) | P | ✅ |
+| PRS-03 | Rota pública para o worker com `PROSPECTING_INGEST_KEY`, upsert idempotente (RF-PRS-03, RN-36) | M | ✅ |
+| PRS-05 | Pedidos de envio com aprovação ou envio automático em 1 hora, SSE para o worker e status do worker na tela (RF-PRS-05, RN-37) | M | ✅ |
+| PRS-04 | Resumo do funil `/prospecting/summary` e tela Prospecção (RF-PRS-04) | M | ✅ |
+
 ## Épico AST — Assistant
 
 | Id | Item | Tam. | Status |

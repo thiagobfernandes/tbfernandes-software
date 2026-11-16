@@ -96,6 +96,13 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
       href: `/contacts?contact=${contact.id}`,
       keywords: contact.specialties.join(" "),
     })),
+    ...data.prospectLeads.map((lead) => ({
+      id: `lead:${lead.id}`,
+      group: "Prospecção",
+      title: lead.name,
+      subtitle: lead.city,
+      href: `/prospecting?lead=${lead.id}`,
+    })),
     ...data.studies.map((study) => ({
       id: `study:${study.id}`,
       group: "Aprendizado",

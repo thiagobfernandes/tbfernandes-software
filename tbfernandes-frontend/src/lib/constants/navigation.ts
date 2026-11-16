@@ -11,6 +11,7 @@ import {
   Landmark,
   LayoutDashboard,
   ListChecks,
+  Megaphone,
   Medal,
   Network,
   Repeat,
@@ -106,7 +107,10 @@ export const mainNavigation: NavEntry[] = [
   {
     title: "Rede",
     icon: Users,
-    items: [{ title: "Contatos", href: "/contacts", icon: Users }],
+    items: [
+      { title: "Contatos", href: "/contacts", icon: Users },
+      { title: "Prospecção", href: "/prospecting", icon: Megaphone },
+    ],
   },
 ];
 

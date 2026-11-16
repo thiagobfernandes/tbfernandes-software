@@ -4,7 +4,7 @@ Versão 0.1 · 2026-10-26 · Fonte da verdade: `tbfernandes-backend/src/main/res
 
 ## 1. Convenções
 
-- Um **schema por módulo**: `identity`, `work`, `knowledge`, `goals`, `learning`, `finance`, `contacts`. A tabela `public.event_publication` é do antigo backend Java (Spring Modulith) e ficou sem uso no NestJS.
+- Um **schema por módulo**: `identity`, `work`, `knowledge`, `goals`, `learning`, `finance`, `contacts`, `prospecting`. A tabela `public.event_publication` é do antigo backend Java (Spring Modulith) e ficou sem uso no NestJS.
 - **Chave primária** `id uuid` (v7, gerada pela aplicação).
 - **Raiz de agregado** tem `owner_id`, `created_at`, `updated_at` e `version` (concorrência otimista). Tabelas filhas (itens de checklist, passos, marcos, interações) herdam o dono da raiz.
 - **Enums** em `text` com `CHECK`, valores em maiúsculas (ADR-004).
@@ -312,6 +312,9 @@ erDiagram
 | `purchases` | `PurchaseGoal` | `finance.purchase_goal` | |
 | `contacts` | `Contact` | `contacts.contact` | `company_id` ou `company_name`, nunca os dois |
 | `interactions` | `Interaction` | `contacts.interaction` | `date` → `occurred_on` |
+| `prospectLeads` | `Lead` | `prospecting.lead` | `external_id` único por dono (id do worker); só leitura, revisão e exclusão pela tela |
+| `sendRequests` | `SendRequest` | `prospecting.send_request` | `auto_send_at` = pedido + 1 hora (RN-37); some com o lead |
+| `prospectMessages` | `LeadMessage` | `prospecting.message` | índice único `(lead_id, direction, sent_at)` (RN-36); some com o lead |
 
 Ids: o frontend usa ids curtos (`t-1a2b3c4d`); a API usa UUID. Na migração dos dados do navegador (RF-GEN-02), cada id antigo vira um UUIDv5 determinístico, o mesmo método usado no seed de `dev`.
 
