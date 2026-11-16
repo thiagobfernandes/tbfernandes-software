@@ -38,3 +38,21 @@ export const leadMessageListQuerySchema = Joi.object<LeadMessageListQuery>({
   leadId: RequestFields.optionalUuid(),
   ...RequestFields.paging(),
 });
+
+/** Body of PUT /webhooks/prospecting/leads/{externalId}/messages (RN-38). */
+export class LeadMessageReclassifyRequest {
+  sentAt: string;
+  /** reply or auto_reply */
+  stage: string;
+}
+
+export interface ValidLeadMessageReclassifyRequest {
+  sentAt: Date;
+  stage: 'REPLY' | 'AUTO_REPLY';
+}
+
+export const leadMessageReclassifyRequestSchema =
+  Joi.object<ValidLeadMessageReclassifyRequest>({
+    sentAt: Joi.date().iso().required(),
+    stage: RequestFields.enumOf(['REPLY', 'AUTO_REPLY'] as const).required(),
+  });

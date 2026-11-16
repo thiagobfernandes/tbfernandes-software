@@ -138,4 +138,36 @@ describe('Prospecting API', () => {
       (await http().delete(`/api/v1/prospecting/leads/${lead.body.id}`)).status,
     ).toBe(204);
   });
+
+  it('turns a greeting into an automatic reply and recounts the lead (RN-38)', async () => {
+    const lead = await ingest('put', '/leads/auto--greeting').send(LEAD);
+    await ingest('post', '/leads/auto--greeting/messages').send({
+      direction: 'outbound',
+      stage: 'first',
+      body: 'Oi!',
+      sentAt: '2026-11-16T14:00:00Z',
+    });
+    await ingest('post', '/leads/auto--greeting/messages').send({
+      direction: 'inbound',
+      stage: 'reply',
+      body: 'Seja bem-vindo!',
+      sentAt: '2026-11-16T14:00:03Z',
+    });
+    const reclassified = await ingest(
+      'put',
+      '/leads/auto--greeting/messages',
+    ).send({
+      sentAt: '2026-11-16T14:00:03Z',
+      stage: 'auto_reply',
+    });
+    expect(reclassified.body.stage).toBe('auto_reply');
+    const after = await http().get(`/api/v1/prospecting/leads/${lead.body.id}`);
+    expect(after.body).toMatchObject({ status: 'active', lastReplyAt: null });
+
+    const missing = await ingest('put', '/leads/auto--greeting/messages').send({
+      sentAt: '2026-11-16T15:00:00Z',
+      stage: 'auto_reply',
+    });
+    expect(missing.status).toBe(404);
+  });
 });

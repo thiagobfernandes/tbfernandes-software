@@ -245,6 +245,7 @@ function MessageBubble({
         {message.stage !== "reply" && message.stage !== "manual" && (
           <span>{stageLabel[message.stage]}</span>
         )}
+        {message.stage === "auto_reply" && <span>não conta como resposta</span>}
       </span>
       <p
         className={cn(
@@ -253,9 +254,11 @@ function MessageBubble({
             ? "rounded-br-sm bg-primary/15"
             : "rounded-bl-sm border bg-card",
           message.stage === "opt_out" && "border-destructive/50",
+          message.stage === "auto_reply" &&
+            "border-dashed bg-transparent text-muted-foreground",
         )}
       >
-        {message.body}
+        {message.body || "(mensagem sem texto)"}
       </p>
       <span className="flex items-center gap-1 px-1 text-xs text-muted-foreground tabular-nums">
         {timeFormat.format(new Date(message.sentAt))}

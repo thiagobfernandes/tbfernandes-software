@@ -191,6 +191,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RN-35 | Um lead que pediu para sair não recebe mais mensagens (422), e o worker nunca desfaz um opt-out nem um "fechou" marcado pelo usuário ao sincronizar de novo. | `Lead.syncFrom`, `Lead.messageRecorded` |
 | RN-36 | A mesma mensagem (lead, direção e horário) é registrada uma vez só: o worker pode reenviar depois de uma falha e recebe a já gravada (200). | `LeadIngestionService.record` + índice único |
 | RN-37 | Um pedido de envio sem decisão sai sozinho 1 hora depois de criado, se o worker estiver rodando; aprovado, sai na hora. O worker reserva o pedido antes de enviar, então um cancelamento que chega antes sempre vence, e cada pedido é enviado uma vez só. | `SendRequest` |
+| RN-38 | A saudação automática do WhatsApp Business de uma clínica (etapa `AUTO_REPLY`) não é resposta: não marca o lead como respondido nem para os follow-ups. Uma resposta já registrada pode virar automática, e o lead é recontado. | `Lead.received`, `Lead.repliesRecounted`, `LeadMessage.reclassify` |
 | RN-22 | Concluir uma tarefa vinculada a uma meta ativa a meta se ela estiver planejada; se o indicador da meta é contado em `tasks`, ele soma 1. | Goals (`Goal.linkedTaskCompleted`) |
 
 ## 4. Requisitos não funcionais

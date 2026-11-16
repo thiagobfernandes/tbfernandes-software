@@ -18,6 +18,8 @@ import { prospectingConfig } from '../../../infrastructure/environments/register
 import { LeadIngestionService } from '../application/lead-ingestion.service';
 import {
   LeadMapper,
+  LeadMessageReclassifyRequest,
+  leadMessageReclassifyRequestSchema,
   LeadMessageRequest,
   leadMessageRequestSchema,
   LeadMessageResponse,
@@ -27,6 +29,7 @@ import {
   ProspectingSummaryResponse,
 } from '../protocols';
 import type {
+  ValidLeadMessageReclassifyRequest,
   ValidLeadMessageRequest,
   ValidLeadSyncRequest,
 } from '../protocols';
@@ -82,6 +85,23 @@ export class LeadIngestionController {
     );
     res.status(recorded.created ? 201 : 200);
     return LeadMapper.toMessageResponse(recorded.message);
+  }
+
+  @Put('leads/:externalId/messages')
+  @ApiBody({ type: LeadMessageReclassifyRequest })
+  async reclassify(
+    @Param('externalId') externalId: string,
+    @ValidatedBody(leadMessageReclassifyRequestSchema)
+    body: ValidLeadMessageReclassifyRequest,
+  ): Promise<LeadMessageResponse> {
+    return LeadMapper.toMessageResponse(
+      await this.ingestion.reclassify(
+        this.ownerId,
+        externalId,
+        body.sentAt,
+        body.stage,
+      ),
+    );
   }
 
   @Get('summary')
