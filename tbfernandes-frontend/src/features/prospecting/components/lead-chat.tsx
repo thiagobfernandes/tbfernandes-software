@@ -116,7 +116,7 @@ export function LeadChat({
   return (
     <section
       aria-label={`Conversa com ${lead.name}`}
-      className="flex min-h-[32rem] min-w-0 flex-col overflow-hidden rounded-xl border bg-card"
+      className="flex min-h-[32rem] min-w-0 flex-col overflow-hidden rounded-xl border bg-card xl:h-full xl:min-h-0"
     >
       <header className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-3">
         <div className="flex min-w-0 flex-col">
@@ -148,7 +148,7 @@ export function LeadChat({
 
       <ol
         ref={scroller}
-        className="flex max-h-[32rem] flex-1 flex-col gap-3 overflow-y-auto bg-muted/30 px-5 py-4"
+        className="flex max-h-[32rem] min-h-0 flex-1 flex-col gap-3 overflow-y-auto bg-muted/30 px-5 py-4 xl:max-h-none"
       >
         {items.length === 0 && (
           <li className="m-auto max-w-xs text-center text-sm text-muted-foreground">
@@ -203,10 +203,12 @@ export function LeadChat({
                 placeholder="Escreva uma mensagem"
                 rows={2}
                 maxLength={4000}
-                className="min-h-11 resize-none"
+                className="min-h-11 resize-none max-sm:text-base"
               />
               <Button
                 type="submit"
+                size="icon"
+                className="size-11 active:scale-[0.97] motion-reduce:active:scale-100"
                 disabled={!draft.trim()}
                 aria-label="Enviar mensagem"
               >

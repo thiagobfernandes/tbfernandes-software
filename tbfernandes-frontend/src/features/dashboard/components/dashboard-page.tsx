@@ -36,7 +36,8 @@ import {
 } from "@/components/shared/metric-visuals";
 import { LifeOverview } from "@/features/dashboard/components/life-overview";
 import { AgendaPanel } from "@/features/dashboard/components/agenda-panel";
-import { sampleTrends } from "@/features/dashboard/data/sample-dashboard";
+import { RhythmSection } from "@/features/dashboard/components/rhythm-section";
+import { completedPerDay, dueAhead } from "@/features/dashboard/lib/trends";
 import { NoteFormDialog } from "@/features/knowledge/components/knowledge-form-dialogs";
 import { buildContextTree } from "@/features/knowledge/lib/graph";
 import { CompanyFormDialog } from "@/features/companies/components/company-form-dialog";
@@ -149,7 +150,7 @@ export function DashboardPage() {
                 label="Tarefas abertas"
                 value={openTasks.length}
                 unit="tarefas"
-                visual={<TickBars values={sampleTrends.openTasksPerDay} />}
+                visual={<TickBars values={dueAhead(data, currentDay())} />}
               />
               <MetricCard
                 label="Atrasadas"
@@ -172,7 +173,13 @@ export function DashboardPage() {
                 label="Concluídas na semana"
                 value={doneThisWeek}
                 unit="tarefas"
-                visual={<Sparkline values={sampleTrends.doneLastSevenDays} />}
+                visual={
+                  <Sparkline
+                    values={completedPerDay(data, currentDay(), 7).map(
+                      (point) => point.value,
+                    )}
+                  />
+                }
               />
             </section>
 
@@ -290,6 +297,8 @@ export function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
+
+            <RhythmSection data={data} today={currentDay()} />
 
             <LifeOverview data={data} />
 

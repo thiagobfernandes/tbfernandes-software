@@ -73,7 +73,11 @@ export function DecisionQueue({
           </p>
         </div>
         {pending.length > 1 && (
-          <Button size="sm" onClick={approveAll}>
+          <Button
+            size="sm"
+            className="active:scale-[0.97] motion-reduce:active:scale-100"
+            onClick={approveAll}
+          >
             <Send /> Enviar todas ({pending.length})
           </Button>
         )}
@@ -116,7 +120,7 @@ export function DecisionQueue({
               <p className="line-clamp-3 text-sm text-muted-foreground">
                 {request.body}
               </p>
-              <div className="flex flex-col gap-1.5">
+              <div className="mt-auto flex flex-col gap-1.5">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums">
                   <Clock3 className="size-3.5" />
                   {countdownLabel(request.autoSendAt, now)}
@@ -136,12 +140,17 @@ export function DecisionQueue({
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" onClick={() => decide(request, "approved")}>
+                <Button
+                  size="sm"
+                  className="active:scale-[0.97] motion-reduce:active:scale-100 max-sm:h-11"
+                  onClick={() => decide(request, "approved")}
+                >
                   <Send /> Enviar agora
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
+                  className="active:scale-[0.97] motion-reduce:active:scale-100 max-sm:h-11"
                   onClick={() => decide(request, "cancelled")}
                 >
                   <X /> Não enviar

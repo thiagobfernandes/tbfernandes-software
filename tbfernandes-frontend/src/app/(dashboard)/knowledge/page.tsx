@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Notas" };
 export default function Page() {
   return (
     // The selected note comes from ?note=, known only at request time.
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense fallback={<PageSkeleton variant="split" />}>
       <KnowledgePage />
     </Suspense>
   );
