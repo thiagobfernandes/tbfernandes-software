@@ -220,3 +220,10 @@ Mesmo formato de `tbfernandes-frontend/src/features/tasks/types/task.ts`:
 |---|---|---|
 | exportar e importar JSON | fica no frontend, que já tem o formato `AppData` e lê e grava pela API | IDN-04, IDN-05 |
 | Open Finance | feito | FIN-OF-* |
+
+
+### Atualização da Prospecção em tempo real
+
+`GET /api/v1/prospecting/events` usa SSE com a autenticação normal da tela e filtra os avisos pelo dono da sessão. Envia `changed` ao conectar e depois de cada escrita concluída nas rotas de leads, mensagens e pedidos, incluindo webhooks. `ping` a cada 25 segundos mantém a conexão aberta. A assinatura da tela não altera a presença do worker de WhatsApp. O canal fica na memória do processo, como o canal do worker; pressupõe uma instância do backend.
+
+O cliente recarrega somente leads, mensagens e pedidos pelo store, preservando as demais coleções e aguardando escritas locais pendentes. Reconexão SSE dispara nova leitura; uma consulta a cada 30 segundos recupera avisos perdidos. No desktop, que exige cabeçalho de autenticação incompatível com EventSource, a consulta ocorre a cada 3 segundos.

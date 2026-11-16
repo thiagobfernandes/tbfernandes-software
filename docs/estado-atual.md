@@ -34,3 +34,8 @@ Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md)
 
 - Repositório: `github.com/thiagobfernandes/tbfernandes-software`. Cópia local do Thiago no WSL em `~/projects/tbfernandes-software`.
 - O trabalho é feito e commitado direto nessa cópia. O push é o Thiago quem faz. Os patches `00NN-*.patch` ficaram para trás: o último foi o 0018.
+
+
+### Prospecção: busca e envio independentes
+
+A rotina de busca do tb-site-factory sincroniza cada lead verificado com o CRM sem precisar ligar o WhatsApp. A rotina de envio lê os leads locais e cria os pedidos de aprovação depois, respeitando as travas existentes. A tela acompanha leads, mensagens e pedidos automaticamente por SSE (desktop: consulta a cada 3 segundos). As filas de sincronização da busca e do envio são arquivos separados.

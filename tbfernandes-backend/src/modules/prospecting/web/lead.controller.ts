@@ -1,3 +1,5 @@
+import { UseInterceptors } from '@nestjs/common';
+import { ProspectingChangesInterceptor } from './prospecting-events';
 import { Controller, Delete, Get, HttpCode, Put } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
@@ -23,6 +25,7 @@ import type {
 } from '../protocols';
 
 @ApiTags('prospecting')
+@UseInterceptors(ProspectingChangesInterceptor)
 @Controller('prospecting')
 export class LeadController {
   constructor(private readonly leads: LeadService) {}

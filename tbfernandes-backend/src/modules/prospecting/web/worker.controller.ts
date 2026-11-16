@@ -1,3 +1,5 @@
+import { UseInterceptors } from '@nestjs/common';
+import { ProspectingChangesInterceptor } from './prospecting-events';
 import {
   Controller,
   Get,
@@ -50,6 +52,7 @@ const RequestIdParam = () =>
 @ApiHeader({ name: INGEST_KEY_HEADER, required: true })
 @Public()
 @UseGuards(IngestKeyGuard)
+@UseInterceptors(ProspectingChangesInterceptor)
 @Controller('webhooks/prospecting')
 export class WorkerController {
   private readonly ownerId: string;

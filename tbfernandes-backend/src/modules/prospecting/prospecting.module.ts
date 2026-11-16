@@ -1,3 +1,8 @@
+import {
+  ProspectingEvents,
+  ProspectingChangesInterceptor,
+  ProspectingEventsController,
+} from './web/prospecting-events';
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { LeadIngestionService } from './application/lead-ingestion.service';
@@ -31,12 +36,15 @@ import { WorkerController } from './web/worker.controller';
     ]),
   ],
   controllers: [
+    ProspectingEventsController,
     LeadController,
     LeadIngestionController,
     SendRequestController,
     WorkerController,
   ],
   providers: [
+    ProspectingEvents,
+    ProspectingChangesInterceptor,
     LeadService,
     LeadIngestionService,
     SendRequestService,

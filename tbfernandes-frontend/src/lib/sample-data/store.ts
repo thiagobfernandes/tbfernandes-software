@@ -180,6 +180,7 @@ function load(): AppData {
     if (typeof window !== "undefined") {
       connectRemote({
         replaceAll: (data) => commit(data),
+        replaceCollections: (data) => commit({ ...load(), ...data }),
         replaceItem(key, item) {
           const data = load();
           const items = data[key] as { id: string }[];

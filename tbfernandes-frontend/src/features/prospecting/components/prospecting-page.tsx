@@ -30,6 +30,7 @@ import {
   statusMeta,
   statusOrder,
 } from "@/features/prospecting/lib/prospecting";
+import { useProspectingLive } from "@/features/prospecting/lib/use-prospecting-live";
 import { useWorkerPresence } from "@/features/prospecting/lib/worker-api";
 import type { LeadStatus } from "@/features/prospecting/types/prospecting";
 import { reload } from "@/lib/api/remote-store";
@@ -44,6 +45,7 @@ type Filter = LeadStatus | typeof ALL | typeof WAITING;
 
 export function ProspectingPage() {
   const data = useAppData();
+  useProspectingLive();
   const today = useToday();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -142,7 +144,7 @@ export function ProspectingPage() {
         <EmptyState
           icon={Megaphone}
           title="Nenhum lead ainda"
-          description="Os leads aparecem aqui quando o envio automático do tb-site-factory sincronizar."
+          description="Os leads aparecem aqui assim que a rotina de busca do tb-site-factory os verificar e sincronizar."
         />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">

@@ -130,6 +130,7 @@ export function useRemoteStatus() {
 type StoreHooks = {
   /** Replaces all data, e.g. after loading or after a refused change. */
   replaceAll(data: AppData): void;
+  replaceCollections(data: Partial<AppData>): void;
   /** Puts the server's version of one record in place of the local one. */
   replaceItem<K extends CollectionKey>(key: K, item: AppData[K][number]): void;
 };
@@ -225,4 +226,23 @@ export async function signIn(email: string, password: string) {
 export async function signOut() {
   await apiFetch("/api/v1/auth/logout", { method: "POST" });
   setStatus({ state: "signed-out" });
+}
+
+/** Refresh only prospecting, after pending local writes have finished. */
+export async function refreshProspecting(signal?: AbortSignal) {
+  const pendingWrites = queue;
+  await pendingWrites;
+  const keys = ["prospectLeads", "prospectMessages", "sendRequests"] as const;
+  const lists = await Promise.all(
+    keys.map((key) => apiFetch<unknown[]>(endpoints[key], { signal })),
+  );
+  if (signal?.aborted || queue !== pendingWrites) return;
+  hooks?.replaceCollections(
+    Object.fromEntries(
+      keys.map((key, index) => [
+        key,
+        lists[index].map((raw) => fromApi(key, raw)),
+      ]),
+    ) as Partial<AppData>,
+  );
 }
