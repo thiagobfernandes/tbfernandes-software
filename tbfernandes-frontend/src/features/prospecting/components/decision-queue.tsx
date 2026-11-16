@@ -60,9 +60,9 @@ export function DecisionQueue({
   return (
     <section
       aria-labelledby="decision-queue-title"
-      className="flex flex-col gap-4 rounded-2xl border border-primary/50 bg-primary/5 p-5"
+      className="flex flex-col gap-3"
     >
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-0.5">
           <h2 id="decision-queue-title" className="text-base font-medium">
             Aguardando sua decisão
@@ -78,7 +78,7 @@ export function DecisionQueue({
           </Button>
         )}
       </header>
-      <ul className="grid gap-3 lg:grid-cols-2">
+      <ul className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
         {pending.map((request) => {
           const lead = leads.find((item) => item.id === request.leadId);
           const progress = countdownProgress(
@@ -90,8 +90,8 @@ export function DecisionQueue({
             <li
               key={request.id}
               className={cn(
-                "flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4",
-                request.leadId === selectedId && "border-primary/60",
+                "flex min-w-0 animate-in flex-col gap-3 rounded-xl border border-primary/40 bg-card p-4 duration-300 fade-in-0 motion-reduce:animate-none",
+                request.leadId === selectedId && "border-primary",
               )}
             >
               <div className="flex items-start justify-between gap-2">
@@ -103,9 +103,11 @@ export function DecisionQueue({
                   <span className="block truncate text-sm font-medium hover:underline">
                     {lead?.name ?? "Lead"}
                   </span>
-                  <span className="text-xs text-muted-foreground">
-                    {lead?.city}
-                  </span>
+                  {lead?.city && (
+                    <span className="text-xs text-muted-foreground">
+                      {lead.city}
+                    </span>
+                  )}
                 </button>
                 <Badge variant="outline" className="shrink-0">
                   {stageLabel[request.stage]}
@@ -128,8 +130,8 @@ export function DecisionQueue({
                   aria-valuemax={100}
                 >
                   <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-1000"
-                    style={{ width: `${progress * 100}%` }}
+                    className="h-full w-full origin-left rounded-full bg-primary transition-transform duration-1000"
+                    style={{ transform: `scaleX(${progress})` }}
                   />
                 </div>
               </div>
@@ -139,7 +141,7 @@ export function DecisionQueue({
                 </Button>
                 <Button
                   size="sm"
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => decide(request, "cancelled")}
                 >
                   <X /> Não enviar

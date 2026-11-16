@@ -49,6 +49,7 @@ export const stageLabel: Record<MessageStage, string> = {
   follow_up_2: "Follow-up 2",
   reply: "Resposta",
   opt_out: "Pediu para sair",
+  manual: "Mensagem sua",
 };
 
 const dateTime = new Intl.DateTimeFormat("pt-BR", {

@@ -146,4 +146,52 @@ describe('Prospecting send requests', () => {
         .body,
     ).toHaveLength(1);
   });
+
+  it('sends the user own message as soon as the worker is connected (RF-PRS-06)', async () => {
+    const lead = await worker('put', '/leads/manual').send({
+      name: 'manual',
+      status: 'replied',
+    });
+    const manual = await http()
+      .post('/api/v1/prospecting/send-requests')
+      .send({ leadId: lead.body.id, body: 'Claro, te mando a prévia agora!' });
+    expect(manual.status).toBe(201);
+    expect(manual.body).toMatchObject({ stage: 'manual', status: 'approved' });
+    const ready = (await worker('get', '/send-requests/ready')).body as {
+      id: string;
+    }[];
+    expect(ready.map((item) => item.id)).toContain(manual.body.id);
+    await worker('post', `/send-requests/${manual.body.id}/claim`);
+    await worker('post', `/send-requests/${manual.body.id}/result`).send({
+      sent: true,
+    });
+    const recorded = await worker('post', '/leads/manual/messages').send({
+      direction: 'outbound',
+      stage: 'manual',
+      body: 'Claro, te mando a prévia agora!',
+      sentAt: now.toISOString(),
+    });
+    expect(recorded.status).toBe(201);
+  });
+
+  it('tells open screens that something changed, over SSE', async () => {
+    const server = app.getHttpServer() as unknown as {
+      address(): AddressInfo;
+    };
+    const controller = new AbortController();
+    const stream = await fetch(
+      `http://127.0.0.1:${server.address().port}/api/v1/prospecting/events`,
+      { signal: controller.signal },
+    );
+    expect(stream.headers.get('content-type')).toContain('text/event-stream');
+    await worker('put', '/leads/live').send({ name: 'live', status: 'new' });
+    const reader = stream.body!.getReader();
+    let text = '';
+    while (!text.includes('event: changed')) {
+      const chunk = await reader.read();
+      text += new TextDecoder().decode(chunk.value);
+    }
+    controller.abort();
+    expect(text).toContain('event: changed');
+  });
 });

@@ -313,7 +313,7 @@ erDiagram
 | `contacts` | `Contact` | `contacts.contact` | `company_id` ou `company_name`, nunca os dois |
 | `interactions` | `Interaction` | `contacts.interaction` | `date` → `occurred_on` |
 | `prospectLeads` | `Lead` | `prospecting.lead` | `external_id` único por dono (id do worker); só leitura, revisão e exclusão pela tela |
-| `sendRequests` | `SendRequest` | `prospecting.send_request` | `auto_send_at` = pedido + 1 hora (RN-37); some com o lead |
+| `sendRequests` | `SendRequest` | `prospecting.send_request` | `auto_send_at` = pedido + 1 hora (RN-37), ou o próprio pedido na etapa `MANUAL` (V19); some com o lead |
 | `prospectMessages` | `LeadMessage` | `prospecting.message` | índice único `(lead_id, direction, sent_at)` (RN-36); some com o lead |
 
 Ids: o frontend usa ids curtos (`t-1a2b3c4d`); a API usa UUID. Na migração dos dados do navegador (RF-GEN-02), cada id antigo vira um UUIDv5 determinístico, o mesmo método usado no seed de `dev`.

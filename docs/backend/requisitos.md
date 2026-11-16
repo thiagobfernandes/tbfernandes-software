@@ -129,6 +129,7 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-PRS-02 | Registrar cada mensagem enviada ou recebida (etapa, texto, horário) e manter as datas de 1º contato, última mensagem e última resposta e o status do lead. | M |
 | RF-PRS-03 | Receber leads e mensagens do worker de prospecção (tb-site-factory, no computador do usuário) por uma rota pública autenticada por chave (`X-Ingest-Key`). | M |
 | RF-PRS-05 | Antes de cada envio, o worker cria um pedido com o texto; o usuário envia agora ou cancela na tela, e o worker conectado por SSE (`/webhooks/prospecting/events`) recebe a decisão na hora. | M |
+| RF-PRS-06 | Escrever uma mensagem para o lead no chat da tela; ela sai pelo worker assim que ele estiver conectado, sem aprovação, sem horário e fora do limite diário, e a sequência automática daquele lead para. | M |
 | RF-PRS-04 | Mostrar o funil (leads, contatados, responderam, opt-out, fecharam, taxa de resposta, envios por dia e por cidade) e permitir ao usuário anotar e marcar o resultado de cada lead. | M |
 
 ### 2.9 Assistant (`/assistant`)
@@ -263,6 +264,6 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Learning, Certifications | RF-LRN-01..06 | learning |
 | Finance (cash flow, purchases) | RF-FIN-01..04 | finance |
 | Contacts | RF-CTC-01..04 | contacts |
-| Prospecção (`/prospecting`) | RF-PRS-01..05 | prospecting |
+| Prospecção (`/prospecting`) | RF-PRS-01..06 | prospecting |
 | Assistant | RF-AST-01 | assistant |
 | Settings | RF-GEN-01..03 | identity |

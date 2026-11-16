@@ -9,6 +9,8 @@ export const MESSAGE_STAGES = [
   'FOLLOW_UP_2',
   'REPLY',
   'OPT_OUT',
+  /** Written by the user in the chat. */
+  'MANUAL',
 ] as const;
 export type MessageStage = (typeof MESSAGE_STAGES)[number];
 
