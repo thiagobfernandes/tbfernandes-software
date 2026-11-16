@@ -4,7 +4,11 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CloudOff, RotateCw } from "lucide-react";
 
-import { PageSkeleton } from "@/components/shared/page-skeleton";
+import {
+  PageSkeleton,
+  skeletonVariantFor,
+} from "@/components/shared/page-skeleton";
+import { ProspectingSkeleton } from "@/features/prospecting/components/prospecting-skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -48,8 +52,8 @@ function ApiGate({ children }: { children: React.ReactNode }) {
               ) : (
                 <>
                   Inicie-a com{" "}
-                  <code>cd tbfernandes-backend && npm run dev</code>{" "}
-                  e tente de novo.
+                  <code>cd tbfernandes-backend && npm run dev</code> e tente de
+                  novo.
                 </>
               )}{" "}
               ({status.message})
@@ -64,7 +68,14 @@ function ApiGate({ children }: { children: React.ReactNode }) {
       </Centered>
     );
   }
-  return <PageSkeleton />;
+  return <RouteSkeleton />;
+}
+
+/** The loading shape of the current route. */
+function RouteSkeleton() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/prospecting")) return <ProspectingSkeleton />;
+  return <PageSkeleton variant={skeletonVariantFor(pathname)} />;
 }
 
 function RedirectToLogin() {
@@ -75,7 +86,7 @@ function RedirectToLogin() {
     router.replace(loginHref(`${pathname}${window.location.search}`));
   }, [router, pathname]);
 
-  return <PageSkeleton />;
+  return <RouteSkeleton />;
 }
 
 function Centered({ children }: { children: React.ReactNode }) {

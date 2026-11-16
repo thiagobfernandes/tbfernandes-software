@@ -125,7 +125,7 @@ export function ProspectingPage() {
           description="Os leads aparecem aqui assim que a rotina de busca do tb-site-factory os verificar e sincronizar."
         />
       ) : (
-        <div className="grid items-start gap-4 lg:grid-cols-[20rem_minmax(0,1fr)]">
+        <div className="grid items-start gap-4 lg:grid-cols-[20rem_minmax(0,1fr)] xl:h-[clamp(34rem,calc(100vh-9rem),46rem)] xl:items-stretch">
           <LeadList
             leads={visible}
             total={data.prospectLeads.length}

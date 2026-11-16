@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Contatos" };
 export default function Page() {
   return (
     // Reads the URL query, which is only known at request time.
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense fallback={<PageSkeleton variant="split" />}>
       <ContactsPage />
     </Suspense>
   );

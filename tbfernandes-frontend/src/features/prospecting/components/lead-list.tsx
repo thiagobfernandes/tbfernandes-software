@@ -78,7 +78,7 @@ export function LeadList({
   return (
     <section
       aria-label="Leads"
-      className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card"
+      className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card xl:h-full"
     >
       <div className="flex flex-col gap-2 border-b p-3">
         <label className="relative">
@@ -117,7 +117,7 @@ export function LeadList({
         </Select>
       </div>
 
-      <ul className="flex flex-col divide-y">
+      <ul className="flex flex-col divide-y xl:min-h-0 xl:flex-1 xl:overflow-y-auto">
         {shown.map((lead) => {
           const selected = lead.id === selectedId;
           const last = relativeTime(lead.lastMessageAt, now);
@@ -192,7 +192,7 @@ export function LeadList({
           <Button
             variant="ghost"
             size="icon"
-            className="size-8"
+            className="size-11 sm:size-8"
             disabled={current === 0}
             onClick={() => setPage(current - 1)}
             aria-label="Página anterior"
@@ -205,7 +205,7 @@ export function LeadList({
           <Button
             variant="ghost"
             size="icon"
-            className="size-8"
+            className="size-11 sm:size-8"
             disabled={current >= pages - 1}
             onClick={() => setPage(current + 1)}
             aria-label="Próxima página"
