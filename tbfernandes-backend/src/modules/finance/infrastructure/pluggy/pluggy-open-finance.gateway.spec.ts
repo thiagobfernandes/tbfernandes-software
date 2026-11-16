@@ -65,6 +65,7 @@ const clock: Clock = {
   now: () => new Date(),
   today: () => '2031-03-05',
   startOfWeek: () => new Date(),
+  dayOf: () => '2031-03-05',
 };
 
 const CHECKING: ExternalAccount = {

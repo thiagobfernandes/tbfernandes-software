@@ -5,6 +5,7 @@ import { authEnvironmentSchema } from './auth.schema';
 import { databaseEnvironmentSchema } from './database.schema';
 import { desktopEnvironmentSchema } from './desktop.schema';
 import { pluggyEnvironmentSchema } from './pluggy.schema';
+import { prospectingEnvironmentSchema } from './prospecting.schema';
 
 export const ValidationSchema = [
   appEnvironmentSchema,
@@ -13,4 +14,5 @@ export const ValidationSchema = [
   desktopEnvironmentSchema,
   pluggyEnvironmentSchema,
   assistantEnvironmentSchema,
+  prospectingEnvironmentSchema,
 ].reduce((acc, schema) => acc.concat(schema), Joi.object());

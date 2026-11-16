@@ -29,6 +29,10 @@ import type {
   Study,
 } from "@/features/learning/types/learning";
 import type { Method } from "@/features/methods/types/method";
+import type {
+  ProspectLead,
+  ProspectMessage,
+} from "@/features/prospecting/types/prospecting";
 import type { Company, Project } from "@/features/projects/types/project";
 import type { Task } from "@/features/tasks/types/task";
 import { sampleAppointments } from "@/lib/sample-data/agenda";
@@ -54,6 +58,10 @@ import {
   samplePurchases,
 } from "@/lib/sample-data/life";
 import { sampleMethods } from "@/lib/sample-data/methods";
+import {
+  sampleProspectLeads,
+  sampleProspectMessages,
+} from "@/lib/sample-data/prospecting";
 import {
   sampleCompanies,
   sampleProjects,
@@ -83,6 +91,9 @@ export type AppData = {
   timeEntries: TimeEntry[];
   routines: Routine[];
   routineChecks: RoutineCheck[];
+  /** Filled by the prospecting worker; the screen only reviews and deletes. */
+  prospectLeads: ProspectLead[];
+  prospectMessages: ProspectMessage[];
 };
 
 /** Kept for the work screens written before the other modules existed. */
@@ -117,6 +128,8 @@ const initialData: AppData = {
   timeEntries: sampleTimeEntries,
   routines: sampleRoutines,
   routineChecks: sampleRoutineChecks,
+  prospectLeads: sampleProspectLeads,
+  prospectMessages: sampleProspectMessages,
 };
 
 const idPrefixes: Record<CollectionKey, string> = {
@@ -141,6 +154,8 @@ const idPrefixes: Record<CollectionKey, string> = {
   timeEntries: "te",
   routines: "rt",
   routineChecks: "rc",
+  prospectLeads: "pl",
+  prospectMessages: "pm",
 };
 
 const useApi = env.dataSource === "api";

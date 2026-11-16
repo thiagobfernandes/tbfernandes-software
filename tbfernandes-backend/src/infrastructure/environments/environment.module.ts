@@ -7,6 +7,7 @@ import {
   databaseConfig,
   desktopConfig,
   pluggyConfig,
+  prospectingConfig,
 } from './registers';
 import { ValidationSchema } from './schemas';
 
@@ -29,6 +30,7 @@ import { ValidationSchema } from './schemas';
         desktopConfig,
         pluggyConfig,
         assistantConfig,
+        prospectingConfig,
       ],
     }),
   ],

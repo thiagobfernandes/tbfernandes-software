@@ -8,4 +8,6 @@ export abstract class Clock {
   abstract now(): Date;
   abstract today(): IsoDate;
   abstract startOfWeek(): Date;
+  /** The user's calendar day of an instant. */
+  abstract dayOf(instant: Date): IsoDate;
 }

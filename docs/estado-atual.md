@@ -1,6 +1,6 @@
 # Estado atual
 
-Atualizado em 2026-11-03. Atualize esta página ao terminar uma etapa.
+Atualizado em 2026-11-16. Atualize esta página ao terminar uma etapa.
 
 ## O que existe
 
@@ -12,6 +12,8 @@ Atualizado em 2026-11-03. Atualize esta página ao terminar uma etapa.
 - **Docker Compose na raiz**: banco, backend, frontend e nginx em um comando, com `/` no frontend e `/api` no backend ([como rodar](como-rodar.md)). As pastas agora são `tbfernandes-backend/`, `tbfernandes-frontend/` e `tbfernandes-nginx/`.
 - **App desktop para Windows** em andamento (Tauri + PostgreSQL embutido, [desktop.md](desktop.md)). Etapas 1 a 4 feitas: janela Tauri em `tbfernandes-desktop/` com instalador gerado pelo workflow `desktop`, backup diário do banco em `Documentos\TBFernandes\backups`; o frontend exporta como estático com `npm run build:desktop` (páginas de detalhe com `?id=`), e o backend tem o perfil `desktop` com PostgreSQL embutido, token por abertura e desligamento junto com o app.
 - **Backend em NestJS** (ADR-009, [migração](backend/implementacao/migracao-nestjs.md)): `tbfernandes-backend/` tem todos os módulos com o mesmo banco e o mesmo JSON do antigo backend Java, que foi removido. O compose, o CI e o app desktop (com Node embutido) usam o NestJS.
+
+- **Prospecção** (épico PRS): módulo `prospecting` com leads e mensagens que o worker de envio pelo WhatsApp (repositório tb-site-factory) manda pela rota `/webhooks/prospecting` com `PROSPECTING_INGEST_KEY`, e a tela `/prospecting` com funil, conversa e acompanhamento de cada lead.
 
 Detalhes de cada etapa: [backend/implementacao](backend/implementacao/README.md).
 

@@ -49,7 +49,7 @@ A sidebar tem grupos recolhíveis por área, cada um com subitens (`lib/constant
 | Conhecimento | `/knowledge` Notas, `/knowledge/snippets`, `/knowledge/graph`, `/methods`, `/methods/view?id=` | knowledge, methods |
 | Crescimento | `/goals`, `/goals/view?id=`, `/learning`, `/certifications` | goals, learning |
 | Finanças | `/finance` Fluxo de caixa, `/finance/purchases` Compras planejadas | finance |
-| Rede | `/contacts` | contacts |
+| Rede | `/contacts`, `/prospecting` Prospecção | contacts, prospecting |
 | — | `/settings` Configurações (aparência, dados, exportar/importar) | settings |
 | — | `/login` Entrar (fora do layout com sidebar; só no modo API com login) | auth |
 

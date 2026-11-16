@@ -22,6 +22,7 @@ Versão 0.2 · 2026-11-03 (NestJS, ADR-009) · Complementa [decisoes-tecnicas.md
 | Learning | `learning` | `learning` | estudos, materiais, habilidades, certificações, formação | Learning, Certifications |
 | Finance | `finance` | `finance` | lançamentos, metas de compra, porta Open Finance | Finance |
 | Contacts | `contacts` | `contacts` | contatos e interações | Contacts |
+| Prospecting | `prospecting` | `prospecting` | leads e mensagens da prospecção automática (worker externo com chave) | Prospecção |
 | Assistant | `assistant` | — | perguntas sobre os dados e grafo (só leitura) | Assistant, Graph |
 
 A lista de módulos agrupa `company`, `project` e `task` da proposta inicial em um único módulo **Work** (ADR-002).

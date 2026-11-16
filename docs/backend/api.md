@@ -136,6 +136,21 @@ Falha ao falar com a Pluggy responde 502.
 | PUT / DELETE | `/interactions/{id}` | edita, exclui | CTC-02 |
 | POST | `/interactions/{id}/follow-up` | `{ dueDate }` → cria a tarefa de follow-up, uma vez só (RN-24) | CTC-03 |
 
+## Prospecting
+
+| Método | Rota | Uso | Item |
+|---|---|---|---|
+| GET | `/prospecting/leads?status=` | lista, contato mais recente primeiro | PRS-01 |
+| GET / DELETE | `/prospecting/leads/{id}` | detalhe; exclui junto com as mensagens | PRS-01 |
+| PUT | `/prospecting/leads/{id}` | `{ status, notes }`: revisão do usuário | PRS-02 |
+| GET | `/prospecting/messages?leadId=` | mensagens, mais recente primeiro | PRS-01 |
+| GET | `/prospecting/summary` | funil, por status, classificação, cidade e envios por dia (30 dias) | PRS-04 |
+| PUT | `/webhooks/prospecting/leads/{externalId}` | público, `X-Ingest-Key`; cria ou atualiza pelo id do worker (RN-35) | PRS-03 |
+| POST | `/webhooks/prospecting/leads/{externalId}/messages` | público, `X-Ingest-Key`; `{ direction, stage, body, sentAt }` → 201, ou 200 se já registrada (RN-36) | PRS-03 |
+| GET | `/webhooks/prospecting/summary` | público, `X-Ingest-Key`; o mesmo resumo, para a dashboard | PRS-04 |
+
+Sem `PROSPECTING_INGEST_KEY` (mínimo 32 caracteres), toda chamada do worker recebe 401. Os dados vão para o dono `TBF_AUTH_OWNER_ID`.
+
 ## Assistant
 
 | Método | Rota | Uso | Item |
