@@ -70,6 +70,10 @@ export const sampleProspectMessages: ProspectMessage[] = [
   },
 ];
 
+// Relative to when the page loads, so the one-hour countdown is visible (RN-37).
+const minutesFromNow = (minutes: number) =>
+  new Date(Date.now() + minutes * 60_000).toISOString();
+
 export const sampleSendRequests: SendRequest[] = [
   {
     id: "sr-1",
@@ -77,7 +81,16 @@ export const sampleSendRequests: SendRequest[] = [
     stage: "first",
     body: "Oi! Tudo bem? Sou o Thiago, da TB Fernandes Softwares. Faço sites para clínicas aqui de Maringá e montei uma ideia de página para a Odonto Demo. Posso te mandar para dar uma olhada?",
     status: "pending",
-    requestedAt: "2026-10-23T12:30:00Z",
-    autoSendAt: "2026-10-23T13:30:00Z",
+    requestedAt: minutesFromNow(-15),
+    autoSendAt: minutesFromNow(45),
+  },
+  {
+    id: "sr-2",
+    leadId: "pl-2",
+    stage: "follow_up_1",
+    body: "Oi! Passando só para saber se você conseguiu ver minha mensagem sobre a página da Sorriso Modelo. Se não fizer sentido agora, sem problema.",
+    status: "pending",
+    requestedAt: minutesFromNow(-40),
+    autoSendAt: minutesFromNow(20),
   },
 ];

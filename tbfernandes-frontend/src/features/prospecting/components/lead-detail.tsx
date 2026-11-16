@@ -45,10 +45,9 @@ export function LeadDetail({
   const messages = data.prospectMessages
     .filter((message) => message.leadId === lead.id)
     .sort((a, b) => a.sentAt.localeCompare(b.sentAt));
+  // Pending ones are decided in the queue at the top; here only what is already released.
   const pending = data.sendRequests.find(
-    (request) =>
-      request.leadId === lead.id &&
-      (request.status === "pending" || request.status === "approved"),
+    (request) => request.leadId === lead.id && request.status === "approved",
   );
   const changed = status !== lead.status || notes !== (lead.notes ?? "");
   const whatsapp = whatsappHref(lead.whatsapp);

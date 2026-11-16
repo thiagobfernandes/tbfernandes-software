@@ -71,6 +71,9 @@ export function whatsappHref(whatsapp?: string) {
 
 export type Funnel = {
   leads: number;
+  /** Not contacted yet. */
+  queued: number;
+  sentRecently: number;
   contacted: number;
   replied: number;
   optedOut: number;
@@ -100,6 +103,8 @@ export function funnelOf(
   });
   return {
     leads: leads.length,
+    queued: leads.filter((lead) => lead.status === "new").length,
+    sentRecently: sentPerDay.reduce((sum, value) => sum + value, 0),
     contacted,
     replied,
     optedOut: leads.filter((lead) => lead.status === "opted_out").length,
@@ -107,4 +112,41 @@ export function funnelOf(
     replyRate: contacted ? replied / contacted : 0,
     sentPerDay,
   };
+}
+
+const MINUTE = 60_000;
+
+/** "sai sozinha em 37 min", or released when the hour is over (RN-37). */
+export function countdownLabel(autoSendAt: string, now: Date) {
+  const left = new Date(autoSendAt).getTime() - now.getTime();
+  if (left <= 0) return "liberada: sai no próximo envio";
+  const minutes = Math.ceil(left / MINUTE);
+  if (minutes < 60) return `sai sozinha em ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  return `sai sozinha em ${hours} h ${String(minutes % 60).padStart(2, "0")}`;
+}
+
+/** Share of the hour already gone, 0..1, for the countdown bar. */
+export function countdownProgress(
+  requestedAt: string,
+  autoSendAt: string,
+  now: Date,
+) {
+  const start = new Date(requestedAt).getTime();
+  const end = new Date(autoSendAt).getTime();
+  if (end <= start) return 1;
+  return Math.min(1, Math.max(0, (now.getTime() - start) / (end - start)));
+}
+
+const relative = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
+
+export function relativeTime(instant: string | undefined, now: Date) {
+  if (!instant) return undefined;
+  const minutes = Math.round(
+    (new Date(instant).getTime() - now.getTime()) / MINUTE,
+  );
+  if (Math.abs(minutes) < 60) return relative.format(minutes, "minute");
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 24) return relative.format(hours, "hour");
+  return relative.format(Math.round(hours / 24), "day");
 }
