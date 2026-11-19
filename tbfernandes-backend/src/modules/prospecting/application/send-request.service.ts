@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   Clock,
+  EventPublisher,
   IdGenerator,
   OwnerContext,
   UnitOfWork,
@@ -17,6 +18,11 @@ import {
   SendRequestRepository,
   SendRequestStatus,
 } from '../domain';
+import {
+  ProspectingEvents,
+  type SendFailed,
+  type SendRequested,
+} from '../prospecting.events';
 import { WorkerChannel, WorkerEvent, WorkerPresence } from './worker-channel';
 
 export interface SendRequestView {
@@ -45,6 +51,7 @@ export class SendRequestService {
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
     private readonly uow: UnitOfWork,
+    private readonly events: EventPublisher,
   ) {}
 
   // The screen
@@ -119,11 +126,17 @@ export class SendRequestService {
         { leadId: lead.id, stage, body },
         this.clock.now(),
       );
-      return {
-        request: await this.requests.create(request),
-        lead,
-        created: true,
-      };
+      const created = await this.requests.create(request);
+      this.events.publish<SendRequested>({
+        type: ProspectingEvents.sendRequested,
+        ownerId,
+        leadId: lead.id,
+        leadName: lead.details.name,
+        requestId: created.id,
+        stage: created.details.stage.toLowerCase(),
+        autoSendAt: created.details.autoSendAt.toISOString(),
+      });
+      return { request: created, lead };
     });
     return view;
   }
@@ -167,7 +180,21 @@ export class SendRequestService {
     const saved = await this.uow.run(async () => {
       const request = await this.find(ownerId, id);
       request.finish(sent, error, this.clock.now());
-      return this.requests.save(request);
+      const finished = await this.requests.save(request);
+      if (!sent) {
+        const lead = await this.leads.findById(
+          ownerId,
+          finished.details.leadId,
+        );
+        this.events.publish<SendFailed>({
+          type: ProspectingEvents.sendFailed,
+          ownerId,
+          leadId: finished.details.leadId,
+          leadName: lead?.details.name ?? 'Lead',
+          error: finished.details.error,
+        });
+      }
+      return finished;
     });
     return saved;
   }

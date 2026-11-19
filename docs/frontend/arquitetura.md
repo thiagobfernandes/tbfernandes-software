@@ -95,10 +95,11 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 
 ## 6. Grafo de conhecimento
 
-- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) . O layout é uma simulação de forças ao vivo com `d3-force` (`lib/force-layout.ts`): arrastar um nó puxa os vizinhos, nós que continuam no grafo mantêm a posição quando os filtros mudam, e os rótulos que se sobrepõem são omitidos. O `GraphCanvas` move os nós escrevendo os atributos do SVG direto, sem render do React a cada quadro.
+- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) . O layout é uma simulação de forças ao vivo com `d3-force` (`lib/force-layout.ts`): arrastar um nó puxa os vizinhos, nós que continuam no grafo mantêm a posição quando os filtros mudam, e os rótulos que se sobrepõem são omitidos. O `GraphCanvas` move os nós escrevendo os atributos do SVG direto, sem render do React a cada quadro. Em repouso, cada nó flutua alguns pixels em fase e ritmo próprios (só no desenho; a simulação não vê esse deslocamento), para o grafo não parecer uma imagem parada. A flutuação para com `prefers-reduced-motion`, no nó que está sendo arrastado e com o grafo fora da tela.
 - Arestas têm `relation`: `link` (vínculo salvo), `wiki` (`[[Título]]` numa nota, ver `lib/wiki-links.ts`) e `tag` (tracejada; tags ficam desligadas por padrão).
 - `/knowledge/graph?focus=<tipo>:<id>` abre o grafo focado num nó. Com foco, o painel agrupa as conexões por tipo e o grafo local mostra 1 ou 2 saltos.
 - A leitura de uma nota mostra o grafo local dela (`NoteConnections`) e as notas que a mencionam.
+- Tela de notas (`/knowledge`): lista em painel fixo com rolagem própria (30 por vez, "Mostrar mais"), filtro de tags recolhido com as mais usadas primeiro (`TagFilter`, `uniqueTags`) e leitura com linhas de até 72 caracteres. Um `# Título` no início do corpo igual ao título da nota não é repetido (`lib/note-text.ts`). No celular a lista e a nota se alternam: a nota abre só com `?note=` e tem o botão "Todas as notas".
 
 ## 7. Padrões de tela
 
@@ -117,3 +118,11 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 - **Visual** em `lib/document-styles.ts`: CSS de impressão próprio, com escopo `.tbdoc`, paleta preto e dourado da plataforma, cobre do portfólio como acento e tipografia Fraunces + Manrope. É a única exceção à regra de cores por token, porque o CSS vai dentro dos arquivos exportados.
 - **Exportar**: “Gerar PDF” imprime um HTML autocontido num iframe oculto (escolher *Salvar como PDF*, A4, sem margens, gráficos de fundo); “Baixar HTML” salva o mesmo arquivo, com imagens embutidas, que também pode virar PDF pelo `scripts/pdf/html-to-pdf.mjs` do portfólio.
 - **Dados**: os documentos ficam no `localStorage` do navegador (`tbf-documents-v1`, `lib/document-store.ts`), fora do store principal, porque a API ainda não tem a coleção. O PDF/HTML exportado é a cópia definitiva.
+
+## Notificações no cabeçalho
+
+`features/notifications` integra o sino em todas as páginas do shell. O hook lê até 50 avisos e o contador total pela API, recebe SSE no navegador e reconcilia a cada minuto e ao recuperar foco. No desktop, consulta a cada 15 segundos para preservar a autenticação por header. É uma exceção ao store: os avisos só existem no servidor; o modo local mostra uma explicação, sem dados fictícios. Falhas de leitura e gravação têm feedback e permitem tentar novamente.
+
+O painel permite abrir o destino do aviso, marcar um ou todos como lidos e pedir permissão para alertas do navegador por ação explícita. Com permissão, novos avisos também geram alertas quando a aba está oculta.
+
+Na Prospecção, a partir de `xl`, lista, conversa e acompanhamento compartilham a altura do espaço de trabalho e rolam por dentro. O cabeçalho, paginação e compositor permanecem disponíveis. Em larguras menores, os painéis se reorganizam; a conversa conserva altura limitada e rolagem própria.

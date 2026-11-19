@@ -229,3 +229,17 @@ Mesmo formato de `tbfernandes-frontend/src/features/tasks/types/task.ts`:
 `GET /api/v1/prospecting/events` usa SSE com a autenticação normal da tela e filtra os avisos pelo dono da sessão. Envia `changed` ao conectar e depois de cada escrita concluída nas rotas de leads, mensagens e pedidos, incluindo webhooks. `ping` a cada 25 segundos mantém a conexão aberta. A assinatura da tela não altera a presença do worker de WhatsApp. O canal fica na memória do processo, como o canal do worker; pressupõe uma instância do backend.
 
 O cliente recarrega somente leads, mensagens e pedidos pelo store, preservando as demais coleções e aguardando escritas locais pendentes. Reconexão SSE dispara nova leitura; uma consulta a cada 30 segundos recupera avisos perdidos. No desktop, que exige cabeçalho de autenticação incompatível com EventSource, a consulta ocorre a cada 3 segundos.
+
+## Notificações
+
+Todos os endpoints usam o dono autenticado, em `/api/v1/notifications`.
+
+| Método | Caminho | Resposta |
+|---|---|---|
+| GET | `/notifications?unread=true` | Até 50 avisos, mais recentes primeiro; sem filtro inclui lidos |
+| GET | `/notifications/summary` | `{ unread: number }`, incluindo avisos fora dos 50 recentes |
+| GET | `/notifications/events` | SSE `notification` com o aviso e `ping` a cada 25 segundos |
+| PUT | `/notifications/:id/read` | Aviso atualizado; leitura idempotente |
+| POST | `/notifications/read-all` | 204; marca todos os avisos do dono como lidos |
+
+Aviso: `id`, `kind` em minúsculas, `title`, `body`, `href`, `createdAt`, `readAt`. `body`, `href` e `readAt` podem ser nulos. A listagem verifica lembretes de tarefas e contatos antes de consultar os avisos.

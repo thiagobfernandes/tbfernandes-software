@@ -358,3 +358,7 @@ Chave primária `(owner_id, source_kind, source_id, position)`. Detalhes em [eta
 | Tabela | Épico | Motivo |
 |---|---|---|
 | `identity.session` ou Spring Session JDBC | IDN | login |
+
+## Notificações
+
+`V21__notifications.sql` cria `notifications.notification`: `id`, `owner_id`, `kind`, `title`, `body`, `href`, `dedupe_key`, `read_at` e auditoria (`created_at`, `updated_at`, `version`). A chave única `(owner_id, dedupe_key)` evita repetir o mesmo aviso. Não há FK entre schemas.

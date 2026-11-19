@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Clock, IdGenerator, UnitOfWork } from '../../../common/application';
+import {
+  Clock,
+  EventPublisher,
+  IdGenerator,
+  UnitOfWork,
+} from '../../../common/application';
 import { NotFoundError } from '../../../common/domain';
 import {
   Lead,
@@ -11,6 +16,11 @@ import {
   MessageStage,
   ProspectingSummary,
 } from '../domain';
+import {
+  ProspectingEvents,
+  type OptedOut,
+  type ReplyReceived,
+} from '../prospecting.events';
 import { summaryFor } from './lead.service';
 
 export interface IncomingMessage {
@@ -38,6 +48,7 @@ export class LeadIngestionService {
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
     private readonly uow: UnitOfWork,
+    private readonly events: EventPublisher,
   ) {}
 
   /** Creates the lead or updates it from the worker's data; safe to repeat. */
@@ -79,6 +90,7 @@ export class LeadIngestionService {
           ...incoming,
         }),
       );
+      this.announce(ownerId, lead, incoming);
       return { message, created: true };
     });
   }
@@ -118,6 +130,27 @@ export class LeadIngestionService {
       await this.leads.save(lead);
       return saved;
     });
+  }
+
+  /** Replies and opt-outs are worth a notification; automatic greetings are not (RN-38). */
+  private announce(
+    ownerId: string,
+    lead: Lead,
+    incoming: IncomingMessage,
+  ): void {
+    if (incoming.direction !== 'INBOUND') return;
+    const base = { ownerId, leadId: lead.id, leadName: lead.details.name };
+    if (incoming.stage === 'REPLY')
+      this.events.publish<ReplyReceived>({
+        ...base,
+        type: ProspectingEvents.replyReceived,
+        body: incoming.body,
+      });
+    else if (incoming.stage === 'OPT_OUT')
+      this.events.publish<OptedOut>({
+        ...base,
+        type: ProspectingEvents.optedOut,
+      });
   }
 
   summary(ownerId: string): Promise<ProspectingSummary> {

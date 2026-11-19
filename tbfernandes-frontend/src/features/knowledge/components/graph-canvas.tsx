@@ -39,6 +39,15 @@ export const kindColor: Record<GraphKind, string> = {
 
 const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 8;
+/** How far, in graph units, a node drifts around its resting place. */
+const DRIFT = 5;
+
+/** Stable phase in radians for a node id, so each node drifts on its own. */
+function seed(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  return ((hash >>> 0) % 6283) / 1000;
+}
 
 type Point = { x: number; y: number };
 type Drag =
@@ -116,25 +125,74 @@ export function GraphCanvas({
 
   useEffect(() => {
     const { simulation, nodes: simNodes, links } = layout;
+    const svg = svgRef.current;
+    // Idle drift: every node bobs gently on its own phase and pace so the
+    // graph never reads as a still picture. It is drawn on top of the
+    // simulated position only; the simulation and saved layout never see it.
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const phases = new Map(simNodes.map((node) => [node.id, seed(node.id)]));
+    let seconds = 0;
+    let onScreen = true;
+    let frame = 0;
+
+    const drift = (node: SimNode): Point => {
+      const current = drag.current;
+      if (
+        reducedMotion.matches ||
+        (current?.type === "node" && current.node === node)
+      ) {
+        return { x: 0, y: 0 };
+      }
+      const phase = phases.get(node.id) ?? 0;
+      const pace = 0.8 + (phase % 1) * 0.5;
+      return {
+        x: Math.sin(seconds * 0.55 * pace + phase) * DRIFT,
+        y: Math.cos(seconds * 0.42 * pace + phase * 1.7) * DRIFT,
+      };
+    };
+
     const paint = () => {
+      const offsets = new Map<string, Point>();
       for (const node of simNodes) {
+        const d = drift(node);
+        offsets.set(node.id, d);
         nodeEls.current
           .get(node.id)
-          ?.setAttribute("transform", `translate(${node.x} ${node.y})`);
+          ?.setAttribute(
+            "transform",
+            `translate(${node.x + d.x} ${node.y + d.y})`,
+          );
       }
       for (const link of links) {
         const line = edgeEls.current.get(
           `${link.edge.source}|${link.edge.target}`,
         );
         if (!line) continue;
-        line.setAttribute("x1", String(link.source.x));
-        line.setAttribute("y1", String(link.source.y));
-        line.setAttribute("x2", String(link.target.x));
-        line.setAttribute("y2", String(link.target.y));
+        const a = offsets.get(link.source.id) ?? { x: 0, y: 0 };
+        const b = offsets.get(link.target.id) ?? { x: 0, y: 0 };
+        line.setAttribute("x1", String(link.source.x + a.x));
+        line.setAttribute("y1", String(link.source.y + a.y));
+        line.setAttribute("x2", String(link.target.x + b.x));
+        line.setAttribute("y2", String(link.target.y + b.y));
       }
     };
+
+    const loop = (now: number) => {
+      seconds = now / 1000;
+      if (onScreen && !reducedMotion.matches) paint();
+      frame = requestAnimationFrame(loop);
+    };
+    frame = requestAnimationFrame(loop);
+
+    const visibility = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+    });
+    if (svg) visibility.observe(svg);
+
     simulation.on("tick", paint).on("end", () => setSettled((n) => n + 1));
     return () => {
+      cancelAnimationFrame(frame);
+      visibility.disconnect();
       simulation.stop().on("tick", null).on("end", null);
     };
   }, [layout]);

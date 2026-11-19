@@ -268,3 +268,12 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | Prospecção (`/prospecting`) | RF-PRS-01..06 | prospecting |
 | Assistant | RF-AST-01 | assistant |
 | Settings | RF-GEN-01..03 | identity |
+
+## Notificações (NTF)
+
+| ID | Requisito |
+|---|---|
+| RF-NTF-01 | Consultar avisos persistidos do dono, contador de não lidos e marcar um ou todos como lidos. |
+| RF-NTF-02 | Avisar sobre aprovação pendente, resposta real, pedido de não contato e falha de envio da Prospecção; saudações automáticas não geram aviso de resposta. |
+| RF-NTF-03 | Lembrar tarefas abertas vencendo hoje ou atrasadas e contatos com próxima conversa vencida; verificar a cada 15 minutos e ao listar avisos. |
+| RN-39 | Criar no máximo um aviso por dono e chave de deduplicação; repetir a leitura não altera o primeiro instante de leitura. |

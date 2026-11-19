@@ -137,7 +137,7 @@ export function LeadDetail({
   ].filter((fact): fact is [string, string] => Boolean(fact[1]));
 
   return (
-    <div className="grid min-w-0 animate-in gap-4 duration-300 fade-in-0 slide-in-from-bottom-1 motion-reduce:animate-none xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_19rem]">
+    <div className="grid min-h-0 min-w-0 animate-in gap-4 duration-300 fade-in-0 motion-reduce:animate-none xl:h-full xl:grid-cols-[minmax(0,1fr)_18rem] xl:grid-rows-[minmax(0,1fr)]">
       <LeadChat
         lead={lead}
         messages={messages}
@@ -147,7 +147,7 @@ export function LeadDetail({
 
       <aside
         aria-label={`Acompanhamento de ${lead.name}`}
-        className="flex h-fit flex-col divide-y rounded-xl border bg-card xl:h-full xl:min-h-0 xl:overflow-y-auto"
+        className="flex min-h-0 min-w-0 flex-col divide-y overflow-y-auto overscroll-contain rounded-xl border bg-card [&>div]:shrink-0 [&>form]:shrink-0"
       >
         <div className="flex flex-col gap-3 p-5">
           <div className="flex flex-col gap-2">
@@ -248,11 +248,7 @@ export function LeadDetail({
                 </Button>
               }
             />
-            <Button
-              type="submit"
-              className="active:scale-[0.97] motion-reduce:active:scale-100 max-sm:h-11"
-              disabled={!changed}
-            >
+            <Button type="submit" disabled={!changed}>
               Salvar
             </Button>
           </div>
