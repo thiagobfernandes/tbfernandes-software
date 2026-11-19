@@ -92,9 +92,14 @@ describe('Notifications API', () => {
         kinds.includes('prospecting_opt_out')
       );
     });
+    // Scoped to this lead: other suites share the database and may add
+    // replies of their own (prospecting.e2e-spec.ts does).
     const replies = (await list()).filter(
-      (item) => item.kind === 'prospecting_reply',
+      (item) =>
+        item.kind === 'prospecting_reply' &&
+        item.href === `/prospecting?lead=${lead.body.id}`,
     );
+    // The automatic greeting does not count as a reply (PRS-07).
     expect(replies).toHaveLength(1);
   });
 
