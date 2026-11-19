@@ -95,10 +95,11 @@ Telas nunca chamam `apiFetch` diretamente para coleções; o store é o único c
 
 ## 6. Grafo de conhecimento
 
-- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) . O layout é uma simulação de forças ao vivo com `d3-force` (`lib/force-layout.ts`): arrastar um nó puxa os vizinhos, nós que continuam no grafo mantêm a posição quando os filtros mudam, e os rótulos que se sobrepõem são omitidos. O `GraphCanvas` move os nós escrevendo os atributos do SVG direto, sem render do React a cada quadro.
+- `features/knowledge/lib/graph.ts` monta nós e arestas a partir do store (metas, empresas, projetos, tarefas, notas, snippets, métodos, estudos, habilidades, contatos e tags) . O layout é uma simulação de forças ao vivo com `d3-force` (`lib/force-layout.ts`): arrastar um nó puxa os vizinhos, nós que continuam no grafo mantêm a posição quando os filtros mudam, e os rótulos que se sobrepõem são omitidos. O `GraphCanvas` move os nós escrevendo os atributos do SVG direto, sem render do React a cada quadro. Em repouso, cada nó flutua alguns pixels em fase e ritmo próprios (só no desenho; a simulação não vê esse deslocamento), para o grafo não parecer uma imagem parada. A flutuação para com `prefers-reduced-motion`, no nó que está sendo arrastado e com o grafo fora da tela.
 - Arestas têm `relation`: `link` (vínculo salvo), `wiki` (`[[Título]]` numa nota, ver `lib/wiki-links.ts`) e `tag` (tracejada; tags ficam desligadas por padrão).
 - `/knowledge/graph?focus=<tipo>:<id>` abre o grafo focado num nó. Com foco, o painel agrupa as conexões por tipo e o grafo local mostra 1 ou 2 saltos.
 - A leitura de uma nota mostra o grafo local dela (`NoteConnections`) e as notas que a mencionam.
+- Tela de notas (`/knowledge`): lista em painel fixo com rolagem própria (30 por vez, "Mostrar mais"), filtro de tags recolhido com as mais usadas primeiro (`TagFilter`, `uniqueTags`) e leitura com linhas de até 72 caracteres. Um `# Título` no início do corpo igual ao título da nota não é repetido (`lib/note-text.ts`). No celular a lista e a nota se alternam: a nota abre só com `?note=` e tem o botão "Todas as notas".
 
 ## 7. Padrões de tela
 

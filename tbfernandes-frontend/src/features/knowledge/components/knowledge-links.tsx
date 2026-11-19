@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { FolderKanban, ListChecks } from "lucide-react";
 import { projectHref } from "@/lib/routes";
@@ -89,24 +90,43 @@ export function TagList({
   );
 }
 
-/** Toggleable tag filter row built from the tags in use. */
+const chipClass =
+  "rounded-full border px-2.5 py-0.5 text-xs outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50";
+
+/**
+ * Toggleable tag filter built from the tags in use. Only the first `limit`
+ * tags show until the user expands the row, so a large tag set never pushes
+ * the list below the fold. Pass tags most used first (`uniqueTags`).
+ */
 export function TagFilter({
   tags,
   active,
   onChange,
+  limit = 10,
 }: {
   tags: string[];
   active?: string;
   onChange: (tag?: string) => void;
+  limit?: number;
 }) {
+  const [expanded, setExpanded] = useState(false);
   if (!tags.length) return null;
+
+  const hidden = Math.max(tags.length - limit, 0);
+  let shown = expanded ? tags : tags.slice(0, limit);
+  // The active tag stays visible even when the row is collapsed.
+  if (active && !shown.includes(active)) shown = [active, ...shown];
+
   return (
     <div
       role="group"
       aria-label="Filtrar por tag"
-      className="flex flex-wrap gap-1.5"
+      className={cn(
+        "flex flex-wrap gap-1.5",
+        expanded && "max-h-40 overflow-y-auto pr-1",
+      )}
     >
-      {tags.map((tag) => {
+      {shown.map((tag) => {
         const selected = tag === active;
         return (
           <button
@@ -115,20 +135,40 @@ export function TagFilter({
             aria-pressed={selected}
             onClick={() => onChange(selected ? undefined : tag)}
             className={cn(
-              "rounded-full border px-2.5 py-0.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+              chipClass,
               selected
                 ? "border-primary bg-primary/10 text-primary"
-                : "text-muted-foreground hover:text-foreground",
+                : "text-muted-foreground hover:border-input hover:text-foreground",
             )}
           >
             #{tag}
           </button>
         );
       })}
+      {hidden > 0 && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((value) => !value)}
+          className={cn(
+            chipClass,
+            "border-dashed text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {expanded ? "Menos tags" : `+${hidden} tags`}
+        </button>
+      )}
     </div>
   );
 }
 
+/** Tags in use, most used first, then alphabetical. */
 export function uniqueTags(items: { tags: string[] }[]) {
-  return [...new Set(items.flatMap((item) => item.tags))].sort();
+  const counts = new Map<string, number>();
+  for (const tag of items.flatMap((item) => item.tags)) {
+    counts.set(tag, (counts.get(tag) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort(([a, ca], [b, cb]) => cb - ca || a.localeCompare(b, "pt-BR"))
+    .map(([tag]) => tag);
 }
