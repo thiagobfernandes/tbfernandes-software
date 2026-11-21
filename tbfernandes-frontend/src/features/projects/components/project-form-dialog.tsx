@@ -40,17 +40,27 @@ const NONE = "none";
 const colors = Object.keys(projectColorClasses) as ProjectColor[];
 
 type ProjectFormDialogProps = {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   project?: Project;
   defaultCompanyId?: string;
+  /** Controlled mode, for opening it from a menu instead of a trigger. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function ProjectFormDialog({
   trigger,
   project,
   defaultCompanyId,
+  open: controlledOpen,
+  onOpenChange,
 }: ProjectFormDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = controlledOpen ?? ownOpen;
+  const setOpen = (next: boolean) => {
+    setOwnOpen(next);
+    onOpenChange?.(next);
+  };
   const { companies, goals } = useWorkData();
   const editing = Boolean(project);
 
@@ -96,7 +106,7 @@ export function ProjectFormDialog({
         if (!next && editing) form.reset();
       }}
     >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>

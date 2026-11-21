@@ -9,13 +9,8 @@ import { Markdown } from "@/components/shared/markdown";
 import { PageHeading } from "@/components/shared/page-heading";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  answer,
-  type Answer,
-  type Reference,
-} from "@/features/assistant/lib/answer";
-import { apiFetch } from "@/lib/api/client";
-import type { components } from "@/lib/api/schema";
+import { type Answer, type Reference } from "@/features/assistant/lib/answer";
+import { askAssistant } from "@/features/assistant/lib/ask";
 import { env } from "@/lib/env";
 import { useAppData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
@@ -73,24 +68,7 @@ export function AssistantPage() {
       ]);
       setThinking(false);
     };
-    if (env.dataSource === "api") {
-      // Same rules, answered by the API (and by the AI model once one is set).
-      const body: components["schemas"]["QuestionRequest"] = { question: text };
-      apiFetch<Answer>("/api/v1/assistant/questions", {
-        method: "POST",
-        body,
-      })
-        .then(reply)
-        .catch(() =>
-          reply({
-            text: "Não foi possível falar com o assistente. Tente de novo em instantes.",
-            references: [],
-          }),
-        );
-      return;
-    }
-    // A short pause so the exchange reads like the real assistant will.
-    setTimeout(() => reply(answer(text, data)), 450);
+    askAssistant(text, data).then(reply);
   }
 
   return (
