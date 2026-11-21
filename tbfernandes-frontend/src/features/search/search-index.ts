@@ -3,6 +3,10 @@ import {
   mainNavigation,
   secondaryNavigation,
 } from "@/lib/constants/navigation";
+import {
+  createActions,
+  createHref,
+} from "@/features/dashboard/lib/create-actions";
 import type { AppData } from "@/lib/sample-data/store";
 import { companyHref, goalHref, methodHref, projectHref } from "@/lib/routes";
 
@@ -27,6 +31,13 @@ export function buildSearchIndex(data: AppData): SearchResult[] {
   ].filter((item) => !item.soon);
 
   return [
+    ...createActions.map((action) => ({
+      id: `create:${action.kind}`,
+      group: "Criar",
+      title: action.label,
+      href: createHref(action.kind),
+      keywords: action.keywords,
+    })),
     ...pages.map((page) => ({
       id: `page:${page.href}`,
       group: "Páginas",

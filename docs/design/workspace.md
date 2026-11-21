@@ -50,7 +50,7 @@ Versão 1 · 2026-11-21. Complementa [referencias.md](referencias.md): a paleta 
 
 ### Chaves de preferência
 
-`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail` · `tbf:projects:view` (visão, agrupamento, ordenação, densidade, campos, filtros) · `tbf:projects:detail:*` (seção, quadro/lista, período do roadmap) · `tbf:panel:projects:task`. "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
+`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail` · `tbf:projects:view` (visão, agrupamento, ordenação, densidade, campos, filtros) · `tbf:projects:detail:*` (seção, quadro/lista, período do roadmap) · `tbf:panel:projects:task` · `tbf:overview` (perfis, widgets, tamanhos, recolhidos, perfil padrão e favoritos). "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
 
 ### Atalhos
 
@@ -128,3 +128,21 @@ Os números saem só de rotinas, marcações e apontamentos (`lib/routine-stats.
 **Workspace do projeto** (`project-detail-page.tsx`): seções Visão geral, Tarefas, Roadmap, Conhecimento, Apontamentos e Configurações. Elas reaproveitam os módulos globais filtrados pelo projeto (`TasksBoard`, `TaskDetail` no painel lateral, `ProjectTimeline`, `LinkedKnowledge`, apontamentos); o grafo local abre o explorador focado no projeto. A visão geral traz próximas ações, bloqueadas, "Precisa de atenção", próximas entregas, atividade recente e relacionamentos (empresa, meta, rotinas, notas).
 
 Fora do escopo por falta de dado no modelo, sem inventar: prioridade de projeto, arquivamento separado de "concluído" e dependências entre etapas.
+
+## 8. Visão geral: central de comando
+
+`features/dashboard/`: uma grade de 12 colunas com widgets que o usuário arruma por **perfil** (Workspace geral, Trabalho, Estudos, Finanças, e os que criar). A página abre no perfil padrão; trocar de perfil vale para a sessão.
+
+| Camada | Arquivo |
+|---|---|
+| Modelo, catálogo (título, grupo, tamanho padrão/mín./máx.) e perfis padrão | `lib/widgets.ts` |
+| Itens de "Precisa de atenção" com o motivo | `lib/attention.ts` |
+| Ações globais de criação (também no `Ctrl K` por `/?create=<tipo>`) | `lib/create-actions.ts` |
+| Componente de cada widget (lê dos módulos, sem regra própria) | `components/widget-registry.tsx` |
+| Moldura: recolher, maximizar (`Esc` sai), tamanho, mover, remover, arrastar, limite de erro | `components/widget-frame.tsx` |
+
+Sem biblioteca de grid nova: a ordem é a da lista (arrastar ou "Mover para antes/depois") e o tamanho é escolhido entre ¼, ⅓, ½, ⅔ e inteiro, sempre a largura toda no celular.
+
+**Precisa de atenção** junta tarefas atrasadas, bloqueadas e que vencem hoje ou amanhã, projetos com saúde ruim (motivos de `project-insights`), compromissos de hoje e amanhã, despesas dos próximos 7 dias e mensagens da prospecção esperando aprovação. Rotinas não planejadas e dias de descanso nunca entram.
+
+O assistente aparece só como widget opcional, com perguntas prontas (resumo do dia, pendências, metas, dinheiro) respondidas pelo mesmo caminho da página do assistente (`features/assistant/lib/ask.ts`).

@@ -1,346 +1,605 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  ArrowUpRight,
-  BookOpen,
-  Building2,
-  Check,
-  FolderKanban,
-  ListChecks,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Check, LayoutGrid, Plus, RotateCcw, Star } from "lucide-react";
 import { toast } from "sonner";
-import { projectHref } from "@/lib/routes";
 
-import { PageContainer } from "@/components/layout/page-container";
-import { PageHeading } from "@/components/shared/page-heading";
-import { PriorityBadge } from "@/components/shared/priority-badge";
-import { RelationTree } from "@/components/shared/relation-tree";
 import { SampleDataBadge } from "@/components/shared/sample-data-badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { MetricCard } from "@/components/shared/metric-card";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
-  DotRow,
-  ProgressRing,
-  Sparkline,
-  TickBars,
-} from "@/components/shared/metric-visuals";
-import { LifeOverview } from "@/features/dashboard/components/life-overview";
-import { AgendaPanel } from "@/features/dashboard/components/agenda-panel";
-import { RhythmSection } from "@/features/dashboard/components/rhythm-section";
-import { completedPerDay, dueAhead } from "@/features/dashboard/lib/trends";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  ToolbarDivider,
+  WorkspaceFrame,
+  WorkspaceToolbar,
+} from "@/components/workspace/workspace-toolbar";
+import { AppointmentSheet } from "@/features/calendar/components/appointment-sheet";
+import { ContactFormDialog } from "@/features/contacts/components/contact-form-dialog";
+import {
+  type CreateKind,
+  createActions,
+  isCreateKind,
+} from "@/features/dashboard/lib/create-actions";
+import {
+  type DashboardPrefs,
+  type DashboardProfile,
+  type WidgetGroup,
+  type WidgetInstance,
+  type WidgetType,
+  clampSize,
+  defaultDashboardPrefs,
+  defaultProfiles,
+  widgetCatalog,
+} from "@/features/dashboard/lib/widgets";
+import { GoalFormDialog } from "@/features/goals/components/goal-form-dialog";
 import { NoteFormDialog } from "@/features/knowledge/components/knowledge-form-dialogs";
-import { buildContextTree } from "@/features/knowledge/lib/graph";
-import { CompanyFormDialog } from "@/features/companies/components/company-form-dialog";
 import { ProjectFormDialog } from "@/features/projects/components/project-form-dialog";
-import { DueChip } from "@/features/tasks/components/due-chip";
+import { RoutineFormDialog } from "@/features/routines/components/routine-form-dialog";
 import { TaskDetailSheet } from "@/features/tasks/components/task-detail-sheet";
 import { TaskFormDialog } from "@/features/tasks/components/task-form-dialog";
-import { projectColorClasses } from "@/lib/project-colors";
-import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
-import { currentDay } from "@/lib/today";
-import { daysBetween } from "@/lib/dates";
+import { TimeEntryFormDialog } from "@/features/time-tracking/components/time-entry-form-dialog";
+import { useNow } from "@/features/time-tracking/hooks/use-now";
+import { localDay } from "@/features/time-tracking/lib/time";
+import { uuidv7 } from "@/lib/api/uuid";
+import { usePreference } from "@/lib/preferences";
+import { useAppData } from "@/lib/sample-data/store";
+import { useToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
+import { WidgetFrame } from "./widget-frame";
+import { widgetComponents } from "./widget-registry";
+
+const groups: WidgetGroup[] = [
+  "Dia",
+  "Execução",
+  "Projetos e metas",
+  "Conhecimento",
+  "Análises",
+  "Outros",
+];
+
+/**
+ * Personal command center: a grid of widgets the user arranges per profile
+ * (Workspace geral, Trabalho, Estudos…). Layout, sizes, collapsed state and
+ * profiles persist in `tbf:overview`; the global "Criar" opens any form.
+ */
 export function DashboardPage() {
-  const data = useWorkData();
-  const { findCompany, findProject, tasksOfProject } = selectors(data);
-  const [selectedTaskId, setSelectedTaskId] = useState<string>();
-  const sampleTasks = data.tasks;
-  const contextTree = buildContextTree(data);
-
-  // Open tasks due within two days, most urgent first.
-  const focusTasks = sampleTasks
-    .filter(
-      (task) =>
-        task.status !== "done" &&
-        task.status !== "canceled" &&
-        task.dueDate &&
-        daysBetween(currentDay(), task.dueDate) <= 2,
-    )
-    .sort((a, b) => a.dueDate!.localeCompare(b.dueDate!));
-
-  const activeProjectRows = data.projects
-    .filter((project) => project.status === "active")
-    .map((project) => {
-      const tasks = tasksOfProject(project.id);
-      const done = tasks.filter((task) => task.status === "done").length;
-      return {
-        ...project,
-        company: findCompany(project.companyId),
-        progress: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
-      };
-    });
-
-  const openTasks = sampleTasks.filter(
-    (task) => task.status !== "done" && task.status !== "canceled",
+  const data = useAppData();
+  const today = useToday();
+  const now = useNow(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [prefs, setPrefs] = usePreference<DashboardPrefs>(
+    "overview",
+    defaultDashboardPrefs,
   );
-  const overdue = openTasks.filter(
-    (task) => task.dueDate && task.dueDate < currentDay(),
-  ).length;
-  const doneThisWeek = sampleTasks.filter(
-    (task) =>
-      task.status === "done" &&
-      task.dueDate &&
-      daysBetween(task.dueDate, currentDay()) < 7,
-  ).length;
+  const [activeId, setActiveId] = useState<string>();
+  const profile =
+    prefs.profiles.find((item) => item.id === (activeId ?? prefs.defaultId)) ??
+    prefs.profiles[0];
+  const [maximizedId, setMaximizedId] = useState<string>();
+  const [draggingId, setDraggingId] = useState<string>();
+  const [overId, setOverId] = useState<string>();
+  const [openTaskId, setOpenTaskId] = useState<string>();
+  const [naming, setNaming] = useState<"new" | "rename">();
+  const [creating, setCreating] = useState<CreateKind>();
+
+  // `/?create=task` (from Ctrl K) opens that form; closing it cleans the URL.
+  const requested = searchParams.get("create");
+  const open = creating ?? (isCreateKind(requested) ? requested : undefined);
+  const closeCreate = () => {
+    setCreating(undefined);
+    if (requested) router.replace("/", { scroll: false });
+  };
+
+  useEffect(() => {
+    if (!maximizedId) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !event.defaultPrevented)
+        setMaximizedId(undefined);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [maximizedId]);
+
+  const saveProfile = (next: DashboardProfile) =>
+    setPrefs({
+      ...prefs,
+      profiles: prefs.profiles.map((item) =>
+        item.id === next.id ? next : item,
+      ),
+    });
+  const setWidgets = (widgets: WidgetInstance[]) =>
+    saveProfile({ ...profile, widgets });
+  const updateWidget = (id: string, patch: Partial<WidgetInstance>) =>
+    setWidgets(
+      profile.widgets.map((item) =>
+        item.id === id ? { ...item, ...patch } : item,
+      ),
+    );
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= profile.widgets.length || from === to) return;
+    const next = [...profile.widgets];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    setWidgets(next);
+  };
+  const toggleWidget = (type: WidgetType) => {
+    const existing = profile.widgets.find((item) => item.type === type);
+    if (existing) {
+      setWidgets(profile.widgets.filter((item) => item.id !== existing.id));
+      return;
+    }
+    setWidgets([
+      ...profile.widgets,
+      {
+        id: type,
+        type,
+        size: clampSize(type, widgetCatalog[type].defaultSize),
+      },
+    ]);
+  };
+  const restore = () => {
+    const original =
+      defaultProfiles.find((item) => item.id === profile.id) ??
+      defaultProfiles[0];
+    setWidgets(original.widgets);
+    toast.success("Layout padrão restaurado", { description: profile.name });
+  };
+
+  const maximized = profile.widgets.find((item) => item.id === maximizedId);
+  const visible = maximized ? [maximized] : profile.widgets;
+  const favorites = new Set(prefs.favorites);
+  const orderedProfiles = [...prefs.profiles].sort(
+    (a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id)),
+  );
+  const present = new Set(profile.widgets.map((item) => item.type));
 
   return (
-    <div className="relative">
-      {/* Soft accent glow at the top of the page, after the Luma reference. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(ellipse_60%_100%_at_15%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent)]"
-      />
-      <PageContainer className="max-w-none">
-        <PageHeading
-          title="Visão geral"
-          description="O que precisa da sua atenção em empresas, projetos e tarefas."
+    <WorkspaceFrame>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <WorkspaceToolbar
           actions={
             <>
-              <SampleDataBadge />
-              <CompanyFormDialog
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <Building2 /> Empresa
+              <span className="hidden md:contents">
+                <SampleDataBadge />
+              </span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <LayoutGrid />
+                    <span className="hidden sm:inline">Widgets</span>
                   </Button>
-                }
-              />
-              <ProjectFormDialog
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <FolderKanban /> Projeto
+                </PopoverTrigger>
+                <PopoverContent
+                  align="end"
+                  className="flex w-80 flex-col gap-0 p-0"
+                >
+                  <div className="flex max-h-[min(30rem,70svh)] flex-col divide-y overflow-y-auto">
+                    {groups.map((group) => (
+                      <section
+                        key={group}
+                        className="flex flex-col gap-0.5 p-1.5"
+                      >
+                        <h3 className="px-2 pt-1 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                          {group}
+                        </h3>
+                        {(Object.keys(widgetCatalog) as WidgetType[])
+                          .filter((type) => widgetCatalog[type].group === group)
+                          .map((type) => (
+                            <button
+                              key={type}
+                              type="button"
+                              role="menuitemcheckbox"
+                              aria-checked={present.has(type)}
+                              onClick={() => toggleWidget(type)}
+                              className="flex w-full items-start gap-2 rounded-md px-2 py-1.5 text-left outline-none hover:bg-accent focus-visible:bg-accent"
+                            >
+                              <span
+                                aria-hidden
+                                className={cn(
+                                  "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[4px] border",
+                                  present.has(type) &&
+                                    "border-primary bg-primary text-primary-foreground",
+                                )}
+                              >
+                                {present.has(type) && (
+                                  <Check className="size-3" />
+                                )}
+                              </span>
+                              <span className="flex min-w-0 flex-col">
+                                <span className="text-sm">
+                                  {widgetCatalog[type].title}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {widgetCatalog[type].description}
+                                </span>
+                              </span>
+                            </button>
+                          ))}
+                      </section>
+                    ))}
+                  </div>
+                  <div className="flex justify-end border-t px-3 py-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={restore}
+                      className="h-7 text-xs text-muted-foreground"
+                    >
+                      <RotateCcw /> Restaurar layout padrão
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <ToolbarDivider />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" className="h-8">
+                    <Plus /> <span className="hidden sm:inline">Criar</span>
                   </Button>
-                }
-              />
-              <TaskFormDialog
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <ListChecks /> Tarefa
-                  </Button>
-                }
-              />
-              <NoteFormDialog
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <BookOpen /> Nota
-                  </Button>
-                }
-              />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {createActions.map((action) => (
+                    <DropdownMenuItem
+                      key={action.kind}
+                      onSelect={() => setCreating(action.kind)}
+                    >
+                      {action.label}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="text-[11px] font-normal text-muted-foreground">
+                    Também na busca: Ctrl K
+                  </DropdownMenuLabel>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           }
-        />
-
-        <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <div className="flex min-w-0 flex-col gap-6">
-            <section
-              aria-label="Indicadores"
-              className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-            >
-              <MetricCard
-                label="Tarefas abertas"
-                value={openTasks.length}
-                unit="tarefas"
-                visual={<TickBars values={dueAhead(data, currentDay())} />}
-              />
-              <MetricCard
-                label="Atrasadas"
-                value={overdue}
-                unit="tarefas"
-                visual={<DotRow active={overdue} total={6} />}
-              />
-              <MetricCard
-                label="Projetos ativos"
-                value={activeProjectRows.length}
-                unit={`/ ${data.projects.length}`}
-                visual={
-                  <ProgressRing
-                    value={activeProjectRows.length}
-                    total={data.projects.length}
+        >
+          <h1 className="hidden text-sm font-semibold sm:block">Visão geral</h1>
+          <span className="hidden sm:contents">
+            <ToolbarDivider />
+          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="max-w-56 gap-1.5 px-2"
+              >
+                <span className="truncate">{profile.name}</span>
+                {profile.id === prefs.defaultId && (
+                  <span className="text-[11px] font-normal text-muted-foreground">
+                    padrão
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Perfis
+              </DropdownMenuLabel>
+              {orderedProfiles.map((item) => (
+                <DropdownMenuItem
+                  key={item.id}
+                  onSelect={() => setActiveId(item.id)}
+                  className="group/profile"
+                >
+                  <Check
+                    className={cn(item.id !== profile.id && "opacity-0")}
                   />
-                }
-              />
-              <MetricCard
-                label="Concluídas na semana"
-                value={doneThisWeek}
-                unit="tarefas"
-                visual={
-                  <Sparkline
-                    values={completedPerDay(data, currentDay(), 7).map(
-                      (point) => point.value,
-                    )}
-                  />
-                }
-              />
-            </section>
-
-            <div className="grid gap-4 lg:grid-cols-5">
-              <Card className="gap-2 rounded-2xl lg:col-span-3">
-                <CardHeader>
-                  <CardTitle className="text-base">Hoje</CardTitle>
-                  <CardDescription>
-                    O que precisa ser feito nos próximos dois dias?
-                  </CardDescription>
-                  <CardAction>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href="/tasks">
-                        Todas as tarefas <ArrowUpRight />
-                      </Link>
-                    </Button>
-                  </CardAction>
-                </CardHeader>
-                <CardContent className="px-3">
-                  <ul className="flex flex-col">
-                    {focusTasks.map((task) => (
-                      <li
-                        key={task.id}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-accent/60"
-                      >
-                        <button
-                          type="button"
-                          aria-label={`Marcar "${task.title}" como concluída`}
-                          onClick={() => {
-                            workActions.updateTask(task.id, { status: "done" });
-                            toast.success("Tarefa concluída", {
-                              action: {
-                                label: "Desfazer",
-                                onClick: () =>
-                                  workActions.updateTask(task.id, {
-                                    status: task.status,
-                                  }),
-                              },
-                            });
-                          }}
-                          className="group/check flex size-4 shrink-0 items-center justify-center rounded-full border border-input outline-none hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        >
-                          <Check className="size-3 text-primary opacity-0 group-hover/check:opacity-100" />
-                        </button>
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedTaskId(task.id)}
-                            className="truncate text-left text-sm font-medium outline-none hover:text-primary focus-visible:text-primary"
-                          >
-                            {task.title}
-                          </button>
-                          <span className="truncate text-xs text-muted-foreground">
-                            {findProject(task.projectId)?.name ?? "Sem projeto"}
-                          </span>
-                        </div>
-                        <PriorityBadge priority={task.priority} />
-                        <span className="hidden sm:block">
-                          <DueChip
-                            dueDate={task.dueDate!}
-                            today={currentDay()}
-                          />
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="gap-2 rounded-2xl lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="text-base">Projetos ativos</CardTitle>
-                  <CardDescription>
-                    O que está acontecendo nos meus projetos?
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="flex flex-col gap-4">
-                    {activeProjectRows.map((project) => (
-                      <li key={project.id} className="flex flex-col gap-2">
-                        <div className="flex items-baseline justify-between gap-3">
-                          <Link
-                            href={projectHref(project.id)}
-                            className="truncate text-sm font-medium hover:text-primary"
-                          >
-                            {project.name}
-                          </Link>
-                          <span className="text-xs text-muted-foreground tabular-nums">
-                            {project.progress}%
-                          </span>
-                        </div>
-                        <div
-                          role="progressbar"
-                          aria-label={`Progresso de ${project.name}`}
-                          aria-valuenow={project.progress}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                          className="h-1.5 overflow-hidden rounded-full bg-muted"
-                        >
-                          <div
-                            className={cn(
-                              "h-full rounded-full",
-                              projectColorClasses[project.color].bg,
-                            )}
-                            style={{ width: `${project.progress}%` }}
-                          />
-                        </div>
-                        <span className="truncate text-xs text-muted-foreground">
-                          {project.company && `${project.company.name} · `}
-                          {project.nextDelivery}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-
-            <RhythmSection data={data} today={currentDay()} />
-
-            <LifeOverview data={data} />
-
-            <Card className="gap-4 rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-base">
-                  Como seu trabalho se conecta
-                </CardTitle>
-                <CardDescription>
-                  Cada tarefa ligada a um projeto, uma empresa e uma meta.
-                </CardDescription>
-                <CardAction>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/knowledge/graph">
-                      Abrir grafo <ArrowUpRight />
-                    </Link>
-                  </Button>
-                </CardAction>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-xl border bg-dot-grid px-4 py-8">
-                  {contextTree ? (
-                    <RelationTree root={contextTree} />
-                  ) : (
-                    <p className="text-center text-sm text-muted-foreground">
-                      Vincule um projeto a uma meta para ver como seu trabalho
-                      se conecta.
-                    </p>
+                  <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                  {item.id === prefs.defaultId && (
+                    <span className="text-[11px] text-muted-foreground">
+                      padrão
+                    </span>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="2xl:sticky 2xl:top-20 2xl:self-start">
-            <AgendaPanel tasks={sampleTasks} today={currentDay()} />
-          </div>
+                  <button
+                    type="button"
+                    aria-label={
+                      favorites.has(item.id)
+                        ? `Desfavoritar ${item.name}`
+                        : `Favoritar ${item.name}`
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setPrefs({
+                        ...prefs,
+                        favorites: favorites.has(item.id)
+                          ? prefs.favorites.filter((id) => id !== item.id)
+                          : [...prefs.favorites, item.id],
+                      });
+                    }}
+                    className="rounded p-0.5 outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-ring/50"
+                  >
+                    <Star
+                      className={cn(
+                        "size-3.5",
+                        favorites.has(item.id)
+                          ? "fill-current text-primary"
+                          : "text-muted-foreground/60",
+                      )}
+                    />
+                  </button>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setNaming("new")}>
+                Salvar como novo perfil…
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setNaming("rename")}>
+                Renomear perfil…
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={profile.id === prefs.defaultId}
+                onSelect={() => {
+                  setPrefs({ ...prefs, defaultId: profile.id });
+                  toast.success(`"${profile.name}" agora abre por padrão`);
+                }}
+              >
+                Definir como padrão
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                disabled={prefs.profiles.length <= 1}
+                onSelect={() => {
+                  const rest = prefs.profiles.filter(
+                    (item) => item.id !== profile.id,
+                  );
+                  setPrefs({
+                    ...prefs,
+                    profiles: rest,
+                    defaultId:
+                      prefs.defaultId === profile.id
+                        ? rest[0].id
+                        : prefs.defaultId,
+                    favorites: prefs.favorites.filter(
+                      (id) => id !== profile.id,
+                    ),
+                  });
+                  setActiveId(undefined);
+                  toast.success(`Perfil "${profile.name}" excluído`);
+                }}
+              >
+                Excluir perfil
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </WorkspaceToolbar>
+
+        <div className="min-h-0 flex-1 overflow-auto">
+          {visible.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
+              <p className="text-sm font-medium">Este perfil está vazio</p>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                Adicione widgets pelo botão “Widgets” na barra, ou restaure o
+                layout padrão.
+              </p>
+              <Button size="sm" variant="outline" onClick={restore}>
+                <RotateCcw /> Restaurar layout padrão
+              </Button>
+            </div>
+          ) : (
+            <div
+              className={cn(
+                "grid grid-cols-12 items-start gap-3 p-3 sm:p-4",
+                maximized && "h-full",
+              )}
+            >
+              {visible.map((widget) => {
+                const index = profile.widgets.indexOf(widget);
+                const Content = widgetComponents[widget.type];
+                return (
+                  <WidgetFrame
+                    key={widget.id}
+                    widget={widget}
+                    index={index}
+                    count={profile.widgets.length}
+                    maximized={widget.id === maximizedId}
+                    dragging={widget.id === draggingId}
+                    over={widget.id === overId}
+                    onChange={(patch) => updateWidget(widget.id, patch)}
+                    onMove={(to) => move(index, to)}
+                    onRemove={() => {
+                      setWidgets(
+                        profile.widgets.filter((item) => item.id !== widget.id),
+                      );
+                      toast.success(
+                        `${widgetCatalog[widget.type].title} removido`,
+                        {
+                          action: {
+                            label: "Desfazer",
+                            onClick: () => setWidgets(profile.widgets),
+                          },
+                        },
+                      );
+                    }}
+                    onMaximize={(on) =>
+                      setMaximizedId(on ? widget.id : undefined)
+                    }
+                    onDragStart={() => setDraggingId(widget.id)}
+                    onDragOver={() => draggingId && setOverId(widget.id)}
+                    onDrop={() => {
+                      if (draggingId) {
+                        const from = profile.widgets.findIndex(
+                          (item) => item.id === draggingId,
+                        );
+                        move(from, index);
+                      }
+                      setDraggingId(undefined);
+                      setOverId(undefined);
+                    }}
+                    onDragEnd={() => {
+                      setDraggingId(undefined);
+                      setOverId(undefined);
+                    }}
+                  >
+                    <Content
+                      data={data}
+                      today={today}
+                      now={now}
+                      config={widget.config ?? {}}
+                      setConfig={(patch) =>
+                        updateWidget(widget.id, {
+                          config: { ...widget.config, ...patch },
+                        })
+                      }
+                      onOpenTask={setOpenTaskId}
+                      expanded={widget.id === maximizedId}
+                    />
+                  </WidgetFrame>
+                );
+              })}
+            </div>
+          )}
         </div>
-        <TaskDetailSheet
-          taskId={selectedTaskId}
-          onOpenChange={(open) => !open && setSelectedTaskId(undefined)}
-        />
-      </PageContainer>
-    </div>
+      </div>
+
+      <ProfileNameDialog
+        mode={naming}
+        current={profile.name}
+        onClose={() => setNaming(undefined)}
+        onSave={(name) => {
+          if (naming === "rename") {
+            saveProfile({ ...profile, name });
+          } else {
+            const created: DashboardProfile = {
+              id: uuidv7(),
+              name,
+              widgets: profile.widgets,
+            };
+            setPrefs({ ...prefs, profiles: [...prefs.profiles, created] });
+            setActiveId(created.id);
+          }
+          setNaming(undefined);
+        }}
+      />
+
+      <TaskDetailSheet
+        taskId={openTaskId}
+        onOpenChange={(open) => !open && setOpenTaskId(undefined)}
+      />
+
+      <TaskFormDialog
+        open={open === "task"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <NoteFormDialog
+        open={open === "note"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <ProjectFormDialog
+        open={open === "project"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <RoutineFormDialog
+        today={localDay(now)}
+        open={open === "routine"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <TimeEntryFormDialog
+        day={localDay(now)}
+        open={open === "time"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <GoalFormDialog
+        open={open === "goal"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <ContactFormDialog
+        open={open === "contact"}
+        onOpenChange={(next) => !next && closeCreate()}
+      />
+      <AppointmentSheet
+        open={open === "appointment"}
+        onOpenChange={(next) => !next && closeCreate()}
+        draft={{ date: today, startTime: "09:00", endTime: "10:00" }}
+      />
+    </WorkspaceFrame>
+  );
+}
+
+function ProfileNameDialog({
+  mode,
+  current,
+  onClose,
+  onSave,
+}: {
+  mode?: "new" | "rename";
+  current: string;
+  onClose: () => void;
+  onSave: (name: string) => void;
+}) {
+  return (
+    <Dialog open={Boolean(mode)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-sm">
+        {mode && (
+          <form
+            key={mode}
+            className="flex flex-col gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const name = String(
+                new FormData(event.currentTarget).get("name") ?? "",
+              ).trim();
+              if (name) onSave(name);
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>
+                {mode === "new" ? "Novo perfil" : "Renomear perfil"}
+              </DialogTitle>
+              <DialogDescription>
+                {mode === "new"
+                  ? "Começa com os widgets do perfil atual; depois é só ajustar."
+                  : "O nome aparece no seletor de perfis."}
+              </DialogDescription>
+            </DialogHeader>
+            <Input
+              name="name"
+              aria-label="Nome do perfil"
+              defaultValue={mode === "rename" ? current : ""}
+              placeholder="Ex.: Empresa, Organização pessoal"
+              autoFocus
+              required
+              maxLength={40}
+            />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button type="submit">Salvar</Button>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
