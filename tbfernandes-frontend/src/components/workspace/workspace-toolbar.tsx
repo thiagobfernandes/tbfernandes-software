@@ -16,11 +16,13 @@ export function WorkspaceToolbar({
   return (
     <div
       className={cn(
-        "flex h-11 shrink-0 items-center gap-2 border-b px-3 pointer-coarse:h-12",
+        "@container/toolbar flex h-11 shrink-0 items-center gap-2 border-b px-3 pointer-coarse:h-12",
         className,
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-2">{children}</div>
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+        {children}
+      </div>
       {actions && (
         <div className="flex shrink-0 items-center gap-0.5">{actions}</div>
       )}
