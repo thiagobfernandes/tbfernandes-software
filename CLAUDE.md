@@ -13,6 +13,7 @@ Este arquivo é o ponto de entrada. Ele é curto de propósito: leia o documento
 | `tbfernandes-nginx/` | Proxy reverso: `/` para o frontend, `/api` para o backend | — |
 | `tbfernandes-desktop/` | App Windows (Tauri 2): janela, backend e PostgreSQL embutidos, instalador NSIS | [docs/desktop.md](docs/desktop.md) |
 | `tbfernandes-backup/` | Script do serviço `backup`: `pg_dump` a cada 10 min em `./backups/`, só o último fica | [docs/como-rodar.md](docs/como-rodar.md#backup-do-banco) |
+| `tbfernandes-mcp/` | Servidor MCP (stdio) para o Claude ler e gravar notas, estudos, materiais e metas pela API de produção; credenciais fora do repo | [tbfernandes-mcp/README.md](tbfernandes-mcp/README.md) |
 | `deploy/` | Produção na EC2: compose, Caddy, script e timer do deploy automático | [docs/deploy.md](docs/deploy.md) |
 | `compose.yaml` | Sobe tudo (banco, backend, frontend, nginx) para uso local e deploy | [docs/como-rodar.md](docs/como-rodar.md) |
 | `docs/` | Toda a documentação (índice em [docs/README.md](docs/README.md)) | — |
