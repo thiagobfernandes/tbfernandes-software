@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Code2, ExternalLink, Pencil, Plus, Search } from "lucide-react";
+import {
+  Code2,
+  ExternalLink,
+  Maximize2,
+  Pencil,
+  Plus,
+  Search,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { PageContainer } from "@/components/layout/page-container";
@@ -26,11 +33,24 @@ import {
   TagList,
   uniqueTags,
 } from "@/features/knowledge/components/knowledge-links";
+import { SnippetViewer } from "@/features/knowledge/components/snippet-viewer";
 import { matchesQuery } from "@/features/knowledge/lib/link-options";
 import type { Snippet } from "@/features/knowledge/types/knowledge";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
 
 const ALL = "all";
+
+/** First words of a Markdown explanation as plain text, for the card. */
+function summaryOf(markdown: string) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/^#+\s.*$/gm, " ")
+    .replace(/[*_`>|#]/g, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/^\s*[-–]\s*/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 export function SnippetsPage() {
   const { snippets } = useAppData();
@@ -38,6 +58,9 @@ export function SnippetsPage() {
   const [tag, setTag] = useState<string>();
   const [language, setLanguage] = useState(ALL);
   const [editing, setEditing] = useState<Snippet>();
+  const [viewingId, setViewingId] = useState<string>();
+  // Read from the store, so the modal shows edits right away.
+  const viewing = snippets.find((snippet) => snippet.id === viewingId);
 
   const languages = [
     ...new Set(snippets.map((snippet) => snippet.language)),
@@ -124,10 +147,18 @@ export function SnippetsPage() {
                 >
                   <header className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-col gap-1">
-                      <h2 className="text-sm font-medium">{snippet.title}</h2>
+                      <h2 className="text-sm font-medium">
+                        <button
+                          type="button"
+                          onClick={() => setViewingId(snippet.id)}
+                          className="rounded-sm text-left outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-ring/50"
+                        >
+                          {snippet.title}
+                        </button>
+                      </h2>
                       {snippet.explanation && (
-                        <p className="text-xs text-muted-foreground">
-                          {snippet.explanation}
+                        <p className="line-clamp-2 text-xs text-muted-foreground">
+                          {summaryOf(snippet.explanation)}
                         </p>
                       )}
                     </div>
@@ -166,15 +197,34 @@ export function SnippetsPage() {
                     code={snippet.code}
                     language={snippet.language}
                     maxLines={12}
+                    onExpand={() => setViewingId(snippet.id)}
                   />
                   <TagList tags={snippet.tags} />
-                  <KnowledgeLinkChips links={snippet} />
+                  <footer className="mt-auto flex items-end justify-between gap-3">
+                    <KnowledgeLinkChips links={snippet} />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setViewingId(snippet.id)}
+                      className="h-7 shrink-0 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      <Maximize2 /> Abrir completo
+                    </Button>
+                  </footer>
                 </article>
               ))}
             </div>
           )}
         </>
       )}
+      <SnippetViewer
+        snippet={viewing}
+        onOpenChange={(open) => !open && setViewingId(undefined)}
+        onEdit={(snippet) => {
+          setViewingId(undefined);
+          setEditing(snippet);
+        }}
+      />
       <SnippetFormDialog
         item={editing}
         open={Boolean(editing)}

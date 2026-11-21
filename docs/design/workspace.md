@@ -173,3 +173,9 @@ O perfil padrão "Workspace geral" responde, de cima para baixo: o que fazer ago
 **Progresso**: tarefas com prazo no período (sem as canceladas): concluídas ÷ total, com em andamento e pendentes ao lado. Também mostra quantas foram concluídas no período.
 
 As molduras saem do catálogo (`chrome`: `card`, `featured`, `bare`). Os widgets sem moldura mantêm o menu (mover, remover) ao passar o mouse. A chave virou `tbf:overview:v2` para quem já tinha salvo o layout anterior receber o novo padrão.
+
+## 10. Snippets: card compacto e visualização completa
+
+Os cards continuam compactos: título, resumo da explicação em texto simples (2 linhas), código com destaque de sintaxe limitado a 12 linhas com rolagem interna, tags e vínculos. O cabeçalho do código mostra a contagem de linhas quando passa do limite e um botão **Abrir snippet completo** (`Maximize2`, com tooltip). O rodapé tem **Abrir completo**, e o título também abre.
+
+O modal (`features/knowledge/components/snippet-viewer.tsx`) ocupa até 90vw × 90vh: código inteiro com numeração de linhas à esquerda e, ao lado, explicação em Markdown, tags e vínculos (empilhados no celular). O cabeçalho fica fixo com copiar (no bloco de código), quebrar linhas longas (preferência `tbf:snippets:wrap`), tela cheia (o modal ocupa a tela toda e usa a tela cheia do navegador quando permitida), editar e fechar. Esc, clique fora ou X fecham; o `Dialog` trava a rolagem do fundo e devolve foco e posição ao fechar. O `CodeBlock` compartilhado ganhou as props opcionais `onExpand`, `wrap`, `fill` e `lineNumbers`.
