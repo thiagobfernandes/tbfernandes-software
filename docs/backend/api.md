@@ -243,3 +243,31 @@ Todos os endpoints usam o dono autenticado, em `/api/v1/notifications`.
 | POST | `/notifications/read-all` | 204; marca todos os avisos do dono como lidos |
 
 Aviso: `id`, `kind` em minúsculas, `title`, `body`, `href`, `createdAt`, `readAt`. `body`, `href` e `readAt` podem ser nulos. A listagem verifica lembretes de tarefas e contatos antes de consultar os avisos.
+
+## Planejamento financeiro
+
+Valores em reais no JSON; enums em minúsculas. Regras e detalhes em [etapa 12](implementacao/etapa-12-planejamento-financeiro.md).
+
+| Método e rota | O que faz |
+|---|---|
+| `GET /finance/planning/projection?from=AAAA-MM&months=13` | Projeção mês a mês |
+| `GET /finance/planning/overview?month=` | Visão geral do mês, metas e próximo vencimento |
+| `GET /finance/planning/report?month=` | Relatório do mês (guarda o plano do mês na primeira vez que ele é aberto) |
+| `POST /finance/planning/simulate` | `{from, months, operations[]}` → `{base, simulated}`; não grava |
+| `POST /finance/planning/scenario/apply` | `{operations[]}` → 204; aplica e grava |
+| `GET/PUT /finance/planning/settings` | Margem, saldo da conta e faixas de salário |
+| `POST /finance/planning/months/close` e `/reopen` | `{month}` |
+| `GET/POST /finance/commitments`, `GET/PUT/DELETE /finance/commitments/{id}` | Compromissos |
+| `POST /finance/commitments/{id}/changes` | Alteração a partir de um mês |
+| `PUT/DELETE /finance/commitments/{id}/months/{AAAA-MM}` | Valor de um mês só |
+| `PUT/DELETE /finance/commitments/{id}/payments/{AAAA-MM}` | Pagamento ou recebimento |
+| `GET/POST /finance/cards`, `GET/PUT/DELETE /finance/cards/{id}` | Cartões |
+| `POST /finance/cards/{id}/imports` | `{dueDate, csv}` → importados, já existentes, total |
+| `PUT/DELETE /finance/cards/{id}/statements/{AAAA-MM}` | Fatura à mão |
+| `PUT/DELETE /finance/cards/{id}/statements/{AAAA-MM}/payment` | Pagamento da fatura |
+| `POST /finance/cards/{id}/purchases`, `PUT/DELETE …/purchases/{purchaseId}` | Compras parceladas |
+| `PUT /finance/cards/{id}/transactions/{transactionId}/classification` | `{commitmentId}`: marca como assinatura |
+| `GET/POST /finance/reserves`, `GET/PUT/DELETE /finance/reserves/{id}` | Reservas e metas |
+| `POST /finance/reserves/{id}/movements`, `PUT/DELETE …/movements/{movementId}` | Movimentações |
+
+Operações do simulador (`type`): `set_month_amount`, `change_from`, `end_commitment`, `add_one_off`, `prepay_debt`, `add_purchase`, `change_purchase`, `reserve_deposit`, `set_contribution`.

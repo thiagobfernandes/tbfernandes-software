@@ -277,3 +277,29 @@ Fora: login multiusuário, assistente com IA, notificações, app mobile. Esses 
 | RF-NTF-02 | Avisar sobre aprovação pendente, resposta real, pedido de não contato e falha de envio da Prospecção; saudações automáticas não geram aviso de resposta. |
 | RF-NTF-03 | Lembrar tarefas abertas vencendo hoje ou atrasadas e contatos com próxima conversa vencida; verificar a cada 15 minutos e ao listar avisos. |
 | RN-39 | Criar no máximo um aviso por dono e chave de deduplicação; repetir a leitura não altera o primeiro instante de leitura. |
+
+## Planejamento financeiro (PLN)
+
+Detalhes em [etapa 12](implementacao/etapa-12-planejamento-financeiro.md).
+
+| ID | Requisito | Prio |
+|---|---|---|
+| RF-PLN-01 | Projeção mês a mês com cada conta em sua linha (vencimento, valor, certeza), receitas, despesas, sobra, sobra acumulada, reservas, dívidas e o que termina. | M |
+| RF-PLN-02 | Compromissos com histórico: alterar a partir de um mês, valor de um mês só, suspender, reativar, encerrar e registrar pagamento. | M |
+| RF-PLN-03 | Cartões com faturas importadas de CSV (date, title, amount) ou lançadas à mão, compras parceladas e classificação de assinaturas. | M |
+| RF-PLN-04 | Reservas com aportes, retiradas e valores a receber; metas com prazo, pacote parcelado ligado e contribuição de terceiros. | M |
+| RF-PLN-05 | Visão geral do mês: receber, pagar, sobrar, guardado, falta para a meta, saldo da conta, dívidas e próximo vencimento. | M |
+| RF-PLN-06 | Relatório do mês: aumentos, reduções, parcelas que terminaram, risco e planejado × realizado. | S |
+| RF-PLN-07 | Simulador que não grava até confirmar. | M |
+
+| Regra | Descrição |
+|---|---|
+| RN-PLN-01 | Mês fechado não aceita alteração. |
+| RN-PLN-02 | Dívida com total termina quando os pagamentos chegam nele; parcelas que passam do total são recusadas. |
+| RN-PLN-03 | Sem juros, as parcelas somam o total; com juros, nunca menos que ele. |
+| RN-PLN-04 | Todo valor é confirmado, estimado ou desconhecido. |
+| RN-PLN-05 | Compra no cartão, assinatura no cartão e pagamento da fatura contam uma vez só. |
+| RN-PLN-06 | Alterar a partir de um mês não reescreve os anteriores. |
+| RN-PLN-07 | Reimportar um CSV não duplica transações; compras iguais legítimas continuam separadas. |
+| RN-PLN-08 | Reserva não é saldo de conta; dinheiro a receber não está disponível. |
+| RN-PLN-09 | Simulação nunca grava; confirmar aplica as mesmas operações. |

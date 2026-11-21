@@ -44,12 +44,13 @@ src/
 
 ## Ferramentas
 
-| Área      | Ferramentas                                                                             |
-| --------- | --------------------------------------------------------------------------------------- |
-| Notas     | `list_notes`, `get_note`, `create_note`, `update_note`, `append_to_note`, `delete_note` |
-| Snippets  | `list_snippets`, `get_snippet`, `create_snippet`, `update_snippet`                      |
-| Estudos   | `list_studies`, `create_study`, `update_study`                                          |
-| Materiais | `list_materials`, `create_material`, `update_material`                                  |
-| Metas     | `list_goals`, `create_goal`, `list_milestones`, `create_milestone`, `update_milestone`  |
+| Área      | Ferramentas                                                                                                                              |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Notas     | `list_notes`, `get_note`, `create_note`, `update_note`, `append_to_note`, `delete_note`                                                  |
+| Snippets  | `list_snippets`, `get_snippet`, `create_snippet`, `update_snippet`                                                                       |
+| Estudos   | `list_studies`, `create_study`, `update_study`                                                                                           |
+| Materiais | `list_materials`, `create_material`, `update_material`                                                                                   |
+| Finanças  | `list_finance_entries`, `create_finance_entries` (parcelas e gastos fixos por N meses), `update_finance_entry`, `delete_finance_entries` |
+| Metas     | `list_goals`, `create_goal`, `list_milestones`, `create_milestone`, `update_milestone`                                                   |
 
 Autenticação: modo `session` da API (`GET /auth/session` → cookie `XSRF-TOKEN`, `POST /auth/login` com `X-XSRF-TOKEN` → cookie `TBF_TOKEN`). Em 401 o servidor faz login de novo uma vez. As edições (`update_*`) leem o registro e enviam o `PUT` completo, então campos omitidos são mantidos.
