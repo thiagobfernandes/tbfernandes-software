@@ -47,6 +47,7 @@ src/
 | Área      | Ferramentas                                                                             |
 | --------- | --------------------------------------------------------------------------------------- |
 | Notas     | `list_notes`, `get_note`, `create_note`, `update_note`, `append_to_note`, `delete_note` |
+| Snippets  | `list_snippets`, `get_snippet`, `create_snippet`, `update_snippet`                      |
 | Estudos   | `list_studies`, `create_study`, `update_study`                                          |
 | Materiais | `list_materials`, `create_material`, `update_material`                                  |
 | Metas     | `list_goals`, `create_goal`, `list_milestones`, `create_milestone`, `update_milestone`  |

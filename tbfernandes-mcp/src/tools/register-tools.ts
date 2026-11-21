@@ -5,10 +5,12 @@ import { goalTools } from './goal.tools.ts';
 import { materialTools } from './material.tools.ts';
 import { milestoneTools } from './milestone.tools.ts';
 import { noteTools } from './note.tools.ts';
+import { snippetTools } from './snippet.tools.ts';
 import { studyTools } from './study.tools.ts';
 
 const TOOL_GROUPS = [
   noteTools,
+  snippetTools,
   studyTools,
   materialTools,
   goalTools,
