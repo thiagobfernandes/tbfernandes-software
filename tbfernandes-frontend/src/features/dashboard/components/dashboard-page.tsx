@@ -68,7 +68,7 @@ import { useToday } from "@/lib/today";
 import { cn } from "@/lib/utils";
 
 import { WidgetFrame } from "./widget-frame";
-import { widgetComponents } from "./widget-registry";
+import { widgetComponents, widgetIcons } from "./widget-registry";
 
 const groups: WidgetGroup[] = [
   "Dia",
@@ -91,7 +91,8 @@ export function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [prefs, setPrefs] = usePreference<DashboardPrefs>(
-    "overview",
+    // v2: new default layout (header, next step, planning). Older saves are left behind.
+    "overview:v2",
     defaultDashboardPrefs,
   );
   const [activeId, setActiveId] = useState<string>();
@@ -420,6 +421,7 @@ export function DashboardPage() {
                   <WidgetFrame
                     key={widget.id}
                     widget={widget}
+                    icon={widgetIcons[widget.type]}
                     index={index}
                     count={profile.widgets.length}
                     maximized={widget.id === maximizedId}
@@ -473,6 +475,7 @@ export function DashboardPage() {
                       }
                       onOpenTask={setOpenTaskId}
                       expanded={widget.id === maximizedId}
+                      maximize={() => setMaximizedId(widget.id)}
                     />
                   </WidgetFrame>
                 );

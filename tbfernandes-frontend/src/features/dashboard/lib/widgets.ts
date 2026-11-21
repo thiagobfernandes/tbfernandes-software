@@ -5,6 +5,11 @@
  */
 
 export type WidgetType =
+  | "greeting"
+  | "quickStats"
+  | "nextStep"
+  | "todayTasks"
+  | "progress"
   | "day"
   | "attention"
   | "indicators"
@@ -47,8 +52,15 @@ export type WidgetGroup =
   | "Análises"
   | "Outros";
 
+/**
+ * How the frame looks: a regular card, the highlighted card (gold edge) for
+ * the one thing to do now, or no frame at all (the page header).
+ */
+export type WidgetChrome = "card" | "featured" | "bare";
+
 export type WidgetMeta = {
   title: string;
+  chrome?: WidgetChrome;
   description: string;
   group: WidgetGroup;
   defaultSize: WidgetSize;
@@ -57,6 +69,50 @@ export type WidgetMeta = {
 };
 
 export const widgetCatalog: Record<WidgetType, WidgetMeta> = {
+  greeting: {
+    title: "Boas-vindas",
+    description: "Cumprimento, data e um resumo do dia",
+    group: "Dia",
+    chrome: "bare",
+    defaultSize: 12,
+    minSize: 12,
+    maxSize: 12,
+  },
+  quickStats: {
+    title: "Indicadores do dia",
+    description:
+      "Compromissos, prazos, rotinas, tempo apontado e progresso da semana",
+    group: "Dia",
+    chrome: "bare",
+    defaultSize: 12,
+    minSize: 12,
+    maxSize: 12,
+  },
+  nextStep: {
+    title: "Próximo passo",
+    description: "A tarefa mais indicada agora, com o motivo e as ações",
+    group: "Execução",
+    chrome: "featured",
+    defaultSize: 6,
+    minSize: 6,
+    maxSize: 12,
+  },
+  todayTasks: {
+    title: "Tarefas do dia",
+    description: "O que vence hoje, com progresso e criação rápida",
+    group: "Execução",
+    defaultSize: 4,
+    minSize: 4,
+    maxSize: 12,
+  },
+  progress: {
+    title: "Seu progresso",
+    description: "Concluídas, em andamento e pendentes na semana ou no mês",
+    group: "Análises",
+    defaultSize: 4,
+    minSize: 4,
+    maxSize: 12,
+  },
   day: {
     title: "Hoje",
     description: "Data, compromissos, rotinas e tarefas do dia",
@@ -271,24 +327,24 @@ export const defaultProfiles: DashboardProfile[] = [
     id: "general",
     name: "Workspace geral",
     widgets: [
-      widget("day"),
+      widget("greeting"),
+      widget("quickStats"),
+      widget("nextStep", 6),
       widget("attention", 6),
-      widget("agenda", 6),
-      widget("priorityTasks", 8),
+      widget("agenda", 4),
+      widget("todayTasks", 4),
+      widget("deliveries", 4),
+      widget("activeProjects", 4),
       widget("routines", 4),
-      widget("activeProjects", 6),
-      widget("deliveries", 6),
-      widget("goals", 6),
-      widget("recentNotes", 3),
-      widget("time", 3),
-      widget("activity", 6),
-      widget("consistency", 6),
+      widget("progress", 4),
     ],
   },
   {
     id: "work",
     name: "Trabalho",
     widgets: [
+      widget("quickStats"),
+      widget("nextStep", 6),
       widget("attention", 6),
       widget("deliveries", 6),
       widget("priorityTasks", 6),
@@ -333,7 +389,8 @@ export function clampSize(type: WidgetType, size: WidgetSize): WidgetSize {
 export const sizeClass: Record<WidgetSize, string> = {
   3: "col-span-12 md:col-span-6 xl:col-span-3",
   4: "col-span-12 md:col-span-6 xl:col-span-4",
-  6: "col-span-12 xl:col-span-6",
+  // Side-by-side pairs share one height.
+  6: "col-span-12 self-stretch lg:col-span-6",
   8: "col-span-12 xl:col-span-8",
   12: "col-span-12",
 };

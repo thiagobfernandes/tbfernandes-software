@@ -50,7 +50,7 @@ Versão 1 · 2026-11-21. Complementa [referencias.md](referencias.md): a paleta 
 
 ### Chaves de preferência
 
-`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail` · `tbf:projects:view` (visão, agrupamento, ordenação, densidade, campos, filtros) · `tbf:projects:detail:*` (seção, quadro/lista, período do roadmap) · `tbf:panel:projects:task` · `tbf:overview` (perfis, widgets, tamanhos, recolhidos, perfil padrão e favoritos). "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
+`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail` · `tbf:projects:view` (visão, agrupamento, ordenação, densidade, campos, filtros) · `tbf:projects:detail:*` (seção, quadro/lista, período do roadmap) · `tbf:panel:projects:task` · `tbf:overview:v2` (perfis, widgets, tamanhos, recolhidos, perfil padrão e favoritos). "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
 
 ### Atalhos
 
@@ -155,3 +155,21 @@ As telas que não viraram workspace (empresas, metas, aprendizado, finanças, co
 - `PageContainer` com menos respiro vertical (20–24px).
 - `MetricCard` com metade da altura (número de 24px, sem sombra).
 - `Card` e cartões das features com raio `rounded-lg` e sem sombra (antes `rounded-2xl` + `shadow-sm`).
+
+### Redesign da visão geral (central de comando)
+
+O perfil padrão "Workspace geral" responde, de cima para baixo: o que fazer agora, o que está atrasado, o que está planejado para hoje, quais projetos pedem atenção e como está o progresso. Continua sendo o mesmo sistema de widgets (mover, redimensionar, recolher, maximizar, perfis); só o layout padrão e alguns widgets mudaram.
+
+| Faixa | Widgets |
+|---|---|
+| A · Cabeçalho | `greeting` (sem moldura): cumprimento pelo horário, primeiro nome de `GET /api/v1/me` (sem nome no modo local), data e uma frase com os números do dia |
+| B · Indicadores | `quickStats` (sem moldura): compromissos, vencem hoje, rotinas, apontado hoje e progresso da semana; cada um leva à tela de origem |
+| C · Execução | `nextStep` (moldura de destaque) e `attention` (5 itens + "Ver todos", que maximiza) |
+| D · Planejamento | `agenda` (linha do tempo do dia ou 7 dias), `todayTasks` (progresso, marcar, criar com prazo hoje) e `deliveries` (atrasadas em vermelho, próximas em âmbar) |
+| E · Acompanhamento | `activeProjects` (progresso só quando há tarefas), `routines` (marcar e cronômetro) e `progress` (semana ou mês) |
+
+**Próximo passo** (`lib/day-plan.ts`): entre as tarefas abertas e não bloqueadas, vem primeiro a que já está em andamento, depois a atrasada, a que vence hoje, a de maior prioridade e o prazo mais próximo. Os motivos mostrados só repetem esses fatos.
+
+**Progresso**: tarefas com prazo no período (sem as canceladas): concluídas ÷ total, com em andamento e pendentes ao lado. Também mostra quantas foram concluídas no período.
+
+As molduras saem do catálogo (`chrome`: `card`, `featured`, `bare`). Os widgets sem moldura mantêm o menu (mover, remover) ao passar o mouse. A chave virou `tbf:overview:v2` para quem já tinha salvo o layout anterior receber o novo padrão.
