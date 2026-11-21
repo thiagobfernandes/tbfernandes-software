@@ -333,7 +333,7 @@ export function CalendarPage() {
       >
         <section
           aria-label="Agenda"
-          className="flex min-w-0 flex-col gap-4 rounded-2xl border bg-card p-4 md:p-5"
+          className="flex min-w-0 flex-col gap-4 rounded-lg border bg-card p-4 md:p-5"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -521,7 +521,7 @@ export function CalendarPage() {
           <aside className="flex flex-col gap-6">
             <section
               aria-label="Dia selecionado"
-              className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
+              className="flex flex-col gap-3 rounded-lg border bg-card p-5"
             >
               <h2 className="text-sm font-semibold">
                 {day === today ? "Hoje · " : ""}
@@ -553,7 +553,7 @@ export function CalendarPage() {
             {overdue.length > 0 && (
               <section
                 aria-label="Atrasados"
-                className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
+                className="flex flex-col gap-3 rounded-lg border bg-card p-5"
               >
                 <h2 className="text-sm font-semibold">
                   Atrasados{" "}
@@ -572,7 +572,7 @@ export function CalendarPage() {
 
             <section
               aria-label="Próximos 14 dias"
-              className="flex flex-col gap-3 rounded-2xl border bg-card p-5"
+              className="flex flex-col gap-3 rounded-lg border bg-card p-5"
             >
               <h2 className="text-sm font-semibold">
                 Próximos 14 dias{" "}

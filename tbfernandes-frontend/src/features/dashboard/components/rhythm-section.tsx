@@ -64,7 +64,7 @@ export function RhythmSection({
 
   return (
     <section aria-label="Ritmo" className="grid gap-4 lg:grid-cols-3">
-      <Card className="gap-3 rounded-2xl lg:col-span-2">
+      <Card className="gap-3 rounded-lg lg:col-span-2">
         <CardHeader>
           <CardTitle className="text-base">
             Ritmo das últimas 2 semanas
@@ -100,7 +100,7 @@ export function RhythmSection({
         </CardContent>
       </Card>
 
-      <Card className="gap-3 rounded-2xl">
+      <Card className="gap-3 rounded-lg">
         <CardHeader>
           <CardTitle className="text-base">Tarefas por status</CardTitle>
           <CardDescription>
@@ -119,7 +119,7 @@ export function RhythmSection({
         </CardContent>
       </Card>
 
-      <Card className="gap-3 rounded-2xl lg:col-span-2">
+      <Card className="gap-3 rounded-lg lg:col-span-2">
         <CardHeader>
           <CardTitle className="text-base">Resultado por mês</CardTitle>
           <CardDescription>
@@ -169,7 +169,7 @@ export function RhythmSection({
         </CardContent>
       </Card>
 
-      <Card className="gap-3 rounded-2xl">
+      <Card className="gap-3 rounded-lg">
         <CardHeader>
           <CardTitle className="text-base">Horas por projeto</CardTitle>
           <CardDescription>Apontamentos dos últimos 7 dias.</CardDescription>

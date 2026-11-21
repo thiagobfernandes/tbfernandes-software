@@ -147,8 +147,8 @@ export function GraphCanvas(props: Props) {
           props.fill
             ? "h-full"
             : props.compact
-              ? "h-64 rounded-2xl border"
-              : "h-[28rem] rounded-2xl border sm:h-[36rem]",
+              ? "h-64 rounded-lg border"
+              : "h-[28rem] rounded-lg border sm:h-[36rem]",
           props.className,
         )}
       />
@@ -709,7 +709,7 @@ function GraphCanvasInner({
     <div
       className={cn(
         "relative overflow-hidden bg-dot-grid",
-        !fill && "rounded-2xl border",
+        !fill && "rounded-lg border",
         fill && "h-full",
         className,
       )}

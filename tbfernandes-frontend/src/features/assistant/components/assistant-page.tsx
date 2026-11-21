@@ -98,7 +98,7 @@ export function AssistantPage() {
       >
         {messages.length === 0 && (
           <div className="flex flex-1 flex-col items-center justify-center gap-6 py-8 text-center">
-            <span className="flex size-14 items-center justify-center rounded-2xl bg-primary/15 text-primary shadow-[0_0_40px_-6px_color-mix(in_oklab,var(--primary)_60%,transparent)]">
+            <span className="flex size-14 items-center justify-center rounded-lg bg-primary/15 text-primary shadow-[0_0_40px_-6px_color-mix(in_oklab,var(--primary)_60%,transparent)]">
               <Sparkles className="size-7" aria-hidden />
             </span>
             <p className="text-lg font-medium">Como posso ajudar?</p>
@@ -121,7 +121,7 @@ export function AssistantPage() {
           message.role === "user" ? (
             <div
               key={message.id}
-              className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-sm text-primary-foreground"
+              className="ml-auto max-w-[85%] rounded-lg rounded-br-md bg-primary px-4 py-2.5 text-sm text-primary-foreground"
             >
               {message.text}
             </div>
@@ -130,7 +130,7 @@ export function AssistantPage() {
               <span className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
                 <Sparkles className="size-3.5" aria-hidden />
               </span>
-              <div className="flex min-w-0 flex-col gap-3 rounded-2xl rounded-tl-md border bg-card px-4 py-3">
+              <div className="flex min-w-0 flex-col gap-3 rounded-lg rounded-tl-md border bg-card px-4 py-3">
                 <Markdown>{message.text}</Markdown>
                 {message.references.length > 0 &&
                   (fromPassages(message.source) ? (
@@ -180,7 +180,7 @@ export function AssistantPage() {
           rows={1}
           placeholder="Pergunte qualquer coisa sobre seu trabalho e sua vida…"
           aria-label="Mensagem"
-          className="max-h-40 min-h-12 resize-none rounded-2xl py-3 pr-14"
+          className="max-h-40 min-h-12 resize-none rounded-lg py-3 pr-14"
         />
         <Button
           type="submit"

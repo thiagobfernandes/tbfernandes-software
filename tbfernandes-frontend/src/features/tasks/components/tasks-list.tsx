@@ -20,14 +20,14 @@ export function TasksList({
 }: TasksListProps) {
   if (tasks.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+      <p className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
         Nenhuma tarefa com esses filtros.
       </p>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-card">
+    <div className="overflow-x-auto rounded-lg border bg-card">
       <table className="w-full min-w-[44rem] text-sm">
         <thead>
           <tr className="border-b text-left text-xs text-muted-foreground">

@@ -272,7 +272,7 @@ function ContactDetail({
   }
 
   return (
-    <article className="flex min-w-0 flex-col gap-5 rounded-2xl border bg-card p-5 md:p-7">
+    <article className="flex min-w-0 flex-col gap-5 rounded-lg border bg-card p-5 md:p-7">
       <header className="flex items-start gap-4">
         <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/15 text-lg font-medium text-primary">
           {initials(contact.name)}

@@ -146,3 +146,12 @@ Sem biblioteca de grid nova: a ordem é a da lista (arrastar ou "Mover para ante
 **Precisa de atenção** junta tarefas atrasadas, bloqueadas e que vencem hoje ou amanhã, projetos com saúde ruim (motivos de `project-insights`), compromissos de hoje e amanhã, despesas dos próximos 7 dias e mensagens da prospecção esperando aprovação. Rotinas não planejadas e dias de descanso nunca entram.
 
 O assistente aparece só como widget opcional, com perguntas prontas (resumo do dia, pendências, metas, dinheiro) respondidas pelo mesmo caminho da página do assistente (`features/assistant/lib/ask.ts`).
+
+## 9. Demais telas
+
+As telas que não viraram workspace (empresas, metas, aprendizado, finanças, contatos, apontamentos, calendário e outras) seguem o padrão pelos componentes compartilhados, sem mudança tela a tela:
+
+- `PageHeading` compacto: título de 18px, descrição de uma linha em 12px, ações na mesma linha e uma linha fina separando do conteúdo.
+- `PageContainer` com menos respiro vertical (20–24px).
+- `MetricCard` com metade da altura (número de 24px, sem sombra).
+- `Card` e cartões das features com raio `rounded-lg` e sem sombra (antes `rounded-2xl` + `shadow-sm`).

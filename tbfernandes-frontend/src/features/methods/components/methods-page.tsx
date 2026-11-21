@@ -37,7 +37,7 @@ export function MethodsPage() {
             <Link
               key={method.id}
               href={methodHref(method.id)}
-              className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition-colors outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className="group flex flex-col gap-4 rounded-lg border bg-card p-5 shadow-sm transition-colors outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
             >
               <div className="flex items-start justify-between gap-3">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-muted text-primary">

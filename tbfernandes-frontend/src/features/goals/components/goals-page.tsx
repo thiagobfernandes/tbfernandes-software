@@ -158,7 +158,7 @@ function GoalCard({ goal, data }: { goal: Goal; data: AppData }) {
   return (
     <Link
       href={goalHref(goal.id)}
-      className="group flex flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      className="group flex flex-col gap-4 rounded-lg border bg-card p-5 shadow-sm outline-none hover:border-input focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <div className="flex items-center justify-between gap-2">
         <GoalStatusBadge status={goal.status} />

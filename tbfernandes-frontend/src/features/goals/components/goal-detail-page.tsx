@@ -122,7 +122,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
 
       <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
             <AreaIcon className="size-6" aria-hidden />
           </span>
           <div className="flex flex-col gap-1.5">
@@ -181,7 +181,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             aria-label="De onde para onde"
             className="grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]"
           >
-            <div className="flex flex-col gap-1 rounded-2xl border bg-card p-4">
+            <div className="flex flex-col gap-1 rounded-lg border bg-card p-4">
               <span className="text-xs text-muted-foreground">
                 Onde estou agora
               </span>
@@ -195,7 +195,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
               className="mx-auto hidden size-5 self-center text-muted-foreground md:block"
               aria-hidden
             />
-            <div className="flex flex-col gap-1 rounded-2xl border border-primary/40 bg-primary/5 p-4">
+            <div className="flex flex-col gap-1 rounded-lg border border-primary/40 bg-primary/5 p-4">
               <span className="text-xs text-primary">Resultado desejado</span>
               <p className="text-sm">{goal.desiredResult}</p>
               {goal.doneCriteria && (
@@ -206,7 +206,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             </div>
           </section>
 
-          <Card className="gap-3 rounded-2xl">
+          <Card className="gap-3 rounded-lg">
             <CardHeader>
               <CardTitle className="text-base">Marcos</CardTitle>
               <CardDescription>
@@ -292,7 +292,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             </CardContent>
           </Card>
 
-          <Card className="gap-3 rounded-2xl">
+          <Card className="gap-3 rounded-lg">
             <CardHeader>
               <CardTitle className="text-base">Tarefas</CardTitle>
               <CardDescription>
@@ -321,7 +321,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
         </div>
 
         <aside className="flex flex-col gap-4">
-          <Card className="gap-4 rounded-2xl">
+          <Card className="gap-4 rounded-lg">
             <CardHeader>
               <CardTitle className="text-base">Progresso</CardTitle>
               <CardDescription>{progress.basis}</CardDescription>
@@ -387,7 +387,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             </CardContent>
           </Card>
 
-          <Card className="gap-3 rounded-2xl">
+          <Card className="gap-3 rounded-lg">
             <CardHeader>
               <CardTitle className="text-base">Projetos</CardTitle>
             </CardHeader>
@@ -431,7 +431,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
             </CardContent>
           </Card>
 
-          <Card className="gap-3 rounded-2xl">
+          <Card className="gap-3 rounded-lg">
             <CardHeader>
               <CardTitle className="text-base">Rotinas</CardTitle>
               <CardDescription>Hábitos que movem esta meta.</CardDescription>
@@ -475,7 +475,7 @@ export function GoalDetailPage({ goalId }: { goalId: string }) {
           {(children.length > 0 ||
             studies.length > 0 ||
             purchases.length > 0) && (
-            <Card className="gap-3 rounded-2xl">
+            <Card className="gap-3 rounded-lg">
               <CardHeader>
                 <CardTitle className="text-base">Relacionados</CardTitle>
               </CardHeader>

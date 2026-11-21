@@ -72,7 +72,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
             <Building2 className="size-6" aria-hidden />
           </span>
           <div className="flex flex-col gap-2">
@@ -176,7 +176,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
       <section className="flex flex-col gap-3">
         <h2 className="text-base font-semibold">Projetos</h2>
         {projects.length === 0 ? (
-          <p className="rounded-2xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum projeto vinculado a esta empresa.
           </p>
         ) : (
