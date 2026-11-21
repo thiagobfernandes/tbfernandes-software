@@ -14,6 +14,7 @@ import {
   Megaphone,
   Medal,
   Network,
+  Receipt,
   Repeat,
   Settings,
   ShoppingCart,
@@ -92,6 +93,7 @@ export const mainNavigation: NavEntry[] = [
     icon: Wallet,
     items: [
       { title: "Fluxo de caixa", href: "/finance", icon: Wallet },
+      { title: "Gastos", href: "/finance/expenses", icon: Receipt },
       {
         title: "Compras planejadas",
         href: "/finance/purchases",
