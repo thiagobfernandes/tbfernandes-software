@@ -14,6 +14,13 @@ export const companyStatusLabels: Record<CompanyStatus, string> = {
 
 export type ProjectCategory =
   "professional" | "personal" | "study" | "research";
+export const projectCategoryLabels: Record<ProjectCategory, string> = {
+  professional: "Profissional",
+  personal: "Pessoal",
+  study: "Estudo",
+  research: "Pesquisa",
+};
+
 export type ProjectColor = "teal" | "violet" | "amber" | "rose" | "sky";
 
 export type CompanyRelationship = "contractor" | "client" | "partner" | "own";

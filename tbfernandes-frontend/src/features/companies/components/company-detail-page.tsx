@@ -30,6 +30,9 @@ import {
   RelationshipBadge,
 } from "@/features/companies/components/company-badges";
 import { ProjectCard } from "@/features/projects/components/project-card";
+import { useNow } from "@/features/time-tracking/hooks/use-now";
+import { projectInsights } from "@/features/projects/lib/project-insights";
+import { defaultProjectsView } from "@/features/projects/lib/project-view";
 import { TasksList } from "@/features/tasks/components/tasks-list";
 import { formatShort, parseDay } from "@/lib/dates";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
@@ -38,7 +41,8 @@ import { currentDay } from "@/lib/today";
 
 export function CompanyDetailPage({ companyId }: { companyId: string }) {
   const data = useWorkData();
-  const { findCompany, projectsOfCompany, tasksOfProject } = selectors(data);
+  const now = useNow(false);
+  const { findCompany, projectsOfCompany } = selectors(data);
   const [selectedTaskId, setSelectedTaskId] = useState<string>();
   const router = useRouter();
   const company = findCompany(companyId);
@@ -182,7 +186,10 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
                 key={project.id}
                 project={project}
                 company={company}
-                tasks={tasksOfProject(project.id)}
+                insights={projectInsights(project, data, currentDay(), now)}
+                fields={defaultProjectsView.fields}
+                density="comfortable"
+                today={currentDay()}
               />
             ))}
           </div>

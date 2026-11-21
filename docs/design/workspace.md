@@ -50,7 +50,7 @@ Versão 1 · 2026-11-21. Complementa [referencias.md](referencias.md): a paleta 
 
 ### Chaves de preferência
 
-`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail`. "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
+`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail` · `tbf:projects:view` (visão, agrupamento, ordenação, densidade, campos, filtros) · `tbf:projects:detail:*` (seção, quadro/lista, período do roadmap) · `tbf:panel:projects:task`. "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
 
 ### Atalhos
 
@@ -107,3 +107,24 @@ Os números saem só de rotinas, marcações e apontamentos (`lib/routine-stats.
 - **Hoje só conta quando feito.** O dia ainda não acabou, então uma rotina não marcada hoje não baixa a taxa nem quebra a sequência.
 - **Rotina pausada** não guarda a data da pausa: a agenda dela termina na última marcação, e os dias seguintes não contam contra ela.
 - Os indicadores são uma linha discreta sob a toolbar, não cartões. O detalhe de qualquer rotina abre no painel lateral (redimensionável; folha no celular) com taxa de 30 dias, sequências, heatmap de 16 semanas e vínculos.
+
+## 7. Projetos: portfólio e workspace do projeto
+
+**Portfólio** (`features/projects/components/projects-page.tsx`): Portfólio (cards), Lista, Quadro por status (arrastar muda o status) e Roadmap (barra do início ao prazo, marcos da meta como losangos, linha de hoje). Busca, filtros (status, saúde, categoria, empresa), agrupamento (empresa, categoria, status, meta, saúde), ordenação, densidade e campos visíveis ficam na toolbar; concluídos saem por padrão. A estrela fixa o projeto nos favoritos da sidebar.
+
+**Saúde ≠ status.** O status (planejado, ativo, pausado, concluído) é escolha do usuário. A saúde é calculada em `lib/project-insights.ts` e só vale para planejados e ativos, sempre com o motivo:
+
+| Sinal | Nível |
+|---|---|
+| Prazo do projeto vencido | Em risco |
+| Tarefas atrasadas (3 ou mais: em risco) | Atenção |
+| Tarefas bloqueadas | Atenção |
+| Marcos da meta vencidos | Atenção |
+| Ativo sem nenhuma tarefa aberta ("sem próxima ação") | Atenção |
+| Ativo sem atividade há 14 dias (tarefa concluída, apontamento, nota ou snippet editado) | Atenção |
+
+**Progresso das tarefas ≠ progresso real.** O card e a visão geral mostram, separados, tarefas concluídas, marcos da meta ligada (o modelo só tem marcos em metas) e prazo decorrido.
+
+**Workspace do projeto** (`project-detail-page.tsx`): seções Visão geral, Tarefas, Roadmap, Conhecimento, Apontamentos e Configurações. Elas reaproveitam os módulos globais filtrados pelo projeto (`TasksBoard`, `TaskDetail` no painel lateral, `ProjectTimeline`, `LinkedKnowledge`, apontamentos); o grafo local abre o explorador focado no projeto. A visão geral traz próximas ações, bloqueadas, "Precisa de atenção", próximas entregas, atividade recente e relacionamentos (empresa, meta, rotinas, notas).
+
+Fora do escopo por falta de dado no modelo, sem inventar: prioridade de projeto, arquivamento separado de "concluído" e dependências entre etapas.
