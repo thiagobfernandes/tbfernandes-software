@@ -80,7 +80,7 @@ export function CertificationsPage() {
                 <section
                   key={status}
                   aria-label={certificationStatusLabels[status]}
-                  className="flex flex-col gap-3 rounded-2xl bg-muted/40 p-2.5"
+                  className="flex flex-col gap-3 rounded-lg bg-muted/40 p-2.5"
                 >
                   <header className="flex items-center gap-2 px-1.5 pt-1">
                     <span

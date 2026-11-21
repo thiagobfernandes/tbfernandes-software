@@ -30,6 +30,9 @@ import {
   RelationshipBadge,
 } from "@/features/companies/components/company-badges";
 import { ProjectCard } from "@/features/projects/components/project-card";
+import { useNow } from "@/features/time-tracking/hooks/use-now";
+import { projectInsights } from "@/features/projects/lib/project-insights";
+import { defaultProjectsView } from "@/features/projects/lib/project-view";
 import { TasksList } from "@/features/tasks/components/tasks-list";
 import { formatShort, parseDay } from "@/lib/dates";
 import { selectors, useWorkData, workActions } from "@/lib/sample-data/store";
@@ -38,7 +41,8 @@ import { currentDay } from "@/lib/today";
 
 export function CompanyDetailPage({ companyId }: { companyId: string }) {
   const data = useWorkData();
-  const { findCompany, projectsOfCompany, tasksOfProject } = selectors(data);
+  const now = useNow(false);
+  const { findCompany, projectsOfCompany } = selectors(data);
   const [selectedTaskId, setSelectedTaskId] = useState<string>();
   const router = useRouter();
   const company = findCompany(companyId);
@@ -68,7 +72,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
             <Building2 className="size-6" aria-hidden />
           </span>
           <div className="flex flex-col gap-2">
@@ -172,7 +176,7 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
       <section className="flex flex-col gap-3">
         <h2 className="text-base font-semibold">Projetos</h2>
         {projects.length === 0 ? (
-          <p className="rounded-2xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
             Nenhum projeto vinculado a esta empresa.
           </p>
         ) : (
@@ -182,7 +186,10 @@ export function CompanyDetailPage({ companyId }: { companyId: string }) {
                 key={project.id}
                 project={project}
                 company={company}
-                tasks={tasksOfProject(project.id)}
+                insights={projectInsights(project, data, currentDay(), now)}
+                fields={defaultProjectsView.fields}
+                density="comfortable"
+                today={currentDay()}
               />
             ))}
           </div>

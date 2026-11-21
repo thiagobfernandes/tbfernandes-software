@@ -9,7 +9,9 @@ const FALLBACK_BY_STATUS: Record<number, string> = {
 
 export function errorMessage(error: unknown): string {
   if (error instanceof ApiError) {
-    return error.problem.detail ?? FALLBACK_BY_STATUS[error.status] ?? error.message;
+    return (
+      error.problem.detail ?? FALLBACK_BY_STATUS[error.status] ?? error.message
+    );
   }
   if (error instanceof NetworkError) return error.message;
   return "Algo deu errado. Tente de novo.";

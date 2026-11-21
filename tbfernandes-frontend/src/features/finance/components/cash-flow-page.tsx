@@ -177,7 +177,7 @@ export function CashFlowPage() {
       </section>
 
       <div className="grid gap-4 xl:grid-cols-5">
-        <Card className="gap-4 rounded-2xl xl:col-span-3">
+        <Card className="gap-4 rounded-lg xl:col-span-3">
           <CardHeader>
             <CardTitle className="text-base">Últimos seis meses</CardTitle>
             <CardDescription>Entradas e saídas por mês.</CardDescription>
@@ -186,7 +186,7 @@ export function CashFlowPage() {
             <MonthlyBars series={series} selected={month} onSelect={setMonth} />
           </CardContent>
         </Card>
-        <Card className="gap-4 rounded-2xl xl:col-span-2">
+        <Card className="gap-4 rounded-lg xl:col-span-2">
           <CardHeader>
             <CardTitle className="text-base">Saídas por categoria</CardTitle>
             <CardDescription>{formatMonth(month)}</CardDescription>
@@ -226,7 +226,7 @@ export function CashFlowPage() {
         </Card>
       </div>
 
-      <Card className="gap-3 rounded-2xl">
+      <Card className="gap-3 rounded-lg">
         <CardHeader>
           <CardTitle className="text-base">Lançamentos</CardTitle>
           <CardDescription>

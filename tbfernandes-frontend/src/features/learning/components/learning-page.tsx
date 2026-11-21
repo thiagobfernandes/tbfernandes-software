@@ -190,7 +190,7 @@ export function LearningPage() {
                 return (
                   <article
                     key={study.id}
-                    className="flex flex-col gap-4 rounded-2xl border bg-card p-5"
+                    className="flex flex-col gap-4 rounded-lg border bg-card p-5"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex flex-col gap-1">
@@ -289,7 +289,7 @@ export function LearningPage() {
         </TabsContent>
 
         <TabsContent value="materials" className="mt-2">
-          <div className="overflow-x-auto rounded-2xl border bg-card">
+          <div className="overflow-x-auto rounded-lg border bg-card">
             <table className="w-full min-w-[44rem] text-sm">
               <thead>
                 <tr className="border-b text-left text-xs text-muted-foreground">
@@ -412,7 +412,7 @@ export function LearningPage() {
               .map((skill) => (
                 <li
                   key={skill.id}
-                  className="flex items-start gap-4 rounded-2xl border bg-card p-4"
+                  className="flex items-start gap-4 rounded-lg border bg-card p-4"
                 >
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
                     <div className="flex items-center justify-between gap-2">
@@ -472,7 +472,7 @@ export function LearningPage() {
             {data.educations.map((education) => (
               <li
                 key={education.id}
-                className="flex items-start gap-4 rounded-2xl border bg-card p-4"
+                className="flex items-start gap-4 rounded-lg border bg-card p-4"
               >
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-primary">
                   <GraduationCap className="size-5" aria-hidden />

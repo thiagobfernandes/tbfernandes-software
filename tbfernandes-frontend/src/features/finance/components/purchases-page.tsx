@@ -108,7 +108,7 @@ export function PurchasesPage() {
             return (
               <article
                 key={purchase.id}
-                className="flex flex-col gap-4 rounded-2xl border bg-card p-5"
+                className="flex flex-col gap-4 rounded-lg border bg-card p-5"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
@@ -259,7 +259,7 @@ export function PurchasesPage() {
           <h2 className="text-sm font-medium text-muted-foreground">
             Compradas
           </h2>
-          <ul className="flex flex-col divide-y rounded-2xl border bg-card">
+          <ul className="flex flex-col divide-y rounded-lg border bg-card">
             {bought.map((purchase) => {
               const difference =
                 (purchase.paid ?? purchase.estimated) - purchase.estimated;

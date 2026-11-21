@@ -112,7 +112,7 @@ export function SnippetsPage() {
           </div>
 
           {visible.length === 0 ? (
-            <p className="rounded-2xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+            <p className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
               Nenhum snippet com esses filtros.
             </p>
           ) : (
@@ -120,7 +120,7 @@ export function SnippetsPage() {
               {visible.map((snippet) => (
                 <article
                   key={snippet.id}
-                  className="flex min-w-0 flex-col gap-3 rounded-2xl border bg-card p-4"
+                  className="flex min-w-0 flex-col gap-3 rounded-lg border bg-card p-4"
                 >
                   <header className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-col gap-1">

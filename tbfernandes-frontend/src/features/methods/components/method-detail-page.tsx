@@ -43,7 +43,7 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
 
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-primary">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
             <Icon className="size-6" aria-hidden />
           </span>
           <div className="flex flex-col gap-1.5">
@@ -98,7 +98,7 @@ export function MethodDetailPage({ methodId }: { methodId: string }) {
         {method.examples?.length ? (
           <aside className="flex flex-col gap-4">
             {method.examples.map((example) => (
-              <Card key={example.title} className="gap-3 rounded-2xl">
+              <Card key={example.title} className="gap-3 rounded-lg">
                 <CardHeader>
                   <CardTitle className="text-base">{example.title}</CardTitle>
                   <CardDescription>Copie e adapte.</CardDescription>

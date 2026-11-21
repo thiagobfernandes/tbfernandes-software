@@ -25,6 +25,9 @@ type ConfirmDeleteProps = {
   consequence?: string;
   /** When set, deleting is not allowed and this explains why. */
   blockedReason?: string;
+  /** Controlled mode, for opening it from a menu item instead of a trigger. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function ConfirmDelete({
@@ -34,21 +37,26 @@ export function ConfirmDelete({
   trigger,
   consequence,
   blockedReason,
+  open,
+  onOpenChange,
 }: ConfirmDeleteProps) {
+  const controlled = open !== undefined;
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        {trigger ?? (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Excluir ${noun}`}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <Trash2 />
-          </Button>
-        )}
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {!controlled && (
+        <AlertDialogTrigger asChild>
+          {trigger ?? (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Excluir ${noun}`}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <Trash2 />
+            </Button>
+          )}
+        </AlertDialogTrigger>
+      )}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>

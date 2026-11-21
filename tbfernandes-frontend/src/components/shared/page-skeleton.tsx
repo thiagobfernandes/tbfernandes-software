@@ -37,7 +37,7 @@ function Metrics({ count = 4 }: { count?: number }) {
       {Array.from({ length: count }, (_, index) => (
         <div
           key={index}
-          className="flex min-h-36 flex-col justify-between rounded-2xl border bg-card p-5"
+          className="flex min-h-36 flex-col justify-between rounded-lg border bg-card p-5"
         >
           <Skeleton className="h-4 w-24" />
           <div className="flex items-end justify-between">
@@ -84,12 +84,12 @@ const bodies: Record<SkeletonVariant, () => React.ReactNode> = {
     <>
       <Metrics />
       <div className="grid gap-4 lg:grid-cols-5">
-        <Skeleton className="h-72 rounded-2xl lg:col-span-3" />
-        <Skeleton className="h-72 rounded-2xl lg:col-span-2" />
+        <Skeleton className="h-72 rounded-lg lg:col-span-3" />
+        <Skeleton className="h-72 rounded-lg lg:col-span-2" />
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
-        <Skeleton className="h-64 rounded-2xl lg:col-span-2" />
-        <Skeleton className="h-64 rounded-2xl" />
+        <Skeleton className="h-64 rounded-lg lg:col-span-2" />
+        <Skeleton className="h-64 rounded-lg" />
       </div>
     </>
   ),
@@ -147,9 +147,9 @@ const bodies: Record<SkeletonVariant, () => React.ReactNode> = {
   ),
   chat: () => (
     <div className="flex min-h-[32rem] flex-col gap-4 rounded-xl border bg-card p-5">
-      <Skeleton className="ml-auto h-12 w-1/2 rounded-2xl" />
-      <Skeleton className="h-24 w-2/3 rounded-2xl" />
-      <Skeleton className="ml-auto h-10 w-1/3 rounded-2xl" />
+      <Skeleton className="ml-auto h-12 w-1/2 rounded-lg" />
+      <Skeleton className="h-24 w-2/3 rounded-lg" />
+      <Skeleton className="ml-auto h-10 w-1/3 rounded-lg" />
       <Skeleton className="mt-auto h-11 w-full" />
     </div>
   ),

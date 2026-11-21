@@ -54,8 +54,8 @@ export function ProspectingSkeleton() {
         <div className="grid gap-4 xl:h-full xl:grid-cols-[minmax(0,1fr)_19rem]">
           <div className="flex min-h-[32rem] flex-col gap-4 rounded-xl border bg-card p-5 xl:h-full xl:min-h-0">
             <Skeleton className="h-5 w-40" />
-            <Skeleton className="ml-auto h-20 w-2/3 rounded-2xl" />
-            <Skeleton className="h-12 w-1/2 rounded-2xl" />
+            <Skeleton className="ml-auto h-20 w-2/3 rounded-lg" />
+            <Skeleton className="h-12 w-1/2 rounded-lg" />
             <Skeleton className="mt-auto h-11 w-full" />
           </div>
           <div className="flex h-fit flex-col gap-3 rounded-xl border bg-card p-5 xl:h-full">

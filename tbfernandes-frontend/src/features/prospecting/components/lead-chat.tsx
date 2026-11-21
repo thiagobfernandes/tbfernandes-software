@@ -252,7 +252,7 @@ function MessageBubble({
       </span>
       <p
         className={cn(
-          "animate-in rounded-2xl px-4 py-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] whitespace-pre-line duration-200 fade-in-0 zoom-in-95 motion-reduce:animate-none",
+          "animate-in rounded-lg px-4 py-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] whitespace-pre-line duration-200 fade-in-0 zoom-in-95 motion-reduce:animate-none",
           outbound
             ? "rounded-br-sm bg-primary/15"
             : "rounded-bl-sm border bg-card",
@@ -281,7 +281,7 @@ function QueuedBubble({ request }: { request: SendRequest }) {
       </span>
       <p
         className={cn(
-          "rounded-2xl rounded-br-sm border border-dashed px-4 py-2.5 text-sm [overflow-wrap:anywhere] whitespace-pre-line text-muted-foreground",
+          "rounded-lg rounded-br-sm border border-dashed px-4 py-2.5 text-sm [overflow-wrap:anywhere] whitespace-pre-line text-muted-foreground",
           failed && "border-destructive/60",
         )}
       >

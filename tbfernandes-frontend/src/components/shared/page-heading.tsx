@@ -7,6 +7,7 @@ type PageHeadingProps = {
   className?: string;
 };
 
+/** Compact page title: name, one quiet line and the page actions. */
 export function PageHeading({
   title,
   description,
@@ -16,17 +17,19 @@ export function PageHeading({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
+        "flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
     >
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
         )}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex flex-wrap items-center gap-1.5">{actions}</div>
+      )}
     </div>
   );
 }

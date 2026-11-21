@@ -123,6 +123,13 @@
 }
 
 @layer base {
+  /* Global header height; 0 while a page is maximized (immersive mode). */
+  html {
+    --header-h: 3.5rem;
+  }
+  html[data-immersive="true"] {
+    --header-h: 0rem;
+  }
   * {
     @apply border-border outline-ring/50;
   }

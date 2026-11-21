@@ -54,7 +54,7 @@ export function ProjectTimeline({
   const pct = (value: number) => `${(value / days) * 100}%`;
 
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-card">
+    <div className="overflow-x-auto rounded-lg border bg-card">
       <div className="relative" style={{ minWidth: days * MIN_DAY_WIDTH }}>
         {/* Day header */}
         <div className="flex border-b">

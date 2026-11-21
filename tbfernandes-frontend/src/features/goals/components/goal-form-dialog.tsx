@@ -8,15 +8,20 @@ import { goalAreaLabels, type Goal } from "@/features/goals/types/goal";
 import { dataActions, useAppData } from "@/lib/sample-data/store";
 
 type GoalFormDialogProps = {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   goal?: Goal;
   defaultParentId?: string;
+  /** Controlled mode, for opening it from a menu instead of a trigger. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function GoalFormDialog({
   trigger,
   goal,
   defaultParentId,
+  open,
+  onOpenChange,
 }: GoalFormDialogProps) {
   const { goals } = useAppData();
   const parents = goals.filter((item) => item.id !== goal?.id);
@@ -24,6 +29,8 @@ export function GoalFormDialog({
   return (
     <EntityFormDialog
       trigger={trigger}
+      open={open}
+      onOpenChange={onOpenChange}
       className="sm:max-w-2xl"
       title={goal ? "Editar meta" : "Nova meta"}
       description="Uma meta se desdobra em marcos, projetos e tarefas que você acompanha."

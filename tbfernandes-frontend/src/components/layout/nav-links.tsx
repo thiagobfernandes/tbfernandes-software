@@ -1,16 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ChevronRight } from "lucide-react";
-import { projectHref } from "@/lib/routes";
+import { usePathname, useSearchParams } from "next/navigation";
+import {
+  ChevronRight,
+  Eye,
+  EyeOff,
+  GripVertical,
+  Star,
+  type LucideIcon,
+} from "lucide-react";
 
+import {
+  arrangeNavigation,
+  sidebarActions,
+  useSidebarPrefs,
+  type ArrangedEntry,
+  type Favorite,
+} from "@/components/layout/sidebar-state";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -21,125 +34,185 @@ import {
   isNavGroup,
   mainNavigation,
   secondaryNavigation,
-  type NavGroup,
   type NavItem,
 } from "@/lib/constants/navigation";
-import {
-  setNavGroupOpen,
-  useNavGroupOverrides,
-} from "@/components/layout/sidebar-state";
 import { projectColorClasses } from "@/lib/project-colors";
+import { projectHref } from "@/lib/routes";
 import { useWorkData } from "@/lib/sample-data/store";
 import { cn } from "@/lib/utils";
 
 type NavLinksProps = {
   collapsed?: boolean;
+  /** Reorder and hide entries instead of navigating. */
+  customizing?: boolean;
   onNavigate?: () => void;
 };
 
-const itemClass =
-  "flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium text-sidebar-foreground transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring";
+/** Active projects listed before "Ver todos". */
+const PROJECT_LIMIT = 6;
 
-export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
+const rowClass =
+  "group/row relative flex h-8 w-full min-w-0 items-center gap-2.5 rounded-md px-2 text-[13px] text-sidebar-foreground/85 transition-colors outline-none hover:bg-sidebar-accent/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring pointer-coarse:h-10";
+const activeRowClass =
+  "bg-sidebar-accent font-medium text-sidebar-accent-foreground hover:bg-sidebar-accent";
+const sectionLabelClass =
+  "flex h-7 w-full items-center gap-1 rounded-md px-2 text-[11px] font-medium tracking-wide text-muted-foreground uppercase outline-none hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring";
+
+const navByHref = new Map<string, NavItem>(
+  [
+    ...mainNavigation.flatMap((entry) =>
+      isNavGroup(entry) ? entry.items : [entry],
+    ),
+    ...secondaryNavigation,
+  ].map((item) => [item.href, item]),
+);
+
+/**
+ * One href is "the" current page, so a single row is highlighted: an exact
+ * favorite or project match wins over the section's navigation item.
+ */
+function useActiveHref(favorites: Favorite[], projectHrefs: string[]) {
   const pathname = usePathname();
-  const activeHref = findActiveNav(pathname)?.item.href;
+  const search = useSearchParams().toString();
+  const full = search ? `${pathname}?${search}` : pathname;
+  const exact = [...favorites.map((f) => f.href), ...projectHrefs].find(
+    (href) => href === full,
+  );
+  return exact ?? findActiveNav(pathname)?.item.href;
+}
+
+export function NavLinks({
+  collapsed = false,
+  customizing = false,
+  onNavigate,
+}: NavLinksProps) {
+  const [prefs] = useSidebarPrefs();
   const data = useWorkData();
-  const pinnedProjects = data.projects.filter(
+  const activeProjects = data.projects.filter(
     (project) => project.status === "active",
   );
-  // Counts from the simulated data until the API exists.
-  const navCounts: Record<string, number> = {
-    "/projects": pinnedProjects.length,
-    "/tasks": data.tasks.filter(
-      (task) => task.status !== "done" && task.status !== "canceled",
-    ).length,
-  };
+  const openTasks = (projectId?: string) =>
+    data.tasks.filter(
+      (task) =>
+        (projectId === undefined || task.projectId === projectId) &&
+        task.status !== "done" &&
+        task.status !== "canceled",
+    ).length;
+  const counts: Record<string, number> = { "/tasks": openTasks() };
+  const activeHref = useActiveHref(
+    prefs.favorites,
+    activeProjects.map((project) => projectHref(project.id)),
+  );
+  const { visible, hiddenItems } = arrangeNavigation(prefs, customizing);
+  const favoriteHrefs = new Set(prefs.favorites.map((f) => f.href));
+  // The first section that shows the active page claims the highlight.
+  const favoriteClaims =
+    activeHref !== undefined && favoriteHrefs.has(activeHref);
+  const navActive = favoriteClaims ? undefined : activeHref;
 
   if (collapsed) {
     return (
-      <nav className="flex flex-1 flex-col gap-1" aria-label="Principal">
-        {mainNavigation.map((entry, index) => {
-          const items = (isNavGroup(entry) ? entry.items : [entry]).filter(
-            (item) => !item.soon,
-          );
-          if (items.length === 0) return null;
-          return (
-            <div key={entry.title} className="flex flex-col gap-1">
-              {isNavGroup(entry) && index > 0 && (
-                <Separator className="my-1 bg-sidebar-border" />
-              )}
-              {items.map((item) => (
-                <RailLink
-                  key={item.href}
-                  item={item}
-                  active={item.href === activeHref}
-                  onNavigate={onNavigate}
-                />
-              ))}
-            </div>
-          );
-        })}
-        <div className="mt-auto flex flex-col gap-1">
-          {secondaryNavigation.map((item) => (
-            <RailLink
-              key={item.href}
-              item={item}
-              active={item.href === activeHref}
-              onNavigate={onNavigate}
-            />
-          ))}
-        </div>
-      </nav>
+      <Rail
+        favorites={prefs.favorites}
+        entries={visible}
+        activeHref={activeHref}
+        onNavigate={onNavigate}
+      />
     );
   }
 
   return (
-    <nav className="flex flex-1 flex-col gap-0.5" aria-label="Principal">
-      {mainNavigation.map((entry) =>
-        isNavGroup(entry) ? (
-          <NavGroupSection
-            key={entry.title}
-            group={entry}
-            activeHref={activeHref}
-            counts={navCounts}
-            onNavigate={onNavigate}
-          />
-        ) : (
-          <TopLink
-            key={entry.href}
-            item={entry}
-            active={entry.href === activeHref}
-            onNavigate={onNavigate}
-          />
-        ),
+    <nav className="flex flex-1 flex-col gap-4" aria-label="Principal">
+      {prefs.favorites.length > 0 && !customizing && (
+        <FavoritesSection
+          favorites={prefs.favorites}
+          activeHref={activeHref}
+          projects={data.projects}
+          onNavigate={onNavigate}
+        />
       )}
-      <div className="mt-4 flex flex-col gap-0.5">
-        <span className="px-2.5 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-          Projetos ativos
-        </span>
-        {pinnedProjects.map((project) => (
-          <Link
-            key={project.id}
-            href={projectHref(project.id)}
-            onClick={onNavigate}
-            className={cn(itemClass, "h-7 font-normal")}
-          >
-            <span
+
+      <EntryList
+        entries={visible}
+        activeHref={navActive}
+        counts={counts}
+        favoriteHrefs={favoriteHrefs}
+        customizing={customizing}
+        hidden={new Set(prefs.hidden)}
+        openGroups={prefs.openGroups}
+        onNavigate={onNavigate}
+      />
+
+      {!customizing && activeProjects.length > 0 && (
+        <Collapsible
+          open={prefs.projectsOpen}
+          onOpenChange={sidebarActions.setProjectsOpen}
+          className="group/section flex flex-col gap-px"
+        >
+          <CollapsibleTrigger className={sectionLabelClass}>
+            Projetos ativos
+            <ChevronRight
               aria-hidden
-              className={projectColorClasses[project.color].text}
-            >
-              #
+              className="size-3 transition-transform group-data-[state=open]/section:rotate-90"
+            />
+            <span className="ml-auto font-normal normal-case tabular-nums">
+              {activeProjects.length}
             </span>
-            <span className="truncate">{project.name}</span>
-          </Link>
-        ))}
-      </div>
-      <div className="mt-auto flex flex-col gap-0.5 pt-4">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-px overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+            {activeProjects.slice(0, PROJECT_LIMIT).map((project) => {
+              const href = projectHref(project.id);
+              return (
+                <NavRow
+                  key={project.id}
+                  href={href}
+                  label={project.name}
+                  active={!favoriteClaims && activeHref === href}
+                  favorite={favoriteHrefs.has(href)}
+                  count={openTasks(project.id) || undefined}
+                  marker={
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "size-2 shrink-0 rounded-full",
+                        projectColorClasses[project.color].bg,
+                      )}
+                    />
+                  }
+                  onNavigate={onNavigate}
+                />
+              );
+            })}
+            {activeProjects.length > PROJECT_LIMIT && (
+              <Link
+                href="/projects"
+                onClick={onNavigate}
+                className={cn(rowClass, "text-muted-foreground")}
+              >
+                <span className="w-4" aria-hidden />
+                Ver todos
+              </Link>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {!customizing && hiddenItems.length > 0 && (
+        <HiddenSection
+          items={hiddenItems}
+          activeHref={navActive}
+          onNavigate={onNavigate}
+        />
+      )}
+
+      <div className="mt-auto flex flex-col gap-px">
         {secondaryNavigation.map((item) => (
-          <TopLink
+          <NavRow
             key={item.href}
-            item={item}
-            active={item.href === activeHref}
+            href={item.href}
+            label={item.title}
+            icon={item.icon}
+            active={navActive === item.href}
             onNavigate={onNavigate}
           />
         ))}
@@ -148,145 +221,523 @@ export function NavLinks({ collapsed = false, onNavigate }: NavLinksProps) {
   );
 }
 
-function SoonBadge() {
-  return (
-    <span className="ml-auto rounded-full border border-sidebar-border px-1.5 py-px text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-      Soon
-    </span>
-  );
-}
-
-function TopLink({
-  item,
-  active,
+function FavoritesSection({
+  favorites,
+  activeHref,
+  projects,
   onNavigate,
 }: {
-  item: NavItem;
-  active: boolean;
+  favorites: Favorite[];
+  activeHref?: string;
+  projects: ReturnType<typeof useWorkData>["projects"];
   onNavigate?: () => void;
 }) {
-  const Icon = item.icon;
-
-  if (item.soon) {
-    return (
-      <span className={cn(itemClass, "pointer-events-none opacity-60")}>
-        <Icon className="size-4 shrink-0" aria-hidden />
-        <span className="truncate">{item.title}</span>
-        <SoonBadge />
-      </span>
-    );
-  }
-
+  const [dragging, setDragging] = useState<string>();
   return (
-    <Link
-      href={item.href}
-      onClick={onNavigate}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        itemClass,
-        active && "bg-sidebar-accent text-sidebar-accent-foreground",
-      )}
-    >
-      <Icon
-        className={cn("size-4 shrink-0", active && "text-sidebar-primary")}
-        aria-hidden
-      />
-      <span className="truncate">{item.title}</span>
-    </Link>
+    <section className="flex flex-col gap-px" aria-label="Favoritos">
+      <span className={cn(sectionLabelClass, "pointer-events-none")}>
+        Favoritos
+      </span>
+      {favorites.map((favorite, index) => {
+        const item = navByHref.get(favorite.href);
+        const project = projects.find(
+          (p) => projectHref(p.id) === favorite.href,
+        );
+        return (
+          <div
+            key={favorite.href}
+            draggable
+            onDragStart={(event) => {
+              setDragging(favorite.href);
+              event.dataTransfer.effectAllowed = "move";
+            }}
+            onDragOver={(event) => dragging && event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              if (dragging) sidebarActions.moveFavorite(dragging, index);
+              setDragging(undefined);
+            }}
+            onDragEnd={() => setDragging(undefined)}
+            className={cn(dragging === favorite.href && "opacity-40")}
+          >
+            <NavRow
+              href={favorite.href}
+              label={project?.name ?? item?.title ?? favorite.label}
+              icon={item?.icon ?? (project ? undefined : Star)}
+              marker={
+                project ? (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "size-2 shrink-0 rounded-full",
+                      projectColorClasses[project.color].bg,
+                    )}
+                  />
+                ) : undefined
+              }
+              active={activeHref === favorite.href}
+              favorite
+              onNavigate={onNavigate}
+            />
+          </div>
+        );
+      })}
+    </section>
   );
 }
 
-function NavGroupSection({
-  group,
+function EntryList({
+  entries,
   activeHref,
   counts,
+  favoriteHrefs,
+  customizing,
+  hidden,
+  openGroups,
   onNavigate,
 }: {
-  group: NavGroup;
+  entries: ArrangedEntry[];
   activeHref?: string;
   counts: Record<string, number>;
+  favoriteHrefs: Set<string>;
+  customizing: boolean;
+  hidden: Set<string>;
+  openGroups: Record<string, boolean>;
   onNavigate?: () => void;
 }) {
-  const Icon = group.icon;
-  const containsActive = group.items.some((item) => item.href === activeHref);
-  const isPlanned = group.items.every((item) => item.soon);
-  const overrides = useNavGroupOverrides();
-  const open = overrides[group.title] ?? containsActive;
+  const [dragging, setDragging] = useState<string>();
+  const [over, setOver] = useState<string>();
 
   return (
-    <Collapsible
-      open={open}
-      onOpenChange={(next) => setNavGroupOpen(group.title, next)}
-      className="group/nav"
-    >
-      <CollapsibleTrigger className={cn(itemClass, "mt-2")}>
-        <Icon
-          className={cn(
-            "size-4 shrink-0",
-            containsActive && "text-sidebar-primary",
-          )}
-          aria-hidden
-        />
-        <span className="truncate">{group.title}</span>
-        {isPlanned && <SoonBadge />}
-        <ChevronRight
-          className={cn(
-            "size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]/nav:rotate-90",
-            !isPlanned && "ml-auto",
-          )}
-          aria-hidden
-        />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-        {/* Tree guide: a vertical rail with a node dot per item, echoing the relationship graph. */}
-        <ul className="relative mt-0.5 ml-[18px] flex flex-col gap-px border-l border-sidebar-border pl-2.5">
-          {group.items.map((item) => {
-            const active = item.href === activeHref;
-            return (
-              <li key={item.href} className="relative">
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute top-1/2 -left-[13.5px] size-1.5 -translate-y-1/2 rounded-full bg-sidebar-border",
-                    active &&
-                      "bg-sidebar-primary shadow-[0_0_8px_var(--sidebar-primary)]",
-                  )}
+    <div className="flex flex-col gap-3">
+      {entries.map((entry, index) => {
+        const dragProps = customizing
+          ? {
+              draggable: true,
+              onDragStart: (event: React.DragEvent) => {
+                event.stopPropagation();
+                setDragging(entry.key);
+                event.dataTransfer.effectAllowed = "move";
+              },
+              onDragOver: (event: React.DragEvent) => {
+                if (!dragging || dragging.startsWith("item:")) return;
+                event.preventDefault();
+                setOver(entry.key);
+              },
+              onDrop: (event: React.DragEvent) => {
+                event.preventDefault();
+                if (dragging && !dragging.startsWith("item:"))
+                  sidebarActions.moveEntry(dragging, index);
+                setDragging(undefined);
+                setOver(undefined);
+              },
+              onDragEnd: () => {
+                setDragging(undefined);
+                setOver(undefined);
+              },
+            }
+          : {};
+        const dropMark = over === entry.key && dragging !== entry.key;
+
+        if (entry.type === "item") {
+          return (
+            <div
+              key={entry.key}
+              {...dragProps}
+              className={cn(
+                "-mb-2.5 rounded-md",
+                dropMark && "ring-1 ring-primary/60",
+                dragging === entry.key && "opacity-40",
+              )}
+            >
+              {customizing ? (
+                <CustomizeRow
+                  label={entry.item.title}
+                  icon={entry.item.icon}
+                  hidden={hidden.has(entry.key)}
+                  onToggleHidden={() =>
+                    sidebarActions.toggleHiddenEntry(entry.key)
+                  }
                 />
-                {item.soon ? (
-                  <span
-                    className={cn(
-                      itemClass,
-                      "pointer-events-none h-7 px-2 font-normal opacity-60",
-                    )}
-                  >
-                    <span className="truncate">{item.title}</span>
-                  </span>
-                ) : (
-                  <Link
-                    href={item.href}
-                    onClick={onNavigate}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      itemClass,
-                      "h-7 px-2 font-normal",
-                      active &&
-                        "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
-                    )}
-                  >
-                    <span className="truncate">{item.title}</span>
-                    {counts[item.href] !== undefined && (
-                      <span className="ml-auto rounded-full bg-sidebar-accent px-1.5 text-[11px] font-medium text-muted-foreground tabular-nums">
-                        {counts[item.href]}
-                      </span>
-                    )}
-                  </Link>
+              ) : (
+                <NavRow
+                  href={entry.item.href}
+                  label={entry.item.title}
+                  icon={entry.item.icon}
+                  active={activeHref === entry.item.href}
+                  favorite={favoriteHrefs.has(entry.item.href)}
+                  onNavigate={onNavigate}
+                />
+              )}
+            </div>
+          );
+        }
+
+        const { group, items } = entry;
+        const containsActive = items.some((item) => item.href === activeHref);
+        const open = customizing || (openGroups[group.title] ?? containsActive);
+        return (
+          <div
+            key={entry.key}
+            {...dragProps}
+            className={cn(
+              "rounded-md",
+              dropMark && "ring-1 ring-primary/60",
+              dragging === entry.key && "opacity-40",
+            )}
+          >
+            <Collapsible
+              open={open}
+              onOpenChange={(next) =>
+                sidebarActions.setGroupOpen(group.title, next)
+              }
+              className="group/section flex flex-col gap-px"
+            >
+              <div className="flex items-center">
+                {customizing && (
+                  <GripVertical
+                    aria-hidden
+                    className="size-3.5 shrink-0 cursor-grab text-muted-foreground"
+                  />
                 )}
-              </li>
-            );
-          })}
-        </ul>
+                <CollapsibleTrigger
+                  className={sectionLabelClass}
+                  disabled={customizing}
+                >
+                  {group.title}
+                  {!customizing && (
+                    <ChevronRight
+                      aria-hidden
+                      className="size-3 transition-transform group-data-[state=open]/section:rotate-90"
+                    />
+                  )}
+                </CollapsibleTrigger>
+                {customizing && (
+                  <HideToggle
+                    hidden={hidden.has(entry.key)}
+                    label={group.title}
+                    onToggle={() => sidebarActions.toggleHiddenEntry(entry.key)}
+                  />
+                )}
+              </div>
+              <CollapsibleContent className="flex flex-col gap-px overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                {customizing ? (
+                  <GroupItemsCustomizer
+                    groupTitle={group.title}
+                    items={items}
+                    hidden={hidden}
+                    groupHidden={hidden.has(entry.key)}
+                  />
+                ) : (
+                  items.map((item) =>
+                    item.soon ? (
+                      <span
+                        key={item.href}
+                        className={cn(
+                          rowClass,
+                          "pointer-events-none opacity-50",
+                        )}
+                      >
+                        <item.icon className="size-4 shrink-0" aria-hidden />
+                        <span className="truncate">{item.title}</span>
+                        <span className="ml-auto text-[10px] uppercase">
+                          Em breve
+                        </span>
+                      </span>
+                    ) : (
+                      <NavRow
+                        key={item.href}
+                        href={item.href}
+                        label={item.title}
+                        icon={item.icon}
+                        active={activeHref === item.href}
+                        favorite={favoriteHrefs.has(item.href)}
+                        count={counts[item.href]}
+                        onNavigate={onNavigate}
+                      />
+                    ),
+                  )
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function GroupItemsCustomizer({
+  groupTitle,
+  items,
+  hidden,
+  groupHidden,
+}: {
+  groupTitle: string;
+  items: NavItem[];
+  hidden: Set<string>;
+  groupHidden: boolean;
+}) {
+  const [dragging, setDragging] = useState<string>();
+  return items.map((item, index) => (
+    <div
+      key={item.href}
+      draggable
+      onDragStart={(event) => {
+        event.stopPropagation();
+        setDragging(item.href);
+        event.dataTransfer.effectAllowed = "move";
+      }}
+      onDragOver={(event) => {
+        if (!dragging) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (dragging) sidebarActions.moveItem(groupTitle, dragging, index);
+        setDragging(undefined);
+      }}
+      onDragEnd={() => setDragging(undefined)}
+      className={cn(
+        dragging === item.href && "opacity-40",
+        groupHidden && "opacity-50",
+      )}
+    >
+      <CustomizeRow
+        label={item.title}
+        icon={item.icon}
+        hidden={hidden.has(item.href)}
+        onToggleHidden={() => sidebarActions.toggleHiddenEntry(item.href)}
+      />
+    </div>
+  ));
+}
+
+function CustomizeRow({
+  label,
+  icon: Icon,
+  hidden,
+  onToggleHidden,
+}: {
+  label: string;
+  icon: LucideIcon;
+  hidden: boolean;
+  onToggleHidden: () => void;
+}) {
+  return (
+    <div
+      className={cn(
+        rowClass,
+        "cursor-grab hover:bg-sidebar-accent/40",
+        hidden && "text-muted-foreground line-through",
+      )}
+    >
+      <GripVertical
+        aria-hidden
+        className="size-3.5 shrink-0 text-muted-foreground"
+      />
+      <Icon aria-hidden className="size-4 shrink-0" />
+      <span className="truncate">{label}</span>
+      <HideToggle hidden={hidden} label={label} onToggle={onToggleHidden} />
+    </div>
+  );
+}
+
+function HideToggle({
+  hidden,
+  label,
+  onToggle,
+}: {
+  hidden: boolean;
+  label: string;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={hidden}
+      aria-label={hidden ? `Mostrar ${label}` : `Ocultar ${label}`}
+      title={hidden ? "Mostrar" : "Ocultar"}
+      className="ml-auto flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+    >
+      {hidden ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+    </button>
+  );
+}
+
+function HiddenSection({
+  items,
+  activeHref,
+  onNavigate,
+}: {
+  items: NavItem[];
+  activeHref?: string;
+  onNavigate?: () => void;
+}) {
+  const containsActive = items.some((item) => item.href === activeHref);
+  const [open, setOpen] = useState(containsActive);
+  return (
+    <Collapsible
+      open={open || containsActive}
+      onOpenChange={setOpen}
+      className="group/section flex flex-col gap-px"
+    >
+      <CollapsibleTrigger className={sectionLabelClass}>
+        Ocultos
+        <ChevronRight
+          aria-hidden
+          className="size-3 transition-transform group-data-[state=open]/section:rotate-90"
+        />
+        <span className="ml-auto font-normal normal-case tabular-nums">
+          {items.length}
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="flex flex-col gap-px overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+        {items.map((item) => (
+          <NavRow
+            key={item.href}
+            href={item.href}
+            label={item.title}
+            icon={item.icon}
+            active={activeHref === item.href}
+            onNavigate={onNavigate}
+          />
+        ))}
       </CollapsibleContent>
     </Collapsible>
+  );
+}
+
+/** A navigation row; hovering shows a star to favorite or unfavorite it. */
+function NavRow({
+  href,
+  label,
+  icon: Icon,
+  marker,
+  active,
+  favorite,
+  count,
+  onNavigate,
+}: {
+  href: string;
+  label: string;
+  icon?: LucideIcon;
+  marker?: React.ReactNode;
+  active: boolean;
+  favorite?: boolean;
+  count?: number;
+  onNavigate?: () => void;
+}) {
+  return (
+    <div className="group/row relative">
+      <Link
+        href={href}
+        onClick={onNavigate}
+        aria-current={active ? "page" : undefined}
+        className={cn(rowClass, "pr-8", active && activeRowClass)}
+      >
+        {marker ??
+          (Icon && (
+            <Icon
+              aria-hidden
+              className={cn(
+                "size-4 shrink-0 text-muted-foreground",
+                active && "text-sidebar-primary",
+              )}
+            />
+          ))}
+        <span className="truncate">{label}</span>
+        {count !== undefined && (
+          <span className="ml-auto text-[11px] text-muted-foreground tabular-nums group-hover/row:invisible">
+            {count}
+          </span>
+        )}
+      </Link>
+      <button
+        type="button"
+        onClick={() => sidebarActions.toggleFavorite({ href, label })}
+        aria-pressed={favorite}
+        aria-label={
+          favorite ? `Remover ${label} dos favoritos` : `Favoritar ${label}`
+        }
+        title={favorite ? "Remover dos favoritos" : "Favoritar"}
+        className={cn(
+          "absolute top-1/2 right-1 flex size-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground opacity-0 outline-none group-hover/row:opacity-100 hover:text-sidebar-primary focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-sidebar-ring pointer-coarse:hidden",
+        )}
+      >
+        <Star
+          className={cn(
+            "size-3.5",
+            favorite && "fill-current text-sidebar-primary",
+          )}
+        />
+      </button>
+    </div>
+  );
+}
+
+/** Compact mode: one icon per page, a tooltip for the name. */
+function Rail({
+  favorites,
+  entries,
+  activeHref,
+  onNavigate,
+}: {
+  favorites: Favorite[];
+  entries: ArrangedEntry[];
+  activeHref?: string;
+  onNavigate?: () => void;
+}) {
+  const favoriteItems = favorites
+    .map((favorite) => ({ favorite, item: navByHref.get(favorite.href) }))
+    .filter(({ item }) => item);
+  const claimed = favoriteItems.some(({ item }) => item!.href === activeHref);
+  return (
+    <nav className="flex flex-1 flex-col gap-3" aria-label="Principal">
+      {favoriteItems.length > 0 && (
+        <div className="flex flex-col gap-px border-b border-sidebar-border pb-3">
+          {favoriteItems.map(({ item }) => (
+            <RailLink
+              key={item!.href}
+              item={item!}
+              active={item!.href === activeHref}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+      )}
+      {entries.map((entry) => {
+        const items = (
+          entry.type === "group" ? entry.items : [entry.item]
+        ).filter((item) => !item.soon);
+        if (items.length === 0) return null;
+        return (
+          <div key={entry.key} className="flex flex-col gap-px">
+            {items.map((item) => (
+              <RailLink
+                key={item.href}
+                item={item}
+                active={!claimed && item.href === activeHref}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
+        );
+      })}
+      <div className="mt-auto flex flex-col gap-px">
+        {secondaryNavigation.map((item) => (
+          <RailLink
+            key={item.href}
+            item={item}
+            active={item.href === activeHref}
+            onNavigate={onNavigate}
+          />
+        ))}
+      </div>
+    </nav>
   );
 }
 
@@ -300,7 +751,6 @@ function RailLink({
   onNavigate?: () => void;
 }) {
   const Icon = item.icon;
-
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -309,14 +759,17 @@ function RailLink({
           onClick={onNavigate}
           aria-current={active ? "page" : undefined}
           className={cn(
-            itemClass,
+            rowClass,
             "justify-center px-0",
-            active && "bg-sidebar-accent text-sidebar-accent-foreground",
+            active && activeRowClass,
           )}
         >
           <Icon
-            className={cn("size-4 shrink-0", active && "text-sidebar-primary")}
             aria-hidden
+            className={cn(
+              "size-4 shrink-0 text-muted-foreground",
+              active && "text-sidebar-primary",
+            )}
           />
           <span className="sr-only">{item.title}</span>
         </Link>
