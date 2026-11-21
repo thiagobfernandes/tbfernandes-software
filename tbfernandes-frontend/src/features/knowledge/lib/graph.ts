@@ -60,6 +60,8 @@ export type GraphNode = {
   label: string;
   /** Where "Abrir" and double-click go. */
   href: string;
+  /** Set only on the stand-in node of a collapsed cluster. */
+  cluster?: { index: number; size: number };
 };
 
 /** `link` is a stored relation, `wiki` a `[[…]]` mention, `tag` a shared tag. */
