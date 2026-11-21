@@ -50,7 +50,7 @@ Versão 1 · 2026-11-21. Complementa [referencias.md](referencias.md): a paleta 
 
 ### Chaves de preferência
 
-`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings`. "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
+`tbf:sidebar` (modo, largura, grupos, ordem, favoritos, ocultos) · `tbf:panel:<id>` (largura, recolhido) · `tbf:notes:view` · `tbf:tasks:view` · `tbf:graph:settings` · `tbf:routines:view` (visão, filtros de projeto e meta, janela da análise) · `tbf:panel:routines:detail`. "Restaurar layout" apaga as chaves da tela atual; `Ctrl .` restaura a sidebar.
 
 ### Atalhos
 
@@ -87,3 +87,23 @@ Hoje: **d3-force** (simulação) + **SVG** desenhado pelo React, com a simulaç�
 | D3 completo | — | Já usamos o módulo que importa (`d3-force`) | — |
 
 Um workspace pessoal tem dezenas a poucas centenas de registros, bem dentro do que o SVG renderiza. A mudança é de **arquitetura**: separar modelo (`graph.ts`), transformações por modo (`graph-views.ts`: global, local, projeto, assunto, clusters, caminho), algoritmos (`graph-algorithms.ts`: comunidades por propagação de rótulos, menor caminho, grau), layout (`force-layout.ts` com forças vindas das configurações, pré-aquecimento em Web Worker acima de 300 nós), seleção/filtros/configurações (`use-graph-explorer.ts`) e renderização (`graph-canvas.tsx`).
+
+## 6. Rotinas: execução, cadastro e consistência
+
+Seis visões na mesma tela (`features/routines/components/routines-page.tsx`), alternadas na toolbar e guardadas em `tbf:routines:view`:
+
+| Visão | Para quê |
+|---|---|
+| Hoje | Execução do dia: marcar, cronômetro, tempo contra a meta, sequência. Setas navegam por dia (também para a frente, só leitura) |
+| Semana | Matriz rotinas × dias com marcação direta, total por rotina e por dia |
+| Mês | Calendário com feitas/planejadas por dia; clicar no dia abre a visão Hoje nele |
+| Todas | Cadastro: agenda, vínculos, consistência em 30 dias, sequência; editar, pausar e excluir no menu da linha |
+| Histórico | Contribution graph de 26 semanas (todas as rotinas e uma faixa por rotina) |
+| Análise | Consistência em 30 ou 90 dias por rotina e por dia da semana, sequência atual e melhor, tempo médio por dia feito contra a meta |
+
+Os números saem só de rotinas, marcações e apontamentos (`lib/routine-stats.ts`). Regras:
+
+- **Descanso não é falha.** Só conta um dia em que a rotina estava planejada (dia da semana escolhido, a partir do início). Dias fora da agenda ficam neutros; marcação fora da agenda aparece em dourado claro e não entra na taxa.
+- **Hoje só conta quando feito.** O dia ainda não acabou, então uma rotina não marcada hoje não baixa a taxa nem quebra a sequência.
+- **Rotina pausada** não guarda a data da pausa: a agenda dela termina na última marcação, e os dias seguintes não contam contra ela.
+- Os indicadores são uma linha discreta sob a toolbar, não cartões. O detalhe de qualquer rotina abre no painel lateral (redimensionável; folha no celular) com taxa de 30 dias, sequências, heatmap de 16 semanas e vínculos.
