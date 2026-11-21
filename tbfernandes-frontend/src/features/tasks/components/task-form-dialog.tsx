@@ -48,6 +48,8 @@ type TaskFormDialogProps = {
   defaultProjectId?: string;
   defaultGoalId?: string;
   defaultStatus?: TaskStatus;
+  /** Prefills the due date of a new task (e.g. "today" lists). */
+  defaultDueDate?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
@@ -58,6 +60,7 @@ export function TaskFormDialog({
   defaultProjectId,
   defaultGoalId,
   defaultStatus = "todo",
+  defaultDueDate,
   open: controlledOpen,
   onOpenChange,
 }: TaskFormDialogProps) {
@@ -77,7 +80,7 @@ export function TaskFormDialog({
     priority: task?.priority ?? "normal",
     tag: task?.tag ?? "",
     startDate: task?.startDate ?? "",
-    dueDate: task?.dueDate ?? "",
+    dueDate: task?.dueDate ?? defaultDueDate ?? "",
   };
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
