@@ -261,6 +261,16 @@ export const projectionQuerySchema = Joi.object<PeriodQuery>({
   months: Joi.number().integer().min(1).max(36).default(13),
 });
 
+export interface ExpensesQuery {
+  month: string | null;
+  scope: EntryScope | null;
+}
+
+export const expensesQuerySchema = Joi.object<ExpensesQuery>({
+  month: RequestFields.yearMonth().default(null),
+  scope: RequestFields.optionalEnumOf(ENTRY_SCOPES),
+});
+
 export const reportQuerySchema = Joi.object<MonthQuery>({
   month: RequestFields.yearMonth().default(null),
 });

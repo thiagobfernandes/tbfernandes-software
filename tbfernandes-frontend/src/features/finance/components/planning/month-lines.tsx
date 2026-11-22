@@ -16,6 +16,7 @@ import type {
 import { formatShort } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
+import { LineDelete } from "./line-delete";
 import { PaymentDialog, undoPayment } from "./planning-dialogs";
 import { CertaintyBadge } from "./planning-ui";
 
@@ -66,7 +67,9 @@ export function MonthLines({
                 <LineRow
                   key={line.key}
                   line={line}
+                  month={projection.month}
                   closed={closed}
+                  onChanged={onChanged}
                   onPay={() => setPaying(line)}
                   onUndo={() => undoPayment(line, projection.month, onChanged)}
                 />
@@ -87,12 +90,16 @@ export function MonthLines({
 
 function LineRow({
   line,
+  month,
   closed,
+  onChanged,
   onPay,
   onUndo,
 }: {
   line: ProjectionLine;
+  month: string;
   closed: boolean;
+  onChanged: () => Promise<void> | void;
   onPay: () => void;
   onUndo: () => void;
 }) {
@@ -151,6 +158,14 @@ function LineRow({
           {formatMoney(line.amount)}
         </span>
         <PaidAction line={line} closed={closed} onPay={onPay} onUndo={onUndo} />
+        {line.direction === "expense" && (
+          <LineDelete
+            line={{ ...line, hasStatement: line.payable }}
+            month={month}
+            closed={closed}
+            onDone={onChanged}
+          />
+        )}
       </div>
       {(line.note || (paid && line.paid !== line.planned)) && (
         <p className="pl-5 text-xs text-muted-foreground">

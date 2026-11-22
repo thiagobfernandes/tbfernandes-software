@@ -252,6 +252,7 @@ Valores em reais no JSON; enums em minúsculas. Regras e detalhes em [etapa 12](
 |---|---|
 | `GET /finance/planning/projection?from=AAAA-MM&months=13` | Projeção mês a mês |
 | `GET /finance/planning/overview?month=` | Visão geral do mês, metas e próximo vencimento |
+| `GET /finance/planning/expenses?month=&scope=` | Gastos do mês: itens do plano e lançamentos, com situação, totais (total, plano, realizado, previsto, pago, a pagar, cartões, recorrentes, lançamentos) e conciliação com a projeção |
 | `GET /finance/planning/report?month=` | Relatório do mês (guarda o plano do mês na primeira vez que ele é aberto) |
 | `POST /finance/planning/simulate` | `{from, months, operations[]}` → `{base, simulated}`; não grava |
 | `POST /finance/planning/scenario/apply` | `{operations[]}` → 204; aplica e grava |

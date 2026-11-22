@@ -4,6 +4,7 @@ import type {
   Commitment,
   CommitmentCategory,
   CreditCard,
+  ExpenseBreakdown,
   FundKind,
   MonthProjection,
   MonthReport,
@@ -70,6 +71,10 @@ export const planningApi = {
   overview: (month?: string) =>
     apiFetch<PlanOverview>(
       `${PLANNING}/overview${month ? `?month=${month}` : ""}`,
+    ),
+  expenses: (month: string, scope: EntryScope | null) =>
+    apiFetch<ExpenseBreakdown>(
+      `${PLANNING}/expenses?month=${month}${scope ? `&scope=${scope}` : ""}`,
     ),
   report: (month: string) =>
     apiFetch<MonthReport>(`${PLANNING}/report?month=${month}`),

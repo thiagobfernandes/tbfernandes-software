@@ -1,6 +1,8 @@
 import type {
   Certainty,
   CommitmentCategory,
+  ExpenseItem,
+  ExpenseStatus,
   FundKind,
   LineGroup,
   Risk,
@@ -59,6 +61,21 @@ export const groupLabels: Record<LineGroup, string> = {
   fixed: "Contas fixas",
   subscription: "Assinaturas",
   extra: "Gastos extras",
+};
+
+export const expenseStatusLabels: Record<ExpenseStatus, string> = {
+  forecast: "Previsto",
+  pending: "A pagar",
+  paid: "Pago",
+  realized: "Realizado",
+  cancelled: "Cancelado",
+};
+
+export const expenseSourceLabels: Record<ExpenseItem["source"], string> = {
+  commitment: "Compromisso",
+  card: "Fatura do cartão",
+  purchase: "Compra parcelada",
+  entry: "Lançamento",
 };
 
 export const groupOrder: LineGroup[] = [

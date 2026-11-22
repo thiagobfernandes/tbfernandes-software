@@ -4,6 +4,7 @@ import {
   Cents,
   Commitment,
   CommitmentDetails,
+  ExpenseBreakdown,
   CreditCard,
   FundDetails,
   GoalStatus,
@@ -305,6 +306,32 @@ export const PlanningResponseMapper = {
       nextDue:
         overview.nextDue && PlanningResponseMapper.line(overview.nextDue),
       pendingReserves: reais(overview.pendingReserves),
+    };
+  },
+
+  expenses(breakdown: ExpenseBreakdown) {
+    return {
+      month: breakdown.month,
+      scope: lower(breakdown.scope),
+      items: breakdown.items.map((item) => ({
+        ...item,
+        source: lower(item.source),
+        group: lower(item.group),
+        category:
+          item.source === 'ENTRY' ? item.category : lower(item.category),
+        scope: lower(item.scope),
+        status: lower(item.status),
+        certainty: lower(item.certainty),
+        amount: reais(item.amount),
+        planned: reais(item.planned),
+        items: item.items.map((part) => ({
+          ...part,
+          kind: lower(part.kind),
+          amount: reais(part.amount),
+        })),
+      })),
+      totals: mapCents(breakdown.totals),
+      reconciliation: mapCents(breakdown.reconciliation),
     };
   },
 

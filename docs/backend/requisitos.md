@@ -291,6 +291,7 @@ Detalhes em [etapa 12](implementacao/etapa-12-planejamento-financeiro.md).
 | RF-PLN-05 | Visão geral do mês: receber, pagar, sobrar, guardado, falta para a meta, saldo da conta, dívidas e próximo vencimento. | M |
 | RF-PLN-06 | Relatório do mês: aumentos, reduções, parcelas que terminaram, risco e planejado × realizado. | S |
 | RF-PLN-07 | Simulador que não grava até confirmar. | M |
+| RF-PLN-08 | Gastos do mês numa visão só: faturas, parcelas, empréstimos, assinaturas, contas fixas e lançamentos, com situação (previsto, a pagar, pago, realizado, cancelado), filtro pessoal/empresa, busca e exclusão de cada item. | M |
 
 | Regra | Descrição |
 |---|---|
@@ -303,3 +304,5 @@ Detalhes em [etapa 12](implementacao/etapa-12-planejamento-financeiro.md).
 | RN-PLN-07 | Reimportar um CSV não duplica transações; compras iguais legítimas continuam separadas. |
 | RN-PLN-08 | Reserva não é saldo de conta; dinheiro a receber não está disponível. |
 | RN-PLN-09 | Simulação nunca grava; confirmar aplica as mesmas operações. |
+| RN-PLN-10 | O total das contas do plano em Gastos é o mesmo de Próximos meses para o mesmo mês; lançamentos fora do plano aparecem somados à parte. |
+| RN-PLN-11 | Transferências e pagamentos de fatura lançados no fluxo de caixa não contam como gasto: a fatura já está no plano. |

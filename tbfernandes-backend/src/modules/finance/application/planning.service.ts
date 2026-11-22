@@ -5,6 +5,10 @@ import {
   applyScenario,
   CommitmentRepository,
   CreditCardRepository,
+  EntryScope,
+  ExpenseBreakdown,
+  expenseBreakdown,
+  FinanceEntryRepository,
   goalStatus,
   GoalStatus,
   MonthProjection,
@@ -38,6 +42,7 @@ export class PlanningService {
     private readonly cards: CreditCardRepository,
     private readonly funds: ReserveFundRepository,
     private readonly snapshots: MonthSnapshotRepository,
+    private readonly entries: FinanceEntryRepository,
     private readonly ids: IdGenerator,
     private readonly clock: Clock,
     private readonly uow: UnitOfWork,
@@ -48,6 +53,28 @@ export class PlanningService {
     months: number,
   ): Promise<MonthProjection[]> {
     return projectPlan(await this.plan.state(), from, lastMonth(from, months));
+  }
+
+  /** Every expense of a month, plan and entries, with status and no double counting (RF-PLN-10). */
+  async expenses(
+    month: YearMonth,
+    scope: EntryScope | null,
+  ): Promise<ExpenseBreakdown> {
+    const state = await this.plan.state();
+    const [projection] = projectPlan(state, month, month);
+    const entries = await this.entries.findAll(this.plan.ownerId(), {
+      from: YearMonths.firstDay(month),
+      to: YearMonths.lastDay(month),
+      scope: null,
+    });
+    return expenseBreakdown({
+      month,
+      scope,
+      projection,
+      commitments: state.commitments,
+      cards: state.cards,
+      entries,
+    });
   }
 
   /** Runs the operations on a copy of the plan; nothing is saved (RN-PLN-09). */
