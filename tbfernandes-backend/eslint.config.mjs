@@ -53,7 +53,7 @@ export default tseslint.config(
   },
   {
     // describe/it blocks are long by nature.
-    files: ['test/**/*.ts', 'src/**/*.spec.ts'],
+    files: ['test/**/*.ts', 'src/**/*.spec.ts', 'src/**/testing/**/*.ts'],
     rules: {
       'max-lines-per-function': 'off',
       'max-nested-callbacks': 'off',

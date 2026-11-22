@@ -6,3 +6,5 @@ export * from './entry/finance-entry.repository';
 export * from './money';
 export * from './purchase/purchase-goal';
 export * from './purchase/purchase-goal.repository';
+export * from './errors';
+export * from './planning';

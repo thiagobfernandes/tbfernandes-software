@@ -29,7 +29,7 @@ O Next.js desta versão tem mudanças em relação ao que você conhece: o bloco
 
 - Textos de interface em **pt-BR**; identificadores em inglês. Datas e dinheiro com `Intl` em `pt-BR` (`lib/dates.ts`, `lib/money.ts`).
 - Server Components por padrão; `"use client"` só onde há interação ou uso do store.
-- Telas leem dados com `useAppData()` e gravam com `dataActions`/`workActions`. Não chame `apiFetch` direto de um componente: o store cuida do modo local e do modo API. As exceções são `features/finance/lib/connections-api.ts` (conexões bancárias só existem no servidor) e `features/prospecting/lib/worker-api.ts` (se o worker de envio está conectado, guardado só na memória da API).
+- Telas leem dados com `useAppData()` e gravam com `dataActions`/`workActions`. Não chame `apiFetch` direto de um componente: o store cuida do modo local e do modo API. As exceções são `features/finance/lib/connections-api.ts` (conexões bancárias só existem no servidor), `features/finance/lib/planning-api.ts` (planejamento financeiro: projeção, CSV e simulador usam as regras do backend) e `features/prospecting/lib/worker-api.ts` (se o worker de envio está conectado, guardado só na memória da API).
 - Ids novos: `uuidv7()` de `lib/api/uuid.ts` (a API aceita via `X-Client-Id`, ADR-007).
 - Formulários: schema Zod em `features/<f>/schemas/`, mensagens de validação em pt-BR; formulários simples usam `EntityFormDialog` com configuração de campos.
 - Cores só por tokens (`bg-card`, `text-muted-foreground`, `text-success`…). Nada de hex solto em componente.

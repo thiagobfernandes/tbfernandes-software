@@ -362,3 +362,7 @@ Chave primária `(owner_id, source_kind, source_id, position)`. Detalhes em [eta
 ## Notificações
 
 `V21__notifications.sql` cria `notifications.notification`: `id`, `owner_id`, `kind`, `title`, `body`, `href`, `dedupe_key`, `read_at` e auditoria (`created_at`, `updated_at`, `version`). A chave única `(owner_id, dedupe_key)` evita repetir o mesmo aviso. Não há FK entre schemas.
+
+## Planejamento financeiro (V22)
+
+Schema `finance`. Agregados com auditoria: `planning_settings` (um por dono; `closed_through` fecha meses), `commitment`, `credit_card`, `reserve_fund`, `month_snapshot` (`lines` jsonb em centavos). Filhos sem auditoria, regravados com o agregado: `commitment_change` (valor a partir de um mês), `commitment_month` (valor de um mês), `commitment_payment`, `card_statement` (competência = mês do vencimento), `card_transaction` (índice único de deduplicação em cartão, competência, data, título normalizado, valor e ocorrência), `card_purchase`, `reserve_movement`. Referências entre agregados (`commitment.card_id`, `card_transaction.commitment_id`, `reserve_fund.purchase_id`) são ids sem FK.

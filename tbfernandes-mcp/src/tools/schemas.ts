@@ -36,3 +36,7 @@ export const goalArea = z.enum([
 ]);
 export const goalStatus = z.enum(['planned', 'active', 'paused', 'completed']);
 export const goalPriority = z.enum(['low', 'normal', 'high']);
+
+export const yearMonth = z.string().regex(/^\d{4}-\d{2}$/, 'use AAAA-MM');
+export const entryKind = z.enum(['income', 'expense']);
+export const entryScope = z.enum(['personal', 'business']);

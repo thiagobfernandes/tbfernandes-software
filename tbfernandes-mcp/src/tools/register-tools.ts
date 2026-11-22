@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import type { ToolContext } from './define-tool.ts';
+import { financeTools } from './finance.tools.ts';
 import { goalTools } from './goal.tools.ts';
 import { materialTools } from './material.tools.ts';
 import { milestoneTools } from './milestone.tools.ts';
@@ -15,6 +16,7 @@ const TOOL_GROUPS = [
   materialTools,
   goalTools,
   milestoneTools,
+  financeTools,
 ];
 
 export function registerTools(server: McpServer, context: ToolContext): void {
