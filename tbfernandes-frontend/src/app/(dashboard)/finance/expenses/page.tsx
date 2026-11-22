@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ExpensesPage } from "@/features/finance/components/expenses-page";
+import { ExpensesPage } from "@/features/finance/components/expenses/expenses-page";
 
 export const metadata: Metadata = { title: "Gastos" };
 

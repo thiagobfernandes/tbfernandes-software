@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useState } from "react";
 
 import { PageContainer } from "@/components/layout/page-container";
@@ -117,7 +118,13 @@ function ProjectionTable({ months }: { months: MonthProjection[] }) {
                   key={month.month}
                   className="px-2 py-2 text-right font-medium"
                 >
-                  {formatMonthShort(month.month)}
+                  <Link
+                    href={`/finance/expenses?month=${month.month}`}
+                    title={`Ver os gastos de ${formatMonthShort(month.month)}`}
+                    className="rounded underline-offset-4 hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  >
+                    {formatMonthShort(month.month)}
+                  </Link>
                 </th>
               ))}
             </tr>

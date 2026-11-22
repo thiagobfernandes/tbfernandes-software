@@ -294,3 +294,49 @@ export type Simulation = {
   base: MonthProjection[];
   simulated: MonthProjection[];
 };
+
+/** Where an expense of the month stands; see RF-PLN-10. */
+export type ExpenseStatus =
+  "forecast" | "pending" | "paid" | "realized" | "cancelled";
+
+export type ExpenseItem = {
+  key: string;
+  source: "commitment" | "card" | "purchase" | "entry";
+  sourceId: string;
+  name: string;
+  /** The plan's group, or "manual" for entries (their category is in `category`). */
+  group: LineGroup | "manual";
+  category: string | null;
+  scope: EntryScope;
+  competence: string;
+  dueDate: string | null;
+  amount: number;
+  planned: number;
+  status: ExpenseStatus;
+  certainty: Certainty;
+  counted: boolean;
+  excludedReason: string | null;
+  installment: { number: number; total: number | null } | null;
+  cardId: string | null;
+  recurring: boolean;
+  payable: boolean;
+  items: ProjectionLine["items"];
+};
+
+export type ExpenseBreakdown = {
+  month: string;
+  scope: EntryScope | null;
+  items: ExpenseItem[];
+  totals: {
+    total: number;
+    planned: number;
+    realized: number;
+    forecast: number;
+    paid: number;
+    pending: number;
+    cards: number;
+    recurring: number;
+    entries: number;
+  };
+  reconciliation: { projection: number; excludedEntries: number };
+};

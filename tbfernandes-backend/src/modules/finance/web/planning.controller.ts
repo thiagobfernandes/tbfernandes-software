@@ -5,6 +5,7 @@ import { Clock } from '../../../common/application';
 import { YearMonths } from '../../../common/domain';
 import { PlanningService } from '../application/planning.service';
 import {
+  expensesQuerySchema,
   monthSchema,
   PlanningRequestMapper as Request,
   PlanningResponseMapper as Response,
@@ -12,6 +13,7 @@ import {
   reportQuerySchema,
   scenarioSchema,
   settingsSchema,
+  type ExpensesQuery,
   type MonthQuery,
   type PeriodQuery,
   type ValidScenarioRequest,
@@ -56,6 +58,14 @@ export class PlanningController {
     @ValidatedBody(scenarioSchema) body: ValidScenarioRequest,
   ): Promise<void> {
     await this.planning.applyScenario(Request.operations(body.operations));
+  }
+
+  /** Every expense of the month: plan lines and entries, with status (RF-PLN-10). */
+  @Get('expenses')
+  async expenses(@ValidatedQuery(expensesQuerySchema) query: ExpensesQuery) {
+    return Response.expenses(
+      await this.planning.expenses(this.from(query.month), query.scope),
+    );
   }
 
   @Get('overview')

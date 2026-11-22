@@ -233,6 +233,35 @@ describe('Financial planning API', () => {
     expect(decreased.map((item) => item.name)).toContain('Nubank PF');
   });
 
+  it('lists the expenses of a month with the same total as the projection', async () => {
+    const expenses = async (query: string) => {
+      const response = await http().get(
+        `/api/v1/finance/planning/expenses?month=2037-01${query}`,
+      );
+      expect(response.status).toBe(200);
+      return response.body as {
+        items: { status: string; scope: string }[];
+        totals: { planned: number; total: number };
+        reconciliation: { projection: number };
+      };
+    };
+    const [month] = await projection('2037-01', 1);
+    const all = await expenses('');
+    expect(all.items.length).toBeGreaterThan(0);
+    expect(all.totals.planned).toBe(month.expenses.total);
+    expect(all.reconciliation.projection).toBe(month.expenses.total);
+    const personal = await expenses('&scope=personal');
+    const business = await expenses('&scope=business');
+    expect(personal.totals.planned + business.totals.planned).toBeCloseTo(
+      all.totals.planned,
+      2,
+    );
+    const invalid = await http().get(
+      '/api/v1/finance/planning/expenses?scope=nope',
+    );
+    expect(invalid.status).toBe(400);
+  });
+
   it('closes months and refuses changes to them', async () => {
     const closed = await http()
       .post('/api/v1/finance/planning/months/close')
